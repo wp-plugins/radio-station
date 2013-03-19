@@ -128,7 +128,10 @@ function master_schedule() {
 	$output .= '<table id="master-program-schedule">';
 	$output .= '<tr> <th></th> <th>Sun</th> <th>Mon</th> <th>Tue</th> <th>Wed</th> <th>Thu</th> <th>Fri</th> <th>Sat</th> </tr>';
 	
-	$nextskip = array();
+	if(!isset($nextskip)) {
+		$nextskip = array();
+	}
+	
 	foreach($master_list as $hour => $days) {
 		$output .= '<tr>';
 		$output .= '<th>';
@@ -154,35 +157,42 @@ function master_schedule() {
 			//overly complex way of determining if we need to accomodate a rowspan due to a show spanning multiple hours
 			$continue = 0;
 			foreach($curskip as $x => $skip) {
+				
 				if($skip['day'] == $day) {
 					if($skip['span'] > 1 ) {
 						$continue = 1;
 						$skip['span'] = $skip['span']-1;
-						$curskip[$x] = $skip;
+						$curskip[$x]['span'] = $skip['span'];
 						$nextskip = $curskip;
 					}
 				}	
 			}
 			
-			//if we need to accomodate a rowspan, skip this itteration so we don't end up with an extra table cell.
-			if($continue) {
-				continue;
-			}
-			
 			$rowspan = 0;
 			foreach($min as $shift) {
-				$rowspan = $rowspan + ($shift['time']['end_hour'] - $shift['time']['start_hour']);
+				
+				if($shift['time']['end_hour'] == 0) { //fix shows that end at midnight, otherwise you could end up with a negative row span
+					$rowspan = $rowspan + (24 - $shift['time']['start_hour']);
+				}
+				else {
+					$rowspan = $rowspan + ($shift['time']['end_hour'] - $shift['time']['start_hour']);
+				}
 			}
 			
 			$span = '';
 			if($rowspan > 1) {
 				$span = ' rowspan="'.$rowspan.'"';
-				$nextskip[] = array('day' => $day, 'span' => $rowspan);
+				//add to both arrays
+				$curskip[] = array('day' => $day, 'span' => $rowspan, 'show' => get_the_title($shift['id']));
+				$nextskip[] = array('day' => $day, 'span' => $rowspan, 'show' => get_the_title($shift['id']));
+			}
+			
+			//if we need to accomodate a rowspan, skip this iteration so we don't end up with an extra table cell.
+			if($continue) {
+				continue;
 			}
 			
 			$output .= '<td'.$span.'>';
-			//$output .= $day;
-			//$output .= '<pre>'.print_r($curskip, true).'</pre>';
 			
 			foreach($min as $shift) {
 				//print_r($shift);
@@ -215,10 +225,10 @@ function master_schedule() {
 				
 				$output .= '<span class="show-time">';
 				if(isset($shift['time']['real_start'])) {
-					$output .= $shift['time']['real_start'].' - '.$shift['time']['end_hour'].':'.$shift['time']['end_min'].$shift['time']['end_meridian'];
+					$output .= $day.'<br />'.$shift['time']['real_start'].' - '.$shift['time']['end_hour'].':'.$shift['time']['end_min'].$shift['time']['end_meridian'];
 				}
 				else {
-					$output .= $shift['time']['start_hour'].':'.$shift['time']['start_min'].$shift['time']['start_meridian'].' - '.$shift['time']['end_hour'].':'.$shift['time']['end_min'].$shift['time']['end_meridian'];
+					$output .= $day.'<br />'.$shift['time']['start_hour'].':'.$shift['time']['start_min'].$shift['time']['start_meridian'].' - '.$shift['time']['end_hour'].':'.$shift['time']['end_min'].$shift['time']['end_meridian'];
 				}
 				$output .= '</span>';
 				
@@ -235,6 +245,7 @@ function master_schedule() {
 			}
 			$output .= '</td>';
 		}
+		
 		$output .= '</tr>';
 	}
 	$output .= '</table>';

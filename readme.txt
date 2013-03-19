@@ -170,6 +170,9 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 * Fixed some minor compatibility issues with WordPress 3.5
 * Fixed Shows icon in Dashboard
 
+= 1.3.1 =
+* Fixed a major bug in the master schedule output
+
 == Upgrade Notice ==
 
 = 1.0 =
@@ -193,3 +196,6 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 = 1.3 =
 * Fixed some minor compatibility issues with WordPress 3.5
 * Fixed Shows icon in Dashboard
+
+= 1.3.1 =
+* Fixed a major bug in the master schedule output
