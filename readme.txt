@@ -205,3 +205,4 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 
 = 1.3.2 =
 * Fixed a bug in the DJ-on-air widget
+* Fixed show select list for show blog posts
