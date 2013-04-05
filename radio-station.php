@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Radio Station
- * @version 1.3.2
+ * @version 1.3
  */
 /*
 Plugin Name: Radio Station
 Plugin URI: http://nlb-creations.com/2013/02/25/wordpress-plugin-radio-station/ 
 Description: Adds playlist and on-air programming functionality to your site.
 Author: Nikki Blight <nblight@nlb-creations.com>
-Version: 1.3.2
+Version: 1.3
 Author URI: http://www.nlb-creations.com
 */
 
@@ -409,10 +409,10 @@ function station_inner_showblog_custom_box() {
 	wp_nonce_field( plugin_basename( __FILE__ ), 'dynamicMetaShowBlog_noncename' );
 
 	$args = array(
-			'numberposts'     => 0,
+			'numberposts'     => -1,
 			'offset'          => 0,
 			'orderby'         => 'post_title',
-			'order'           => 'aSC',
+			'order'           => 'ASC',
 			'post_type'       => 'show',
 			'post_status'     => 'publish'
 	);
