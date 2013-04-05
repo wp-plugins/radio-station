@@ -173,6 +173,9 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 = 1.3.1 =
 * Fixed a major bug in the master schedule output
 
+= 1.3.2 =
+* Fixed a bug in the DJ-on-air widget
+
 == Upgrade Notice ==
 
 = 1.0 =
@@ -199,3 +202,6 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 
 = 1.3.1 =
 * Fixed a major bug in the master schedule output
+
+= 1.3.2 =
+* Fixed a bug in the DJ-on-air widget

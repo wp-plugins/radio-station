@@ -15,7 +15,6 @@ function dj_show_widget($atts) {
 	
 	//find out which DJ(s) are currently scheduled to be on-air and display them
 	$djs = dj_get_current();
-	$scheds = get_post_meta($dj->ID, 'show_sched', true);
 	$playlist = myplaylist_get_now_playing();
 	
 	$dj_str = '';
@@ -29,7 +28,6 @@ function dj_show_widget($atts) {
 	//echo the show/dj currently on-air
 	if(count($djs['all']) > 0) {
 		foreach($djs['all'] as $dj) {
-			//print_r($dj);
 			$dj_str .= '<li class="on-air-dj">';
 			if($show_avatar) {
 				$dj_str .= '<span class="on-air-dj-avatar">'.get_the_post_thumbnail($dj->ID, 'thumbnail').'</span>';
@@ -46,6 +44,8 @@ function dj_show_widget($atts) {
 			}
 			
 			$dj_str .= '<span class="radio-clear"></span>';
+			
+			$scheds = get_post_meta($dj->ID, 'show_sched', true);
 			foreach($scheds as $sched) {
 				$dj_str .= '<span class="on-air-dj-sched">'.$sched['day'].'s, '.$sched['start_hour'].':'.$sched['start_min'].' '.$sched['start_meridian'].'-'.$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian'].'</span><br />';
 			}
