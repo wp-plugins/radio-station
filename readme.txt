@@ -116,7 +116,21 @@ containing the titles of and links to all shows marked as "Active".
 Since I'm stongly opposed to reinventing the wheel, I recommend Justin Tadlock's excellent "Members" plugin for that purpose.  You can find it on
 Wordpress.org, here: http://wordpress.org/extend/plugins/members/
 
-Just give your desired roles the capabilities labeled with 'shows' or 'playlists'.
+Add the following capabilities to any role you want to give access to Shows and Playlist:
+
+edit_shows
+edit_published_shows
+edit_others_shows
+read_shows
+edit_playlists
+edit_published_playlists
+read_playlists
+publish_playlists
+read
+upload_files
+edit_posts
+edit_published_posts
+publish_posts
 
 = How do I change the DJ's avatar in the sidebar widget? =
 
@@ -176,6 +190,9 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 = 1.3.2 =
 * Fixed a bug in the DJ-on-air widget
 
+= 1.3.3 =
+* Added the ability to assign any user with the edit_shows capability as a DJ, to accomodate custom and edited roles.
+
 == Upgrade Notice ==
 
 = 1.0 =
@@ -206,3 +223,6 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 = 1.3.2 =
 * Fixed a bug in the DJ-on-air widget
 * Fixed show select list for show blog posts
+
+= 1.3.3 =
+* Added the ability to assign any user with the edit_shows capability as a DJ, to accomodate custom and edited roles.

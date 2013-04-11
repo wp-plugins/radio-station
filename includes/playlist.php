@@ -581,19 +581,43 @@ add_action( 'add_meta_boxes', 'myplaylist_add_user_box' );
 //Prints the box for user assignement for the Show post type
 function myplaylist_inner_user_custom_box() {
 	global $post;
+	global $wp_roles;
+	
 	// Use nonce for verification
 	wp_nonce_field( plugin_basename( __FILE__ ), 'dynamicMetaUser_noncename' );
-
-
+	
+	//check for roles that have the edit_shows capability enabled
+	$add_roles = array('dj');
+	foreach($wp_roles->roles as $name => $role) {
+		foreach($role['capabilities'] as $capname => $capstatus) {
+			if($capname == "edit_shows" && $capstatus == 1) {
+				$add_roles[] = $name;
+			}
+		}
+	}
+	$add_roles = array_unique($add_roles);
+	
+	//create the meta query for get_users()
+	$meta_query = array('relation' => 'OR');
+	foreach($add_roles as $role) {
+		$meta_query[] = array(
+						'key' => 'wp_capabilities',
+						'value' => $role,
+						'compare' => 'like'
+				);
+	}
+	
+	//get all eligible users
 	$args = array(
-				'role' => 'dj',
-				'orderby' => 'display_name',
-				'order' => 'ASC',
-				'fields' => array('ID, display_name'), 
+			'meta_query' => $meta_query,
+			'orderby' => 'display_name',
+			'order' => 'ASC',
+			'fields' => array('ID, display_name'),
 	);
-
+	
 	$users = get_users($args);
 
+	//get the DJs currently assigned to the show
 	$current = get_post_meta($post->ID,'show_user_list',true);
 	if(!$current) {
 		$current = array();
@@ -610,7 +634,7 @@ function myplaylist_inner_user_custom_box() {
 	?>
     <div id="meta_inner">
     
-    <select name="show_user_list[]" multiple="multiple">
+    <select name="show_user_list[]" multiple="multiple" style="height: 150px;">
     <?php
     	foreach($users as $dj) {
     		$selected = '';
