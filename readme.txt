@@ -29,6 +29,8 @@ all show can also be generated.
 
 Use the shortcode `[master-schedule]` on any page.  This will generate a table containing your show details.
 
+If you wish to use 24-hour time format, user `[master-schedule time="24"]`.
+
 = How do I get the last song played to show up? = 
 
 You'll find a widget for just that purpose under the Widgets tab.  You can also use the shortcode `[now-playing]` in your page/post, or use `do_shortcode('[now-playing]');` in your template files.
@@ -54,9 +56,10 @@ The following attributes are available for the shortcode:
 		'show_avatar' => Display a show's thumbnail.  Valid values are 0 for hide avatar, 1 for show avatar.  Default is 0.
 		'show_link' => Display a link to a show's page.  Valid values are 0 for hide link, 1 for show link.  Default is 0.
 		'default_name' => The text you would like to display when no show is schedule for the current time.
+		'time' => The time format used for displaying schedules.  Valid values are 12 and 24.  Default is 12.
 		
 Example:
-`[dj-widget title="Now On-Air" show_avatar="1" show_link="1" default_name="RadioBot"]`
+`[dj-widget title="Now On-Air" show_avatar="1" show_link="1" default_name="RadioBot" time="12"]`
 
 
 = Can I display upcoming shows, too? =
@@ -68,10 +71,11 @@ The following attributes are available for the shortcode:
 		'title' => The title you would like to appear over the on-air block 
 		'show_avatar' => Display a show's thumbnail.  Valid values are 0 for hide avatar, 1 for show avatar.  Default is 0.
 		'show_link' => Display a link to a show's page.  Valid values are 0 for hide link, 1 for show link.  Default is 0.
-		'limit' => The number of upcoming shows to display.  Default is 1
+		'limit' => The number of upcoming shows to display.  Default is 1.
+		'time' => The time format used for displaying schedules.  Valid values are 12 and 24.  Default is 12.
 		
 Example:
-`[dj-widget title="Coming Up On-Air" show_avatar="1" show_link="1" limit="3"]`
+`[dj-widget title="Coming Up On-Air" show_avatar="1" show_link="1" limit="3" time="12"]`
 
 = Can I change how show pages are laid out/displayed? =
 
@@ -193,6 +197,9 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 = 1.3.3 =
 * Added the ability to assign any user with the edit_shows capability as a DJ, to accomodate custom and edited roles.
 
+= 1.3.4 =
+* By request, added as 24-hour time format option to the master schedule and sidebar widgets.
+
 == Upgrade Notice ==
 
 = 1.0 =
@@ -226,3 +233,6 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 
 = 1.3.3 =
 * Added the ability to assign any user with the edit_shows capability as a DJ, to accomodate custom and edited roles.
+
+= 1.3.4 =
+* By request, added as 24-hour time format option to the master schedule and sidebar widgets.
