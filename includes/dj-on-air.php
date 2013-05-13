@@ -364,7 +364,7 @@ class DJ_Widget extends WP_Widget {
 		$djavatar = $instance['djavatar'];
 		$link = $instance['link'];
  		$default = empty($instance['default']) ? '' : $instance['default'];
- 		$default = empty($instance['time']) ? '' : $instance['time'];
+ 		$time = empty($instance['time']) ? '' : $instance['time'];
 		
  		//fetch the current DJs
 		$djs = dj_get_current();

@@ -25,11 +25,14 @@ all show can also be generated.
 
 == Frequently Asked Questions ==
 
+= I'm seeing 404 Not Found errors when I click on the link for a show! = 
+Try re-saving your site's permalink settings.  Wordpress sometimes gets confused with a custom post type is added.
+
 = How do I display a full schedule of my station's shows? =
 
 Use the shortcode `[master-schedule]` on any page.  This will generate a table containing your show details.
 
-If you wish to use 24-hour time format, user `[master-schedule time="24"]`.
+If you wish to display the schedule in 24-hour time format, user `[master-schedule time="24"]`.
 
 = How do I get the last song played to show up? = 
 
@@ -200,6 +203,10 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 = 1.3.4 =
 * By request, added as 24-hour time format option to the master schedule and sidebar widgets.
 
+= 1.3.5 =
+* Fixed a time display bug in the DJ On-Air sidebar widget
+* Fixed a display bug on the master schedule with overnight shows
+
 == Upgrade Notice ==
 
 = 1.0 =
@@ -236,3 +243,7 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 
 = 1.3.4 =
 * By request, added as 24-hour time format option to the master schedule and sidebar widgets.
+
+= 1.3.5 =
+* Fixed a time display bug in the DJ On-Air sidebar widget
+* Fixed a display bug on the master schedule with overnight shows 
