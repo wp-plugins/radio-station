@@ -88,6 +88,7 @@ function dj_get_current() {
 	$min = date('i', strtotime(current_time("mysql")));
 	$curDay = date('l', strtotime(current_time("mysql")));
 	$curDate = date('Y-m-d', strtotime(current_time("mysql")));
+	$tomDate = date('Y-m-d', ( strtotime(current_time("mysql")) + 36400)); //get the date for tomorrow
 	$now = strtotime(current_time("mysql"));
 	
 	//first check to see if a show is scheduled
@@ -125,7 +126,13 @@ function dj_get_current() {
 				
 				//get a timestamp for the schedule start and end
 				$start_time = strtotime($curDate.' '.$time['start_hour'].':'.$time['start_min']);
-				$end_time = strtotime($curDate.' '.$time['end_hour'].':'.$time['end_min']);
+				
+				if($time['start_meridian'] ==  'pm' && $time['end_meridian'] == 'am') { //check for shows that run overnight into the next morning
+					$end_time = strtotime($tomDate.' '.$time['end_hour'].':'.$time['end_min']);
+				}
+				else {
+					$end_time = strtotime($curDate.' '.$time['end_hour'].':'.$time['end_min']);
+				}
 				
 				//compare to the current timestamp
 				if($start_time <= $now && $end_time >= $now) {	

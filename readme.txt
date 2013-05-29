@@ -207,6 +207,9 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 * Fixed a time display bug in the DJ On-Air sidebar widget
 * Fixed a display bug on the master schedule with overnight shows
 
+= 1.3.6 =
+* Fixed issue with shows that run overnight not showing up correctly in the sidebar widgets
+
 == Upgrade Notice ==
 
 = 1.0 =
@@ -247,3 +250,6 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 = 1.3.5 =
 * Fixed a time display bug in the DJ On-Air sidebar widget
 * Fixed a display bug on the master schedule with overnight shows 
+
+= 1.3.6 =
+* Fixed issue with shows that run overnight not showing up correctly in the sidebar widgets
