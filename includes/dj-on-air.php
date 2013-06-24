@@ -156,18 +156,19 @@ function dj_get_next($limit = 1) {
 	//load the info for the DJ
 	global $wpdb;
 
-	//get the current time
-	$hour = date('H', strtotime(current_time("mysql")));
-	$min = date('i', strtotime(current_time("mysql")));
+	//get the various times/dates we need
 	$curDay = date('l', strtotime(current_time("mysql")));
 	$curDate = date('Y-m-d', strtotime(current_time("mysql")));
 	$now = strtotime(current_time("mysql"));
-
-	//first check to see if a show is scheduled
+	$tomorrow = date( "Y-m-d", (strtotime($curDate) + 86400) );
+	$tomorrowDay = date( "l", (strtotime($curDate) + 86400) );
+	
+	//Fetch all schedules
 	$show_shifts = $wpdb->get_results("SELECT `meta`.`post_id`, `meta`.`meta_value` FROM ".$wpdb->prefix."postmeta AS `meta`
 			WHERE `meta_key` = 'show_sched';");
 
 	$show_ids = array();
+	
 	foreach($show_shifts as $shift) {
 		$shift->meta_value = unserialize($shift->meta_value);
 
@@ -177,49 +178,42 @@ function dj_get_next($limit = 1) {
 		}
 
 		foreach($shift->meta_value as $time) {
-			//check if the shift is for the current day.  If it's not, skip it
-			if($time['day'] != $curDay) {
+
+			//check if the shift is for the current day or for tomorrow.  If it's not, skip it
+			if($time['day'] != $curDay  && $time['day'] != $tomorrowDay) {
 				continue;
 			}
-
-			//convert to 24 hour time
-			if($time['start_hour'] < 10) {
-				$time['start_hour'] = '0'.$time['start_hour'];
-			}
-
-			if($time['end_hour'] < 10) {
-				$time['end_hour'] = '0'.$time['end_hour'];
-			}
-
-			if($time['start_meridian'] == 'pm' && $time['start_hour'] != 12) {
-				$time['start_hour'] = $time['start_hour'] + 12;
-			}
-			if($time['end_meridian'] == 'pm' && $time['end_hour'] != 12) {
-				$time['end_hour'] = $time['end_hour'] + 12;
-			}
-
-			//get a timestamp for the schedule start and end
-			$start_time = strtotime($curDate.' '.$time['start_hour'].':'.$time['start_min']);
-			$end_time = strtotime($curDate.' '.$time['end_hour'].':'.$time['end_min']);
-
 			
-			//if the start time is at some point in the future, we want it
-			if($start_time > $now) {
-				$show_ids[$start_time] = $shift->post_id;
+			//determine is the particular shift is for today or tomorrow and assign a real timestamp accordingly
+			if($time['day'] == $tomorrowDay) {
+				$curShift = strtotime($tomorrow.' '.$time['start_hour'].':'.$time['start_min'].':00 '.$time['start_meridian']);
 			}
+			else {
+				$curShift = strtotime($curDate.' '.$time['start_hour'].':'.$time['start_min'].':00 '.$time['start_meridian']);
+			}
+			
+			//if the shift occurs later than the current time, we want it
+			if($curShift >= $now) {
+				$show_ids[$curShift] = $shift->post_id;
+			}
+			
 		}
-		//sort by start time
-		ksort($show_ids);
-		
-		$show_ids = array_slice($show_ids, 0, $limit);
 	}
-
+	
+	//sort the shows by start time
+	ksort($show_ids);
+	
+	//grab the number of shows from the list the user wants to display
+	$show_ids = array_slice($show_ids, 0, $limit);
+	
+	//fetch detailed show information
 	$shows = array();
 	foreach($show_ids as $id) {
-		$shows['all'][] = get_post($id);
+		$shows['all'][$id] = get_post($id);
 	}
 	$shows['type'] = 'shows';
-
+	
+	//return the information
 	return $shows;
 }
 

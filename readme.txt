@@ -3,7 +3,7 @@ Contributors: kionae
 Donate link: http://www.nlb-creations.com/donate
 Tags: dj, music, playlist, radio, scheduling
 Requires at least: 3.3.1
-Tested up to: 3.5.1
+Tested up to: 3.5.2
 Stable tag: trunk
 
 Radio Station is a plugin to run a radio station's website. It's functionality is based on Drupal 6's Station plugin.
@@ -210,6 +210,10 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 = 1.3.6 =
 * Fixed issue with shows that run overnight not showing up correctly in the sidebar widgets
 
+= 1.3.7 =
+* Fixed a scheduling bug in the upcoming shows widget
+* By popular request, switched the order of artist and song in the now playing widget
+
 == Upgrade Notice ==
 
 = 1.0 =
@@ -253,3 +257,7 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 
 = 1.3.6 =
 * Fixed issue with shows that run overnight not showing up correctly in the sidebar widgets
+
+= 1.3.7 =
+* Fixed a scheduling bug in the upcoming shows widget
+* By popular request, switched the order of artist and song in the now playing widget

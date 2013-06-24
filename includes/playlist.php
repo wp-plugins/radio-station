@@ -297,11 +297,11 @@ function myplaylist_now_playing($atts) {
 			$output .= '<h3>'.$title.'</h3>';
 		}
 		
-		if($artist == 1) {
-			$output .= '<span class="myplaylist-artist">'.$most_recent['playlist_entry_artist'].'</span> ';
-		}
 		if($song == 1) {
 			$output .= '<span class="myplaylist-song">'.$most_recent['playlist_entry_song'].'</span> ';
+		}
+		if($artist == 1) {
+			$output .= '<span class="myplaylist-artist">'.$most_recent['playlist_entry_artist'].'</span> ';
 		}
 		if($album == 1) {
 			$output .= '<span class="myplaylist-album">'.$most_recent['playlist_entry_album'].'</span> ';
@@ -469,12 +469,12 @@ class Playlist_Widget extends WP_Widget {
 				
 				echo '<div id="myplaylist-nowplaying"'.$class.'>';
 				
-				if($artist) {
-					echo '<span class="myplaylist-artist">'.$most_recent['playlist_entry_artist'].'</span> ';
-				}
-				
 				if($song) {
 					echo '<span class="myplaylist-song">'.$most_recent['playlist_entry_song'].'</span> ';
+				}
+				
+				if($artist) {
+					echo '<span class="myplaylist-artist">'.$most_recent['playlist_entry_artist'].'</span> ';
 				}
 				
 				if($album) {
