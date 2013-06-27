@@ -197,19 +197,63 @@ add_action( 'add_meta_boxes', 'myplaylist_add_show_box' );
 //Prints the box content for the Show field
 function myplaylist_inner_show_custom_box() {
 	global $post;
+	global $wpdb;
+	
 	// Use nonce for verification
 	wp_nonce_field( plugin_basename( __FILE__ ), 'dynamicMetaShow_noncename' );
 
-	$args = array(
-					'numberposts'     => 0,
-					'offset'          => 0,
-					'orderby'         => 'post_title',
-					'order'           => 'aSC',
-					'post_type'       => 'show',
-					'post_status'     => 'publish'
-	);
+	$user = wp_get_current_user();
+	
+	//exclude administrators... they should be able to do whatever they want
+	if(!in_array('administrator', $user->roles)) {
+		//get the user lists for all shows    
+	    $allowed_shows = array();
+	    
+	    $show_user_lists = $wpdb->get_results("SELECT pm.meta_value, pm.post_id FROM {$wpdb->postmeta} pm WHERE pm.meta_key = 'show_user_list'");
+	    
+	    //check each list for the current user
+	    foreach($show_user_lists as $list) {
+	    	
+	    	$list->meta_value = unserialize($list->meta_value);
+	    	
+	    	//if a list has no users, unserialize() will return false instead of an empty array... fix that to prevent errors in the foreach loop.
+	    	if(!is_array($list->meta_value)) {
+	    		$list->meta_value = array();
+	    	}
+	    	
+	    	//only include shows the user is assigned to
+	    	foreach($list->meta_value as $user_id) {
+	    		if($user->ID == $user_id) {
+	    			$allowed_shows[] = $list->post_id;
+	    		}	
+	    	}
+	    }
+		
+		$args = array(
+			'numberposts'     => -1,
+			'offset'          => 0,
+			'orderby'         => 'post_title',
+			'order'           => 'aSC',
+			'post_type'       => 'show',
+			'post_status'     => 'publish',
+			'include'		  => implode(',', $allowed_shows)
+		);
 
-	$shows = get_posts($args);
+		$shows = get_posts($args);
+	}
+	else {  //you're an administrator
+		$args = array(
+				'numberposts'     => -1,
+				'offset'          => 0,
+				'orderby'         => 'post_title',
+				'order'           => 'aSC',
+				'post_type'       => 'show',
+				'post_status'     => 'publish'
+		);
+		
+		$shows = get_posts($args);
+	}
+
 	$current = get_post_meta($post->ID,'playlist_show_id',true);
 	
 	?>

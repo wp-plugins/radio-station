@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Radio Station
- * @version 1.3.7
+ * @version 1.3.8
  */
 /*
 Plugin Name: Radio Station
 Plugin URI: http://nlb-creations.com/2013/02/25/wordpress-plugin-radio-station/ 
 Description: Adds playlist and on-air programming functionality to your site.
 Author: Nikki Blight <nblight@nlb-creations.com>
-Version: 1.3.7
+Version: 1.3.8
 Author URI: http://www.nlb-creations.com
 */
 
@@ -84,10 +84,12 @@ add_filter( 'archive_template', 'station_load_custom_post_type_template' ) ;
 function station_load_admin_styles() {
 	global $post;
 	
-	if ($post->post_type == 'playlist') {
-		echo '<style type="text/css">
-	           .wp-editor-container textarea.wp-editor-area { height: 100px; }
-	         </style>';
+	if(isset($post->post_type)) {
+		if ($post->post_type == 'playlist') {
+			echo '<style type="text/css">
+		           .wp-editor-container textarea.wp-editor-area { height: 100px; }
+		         </style>';
+		}
 	}
 }
 add_action('admin_head', 'station_load_admin_styles');
@@ -149,17 +151,19 @@ function revoke_show_edit_cap($allcaps, $cap = 'edit_shows', $args) {
 	if(!in_array('administrator', $user->roles)) {	
 		
 		//limit this to published shows
-		if(is_admin() && $post->post_type == 'show' && $post->post_status == 'publish') {
-			$djs = get_post_meta($post->ID, "show_user_list", true);
-			
-			if($djs == '') {
-				$djs = array();
-			}
-			
-			//if they're not listed, temporarily revoke editing ability for this post
-			if(!in_array($user->ID, $djs)) {
-				$allcaps['edit_shows'] = false;
-				$allcaps['edit_published_shows'] = false;
+		if(isset($post->post_type)) {
+			if(is_admin() && $post->post_type == 'show' && $post->post_status == 'publish') {
+				$djs = get_post_meta($post->ID, "show_user_list", true);
+				
+				if($djs == '') {
+					$djs = array();
+				}
+				
+				//if they're not listed, temporarily revoke editing ability for this post
+				if(!in_array($user->ID, $djs)) {
+					$allcaps['edit_shows'] = false;
+					$allcaps['edit_published_shows'] = false;
+				}
 			}
 		}
 	}
@@ -167,6 +171,26 @@ function revoke_show_edit_cap($allcaps, $cap = 'edit_shows', $args) {
 }
 add_filter('user_has_cap', 'revoke_show_edit_cap', 10, 3);
 
+//remove the Add Show link for DJs from the admin side menu
+function radio_modify_shows_menu() {
+	global $submenu;
+	
+	$user = wp_get_current_user();
+	if(in_array('dj', $user->roles)) {
+		unset($submenu['edit.php?post_type=show'][10]);
+	}
+}
+add_action('admin_menu','radio_modify_shows_menu');
+
+//remove the Add Show link for DJs from the wp admin bar
+function radio_modify_admin_bar_menu($wp_admin_bar) {
+
+	$user = wp_get_current_user();
+	if(in_array('dj', $user->roles)) {
+		$wp_admin_bar->remove_node('new-show');
+	}
+}
+add_action( 'admin_bar_menu', 'radio_modify_admin_bar_menu', 999 );
 
 //create a menu item for the options page
 function station_admin_menu() {

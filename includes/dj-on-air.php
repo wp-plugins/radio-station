@@ -44,6 +44,8 @@ function dj_show_widget($atts) {
 				$dj_str .= $dj->post_title;
 			}
 			
+			$dj_str .= '<span class="on-air-dj-playlist"><a href="'.$playlist['playlist_permalink'].'">View Playlist</a></span>';
+			
 			$dj_str .= '<span class="radio-clear"></span>';
 			
 			$scheds = get_post_meta($dj->ID, 'show_sched', true);
@@ -62,8 +64,6 @@ function dj_show_widget($atts) {
 			}
 			
 			$dj_str .= '</li>';
-			
-			$dj_str .= '<span class="on-air-dj-playlist"><a href="'.$playlist['playlist_permalink'].'">View Playlist</a></span>';
 		}
 	}
 	else {
@@ -405,6 +405,8 @@ class DJ_Widget extends WP_Widget {
 							echo $dj->post_title;
 						}
 						
+						echo '<span class="on-air-dj-playlist"><a href="'.$playlist['playlist_permalink'].'">View Playlist</a></span>';
+						
 						echo '<span class="radio-clear"></span>';
 						foreach($scheds as $sched) {
 							if($time == 12) {
@@ -436,7 +438,6 @@ class DJ_Widget extends WP_Widget {
 						}
 						echo '</li>';
 						
-						echo '<span class="on-air-dj-playlist"><a href="'.$playlist['playlist_permalink'].'">View Playlist</a></span>';
 					}
 				}
 				else {

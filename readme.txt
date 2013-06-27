@@ -214,6 +214,10 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 * Fixed a scheduling bug in the upcoming shows widget
 * By popular request, switched the order of artist and song in the now playing widget
 
+= 1.3.8 =
+* Changes to fix the incorrect list of available shows on the Add Playlist page
+* Removing Add Show links from admin menu for DJs, since they don't have permission to use them anyway.
+
 == Upgrade Notice ==
 
 = 1.0 =
@@ -261,3 +265,7 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 = 1.3.7 =
 * Fixed a scheduling bug in the upcoming shows widget
 * By popular request, switched the order of artist and song in the now playing widget
+
+= 1.3.8 =
+* Changes to fix the incorrect list of available shows on the Add Playlist page
+* Removing Add Show links from admin menu for DJs, since they don't have permission to use them anyway.
