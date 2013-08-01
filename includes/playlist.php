@@ -626,6 +626,7 @@ add_action( 'add_meta_boxes', 'myplaylist_add_user_box' );
 function myplaylist_inner_user_custom_box() {
 	global $post;
 	global $wp_roles;
+	global $table_prefix;
 	
 	// Use nonce for verification
 	wp_nonce_field( plugin_basename( __FILE__ ), 'dynamicMetaUser_noncename' );
@@ -645,7 +646,7 @@ function myplaylist_inner_user_custom_box() {
 	$meta_query = array('relation' => 'OR');
 	foreach($add_roles as $role) {
 		$meta_query[] = array(
-						'key' => 'wp_capabilities',
+						'key' => $table_prefix.'capabilities',
 						'value' => $role,
 						'compare' => 'like'
 				);
