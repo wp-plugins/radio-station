@@ -426,7 +426,7 @@ class Playlist_Widget extends WP_Widget {
 		?>
 			<p>
 		  		<label for="<?php echo $this->get_field_id('title'); ?>">Title: 
-		  		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo attribute_escape($title); ?>" />
+		  		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" />
 		  		</label>
 		  	</p>
 		  	
@@ -986,13 +986,15 @@ function myplaylist_get_posts_for_show($show_id = null, $title = '', $limit = 10
 		$blog_array[] = $f->post_id;
 	}
 	
-	$blog_array = implode(",", $blog_array);
-	
-	$blogposts = $wpdb->get_results("SELECT `posts`.`ID`, `posts`.`post_title` FROM ".$wpdb->prefix."posts AS `posts`
-			WHERE `posts`.`ID` IN(".$blog_array.")
-			AND `posts`.`post_status` = 'publish'
-			ORDER BY `posts`.`post_date` DESC
-			LIMIT ".$limit.";");
+	if($blog_array) {
+		$blog_array = implode(",", $blog_array);
+		
+		$blogposts = $wpdb->get_results("SELECT `posts`.`ID`, `posts`.`post_title` FROM ".$wpdb->prefix."posts AS `posts`
+				WHERE `posts`.`ID` IN(".$blog_array.")
+				AND `posts`.`post_status` = 'publish'
+				ORDER BY `posts`.`post_date` DESC
+				LIMIT ".$limit.";");
+	}
 	
 	$output = '';
 

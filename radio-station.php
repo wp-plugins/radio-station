@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Radio Station
- * @version 1.4.0
+ * @version 1.4.1
  */
 /*
 Plugin Name: Radio Station
 Plugin URI: http://nlb-creations.com/2013/02/25/wordpress-plugin-radio-station/ 
 Description: Adds playlist and on-air programming functionality to your site.
 Author: Nikki Blight <nblight@nlb-creations.com>
-Version: 1.4.0
+Version: 1.4.1
 Author URI: http://www.nlb-creations.com
 */
 
@@ -18,25 +18,28 @@ include('includes/dj-on-air.php');
 include('includes/master_schedule.php');
 
 //add the necessary stylesheets
-if ( !is_admin() ) {
-	$dir = WP_PLUGIN_URL.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__));
-	
-	$program_css = get_stylesheet_directory_uri().'/program-schedule.css';
-	if(!file_exists($program_css)) {
-		wp_enqueue_style( 'program-schedule', $dir.'/templates/program-schedule.css' );
-	}
-	else {
-		wp_enqueue_style( 'program-schedule', $program_css);
-	}
-	
-	$dj_widget_css = get_stylesheet_directory_uri().'/djonair.css';
-	if(!file_exists($dj_widget_css)) {
-		wp_enqueue_style( 'dj-widget', $dir.'/templates/djonair.css' );
-	}
-	else {
-		wp_enqueue_style( 'dj-widget', $dj_widget_css);
+function station_load_styles() {
+	if ( !is_admin() ) {
+		$dir = WP_PLUGIN_URL.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__));
+		
+		$program_css = get_stylesheet_directory().'/program-schedule.css';
+		if(!file_exists($program_css)) {
+			wp_enqueue_style( 'program-schedule', $dir.'/templates/program-schedule.css' );
+		}
+		else {
+			wp_enqueue_style( 'program-schedule', $program_css);
+		}
+		
+		$dj_widget_css = get_stylesheet_directory().'/djonair.css';
+		if(!file_exists($dj_widget_css)) {
+			wp_enqueue_style( 'dj-widget', $dir.'/templates/djonair.css' );
+		}
+		else {
+			wp_enqueue_style( 'dj-widget', $dj_widget_css);
+		}
 	}
 }
+add_action('wp_enqueue_scripts', 'station_load_styles');
 
 // load the theme file for the playlist and show post types
 function station_load_templates($single_template) {
@@ -44,7 +47,7 @@ function station_load_templates($single_template) {
 
 	if ($post->post_type == 'playlist') {
 		//first check to see if there's a template in the active theme's directory
-		$user_theme = get_stylesheet_directory_uri().'/single-playlist.php';
+		$user_theme = get_stylesheet_directory().'/single-playlist.php';
 		if(!file_exists($user_theme)) {
 			$single_template = ABSPATH.'wp-content/plugins/radio-station/templates/single-playlist.php';
 		}
@@ -52,7 +55,7 @@ function station_load_templates($single_template) {
 	 
 	if ($post->post_type == 'show') {
 		//first check to see if there's a template in the active theme's directory
-		$user_theme = get_stylesheet_directory_uri().'/single-show.php';
+		$user_theme = get_stylesheet_directory().'/single-show.php';
 		if(!file_exists($user_theme)) {
 			$single_template = ABSPATH.'wp-content/plugins/radio-station/templates/single-show.php';
 		}
@@ -68,7 +71,7 @@ function station_load_custom_post_type_template( $archive_template ) {
 	
 	if(is_post_type_archive('playlist')) {
 	
-		$playlist_archive_theme = get_stylesheet_directory_uri().'/archive-playlist.php';
+		$playlist_archive_theme = get_stylesheet_directory().'/archive-playlist.php';
 		if(!file_exists($playlist_archive_theme)) {
 			$archive_template = ABSPATH.'wp-content/plugins/radio-station/templates/archive-playlist.php';
 		}

@@ -310,7 +310,7 @@ class DJ_Widget extends WP_Widget {
 		?>
 			<p>
 		  		<label for="<?php echo $this->get_field_id('title'); ?>">Title: 
-		  		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo attribute_escape($title); ?>" />
+		  		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" />
 		  		</label>
 		  	</p>
 		  	
@@ -330,7 +330,7 @@ class DJ_Widget extends WP_Widget {
 		  	
 		  	<p>
 		  		<label for="<?php echo $this->get_field_id('default'); ?>">Default DJ Name: 
-		  		<input class="widefat" id="<?php echo $this->get_field_id('default'); ?>" name="<?php echo $this->get_field_name('default'); ?>" type="text" value="<?php echo attribute_escape($default); ?>" />
+		  		<input class="widefat" id="<?php echo $this->get_field_id('default'); ?>" name="<?php echo $this->get_field_name('default'); ?>" type="text" value="<?php echo esc_attr($default); ?>" />
 		  		</label>
 		  		<small>If no DJ is scheduled for the current hour, display this name/text.</small>
 		  	</p>
@@ -338,8 +338,8 @@ class DJ_Widget extends WP_Widget {
 		  	<p>
 		  		<label for="<?php echo $this->get_field_id('time'); ?>">Time Format:<br /> 
 		  		<select id="<?php echo $this->get_field_id('time'); ?>" name="<?php echo $this->get_field_name('time'); ?>">
-		  			<option value="12" <?php if(attribute_escape($time) == 12) { echo 'selected="selected"'; } ?>>12-hour</option>
-		  			<option value="24" <?php if(attribute_escape($time) == 24) { echo 'selected="selected"'; } ?>>24-hour</option>
+		  			<option value="12" <?php if(esc_attr($time) == 12) { echo 'selected="selected"'; } ?>>12-hour</option>
+		  			<option value="24" <?php if(esc_attr($time) == 24) { echo 'selected="selected"'; } ?>>24-hour</option>
 		  		</select>
 		  		</label><br />
 		  		<small>Choose time format for displayed schedules.</small>
@@ -385,7 +385,7 @@ class DJ_Widget extends WP_Widget {
 				<?php 
 				//find out which DJ/show is currently scheduled to be on-air and display them
 				
-				if(count($djs['all']) > 0) {
+				if(isset($djs['all']) && count($djs['all']) > 0) {
 					foreach($djs['all'] as $dj) {
 						
 						$scheds = get_post_meta($dj->ID, 'show_sched', true);
@@ -475,7 +475,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		?>
 			<p>
 		  		<label for="<?php echo $this->get_field_id('title'); ?>">Title: 
-		  		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo attribute_escape($title); ?>" />
+		  		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" />
 		  		</label>
 		  	</p>
 		  	
@@ -495,14 +495,14 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		  	
 		  	<p>
 		  		<label for="<?php echo $this->get_field_id('default'); ?>">No Additional Schedules: 
-		  		<input class="widefat" id="<?php echo $this->get_field_id('default'); ?>" name="<?php echo $this->get_field_name('default'); ?>" type="text" value="<?php echo attribute_escape($default); ?>" />
+		  		<input class="widefat" id="<?php echo $this->get_field_id('default'); ?>" name="<?php echo $this->get_field_name('default'); ?>" type="text" value="<?php echo esc_attr($default); ?>" />
 		  		</label>
 		  		<small>If no DJ is scheduled for the current hour, display this name/text.</small>
 		  	</p>
 		  	
 		  	<p>
 		  		<label for="<?php echo $this->get_field_id('limit'); ?>">Limit: 
-		  		<input class="widefat" id="<?php echo $this->get_field_id('limit'); ?>" name="<?php echo $this->get_field_name('limit'); ?>" type="text" value="<?php echo attribute_escape($limit); ?>" />
+		  		<input class="widefat" id="<?php echo $this->get_field_id('limit'); ?>" name="<?php echo $this->get_field_name('limit'); ?>" type="text" value="<?php echo esc_attr($limit); ?>" />
 		  		</label>
 		  		<small>Number of upcoming DJs/Shows to display.</small>
 		  	</p>
@@ -510,8 +510,8 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		  	<p>
 		  		<label for="<?php echo $this->get_field_id('time'); ?>">Time Format:<br /> 
 		  		<select id="<?php echo $this->get_field_id('time'); ?>" name="<?php echo $this->get_field_name('time'); ?>">
-		  			<option value="12" <?php if(attribute_escape($time) == 12) { echo 'selected="selected"'; } ?>>12-hour</option>
-		  			<option value="24" <?php if(attribute_escape($time) == 24) { echo 'selected="selected"'; } ?>>24-hour</option>
+		  			<option value="12" <?php if(esc_attr($time) == 12) { echo 'selected="selected"'; } ?>>12-hour</option>
+		  			<option value="24" <?php if(esc_attr($time) == 24) { echo 'selected="selected"'; } ?>>24-hour</option>
 		  		</select>
 		  		</label><br />
 		  		<small>Choose time format for displayed schedules.</small>
