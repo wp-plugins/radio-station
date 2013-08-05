@@ -3,7 +3,7 @@ Contributors: kionae
 Donate link: http://www.nlb-creations.com/donate
 Tags: dj, music, playlist, radio, scheduling
 Requires at least: 3.3.1
-Tested up to: 3.5.2
+Tested up to: 3.6
 Stable tag: trunk
 
 Radio Station is a plugin to run a radio station's website. It's functionality is based on Drupal 6's Station plugin.
@@ -221,6 +221,9 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 = 1.3.9 =
 * Fixed a bug that was preventing sites using a non-default table prefix from seeing the list of DJs on the add/edit show pages
 
+= 1.4.0 =
+* Compatibility fix for WordPress 3.6
+
 == Upgrade Notice ==
 
 = 1.0 =
@@ -275,3 +278,6 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 
 = 1.3.9 =
 * Fixed a bug that was preventing sites using a non-default table prefix from seeing the list of DJs on the add/edit show pages
+
+= 1.4.0 =
+* Compatibility fix for WordPress 3.6

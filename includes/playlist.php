@@ -657,7 +657,7 @@ function myplaylist_inner_user_custom_box() {
 			'meta_query' => $meta_query,
 			'orderby' => 'display_name',
 			'order' => 'ASC',
-			'fields' => array('ID, display_name'),
+			//'fields' => array('ID, display_name'),
 	);
 	
 	$users = get_users($args);
