@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Radio Station
- * @version 1.4.1
+ * @version 1.4.2
  */
 /*
 Plugin Name: Radio Station
 Plugin URI: http://nlb-creations.com/2013/02/25/wordpress-plugin-radio-station/ 
 Description: Adds playlist and on-air programming functionality to your site.
 Author: Nikki Blight <nblight@nlb-creations.com>
-Version: 1.4.1
+Version: 1.4.2
 Author URI: http://www.nlb-creations.com
 */
 
@@ -24,18 +24,18 @@ function station_load_styles() {
 		
 		$program_css = get_stylesheet_directory().'/program-schedule.css';
 		if(!file_exists($program_css)) {
-			wp_enqueue_style( 'program-schedule', $dir.'/templates/program-schedule.css' );
+			wp_enqueue_style( 'program-schedule', $dir.'templates/program-schedule.css' );
 		}
 		else {
-			wp_enqueue_style( 'program-schedule', $program_css);
+			wp_enqueue_style( 'program-schedule', get_stylesheet_directory_uri().'/program-schedule.css');
 		}
 		
 		$dj_widget_css = get_stylesheet_directory().'/djonair.css';
 		if(!file_exists($dj_widget_css)) {
-			wp_enqueue_style( 'dj-widget', $dir.'/templates/djonair.css' );
+			wp_enqueue_style( 'dj-widget', $dir.'templates/djonair.css' );
 		}
 		else {
-			wp_enqueue_style( 'dj-widget', $dj_widget_css);
+			wp_enqueue_style( 'dj-widget', get_stylesheet_directory_uri().'/djonair.css');
 		}
 	}
 }

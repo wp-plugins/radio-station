@@ -230,6 +230,9 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 * Removed deprecated escape_attribute() function from the plugin widgets
 * Fixed some areas of the code that were generating PHP notices
 
+= 1.4.2 =
+* Fixed a bug in the CSS file override from theme directory
+
 == Upgrade Notice ==
 
 = 1.0 =
@@ -287,3 +290,12 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 
 = 1.4.0 =
 * Compatibility fix for WordPress 3.6
+
+= 1.4.1 =
+* Fixed issue with templates copied to the theme directory not overriding the defaults correctly
+* Fixed incorrectly implemented wp_enqueue_styles()
+* Removed deprecated escape_attribute() function from the plugin widgets
+* Fixed some areas of the code that were generating PHP notices
+
+= 1.4.2 =
+* Fixed a bug in the CSS file override from theme directory
