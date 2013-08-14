@@ -94,6 +94,39 @@ get_header(); ?>
 							<a href="<?php echo get_post_meta(get_the_ID(), 'show_file', true); ?>">Most recent broadcast</a>
 						</div>
 						
+						<div class="station-show-schedules">
+							<h3>Schedule</h3>
+								<ul>
+								<?php 
+									//12-hour time
+									$shifts = get_post_meta(get_the_ID(), 'show_sched', true);
+									foreach($shifts as $shift) {
+										echo '<li>';
+										echo $shift['day'].' - '.$shift['start_hour'].':'.$shift['start_min'].' '.$shift['start_meridian'].' to '.$shift['end_hour'].':'.$shift['end_min'].' '.$shift['end_meridian'];
+										echo '</li>';
+									}
+									
+									//24-hour time
+									/*
+									$shifts = get_post_meta(get_the_ID(), 'show_sched', true);
+									foreach($shifts as $shift) {
+										if($shift['start_hour'] != 12 && $shift['start_meridian'] == 'pm') {
+											$shift['start_hour'] = $shift['start_hour'] + 12;
+										}
+										
+										if($shift['end_hour'] != 12 && $shift['end_meridian'] == 'pm') {
+											$shift['end_hour'] = $shift['end_hour'] + 12;
+										}
+										
+										echo '<li>';
+										echo $shift['day'].' - '.$shift['start_hour'].':'.$shift['start_min'].' to '.$shift['end_hour'].':'.$shift['end_min'];
+										echo '</li>';
+									}
+									*/
+								?>
+								</ul>
+						</div>
+						
 						<div class="station-show-playlists">
 							<h3>Playlists</h3>
 							<?php echo do_shortcode('[get-playlists show="'.get_the_ID().'" limit="5"]'); ?>

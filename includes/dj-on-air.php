@@ -11,7 +11,9 @@ function dj_show_widget($atts) {
 		'show_avatar' => 0,
 		'show_link' => 0,
 		'default_name' => '',
-		'time' => '12'
+		'time' => '12',
+		'show_sched' => 1,
+		'show_playlist' => 1
 	), $atts ) );
 	
 	//find out which DJ(s) are currently scheduled to be on-air and display them
@@ -44,23 +46,27 @@ function dj_show_widget($atts) {
 				$dj_str .= $dj->post_title;
 			}
 			
-			$dj_str .= '<span class="on-air-dj-playlist"><a href="'.$playlist['playlist_permalink'].'">View Playlist</a></span>';
+			if($show_playlist) {
+				$dj_str .= '<span class="on-air-dj-playlist"><a href="'.$playlist['playlist_permalink'].'">View Playlist</a></span>';
+			}
 			
 			$dj_str .= '<span class="radio-clear"></span>';
 			
-			$scheds = get_post_meta($dj->ID, 'show_sched', true);
-			foreach($scheds as $sched) {
-				$dj_str .= '<span class="on-air-dj-sched">'.$sched['day'].'s, '.$sched['start_hour'].':'.$sched['start_min'].' ';
-				if($time == 12) {
-					$dj_str .= $sched['start_meridian'];
+			if($show_sched) {
+				$scheds = get_post_meta($dj->ID, 'show_sched', true);
+				foreach($scheds as $sched) {
+					$dj_str .= '<span class="on-air-dj-sched">'.$sched['day'].'s, '.$sched['start_hour'].':'.$sched['start_min'].' ';
+					if($time == 12) {
+						$dj_str .= $sched['start_meridian'];
+					}
+					
+					$dj_str .= '-'.$sched['end_hour'].':'.$sched['end_min'].' ';
+					if($time == 12) {
+						$dj_str .= $sched['end_meridian'];
+					}
+					
+					$dj_str .= '</span><br />';
 				}
-				
-				$dj_str .= '-'.$sched['end_hour'].':'.$sched['end_min'].' ';
-				if($time == 12) {
-					$dj_str .= $sched['end_meridian'];
-				}
-				
-				$dj_str .= '</span><br />';
 			}
 			
 			$dj_str .= '</li>';
@@ -224,7 +230,8 @@ function dj_coming_up($atts) {
 			'show_avatar' => 0,
 			'show_link' => 0,
 			'limit' => 1,
-			'time' => '12'
+			'time' => '12',
+			'show_sched' => 1
 	), $atts ) );
 
 	//find out which DJ(s) are coming up today
@@ -239,7 +246,7 @@ function dj_coming_up($atts) {
 	$dj_str .= '<ul class="on-air-list">';
 
 	//echo the show/dj currently on-air
-	if(count($djs['all']) > 0) {
+	if(isset($djs['all']) && count($djs['all']) > 0) {
 		foreach($djs['all'] as $dj) {
 			//print_r($dj);
 			$dj_str .= '<li class="on-air-dj">';
@@ -257,24 +264,25 @@ function dj_coming_up($atts) {
 				$dj_str .= $dj->post_title;
 			}
 			
-			$scheds = get_post_meta($dj->ID, 'show_sched', true);
-				
 			$dj_str .= '<span class="radio-clear"></span>';
 			
-			foreach($scheds as $sched) {
-				$dj_str .= '<span class="on-air-dj-sched">'.$sched['day'].'s, '.$sched['start_hour'].':'.$sched['start_min'].' ';
-				if($time == 12) {
-					$dj_str .= $sched['start_meridian'];
+			if($show_sched) {
+				$scheds = get_post_meta($dj->ID, 'show_sched', true);
+				
+				foreach($scheds as $sched) {
+					$dj_str .= '<span class="on-air-dj-sched">'.$sched['day'].'s, '.$sched['start_hour'].':'.$sched['start_min'].' ';
+					if($time == 12) {
+						$dj_str .= $sched['start_meridian'];
+					}
+				
+					$dj_str .= '-'.$sched['end_hour'].':'.$sched['end_min'].' ';
+					if($time == 12) {
+						$dj_str .= $sched['end_meridian'];
+					}
+				
+					$dj_str .= '</span><br />';
 				}
-			
-				$dj_str .= '-'.$sched['end_hour'].':'.$sched['end_min'].' ';
-				if($time == 12) {
-					$dj_str .= $sched['end_meridian'];
-				}
-			
-				$dj_str .= '</span><br />';
 			}
-			
 				
 			$dj_str .= '</li>';
 		}
@@ -296,7 +304,7 @@ class DJ_Widget extends WP_Widget {
 	
 	function DJ_Widget() {
 		$widget_ops = array('classname' => 'DJ_Widget', 'description' => 'The current on-air DJ.');
-		$this->WP_Widget('DJ_Widget', 'Radio Station: DJ On-Air', $widget_ops);
+		$this->WP_Widget('DJ_Widget', 'Radio Station: Show/DJ On-Air', $widget_ops);
 	}
  
 	function form($instance) {
@@ -306,6 +314,8 @@ class DJ_Widget extends WP_Widget {
 		$default = $instance['default'];
 		$link = $instance['link'];
 		$time = $instance['time'];
+		$show_sched = $instance['show_sched'];
+		$show_playlist = $instance['show_playlist'];
 		
 		?>
 			<p>
@@ -324,7 +334,21 @@ class DJ_Widget extends WP_Widget {
 		  	<p>
 		  		<label for="<?php echo $this->get_field_id('link'); ?>"> 
 		  		<input id="<?php echo $this->get_field_id('link'); ?>" name="<?php echo $this->get_field_name('link'); ?>" type="checkbox" <?php if($link) { echo 'checked="checked"'; } ?> /> 
-		  		Link to DJ's user profile
+		  		Link to the Show/DJ's profile
+		  		</label>
+		  	</p>
+		  	
+		  	<p>
+		  		<label for="<?php echo $this->get_field_id('show_sched'); ?>"> 
+		  		<input id="<?php echo $this->get_field_id('show_sched'); ?>" name="<?php echo $this->get_field_name('show_sched'); ?>" type="checkbox" <?php if($show_sched) { echo 'checked="checked"'; } ?> /> 
+		  		Display schedule info for this show
+		  		</label>
+		  	</p>
+		  	
+		  	<p>
+		  		<label for="<?php echo $this->get_field_id('show_playlist'); ?>"> 
+		  		<input id="<?php echo $this->get_field_id('show_playlist'); ?>" name="<?php echo $this->get_field_name('show_playlist'); ?>" type="checkbox" <?php if($show_playlist) { echo 'checked="checked"'; } ?> /> 
+		  		Display link to show's playlist
 		  		</label>
 		  	</p>
 		  	
@@ -332,7 +356,7 @@ class DJ_Widget extends WP_Widget {
 		  		<label for="<?php echo $this->get_field_id('default'); ?>">Default DJ Name: 
 		  		<input class="widefat" id="<?php echo $this->get_field_id('default'); ?>" name="<?php echo $this->get_field_name('default'); ?>" type="text" value="<?php echo esc_attr($default); ?>" />
 		  		</label>
-		  		<small>If no DJ is scheduled for the current hour, display this name/text.</small>
+		  		<small>If no Show/DJ is scheduled for the current hour, display this name/text.</small>
 		  	</p>
 		  	
 		  	<p>
@@ -354,6 +378,8 @@ class DJ_Widget extends WP_Widget {
 		$instance['link'] = ( isset( $new_instance['link'] ) ? 1 : 0 );
 		$instance['default'] = $new_instance['default'];
 		$instance['time'] = $new_instance['time'];
+		$instance['show_sched'] = $new_instance['show_sched'];
+		$instance['show_playlist'] = $new_instance['show_playlist'];
 		return $instance;
 	}
  
@@ -366,7 +392,9 @@ class DJ_Widget extends WP_Widget {
 		$link = $instance['link'];
  		$default = empty($instance['default']) ? '' : $instance['default'];
  		$time = empty($instance['time']) ? '' : $instance['time'];
-		
+ 		$show_sched = $instance['show_sched'];
+ 		$show_playlist = $instance['show_playlist'];
+ 		
  		//fetch the current DJs
 		$djs = dj_get_current();
 		$playlist = myplaylist_get_now_playing();
@@ -405,35 +433,39 @@ class DJ_Widget extends WP_Widget {
 							echo $dj->post_title;
 						}
 						
-						echo '<span class="on-air-dj-playlist"><a href="'.$playlist['playlist_permalink'].'">View Playlist</a></span>';
-						
+						if($show_playlist) {
+							echo '<span class="on-air-dj-playlist"><a href="'.$playlist['playlist_permalink'].'">View Playlist</a></span>';
+						}
 						echo '<span class="radio-clear"></span>';
-						foreach($scheds as $sched) {
-							if($time == 12) {
-								echo '<span class="on-air-dj-sched">'.$sched['day'].'s, '.$sched['start_hour'].':'.$sched['start_min'].' '.$sched['start_meridian'].'-'.$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian'].'</span><br />';
-							}
-							else {
-								if($sched['start_meridian'] == 'pm' && $sched['start_hour'] != 12) {
-									$sched['start_hour'] = $sched['start_hour'] + 12;
+						
+						if($show_sched) {
+							foreach($scheds as $sched) {
+								if($time == 12) {
+									echo '<span class="on-air-dj-sched">'.$sched['day'].'s, '.$sched['start_hour'].':'.$sched['start_min'].' '.$sched['start_meridian'].'-'.$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian'].'</span><br />';
 								}
-								if($sched['start_meridian'] == 'am' && $sched['start_hour'] < 10) {
-									$sched['start_hour'] = "0".$sched['start_hour'];
+								else {
+									if($sched['start_meridian'] == 'pm' && $sched['start_hour'] != 12) {
+										$sched['start_hour'] = $sched['start_hour'] + 12;
+									}
+									if($sched['start_meridian'] == 'am' && $sched['start_hour'] < 10) {
+										$sched['start_hour'] = "0".$sched['start_hour'];
+									}
+									if($sched['start_meridian'] == 'am' && $sched['start_hour'] == 12) {
+										$sched['start_hour'] = '00';
+									}
+									
+									if($sched['end_meridian'] == 'pm' && $sched['end_hour'] != 12) {
+										$sched['end_hour'] = $sched['end_hour'] + 12;
+									}
+									if($sched['end_meridian'] == 'am' && $sched['end_hour'] < 10) {
+										$sched['end_hour'] = "0".$sched['end_hour'];
+									}
+									if($sched['end_meridian'] == 'am' && $sched['end_hour'] == 12) {
+										$sched['end_hour'] = '00';
+									}
+									
+									echo '<span class="on-air-dj-sched">'.$sched['day'].'s, '.$sched['start_hour'].':'.$sched['start_min'].' '.'-'.$sched['end_hour'].':'.$sched['end_min'].'</span><br />';
 								}
-								if($sched['start_meridian'] == 'am' && $sched['start_hour'] == 12) {
-									$sched['start_hour'] = '00';
-								}
-								
-								if($sched['end_meridian'] == 'pm' && $sched['end_hour'] != 12) {
-									$sched['end_hour'] = $sched['end_hour'] + 12;
-								}
-								if($sched['end_meridian'] == 'am' && $sched['end_hour'] < 10) {
-									$sched['end_hour'] = "0".$sched['end_hour'];
-								}
-								if($sched['end_meridian'] == 'am' && $sched['end_hour'] == 12) {
-									$sched['end_hour'] = '00';
-								}
-								
-								echo '<span class="on-air-dj-sched">'.$sched['day'].'s, '.$sched['start_hour'].':'.$sched['start_min'].' '.'-'.$sched['end_hour'].':'.$sched['end_min'].'</span><br />';
 							}
 						}
 						echo '</li>';
@@ -471,6 +503,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		$link = $instance['link'];
 		$limit = $instance['limit'];
 		$time = $instance['time'];
+		$show_sched = $instance['show_sched'];
 
 		?>
 			<p>
@@ -489,7 +522,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		  	<p>
 		  		<label for="<?php echo $this->get_field_id('link'); ?>"> 
 		  		<input id="<?php echo $this->get_field_id('link'); ?>" name="<?php echo $this->get_field_name('link'); ?>" type="checkbox" <?php if($link) { echo 'checked="checked"'; } ?> /> 
-		  		Link to DJ's user profile
+		  		Link to Show/DJ's user profile
 		  		</label>
 		  	</p>
 		  	
@@ -497,7 +530,14 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		  		<label for="<?php echo $this->get_field_id('default'); ?>">No Additional Schedules: 
 		  		<input class="widefat" id="<?php echo $this->get_field_id('default'); ?>" name="<?php echo $this->get_field_name('default'); ?>" type="text" value="<?php echo esc_attr($default); ?>" />
 		  		</label>
-		  		<small>If no DJ is scheduled for the current hour, display this name/text.</small>
+		  		<small>If no Show/DJ is scheduled for the current hour, display this name/text.</small>
+		  	</p>
+		  	
+		  	<p>
+		  		<label for="<?php echo $this->get_field_id('show_sched'); ?>"> 
+		  		<input id="<?php echo $this->get_field_id('show_sched'); ?>" name="<?php echo $this->get_field_name('show_sched'); ?>" type="checkbox" <?php if($show_sched) { echo 'checked="checked"'; } ?> /> 
+		  		Display schedule info for this show
+		  		</label>
 		  	</p>
 		  	
 		  	<p>
@@ -527,6 +567,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		$instance['default'] = $new_instance['default'];
 		$instance['limit'] = $new_instance['limit'];
 		$instance['time'] = $new_instance['time'];
+		$instance['show_sched'] = $new_instance['show_sched'];
 		return $instance;
 	}
  
@@ -540,6 +581,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
  		$default = empty($instance['default']) ? '' : $instance['default'];
  		$limit = empty($instance['limit']) ? '1' : $instance['limit'];
  		$time = empty($instance['time']) ? '' : $instance['time'];
+ 		$show_sched = $instance['show_sched'];
 
  		//find out which DJ(s) are coming up today
  		$djs = dj_get_next($limit);
@@ -557,7 +599,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
  		<ul class="on-air-upcoming-list">
 			<?php 
 		 		//echo the show/dj currently on-air
-		 		if(count($djs['all']) > 0) {
+		 		if(isset($djs['all']) && count($djs['all']) > 0) {
 		 			foreach($djs['all'] as $dj) {
 		 				//print_r($dj);
 		 				echo '<li class="on-air-dj">';
@@ -574,37 +616,40 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		 				else {
 		 					echo $dj->post_title;
 		 				}
-		 		
-		 				$scheds = get_post_meta($dj->ID, 'show_sched', true);
 		 				
 		 				echo '<span class="radio-clear"></span>';
-		 				foreach($scheds as $sched) {
-		 					if($time == 12) {
-		 						echo '<span class="on-air-dj-sched">'.$sched['day'].'s, '.$sched['start_hour'].':'.$sched['start_min'].' '.$sched['start_meridian'].'-'.$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian'].'</span><br />';
-		 					}
-		 					else {
-		 						if($sched['start_meridian'] == 'pm' && $sched['start_hour'] != 12) {
-		 							$sched['start_hour'] = $sched['start_hour'] + 12;
-		 						}
-		 						if($sched['start_meridian'] == 'am' && $sched['start_hour'] < 10) {
-		 							$sched['start_hour'] = "0".$sched['start_hour'];
-		 						}
-		 						if($sched['start_meridian'] == 'am' && $sched['start_hour'] == 12) {
-		 							$sched['start_hour'] = '00';
-		 						}
-		 						
-		 						if($sched['end_meridian'] == 'pm' && $sched['end_hour'] != 12) {
-		 							$sched['end_hour'] = $sched['end_hour'] + 12;
-		 						}
-		 						if($sched['end_meridian'] == 'am' && $sched['end_hour'] < 10) {
-		 							$sched['end_hour'] = "0".$sched['end_hour'];
-		 						}
-		 						if($sched['end_meridian'] == 'am' && $sched['end_hour'] == 12) {
-		 							$sched['end_hour'] = '00';
-		 						}
-		 					
-		 						echo '<span class="on-air-dj-sched">'.$sched['day'].'s, '.$sched['start_hour'].':'.$sched['start_min'].' '.'-'.$sched['end_hour'].':'.$sched['end_min'].'</span><br />';
-		 					}
+		 				
+		 				if($show_sched) {
+			 				$scheds = get_post_meta($dj->ID, 'show_sched', true);
+			 				
+			 				foreach($scheds as $sched) {
+			 					if($time == 12) {
+			 						echo '<span class="on-air-dj-sched">'.$sched['day'].'s, '.$sched['start_hour'].':'.$sched['start_min'].' '.$sched['start_meridian'].'-'.$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian'].'</span><br />';
+			 					}
+			 					else {
+			 						if($sched['start_meridian'] == 'pm' && $sched['start_hour'] != 12) {
+			 							$sched['start_hour'] = $sched['start_hour'] + 12;
+			 						}
+			 						if($sched['start_meridian'] == 'am' && $sched['start_hour'] < 10) {
+			 							$sched['start_hour'] = "0".$sched['start_hour'];
+			 						}
+			 						if($sched['start_meridian'] == 'am' && $sched['start_hour'] == 12) {
+			 							$sched['start_hour'] = '00';
+			 						}
+			 						
+			 						if($sched['end_meridian'] == 'pm' && $sched['end_hour'] != 12) {
+			 							$sched['end_hour'] = $sched['end_hour'] + 12;
+			 						}
+			 						if($sched['end_meridian'] == 'am' && $sched['end_hour'] < 10) {
+			 							$sched['end_hour'] = "0".$sched['end_hour'];
+			 						}
+			 						if($sched['end_meridian'] == 'am' && $sched['end_hour'] == 12) {
+			 							$sched['end_hour'] = '00';
+			 						}
+			 					
+			 						echo '<span class="on-air-dj-sched">'.$sched['day'].'s, '.$sched['start_hour'].':'.$sched['start_min'].' '.'-'.$sched['end_hour'].':'.$sched['end_min'].'</span><br />';
+			 					}
+			 				}
 		 				}
 		 		
 		 				echo '</li>';

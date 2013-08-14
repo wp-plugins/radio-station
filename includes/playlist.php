@@ -786,7 +786,7 @@ function myplaylist_inner_sched_custom_box() {
 	            			<option value="am"<?php if($track['end_meridian'] == "am") { echo ' selected="selected"'; } ?>>am</option>
 	            			<option value="pm"<?php if($track['end_meridian'] == "pm") { echo ' selected="selected"'; } ?>>pm</option>
 	            		</select>
-	            		<input type="checkbox" name="show_sched[<?php echo $c; ?>][encore]" <?php if($track['encore'] == 'on') { echo 'checked="checked"'; } ?>/> Encore Presentation
+	            		<input type="checkbox" name="show_sched[<?php echo $c; ?>][encore]" <?php if(isset($track['encore']) && $track['encore'] == 'on') { echo 'checked="checked"'; } ?>/> Encore Presentation
 	            		<span class="remove button-secondary" style="cursor: pointer;">Remove</span>
 	            	</p>
 	            	<?php 
@@ -982,6 +982,7 @@ function myplaylist_get_posts_for_show($show_id = null, $title = '', $limit = 10
 			WHERE `meta`.`meta_key` = 'post_showblog_id' AND `meta`.`meta_value` = ".$show_id.";");
 
 	$blog_array = array();
+	$blogposts = array();
 	foreach($fetch_posts as $f) {
 		$blog_array[] = $f->post_id;
 	}

@@ -32,7 +32,12 @@ Try re-saving your site's permalink settings.  Wordpress sometimes gets confused
 
 Use the shortcode `[master-schedule]` on any page.  This will generate a table containing your show details.
 
-If you wish to display the schedule in 24-hour time format, user `[master-schedule time="24"]`.
+The following attributes are available for the shortcode:
+			'time' => The time format you with to use.  Valid values are 12 and 24.  Default is 12.
+			'show_link' => Display the title of the show as a link to its profile page.  Valid values are 0 for hide, 1 for show.  Default is 1.
+			'display_show_time' => Display start and end times of each show after the title in the grid.  Valid values are 0 for hide, 1 for show.  Default is 1.
+
+For example, if you wish to display the schedule in 24-hour time format, use `[master-schedule time="24"]`.
 
 = How do I get the last song played to show up? = 
 
@@ -60,9 +65,11 @@ The following attributes are available for the shortcode:
 		'show_link' => Display a link to a show's page.  Valid values are 0 for hide link, 1 for show link.  Default is 0.
 		'default_name' => The text you would like to display when no show is schedule for the current time.
 		'time' => The time format used for displaying schedules.  Valid values are 12 and 24.  Default is 12.
+		'show_sched' => Display the show's schedules.  Valid values are 0 for hide schedule, 1 for show schedule.  Default is 1.
+		'show_playlist' => Display a link to the show's current playlist.  Valid values are 0 for hide link, 1 for show link.  Default is 1.
 		
 Example:
-`[dj-widget title="Now On-Air" show_avatar="1" show_link="1" default_name="RadioBot" time="12"]`
+`[dj-widget title="Now On-Air" show_avatar="1" show_link="1" default_name="RadioBot" time="12" schow_sched="1" show_playlist="1"]`
 
 
 = Can I display upcoming shows, too? =
@@ -76,9 +83,10 @@ The following attributes are available for the shortcode:
 		'show_link' => Display a link to a show's page.  Valid values are 0 for hide link, 1 for show link.  Default is 0.
 		'limit' => The number of upcoming shows to display.  Default is 1.
 		'time' => The time format used for displaying schedules.  Valid values are 12 and 24.  Default is 12.
+		'show_sched' => Display the show's schedules.  Valid values are 0 for hide schedule, 1 for show schedule.  Default is 1.
 		
 Example:
-`[dj-widget title="Coming Up On-Air" show_avatar="1" show_link="1" limit="3" time="12"]`
+`[dj-widget title="Coming Up On-Air" show_avatar="1" show_link="1" limit="3" time="12" schow_sched="1"]`
 
 = Can I change how show pages are laid out/displayed? =
 
@@ -233,6 +241,13 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 = 1.4.2 =
 * Fixed a bug in the CSS file override from theme directory
 
+= 1.4.3 =
+* Master schedule shortcode now displays indiviual shows in both 24 and 12 hour time
+* Fixed some areas of the code that were generating PHP notices in WordPress 3.6
+* Added example of how to display show schedule to single-show.php template
+* Added more options to the plugin's widgets
+* Added new options to the master-schedule shortcode
+
 == Upgrade Notice ==
 
 = 1.0 =
@@ -299,3 +314,10 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 
 = 1.4.2 =
 * Fixed a bug in the CSS file override from theme directory
+
+= 1.4.3 =
+* Master schedule shortcode now displays indiviual shows in both 24 and 12 hour time
+* Fixed some areas of the code that were generating PHP notices in WordPress 3.6
+* Added example of how to display show schedule to single-show.php template
+* Added more options to the plugin's widgets
+* Added new options to the master-schedule shortcode

@@ -16,7 +16,11 @@ function master_schedule($atts) {
 	
 	extract( shortcode_atts( array(
 			'time' => '12',
+			'show_link' => 1,
+			'display_show_time' => 1
 	), $atts ) );
+	
+	$timeformat = $time;
 
 	//set up the structure of the master schedule
 	$default_dj = get_option('dj_default_name');
@@ -230,48 +234,55 @@ function master_schedule($atts) {
 				
 				$output .= '<div class="master-show-entry'.$classes.'">';
 				$output .= '<span class="show-title">';
-				$output .= '<a href="'.get_permalink($shift['id']).'">'.get_the_title($shift['id']).'</a>';
-				$output .= '</span>';
-				
-				//convert back to 12-hour time if 12-hour has been selected
-				if($time == 12) {
-					if($shift['time']['start_meridian'] == 'pm' && $shift['time']['start_hour'] != 12) {
-						$shift['time']['start_hour'] = $shift['time']['start_hour'] - 12;
-					}
-					if($shift['time']['start_meridian'] == 'am' && $shift['time']['start_hour'] == 0) {
-						$shift['time']['start_hour'] = 12;
-					}
-					
-					if($shift['time']['end_meridian'] == 'pm' && $shift['time']['end_hour'] != 12) {
-						$shift['time']['end_hour'] = $shift['time']['end_hour'] - 12;
-					}
-					if($shift['time']['end_meridian'] == 'am' && $shift['time']['end_hour'] == 0) {
-						$shift['time']['end_hour'] = 12;
-					}
-				}
-				
-				$output .= '<span class="show-time">';
-				if(isset($shift['time']['real_start'])) {
-					$output .= $day.'<br />'.$shift['time']['real_start'].' - '.$shift['time']['end_hour'].':'.$shift['time']['end_min'];
-					if($time == 12) {
-						$output .= $shift['time']['end_meridian'];
-					}
+				if($show_link) {
+					$output .= '<a href="'.get_permalink($shift['id']).'">'.get_the_title($shift['id']).'</a>';
 				}
 				else {
-					$output .= $day.'<br />'.$shift['time']['start_hour'].':'.$shift['time']['start_min'];
-					if($time == 12) {
-						$output .= $shift['time']['start_meridian'];;
-					}
-					
-					$output .= ' - '.$shift['time']['end_hour'].':'.$shift['time']['end_min'];
-					
-					if($time == 12) {
-						$output .= $shift['time']['end_meridian'];
-					}
+					$output .= get_the_title($shift['id']);
 				}
 				$output .= '</span>';
 				
-				if($shift['time']['encore'] == 'on') {
+				if($display_show_time) {
+					//convert back to 12-hour time if 12-hour has been selected
+					if($timeformat == 12) {
+						if($shift['time']['start_meridian'] == 'pm' && $shift['time']['start_hour'] != 12) {
+							$shift['time']['start_hour'] = $shift['time']['start_hour'] - 12;
+						}
+						if($shift['time']['start_meridian'] == 'am' && $shift['time']['start_hour'] == 0) {
+							$shift['time']['start_hour'] = 12;
+						}
+						
+						if($shift['time']['end_meridian'] == 'pm' && $shift['time']['end_hour'] != 12) {
+							$shift['time']['end_hour'] = $shift['time']['end_hour'] - 12;
+						}
+						if($shift['time']['end_meridian'] == 'am' && $shift['time']['end_hour'] == 0) {
+							$shift['time']['end_hour'] = 12;
+						}
+					}
+					
+					$output .= '<span class="show-time">';
+					if(isset($shift['time']['real_start'])) {
+						$output .= $day.'<br />'.$shift['time']['real_start'].' - '.$shift['time']['end_hour'].':'.$shift['time']['end_min'];
+						if($timeformat == 12) {
+							$output .= $shift['time']['end_meridian'];
+						}
+					}
+					else {
+						$output .= $day.'<br />'.$shift['time']['start_hour'].':'.$shift['time']['start_min'];
+						if($timeformat == 12) {
+							$output .= $shift['time']['start_meridian'];;
+						}
+						
+						$output .= ' - '.$shift['time']['end_hour'].':'.$shift['time']['end_min'];
+						
+						if($timeformat == 12) {
+							$output .= $shift['time']['end_meridian'];
+						}
+					}
+					$output .= '</span>';
+				}
+				
+				if(isset($shift['time']['encore']) && $shift['time']['encore'] == 'on') {
 					$output .= '<span class="show-encore">encore airing</span>';
 				}
 				
