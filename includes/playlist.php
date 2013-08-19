@@ -93,7 +93,7 @@ function myplaylist_inner_custom_box() {
     echo "<th></th><th>Artist</th><th>Song</th><th>Album</th><th>Record Label</th><th>DJ Comments</th><th>New</th><th>Status</th><th>Remove</th>";
     echo "</tr>";
     
-    if (count($entries[0]) > 0){
+    if (isset($entries[0]) && count($entries[0]) > 0){
     	
         foreach($entries[0] as $track ){
             if (isset($track['playlist_entry_artist']) || isset($track['playlist_entry_song']) || isset($track['playlist_entry_album']) || isset($track['playlist_entry_label']) || isset($track['playlist_entry_comments']) || isset($track['playlist_entry_new']) || isset($track['playlist_entry_status'])){
@@ -106,7 +106,7 @@ function myplaylist_inner_custom_box() {
                 echo '<td><textarea name="playlist['.$c.'][playlist_entry_comments]">'.$track['playlist_entry_comments'].'</textarea></td>';
                 
                 echo '<td><input type="checkbox" name="playlist['.$c.'][playlist_entry_new]"';
-				if($track['playlist_entry_new']) {
+				if(isset($track['playlist_entry_new']) && $track['playlist_entry_new']) {
 					echo ' checked="checked"';
 				}
 				echo ' /></td>';
@@ -155,6 +155,7 @@ function myplaylist_inner_custom_box() {
 <div id="publishing-action-bottom">
 	<br /><br />
 	<?php
+	$can_publish = current_user_can('publish_playlists');
 	//borrowed from wp-admin/includes/meta-boxes.php
 	if ( !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0 == $post->ID ) {
 		if ( $can_publish ) :
@@ -635,11 +636,12 @@ function myplaylist_inner_user_custom_box() {
 	$add_roles = array('dj');
 	foreach($wp_roles->roles as $name => $role) {
 		foreach($role['capabilities'] as $capname => $capstatus) {
-			if($capname == "edit_shows" && $capstatus == 1) {
+			if($capname == "edit_shows" && ($capstatus == 1 || $capstatus == true)) {
 				$add_roles[] = $name;
 			}
 		}
 	}
+	
 	$add_roles = array_unique($add_roles);
 	
 	//create the meta query for get_users()

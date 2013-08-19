@@ -147,6 +147,11 @@ edit_posts
 edit_published_posts
 publish_posts
 
+If you want the new role to be able to create or approve new shows, you should also give them the following capabilities:
+
+publish_shows
+edit_others_shows
+
 = How do I change the DJ's avatar in the sidebar widget? =
 
 It's the same avatar that's assigned to the email listed in the DJ's user account via Gravatar.
@@ -248,6 +253,10 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 * Added more options to the plugin's widgets
 * Added new options to the master-schedule shortcode
 
+= 1.4.4 =
+* Compatibility fix for Wordpress 3.6 - fixed problem with giving alternative roles DJ capabilities
+* Fixed some areas of the code that were generating PHP notices in WordPress 3.6
+
 == Upgrade Notice ==
 
 = 1.0 =
@@ -321,3 +330,7 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 * Added example of how to display show schedule to single-show.php template
 * Added more options to the plugin's widgets
 * Added new options to the master-schedule shortcode
+
+= 1.4.4 =
+* Compatibility fix for Wordpress 3.6 - fixed problem with giving alternative roles DJ capabilities
+* Fixed some areas of the code that were generating PHP notices in WordPress 3.6

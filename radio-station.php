@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Radio Station
- * @version 1.4.3
+ * @version 1.4.4
  */
 /*
 Plugin Name: Radio Station
 Plugin URI: http://nlb-creations.com/2013/02/25/wordpress-plugin-radio-station/ 
 Description: Adds playlist and on-air programming functionality to your site.
 Author: Nikki Blight <nblight@nlb-creations.com>
-Version: 1.4.3
+Version: 1.4.4
 Author URI: http://www.nlb-creations.com
 */
 
@@ -147,11 +147,29 @@ add_action('admin_init', 'set_station_roles', 10, 0);
 //revoke the ability to edit a show if the user is not listed as a DJ on that show
 function revoke_show_edit_cap($allcaps, $cap = 'edit_shows', $args) {
 	global $post;
+	global $wp_roles;
 	
 	$user = wp_get_current_user();
 	
-	//exclude administrators... they should be able to do whatever they want
-	if(!in_array('administrator', $user->roles)) {	
+	//determine which roles should have full access aside from administrator
+	$add_roles = array('administrator');
+	foreach($wp_roles->roles as $name => $role) {
+		foreach($role['capabilities'] as $capname => $capstatus) {
+			if($capname == "publish_shows" && ($capstatus == 1 || $capstatus == true)) {
+				$add_roles[] = $name;
+			}
+		}
+	}
+	
+	//exclude administrators and custom roles with appropriate capabilities... they should be able to do whatever they want
+	$found = false;
+	foreach($add_roles as $role) {
+		if(in_array($role, $user->roles)) {
+			$found = true;
+		}
+	}
+
+	if(!$found) {	
 		
 		//limit this to published shows
 		if(isset($post->post_type)) {
