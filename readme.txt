@@ -257,6 +257,9 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 * Compatibility fix for Wordpress 3.6 - fixed problem with giving alternative roles DJ capabilities
 * Fixed some areas of the code that were generating PHP notices in WordPress 3.6
 
+= 1.4.5 =
+* Fixed master-schedule shortcode bug that was preventing display of 12 hour time
+
 == Upgrade Notice ==
 
 = 1.0 =
@@ -334,3 +337,6 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 = 1.4.4 =
 * Compatibility fix for Wordpress 3.6 - fixed problem with giving alternative roles DJ capabilities
 * Fixed some areas of the code that were generating PHP notices in WordPress 3.6
+
+= 1.4.5 =
+* Fixed master-schedule shortcode bug that was preventing display of 12 hour time 

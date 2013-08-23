@@ -152,7 +152,7 @@ function master_schedule($atts) {
 		$output .= '<tr>';
 		$output .= '<th>';
 		
-		if($time == 12) {
+		if($timeformat == 12) {
 			if($hour == 0) {
 				$output .= '12am';
 			}
