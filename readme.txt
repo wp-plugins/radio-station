@@ -176,12 +176,12 @@ without permission.
 
 Under the Playlists menu in the dashboard is an Export link.  Simply specify the a date range, and a text file will be generated for you.
 
-= Can my DJ's have customized user pages in addition to Show pages? = 
+= Can my DJ's have customized user profile pages in addition to Show pages? = 
 
 Yes.  These pages are the same as any other author page (edit or create the author.php template file in your theme directory).  A sample can be found 
 in the radio-station/templates/author.php file.  Like the other theme templates included with this plugin, this file is based on the TwentyEleven theme.
 
-= I don't want to use Gravatar for my DJ's image on their profile page. =
+= I don't want to use Gravatar for my DJ's image on their user profile page. =
 
 Then you'll need to install a plugin that lets you add a different image to your DJ's user account and edit your author.php theme file accordingly.  That's a 
 little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  http://wordpress.org/extend/plugins/cimy-user-extra-fields/
