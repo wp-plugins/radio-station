@@ -3,7 +3,7 @@ Contributors: kionae
 Donate link: http://www.nlb-creations.com/donate
 Tags: dj, music, playlist, radio, scheduling
 Requires at least: 3.3.1
-Tested up to: 3.6
+Tested up to: 3.6.1
 Stable tag: trunk
 
 Radio Station is a plugin to run a radio station's website. It's functionality is based on Drupal 6's Station plugin.
@@ -126,6 +126,13 @@ your active theme directory.  Then, create a Page in wordpress to hold the blog 
 Use the shortcode `[list-shows]` in your page/posts or use `do_shortcode(['list-shows']);` in your template files.  This will output an unordered list element
 containing the titles of and links to all shows marked as "Active". 
 
+The following attributes are available for the shortcode:
+		'genre' => Displays shows only from the specified genre(s).  Separate multiple genres with a comma, e.g. genre="pop,rock".
+
+Example:
+`[list-shows genre="pop"]`
+`[list-shows genre="pop,rock,metal"]`
+
 = I need users other than just the Administrator and DJ roles to have access to the Shows and Playlists post types.  How do I do that? =
 
 Since I'm stongly opposed to reinventing the wheel, I recommend Justin Tadlock's excellent "Members" plugin for that purpose.  You can find it on
@@ -154,7 +161,7 @@ edit_others_shows
 
 = How do I change the DJ's avatar in the sidebar widget? =
 
-It's the same avatar that's assigned to the email listed in the DJ's user account via Gravatar.
+The avatar is whatever image is assigned as the DJ/Show's featured image.  All you have to do is set a new featured image.
 
 = Why don't any users show up in the DJs list on the Show edit page? =
 
@@ -181,70 +188,109 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 
 == Changelog ==
 
-= 1.0 =
-* Initial release
+= 1.4.6 =
+* Fixed a bug with shows that start at midnight not displaying in the on-air sidebar widget.
+* Switched DJ/Show avatars in the widgets to use the featured image of the show instead of gravatar.
+* Updated show template to get rid of a PHP warning that appeared if the show had no schedules. 
+* Fixed some other areas of the code that were generating PHP notices in WordPress 3.6
+* Added CSS classes to master program schedule output so CSS rules can be applied to specific shows
+* Added new attribute to the list-shows shortcode to allow only specified genres to be displayed
 
-= 1.1 =
-* Fixed playlist edit screen so that queued songs fall to the bottom of the list to maintain play order
-* Reduced the size of the content field in the playlist post type
-* Some minor formatting changes to default templates
-* Added genre highlighter to the master programming schedule page
-* Added a second Update button on the bottom of the playlist edit page for convinience.
-* Added sample template for DJ user pages
-* Fixed a bug in the master schedule shortcode that messed up the table for shows that are more than two hours in duration
-* Fixed a bug in the master schedule shortcode to accomodate shows that run from late night into the following morning.
-* Added new field to associate blog posts with shows
+= 1.4.5 =
+* Fixed master-schedule shortcode bug that was preventing display of 12 hour time
+
+= 1.4.4 =
+* Compatibility fix for Wordpress 3.6 - fixed problem with giving alternative roles DJ capabilities
+* Fixed some areas of the code that were generating PHP notices in WordPress 3.6
+
+= 1.4.3 =
+* Master schedule shortcode now displays indiviual shows in both 24 and 12 hour time
+* Fixed some areas of the code that were generating PHP notices in WordPress 3.6
+* Added example of how to display show schedule to single-show.php template
+* Added more options to the plugin's widgets
+* Added new options to the master-schedule shortcode
+
+= 1.4.2 =
+* Fixed a bug in the CSS file override from theme directory
+
+= 1.4.1 =
+* Fixed issue with templates copied to the theme directory not overriding the defaults correctly
+* Fixed incorrectly implemented wp_enqueue_styles()
+* Removed deprecated escape_attribute() function from the plugin widgets
+* Fixed some areas of the code that were generating PHP notices
+
+= 1.4.0 =
+* Compatibility fix for WordPress 3.6
+
+= 1.3.9 =
+* Fixed a bug that was preventing sites using a non-default table prefix from seeing the list of DJs on the add/edit show pages
+
+= 1.3.8 =
+* Changes to fix the incorrect list of available shows on the Add Playlist page
+* Removing Add Show links from admin menu for DJs, since they don't have permission to use them anyway.
+
+= 1.3.7 =
+* Fixed a scheduling bug in the upcoming shows widget
+* By popular request, switched the order of artist and song in the now playing widget
+
+= 1.3.6 =
+* Fixed issue with shows that run overnight not showing up correctly in the sidebar widgets
+
+= 1.3.5 =
+* Fixed a time display bug in the DJ On-Air sidebar widget
+* Fixed a display bug on the master schedule with overnight shows
+
+= 1.3.4 =
+* By request, added as 24-hour time format option to the master schedule and sidebar widgets.
+
+= 1.3.3 =
+* Added the ability to assign any user with the edit_shows capability as a DJ, to accomodate custom and edited roles.
+
+= 1.3.2 =
+* Fixed a bug in the DJ-on-air widget
+
+= 1.3.1 =
+* Fixed a major bug in the master schedule output
+
+= 1.3 =
+* Fixed some minor compatibility issues with WordPress 3.5
+* Fixed Shows icon in Dashboard
 
 = 1.2 =
 * Fixed thumbnail bug in sidebar widgets
 * Added new widget to display upcoming shows
 * Added pagination options for playlists and show blogs
 
-= 1.3 =
-* Fixed some minor compatibility issues with WordPress 3.5
-* Fixed Shows icon in Dashboard
+= 1.1 =
+* Fixed playlist edit screen so that queued songs fall to the bottom of the list to maintain play order
+* Reduced the size of the content field in the playlist post type
+* Some minor formatting changes to default templates
+* Added genre highlighter to the master programming schedule page
+* Added a second Update button on the bottom of the playlist edit page for convinience.
+* Added sample template for DJ user pages
+* Fixed a bug in the master schedule shortcode that messed up the table for shows that are more than two hours in duration
+* Fixed a bug in the master schedule shortcode to accomodate shows that run from late night into the following morning.
+* Added new field to associate blog posts with shows
 
-= 1.3.1 =
-* Fixed a major bug in the master schedule output
+= 1.0 =
+* Initial release
 
-= 1.3.2 =
-* Fixed a bug in the DJ-on-air widget
+== Upgrade Notice ==
 
-= 1.3.3 =
-* Added the ability to assign any user with the edit_shows capability as a DJ, to accomodate custom and edited roles.
+= 1.4.6 =
+* Fixed a bug with shows that start at midnight not displaying in the on-air sidebar widget.
+* Switched DJ/Show avatars in the widgets to use the featured image of the show instead of gravatar.
+* Updated show template to get rid of a PHP warning that appeared if the show had no schedules. 
+* Fixed some other areas of the code that were generating PHP notices in WordPress 3.6
+* Added CSS classes to master program schedule output so CSS rules can be applied to specific shows
+* Added new attribute to the list-shows shortcode to allow only specified genres to be displayed
 
-= 1.3.4 =
-* By request, added as 24-hour time format option to the master schedule and sidebar widgets.
+= 1.4.5 =
+* Fixed master-schedule shortcode bug that was preventing display of 12 hour time
 
-= 1.3.5 =
-* Fixed a time display bug in the DJ On-Air sidebar widget
-* Fixed a display bug on the master schedule with overnight shows
-
-= 1.3.6 =
-* Fixed issue with shows that run overnight not showing up correctly in the sidebar widgets
-
-= 1.3.7 =
-* Fixed a scheduling bug in the upcoming shows widget
-* By popular request, switched the order of artist and song in the now playing widget
-
-= 1.3.8 =
-* Changes to fix the incorrect list of available shows on the Add Playlist page
-* Removing Add Show links from admin menu for DJs, since they don't have permission to use them anyway.
-
-= 1.3.9 =
-* Fixed a bug that was preventing sites using a non-default table prefix from seeing the list of DJs on the add/edit show pages
-
-= 1.4.0 =
-* Compatibility fix for WordPress 3.6
-
-= 1.4.1 =
-* Fixed issue with templates copied to the theme directory not overriding the defaults correctly
-* Fixed incorrectly implemented wp_enqueue_styles()
-* Removed deprecated escape_attribute() function from the plugin widgets
-* Fixed some areas of the code that were generating PHP notices
-
-= 1.4.2 =
-* Fixed a bug in the CSS file override from theme directory
+= 1.4.4 =
+* Compatibility fix for Wordpress 3.6 - fixed problem with giving alternative roles DJ capabilities
+* Fixed some areas of the code that were generating PHP notices in WordPress 3.6
 
 = 1.4.3 =
 * Master schedule shortcode now displays indiviual shows in both 24 and 12 hour time
@@ -253,17 +299,56 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 * Added more options to the plugin's widgets
 * Added new options to the master-schedule shortcode
 
-= 1.4.4 =
-* Compatibility fix for Wordpress 3.6 - fixed problem with giving alternative roles DJ capabilities
-* Fixed some areas of the code that were generating PHP notices in WordPress 3.6
+= 1.4.2 =
+* Fixed a bug in the CSS file override from theme directory
 
-= 1.4.5 =
-* Fixed master-schedule shortcode bug that was preventing display of 12 hour time
+= 1.4.1 =
+* Fixed issue with templates copied to the theme directory not overriding the defaults correctly
+* Fixed incorrectly implemented wp_enqueue_styles()
+* Removed deprecated escape_attribute() function from the plugin widgets
+* Fixed some areas of the code that were generating PHP notices
 
-== Upgrade Notice ==
+= 1.4.0 =
+* Compatibility fix for WordPress 3.6
 
-= 1.0 =
-* Initial release
+= 1.3.9 =
+* Fixed a bug that was preventing sites using a non-default table prefix from seeing the list of DJs on the add/edit show pages
+
+= 1.3.8 =
+* Changes to fix the incorrect list of available shows on the Add Playlist page
+* Removing Add Show links from admin menu for DJs, since they don't have permission to use them anyway.
+
+= 1.3.7 =
+* Fixed a scheduling bug in the upcoming shows widget
+* By popular request, switched the order of artist and song in the now playing widget
+
+= 1.3.6 =
+* Fixed issue with shows that run overnight not showing up correctly in the sidebar widgets
+
+= 1.3.5 =
+* Fixed a time display bug in the DJ On-Air sidebar widget
+* Fixed a display bug on the master schedule with overnight shows
+
+= 1.3.4 =
+* By request, added as 24-hour time format option to the master schedule and sidebar widgets.
+
+= 1.3.3 =
+* Added the ability to assign any user with the edit_shows capability as a DJ, to accomodate custom and edited roles.
+
+= 1.3.2 =
+* Fixed a bug in the DJ-on-air widget
+
+= 1.3.1 =
+* Fixed a major bug in the master schedule output
+
+= 1.3 =
+* Fixed some minor compatibility issues with WordPress 3.5
+* Fixed Shows icon in Dashboard
+
+= 1.2 =
+* Fixed thumbnail bug in sidebar widgets
+* Added new widget to display upcoming shows
+* Added pagination options for playlists and show blogs
 
 = 1.1 =
 * Fixed playlist edit screen so that queued songs fall to the bottom of the list to maintain play order
@@ -276,67 +361,5 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 * Fixed a bug in the master schedule shortcode to accomodate shows that run from late night into the following morning.
 * Added new field to associate blog posts with shows
 
-= 1.2 =
-* Fixed thumbnail bug in sidebar widgets
-* Added new widget to display upcoming shows
-
-= 1.3 =
-* Fixed some minor compatibility issues with WordPress 3.5
-* Fixed Shows icon in Dashboard
-
-= 1.3.1 =
-* Fixed a major bug in the master schedule output
-
-= 1.3.2 =
-* Fixed a bug in the DJ-on-air widget
-* Fixed show select list for show blog posts
-
-= 1.3.3 =
-* Added the ability to assign any user with the edit_shows capability as a DJ, to accomodate custom and edited roles.
-
-= 1.3.4 =
-* By request, added as 24-hour time format option to the master schedule and sidebar widgets.
-
-= 1.3.5 =
-* Fixed a time display bug in the DJ On-Air sidebar widget
-* Fixed a display bug on the master schedule with overnight shows 
-
-= 1.3.6 =
-* Fixed issue with shows that run overnight not showing up correctly in the sidebar widgets
-
-= 1.3.7 =
-* Fixed a scheduling bug in the upcoming shows widget
-* By popular request, switched the order of artist and song in the now playing widget
-
-= 1.3.8 =
-* Changes to fix the incorrect list of available shows on the Add Playlist page
-* Removing Add Show links from admin menu for DJs, since they don't have permission to use them anyway.
-
-= 1.3.9 =
-* Fixed a bug that was preventing sites using a non-default table prefix from seeing the list of DJs on the add/edit show pages
-
-= 1.4.0 =
-* Compatibility fix for WordPress 3.6
-
-= 1.4.1 =
-* Fixed issue with templates copied to the theme directory not overriding the defaults correctly
-* Fixed incorrectly implemented wp_enqueue_styles()
-* Removed deprecated escape_attribute() function from the plugin widgets
-* Fixed some areas of the code that were generating PHP notices
-
-= 1.4.2 =
-* Fixed a bug in the CSS file override from theme directory
-
-= 1.4.3 =
-* Master schedule shortcode now displays indiviual shows in both 24 and 12 hour time
-* Fixed some areas of the code that were generating PHP notices in WordPress 3.6
-* Added example of how to display show schedule to single-show.php template
-* Added more options to the plugin's widgets
-* Added new options to the master-schedule shortcode
-
-= 1.4.4 =
-* Compatibility fix for Wordpress 3.6 - fixed problem with giving alternative roles DJ capabilities
-* Fixed some areas of the code that were generating PHP notices in WordPress 3.6
-
-= 1.4.5 =
-* Fixed master-schedule shortcode bug that was preventing display of 12 hour time 
+= 1.0 =
+* Initial release  

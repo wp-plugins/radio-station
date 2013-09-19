@@ -90,12 +90,12 @@ function dj_get_current() {
 	global $wpdb;
 	
 	//get the current time
-	$hour = date('H', strtotime(current_time("mysql")));
-	$min = date('i', strtotime(current_time("mysql")));
-	$curDay = date('l', strtotime(current_time("mysql")));
-	$curDate = date('Y-m-d', strtotime(current_time("mysql")));
-	$tomDate = date('Y-m-d', ( strtotime(current_time("mysql")) + 36400)); //get the date for tomorrow
 	$now = strtotime(current_time("mysql"));
+	$hour = date('H', $now);
+	$min = date('i', $now);
+	$curDay = date('l', $now);
+	$curDate = date('Y-m-d', $now);
+	$tomDate = date('Y-m-d', ( $now + 36400)); //get the date for tomorrow
 	
 	//first check to see if a show is scheduled
 	$show_shifts = $wpdb->get_results("SELECT `meta`.`post_id`, `meta`.`meta_value` FROM ".$wpdb->prefix."postmeta AS `meta`
@@ -112,6 +112,8 @@ function dj_get_current() {
 		
 		foreach($shift->meta_value as $time) {
 			//check if the shift is for the current day.  If it's not, skip it
+			
+			
 			if($time['day'] == $curDay) {
 				
 				//convert to 24 hour time
@@ -126,8 +128,17 @@ function dj_get_current() {
 				if($time['start_meridian'] == 'pm' && $time['start_hour'] != 12) {
 					$time['start_hour'] = $time['start_hour'] + 12;
 				}
+				
 				if($time['end_meridian'] == 'pm' && $time['end_hour'] != 12) {
 					$time['end_hour'] = $time['end_hour'] + 12;
+				}
+				
+				if($time['start_meridian'] == 'am' && $time['start_hour'] == 12) {
+					$time['start_hour'] = '00';
+				}
+				
+				if($time['end_meridian'] == 'am' && $time['end_hour'] == 12) {
+					$time['end_hour'] = '00';
 				}
 				
 				//get a timestamp for the schedule start and end
