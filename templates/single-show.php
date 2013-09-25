@@ -29,7 +29,7 @@ get_header(); ?>
 					
 						<!-- custom show output : This portion can be edited or inserted into your own theme files -->
 						<div class="alignleft">
-						<h3>Hosted by:</h3>
+						<h3><?php _e('Hosted by', 'radio-station'); ?>:</h3>
 						<?php 
 							$djs = get_post_meta(get_the_ID(), 'show_user_list', true);
 							$count = 0;
@@ -56,7 +56,7 @@ get_header(); ?>
 						</div>
 						
 						<div class="station-genres alignright">
-							<h3>Genre:</h3>
+							<h3><?php _e('Genre', 'radio-station'); ?>:</h3>
 							<?php
 								//use this function instead if you would like the genres to link to an archive page 
 								//wp_list_categories( array('taxonomy' => 'genres', 'title_li' => '') ); 
@@ -80,22 +80,22 @@ get_header(); ?>
 								}
 							?>
 							<?php if($show_email = get_post_meta(get_the_ID(), 'show_email', true)): ?>
-							<p class="station-dj-email"><a href="mailto:<?php echo $show_email; ?>">Email the DJ</a></p>
+							<p class="station-dj-email"><a href="mailto:<?php echo $show_email; ?>"><?php _e('Email the DJ', 'radio-station'); ?></a></p>
 							<?php endif; ?>
 							
 							<?php if($show_link = get_post_meta(get_the_ID(), 'show_link', true)): ?>
-							<p class="station-show-link"><a href="<?php echo $show_link; ?>">Show Website</a></p>
+							<p class="station-show-link"><a href="<?php echo $show_link; ?>"><?php _e('Show Website', 'radio-station'); ?></a></p>
 							<?php endif; ?>
 						</div>
 						
 						<?php the_content(); ?>
 						
 						<div class="station-broadcast-file">
-							<a href="<?php echo get_post_meta(get_the_ID(), 'show_file', true); ?>">Most recent broadcast</a>
+							<a href="<?php echo get_post_meta(get_the_ID(), 'show_file', true); ?>"><?php _e('Most recent broadcast', 'radio-station'); ?></a>
 						</div>
 						
 						<div class="station-show-schedules">
-							<h3>Schedule</h3>
+							<h3><?php _e('Schedule', 'radio-station'); ?></h3>
 								<ul>
 								<?php 
 									//12-hour time
@@ -103,7 +103,7 @@ get_header(); ?>
 									if($shifts) {
 										foreach($shifts as $shift) {
 											echo '<li>';
-											echo $shift['day'].' - '.$shift['start_hour'].':'.$shift['start_min'].' '.$shift['start_meridian'].' to '.$shift['end_hour'].':'.$shift['end_min'].' '.$shift['end_meridian'];
+											echo __($shift['day'], 'radio-station').' - '.$shift['start_hour'].':'.$shift['start_min'].' '.$shift['start_meridian'].' to '.$shift['end_hour'].':'.$shift['end_min'].' '.$shift['end_meridian'];
 											echo '</li>';
 										}
 									}
@@ -122,7 +122,7 @@ get_header(); ?>
 											}
 											
 											echo '<li>';
-											echo $shift['day'].' - '.$shift['start_hour'].':'.$shift['start_min'].' to '.$shift['end_hour'].':'.$shift['end_min'];
+											echo __($shift['day'], 'radio-station').' - '.$shift['start_hour'].':'.$shift['start_min'].' to '.$shift['end_hour'].':'.$shift['end_min'];
 											echo '</li>';
 										}
 									}
@@ -132,11 +132,11 @@ get_header(); ?>
 						</div>
 						
 						<div class="station-show-playlists">
-							<h3>Playlists</h3>
+							<h3><?php _e('Playlists', 'radio-station'); ?></h3>
 							<?php echo do_shortcode('[get-playlists show="'.get_the_ID().'" limit="5"]'); ?>
 						</div>
 						
-						<?php echo myplaylist_get_posts_for_show(get_the_ID(), 'Blog Posts', '10'); ?>
+						<?php echo myplaylist_get_posts_for_show(get_the_ID(), __('Blog Posts', 'radio-station'), '10'); ?>
 						 
 						<!-- /custom show output -->
 						

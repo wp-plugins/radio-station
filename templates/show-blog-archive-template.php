@@ -13,7 +13,7 @@ get_header(); ?>
 			<?php if ( have_posts() ) : ?>
 
 				<header class="page-header">
-					<h1 class="page-title"><?php echo get_the_title($_GET['show_id']); ?> Blog Archive</h1>
+					<h1 class="page-title"><?php echo get_the_title($_GET['show_id']); ?> <?php _e('Blog Archive', 'radio-station'); ?></h1>
 				</header>
 				<!-- this is the important part... be careful when you're changing this -->
 				<?php
@@ -43,7 +43,7 @@ get_header(); ?>
 
 							<div class="show-date-and author">
 								<?php echo the_date(); ?> - 
-								Posted by <?php the_author_posts_link(); ?>
+								<?php _e('Posted by', 'twentyeleven'); ?> <?php the_author_posts_link(); ?>
 							</div>
 					</header><!-- .entry-header -->
 					

@@ -176,17 +176,27 @@ without permission.
 
 Under the Playlists menu in the dashboard is an Export link.  Simply specify the a date range, and a text file will be generated for you.
 
-= Can my DJ's have customized user profile pages in addition to Show pages? = 
+= Can my DJ's have customized user pages in addition to Show pages? = 
 
 Yes.  These pages are the same as any other author page (edit or create the author.php template file in your theme directory).  A sample can be found 
 in the radio-station/templates/author.php file.  Like the other theme templates included with this plugin, this file is based on the TwentyEleven theme.
 
-= I don't want to use Gravatar for my DJ's image on their user profile page. =
+= I don't want to use Gravatar for my DJ's image on their profile page. =
 
 Then you'll need to install a plugin that lets you add a different image to your DJ's user account and edit your author.php theme file accordingly.  That's a 
 little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  http://wordpress.org/extend/plugins/cimy-user-extra-fields/
 
+= Can you translate the plugin into my language? =
+
+My foreign language skills are rather lacking.  I managed a Spanish translation, sheerly due to the fact that I still remember at least some of what 
+I learned in high school Spanish class.  But I've included the .pot file in the /languages directory.  If you want to give it a shot, be my guest.  If 
+you send me your finished translation, I'd love to include it.
+
 == Changelog ==
+
+= 1.5.0 =
+* Plugin modified to allow for internationalization.
+* Spanish translation added.
 
 = 1.4.6 =
 * Fixed a bug with shows that start at midnight not displaying in the on-air sidebar widget.
@@ -276,6 +286,10 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.5.0 =
+* Plugin modified to allow for internationalization.
+* Spanish translation added.
 
 = 1.4.6 =
 * Fixed a bug with shows that start at midnight not displaying in the on-air sidebar widget.

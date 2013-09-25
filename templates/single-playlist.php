@@ -40,11 +40,11 @@ get_header(); ?>
 						<div class="myplaylist-playlist-entires">
 							<table>
 							<tr>
-								<th>Artist</th>
-								<th>Song</th>
-								<th>Album</th>
-								<th>Label</th>
-								<th>Comments</th>
+								<th><?php _e('Artist', 'radio-station'); ?></th>
+								<th><?php _e('Song', 'radio-station'); ?></th>
+								<th><?php _e('Album', 'radio-station'); ?></th>
+								<th><?php _e('Record Label', 'radio-station'); ?></th>
+								<th><?php _e('DJ Comments', 'radio-station'); ?></th>
 							</tr>
 							<?php foreach($playlist as $entry): ?>
 								<?php if($entry['playlist_entry_status'] == 'played'): ?>
@@ -62,7 +62,7 @@ get_header(); ?>
 						</div>
 						<? else: ?>
 						<div class="myplaylist-no-entries">
-							No entries for this playlist
+							<?php _e('No entries for this playlist', 'radio-station'); ?>
 						</div>
 						<?php endif; ?>
 						

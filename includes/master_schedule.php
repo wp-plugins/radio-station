@@ -2,6 +2,7 @@
 /*
  * Master Show schedule
  * Author: Nikki Blight
+ * @Since: 1.4.5
  */
 
 //jQuery is needed by the output of this code, so let's make sure we have it available
@@ -142,7 +143,7 @@ function master_schedule($atts) {
 	$output .= master_fetch_js_filter();
 	
 	$output .= '<table id="master-program-schedule">';
-	$output .= '<tr> <th></th> <th>Sun</th> <th>Mon</th> <th>Tue</th> <th>Wed</th> <th>Thu</th> <th>Fri</th> <th>Sat</th> </tr>';
+	$output .= '<tr class="master-program-day-row"> <th></th> <th>'.__('Sun', 'radio-station').'</th> <th>'.__('Mon', 'radio-station').'</th> <th>'.__('Tue', 'radio-station').'</th> <th>'.__('Wed', 'radio-station').'</th> <th>'.__('Thu', 'radio-station').'</th> <th>'.__('Fri', 'radio-station').'</th> <th>'.__('Sat', 'radio-station').'</th> </tr>';
 	
 	if(!isset($nextskip)) {
 		$nextskip = array();
@@ -150,7 +151,7 @@ function master_schedule($atts) {
 	
 	foreach($master_list as $hour => $days) {
 		$output .= '<tr>';
-		$output .= '<th>';
+		$output .= '<th class="master-program-hour">';
 		
 		if($timeformat == 12) {
 			if($hour == 0) {
@@ -227,7 +228,7 @@ function master_schedule($atts) {
 				//print_r($shift);
 				
 				$terms = wp_get_post_terms( $shift['id'], 'genres', array() );
-				$classes = ' ';
+				$classes = ' show-id-'.$shift['id'].' '.sanitize_title_with_dashes(str_replace("_", "-", get_the_title($shift['id']))).' ';
 				foreach($terms as $term) {
 					$classes .= $term->name.' ';
 				}
@@ -262,13 +263,13 @@ function master_schedule($atts) {
 					
 					$output .= '<span class="show-time">';
 					if(isset($shift['time']['real_start'])) {
-						$output .= $day.'<br />'.$shift['time']['real_start'].' - '.$shift['time']['end_hour'].':'.$shift['time']['end_min'];
+						$output .= __($day, 'radio-station').'<br />'.$shift['time']['real_start'].' - '.$shift['time']['end_hour'].':'.$shift['time']['end_min'];
 						if($timeformat == 12) {
 							$output .= $shift['time']['end_meridian'];
 						}
 					}
 					else {
-						$output .= $day.'<br />'.$shift['time']['start_hour'].':'.$shift['time']['start_min'];
+						$output .= __($day, 'radio-station').'<br />'.$shift['time']['start_hour'].':'.$shift['time']['start_min'];
 						if($timeformat == 12) {
 							$output .= $shift['time']['start_meridian'];;
 						}
@@ -283,12 +284,12 @@ function master_schedule($atts) {
 				}
 				
 				if(isset($shift['time']['encore']) && $shift['time']['encore'] == 'on') {
-					$output .= '<span class="show-encore">encore airing</span>';
+					$output .= '<span class="show-encore">'.__('encore airing', 'radio-station').'</span>';
 				}
 				
 				$link = get_post_meta($shift['id'], 'show_file', true);
 				if($link != '') {
-					$output .= '<span class="show-file"><a href="'.$link.'">Audio File</a>';
+					$output .= '<span class="show-file"><a href="'.$link.'">'.__('Audio File', 'radio-station').'</a>';
 				}
 				
 				$output .= '</div>';
@@ -306,7 +307,7 @@ function master_schedule($atts) {
 add_shortcode( 'master-schedule', 'master_schedule');
 
 function master_fetch_js_filter(){
-	$js = '<div id="master-genre-list"><span class="heading">Genres: </span>';
+	$js = '<div id="master-genre-list"><span class="heading">'.__('Genres', 'radio-station').': </span>';
 	
 	$taxes = get_terms('genres', array('hide_empty' => true, 'orderby' => 'name', 'order' => 'ASC'));
 	foreach($taxes as $i => $tax) {

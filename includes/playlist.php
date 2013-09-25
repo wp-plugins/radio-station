@@ -2,7 +2,7 @@
 /* 
  * Playlist and Show functionality
  * Author: Nikki Blight
- * 
+ * Since: 1.3.8
  */
 
 /* Playlists */
@@ -13,16 +13,16 @@ function myplaylist_create_post_types() {
 	register_post_type( 'playlist',
 		array(
 			'labels' => array(
-				'name' => __( 'Playlists' ),
-				'singular_name' => __( 'Playlist' ),
-				'add_new' => __( 'Add Playlist'),
-				'add_new_item' => __( 'Add Playlist'),
-				'edit_item' => __( 'Edit Playlist' ),
-				'new_item' => __( 'New Playlist' ),
-				'view_item' => __( 'View Playlist' )
+				'name' => __( 'Playlists', 'radio-station' ),
+				'singular_name' => __( 'Playlist', 'radio-station' ),
+				'add_new' => __( 'Add Playlist', 'radio-station' ),
+				'add_new_item' => __( 'Add Playlist', 'radio-station' ),
+				'edit_item' => __( 'Edit Playlist', 'radio-station' ),
+				'new_item' => __( 'New Playlist', 'radio-station' ),
+				'view_item' => __( 'View Playlist', 'radio-station' )
 			),
 			'show_ui' => true,
-			'description' => 'Post type for Playlist descriptions',
+			'description' => __('Post type for Playlist descriptions', 'radio-station'),
 			'menu_position' => 5,
 			'menu_icon' => WP_PLUGIN_URL.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__)) . 'images/playlist-menu-icon.png',
 			'public' => true,
@@ -39,16 +39,16 @@ function myplaylist_create_post_types() {
 	register_post_type( 'show',
 		array(
 			'labels' => array(
-				'name' => __( 'Shows' ),
-				'singular_name' => __( 'Show' ),
-				'add_new' => __( 'Add Show'),
-				'add_new_item' => __( 'Add Show'),
-				'edit_item' => __( 'Edit Show' ),
-				'new_item' => __( 'New Show' ),
-				'view_item' => __( 'View Show' )
+				'name' => __( 'Shows', 'radio-station' ),
+				'singular_name' => __( 'Show', 'radio-station' ),
+				'add_new' => __( 'Add Show', 'radio-station' ),
+				'add_new_item' => __( 'Add Show', 'radio-station' ),
+				'edit_item' => __( 'Edit Show', 'radio-station' ),
+				'new_item' => __( 'New Show', 'radio-station' ),
+				'view_item' => __( 'View Show', 'radio-station' )
 			),
 			'show_ui' => true,
-			'description' => 'Post type for Show descriptions',
+			'description' => __('Post type for Show descriptions', 'radio-station'),
 			'menu_position' => 5,
 			'menu_icon' => WP_PLUGIN_URL.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__)) . 'images/show-menu-icon.png',
 			'public' => true,
@@ -68,7 +68,7 @@ add_action( 'init', 'myplaylist_create_post_types' );
 function myplaylist_add_custom_box() {
 	add_meta_box(
         'dynamic_sectionid',
-	__( 'Playlist Entries', 'myplugin_textdomain' ),
+	__( 'Playlist Entries', 'radio-station' ),
         'myplaylist_inner_custom_box',
         'playlist');
 }
@@ -90,7 +90,7 @@ function myplaylist_inner_custom_box() {
     
     echo '<table id="here" class="widefat">';
     echo "<tr>";
-    echo "<th></th><th>Artist</th><th>Song</th><th>Album</th><th>Record Label</th><th>DJ Comments</th><th>New</th><th>Status</th><th>Remove</th>";
+    echo "<th></th><th>".__('Artist', 'radio-station')."</th><th>".__('Song', 'radio-station')."</th><th>".__('Album', 'radio-station')."</th><th>".__('Record Label', 'radio-station')."</th><th>".__('DJ Comments', 'radio-station')."</th><th>".__('New', 'radio-station')."</th><th>".__('Status', 'radio-station')."</th><th>".__('Remove', 'radio-station')."</th>";
     echo "</tr>";
     
     if (isset($entries[0]) && count($entries[0]) > 0){
@@ -116,15 +116,15 @@ function myplaylist_inner_custom_box() {
                 
                 echo '<option value="queued"';
                 if($track['playlist_entry_status'] == "queued") { echo ' selected="selected"'; }
-                echo '>Queued</option>';
+                echo '>'.__('Queued', 'radio-station').'</option>';
                 
                 echo '<option value="played"';
                 if($track['playlist_entry_status'] == "played") { echo ' selected="selected"'; }
-                echo '>Played</option>';
+                echo '>'.__('Played', 'radio-station').'</option>';
                 
                 echo '</select></td>';
                 
-                echo '<td><span class="remove button-secondary" style="cursor: pointer;">Remove</span></td>';
+                echo '<td><span class="remove button-secondary" style="cursor: pointer;">'.__('Remove', 'radio-station').'</span></td>';
                 echo '</tr>';
                 $c = $c +1;
             }
@@ -133,7 +133,7 @@ function myplaylist_inner_custom_box() {
     echo '</table>';
 
     ?>
-<a class="add button-primary" style="cursor: pointer; float: right; margin-top: 5px;"><?php echo __('Add Entry'); ?></a>
+<a class="add button-primary" style="cursor: pointer; float: right; margin-top: 5px;"><?php echo __('Add Entry', 'radio-station'); ?></a>
 <div style="clear: both;"></div>
 <script>
     var $ =jQuery.noConflict();
@@ -141,7 +141,7 @@ function myplaylist_inner_custom_box() {
         var count = <?php echo $c; ?>;
         $(".add").click(function() {
             
-            $('#here').append('<tr><td>'+count+'</td><td><input type="text" name="playlist['+count+'][playlist_entry_artist]" value="" /></td><td><input type="text" name="playlist['+count+'][playlist_entry_song]" value="" /></td><td><input type="text" name="playlist['+count+'][playlist_entry_album]" value="" /></td><td><input type="text" name="playlist['+count+'][playlist_entry_label]" value="" /></td><td><textarea name="playlist['+count+'][playlist_entry_comments]"></textarea></td><td><input type="checkbox" name="playlist['+count+'][playlist_entry_new]" /></td><td><select name="playlist['+count+'][playlist_entry_status]"><option value="queued">Queued</option><option value="played">Played</option></select></td><td><span class="remove button-secondary" style="cursor: pointer;">Remove</span></td></tr>' );
+            $('#here').append('<tr><td>'+count+'</td><td><input type="text" name="playlist['+count+'][playlist_entry_artist]" value="" /></td><td><input type="text" name="playlist['+count+'][playlist_entry_song]" value="" /></td><td><input type="text" name="playlist['+count+'][playlist_entry_album]" value="" /></td><td><input type="text" name="playlist['+count+'][playlist_entry_label]" value="" /></td><td><textarea name="playlist['+count+'][playlist_entry_comments]"></textarea></td><td><input type="checkbox" name="playlist['+count+'][playlist_entry_new]" /></td><td><select name="playlist['+count+'][playlist_entry_status]"><option value="queued"><?php _e('Queued', 'radio-station'); ?></option><option value="played"><?php _e('Played', 'radio-station'); ?></option></select></td><td><span class="remove button-secondary" style="cursor: pointer;"><?php _e('Remove', 'radio-station'); ?></span></td></tr>' );
             count = count + 1;
             return false;
         });
@@ -160,20 +160,20 @@ function myplaylist_inner_custom_box() {
 	if ( !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0 == $post->ID ) {
 		if ( $can_publish ) :
 		if ( !empty($post->post_date_gmt) && time() < strtotime( $post->post_date_gmt . ' +0000' ) ) : ?>
-			<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Schedule') ?>" />
+			<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Schedule','radio-station'); ?>" />
 			<?php submit_button( __( 'Schedule' ), 'primary', 'publish', false, array( 'tabindex' => '50', 'accesskey' => 'o' ) ); ?>
 	<?php	else : ?>
-			<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Publish') ?>" />
+			<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Publish', 'radio-station'); ?>" />
 			<?php submit_button( __( 'Publish' ), 'primary', 'publish', false, array( 'tabindex' => '50', 'accesskey' => 'o' ) ); ?>
 	<?php	endif;
 		else : ?>
-			<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Submit for Review') ?>" />
+			<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Submit for Review', 'radio-station'); ?>" />
 			<?php submit_button( __( 'Update Playlist' ), 'primary', 'publish', false, array( 'tabindex' => '50', 'accesskey' => 'o' ) ); ?>
 	<?php
 		endif;
 	} else { ?>
-			<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Update') ?>" />
-			<input name="save" type="submit" class="button-primary" id="publish" tabindex="50" accesskey="o" value="<?php esc_attr_e('Update Playlist') ?>" />
+			<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Update', 'radio-station'); ?>" />
+			<input name="save" type="submit" class="button-primary" id="publish" tabindex="50" accesskey="o" value="<?php esc_attr_e('Update Playlist', 'radio-station'); ?>" />
 	<?php
 	} ?>
 </div>
@@ -188,7 +188,7 @@ function myplaylist_inner_custom_box() {
 function myplaylist_add_show_box() {
 	add_meta_box(
         'dynamicShow_sectionid',
-	__( 'Show', 'myplugin_textdomain' ),
+	__( 'Show', 'radio-station' ),
         'myplaylist_inner_show_custom_box',
         'playlist',
 		'side');
@@ -410,8 +410,8 @@ class Playlist_Widget extends WP_Widget {
 	
 	//define the widget
 	function Playlist_Widget() {
-		$widget_ops = array('classname' => 'Playlist_Widget', 'description' => 'Display the current song.');
-		$this->WP_Widget('Playlist_Widget', 'Radio Station: Now Playing', $widget_ops);
+		$widget_ops = array('classname' => 'Playlist_Widget', 'description' => __('Display the current song.', 'radio-station'));
+		$this->WP_Widget('Playlist_Widget', __('Radio Station: Now Playing', 'radio-station'), $widget_ops);
 	}
  	
 	//build the backend widget form
@@ -426,7 +426,7 @@ class Playlist_Widget extends WP_Widget {
 		
 		?>
 			<p>
-		  		<label for="<?php echo $this->get_field_id('title'); ?>">Title: 
+		  		<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title', 'radio-station'); ?>: 
 		  		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" />
 		  		</label>
 		  	</p>
@@ -434,35 +434,35 @@ class Playlist_Widget extends WP_Widget {
 		  	<p>
 		  		<label for="<?php echo $this->get_field_id('artist'); ?>"> 
 		  		<input id="<?php echo $this->get_field_id('artist'); ?>" name="<?php echo $this->get_field_name('artist'); ?>" type="checkbox" <?php if($artist) { echo 'checked="checked"'; } ?> /> 
-		  		Show Artist Name
+		  		<?php _e('Show Artist Name', 'radio-station'); ?>
 		  		</label>
 		  	</p>
 		  	
 		  	<p>
 		  		<label for="<?php echo $this->get_field_id('song'); ?>"> 
 		  		<input id="<?php echo $this->get_field_id('song'); ?>" name="<?php echo $this->get_field_name('song'); ?>" type="checkbox" <?php if($song) { echo 'checked="checked"'; } ?> /> 
-		  		Show Song Title
+		  		<?php _e('Show Song Title', 'radio-station'); ?>
 		  		</label>
 		  	</p>
 		  	
 		  	<p>
 		  		<label for="<?php echo $this->get_field_id('album'); ?>"> 
 		  		<input id="<?php echo $this->get_field_id('album'); ?>" name="<?php echo $this->get_field_name('album'); ?>" type="checkbox" <?php if($album) { echo 'checked="checked"'; } ?> /> 
-		  		Show Album Name
+		  		<?php _e('Show Album Name', 'radio-station'); ?>
 		  		</label>
 		  	</p>
 		  	
 		  	<p>
 		  		<label for="<?php echo $this->get_field_id('label'); ?>"> 
 		  		<input id="<?php echo $this->get_field_id('label'); ?>" name="<?php echo $this->get_field_name('label'); ?>" type="checkbox" <?php if($label) { echo 'checked="checked"'; } ?> /> 
-		  		Show Record Label Name
+		  		<?php _e('Show Record Label Name', 'radio-station'); ?>
 		  		</label>
 		  	</p>
 		  	
 		  	<p>
 		  		<label for="<?php echo $this->get_field_id('comments'); ?>"> 
 		  		<input id="<?php echo $this->get_field_id('comments'); ?>" name="<?php echo $this->get_field_name('comments'); ?>" type="checkbox" <?php if($comments) { echo 'checked="checked"'; } ?> /> 
-		  		Show DJ Comments
+		  		<?php _e('Show DJ Comments', 'radio-station'); ?>
 		  		</label>
 		  	</p>
 		<?php
@@ -535,7 +535,7 @@ class Playlist_Widget extends WP_Widget {
 				}
 				
 				echo '<span class="myplaylist-link">';
-				echo '<a href="'.$most_recent['playlist_permalink'].'">View Playlist</a>';
+				echo '<a href="'.$most_recent['playlist_permalink'].'">'.__('View Playlist', 'radio-station').'</a>';
 				echo '</span>';
 				echo '</div>';
 			?>
@@ -556,8 +556,8 @@ function myplaylist_create_show_taxonomy() {
 	register_taxonomy('genres', array('show'),
 		array(
 				'hierarchical' => true, 
-				'label' => 'Genres', 
-				'singular_label' => 'Genres',
+				'label' => __('Genres', 'radio-station'), 
+				'singular_label' => __('Genre', 'radio-station'),
 				'public' => true,
 				'show_tagcloud' => false,
 				'query_var' => true,
@@ -578,7 +578,7 @@ add_action('init', 'myplaylist_create_show_taxonomy');
 function myplaylist_add_metainfo_box() {
 	add_meta_box(
         'dynamicShowMeta_sectionid',
-	__( 'Information', 'myplugin_textdomain' ),
+	__( 'Information', 'radio-station' ),
         'myplaylist_inner_metainfo_custom_box',
         'show');
 }
@@ -596,16 +596,17 @@ function myplaylist_inner_metainfo_custom_box() {
 	?>
     <div id="meta_inner">
     
-    <p><label>Active</label>
-    <input type="checkbox" name="show_active" <?php if($active == 'on') { echo 'checked="checked"'; } ?>  /><br /><em>Check this box if show is currently active (Show will not appear on programming schedule if unchecked)</em></p>
+    <p><label><?php _e('Active', 'radio-station'); ?></label>
+    <input type="checkbox" name="show_active" <?php if($active == 'on') { echo 'checked="checked"'; } ?>  /><br />
+    <em><?php _e('Check this box if show is currently active (Show will not appear on programming schedule if unchecked)', 'radio-station'); ?></em></p>
     
-    <p><label>Current Audio File:</label><br />
+    <p><label><?php _e('Current Audio File', 'radio-station'); ?>:</label><br />
     <input type="text" name="show_file" size="100" value="<?php echo $file; ?>" /></p>
     
-    <p><label>DJ Email:</label><br />
+    <p><label><?php _e('DJ Email', 'radio-station'); ?>:</label><br />
     <input type="text" name="show_email" size="100" value="<?php echo $email; ?>" /></p>
     
-    <p><label>Website Link:</label><br />
+    <p><label><?php _e('Website Link', 'radio-station'); ?>:</label><br />
     <input type="text" name="show_link" size="100" value="<?php echo $link; ?>" /></p>
     
 	</div>
@@ -616,7 +617,7 @@ function myplaylist_inner_metainfo_custom_box() {
 function myplaylist_add_user_box() {
 	add_meta_box(
         'dynamicUser_sectionid',
-	__( 'DJs', 'myplugin_textdomain' ),
+	__( 'DJs', 'radio-station' ),
         'myplaylist_inner_user_custom_box',
         'show',
 		'side');
@@ -701,7 +702,7 @@ function myplaylist_inner_user_custom_box() {
 function myplaylist_add_sched_box() {
 	add_meta_box(
         'dynamicSched_sectionid',
-	__( 'Schedules', 'myplugin_textdomain' ),
+	__( 'Schedules', 'radio-station' ),
         'myplaylist_inner_sched_custom_box',
         'show');
 }
@@ -726,19 +727,19 @@ function myplaylist_inner_sched_custom_box() {
 	            if (isset($track['day']) || isset($track['time'])){
 	            	?>
 	            	<p>
-	            		Day: 
+	            		<?php _e('Day', 'radio-station'); ?>: 
 	            		<select name="show_sched[<?php echo $c; ?>][day]">
 	            			<option value=""></option>
-	            			<option value="Monday"<?php if($track['day'] == "Monday") { echo ' selected="selected"'; } ?>>Monday</option>
-	            			<option value="Tuesday"<?php if($track['day'] == "Tuesday") { echo ' selected="selected"'; } ?>>Tuesday</option>
-	            			<option value="Wednesday"<?php if($track['day'] == "Wednesday") { echo ' selected="selected"'; } ?>>Wednesday</option>
-	            			<option value="Thursday"<?php if($track['day'] == "Thursday") { echo ' selected="selected"'; } ?>>Thursday</option>
-	            			<option value="Friday"<?php if($track['day'] == "Friday") { echo ' selected="selected"'; } ?>>Friday</option>
-	            			<option value="Saturday"<?php if($track['day'] == "Saturday") { echo ' selected="selected"'; } ?>>Saturday</option>
-	            			<option value="Sunday"<?php if($track['day'] == "Sunday") { echo ' selected="selected"'; } ?>>Sunday</option>
+	            			<option value="Monday"<?php if($track['day'] == "Monday") { echo ' selected="selected"'; } ?>><?php _e('Monday', 'radio-station'); ?></option>
+	            			<option value="Tuesday"<?php if($track['day'] == "Tuesday") { echo ' selected="selected"'; } ?>><?php _e('Tuesday', 'radio-station'); ?></option>
+	            			<option value="Wednesday"<?php if($track['day'] == "Wednesday") { echo ' selected="selected"'; } ?>><?php _e('Wednesday', 'radio-station'); ?></option>
+	            			<option value="Thursday"<?php if($track['day'] == "Thursday") { echo ' selected="selected"'; } ?>><?php _e('Thursday', 'radio-station'); ?></option>
+	            			<option value="Friday"<?php if($track['day'] == "Friday") { echo ' selected="selected"'; } ?>><?php _e('Friday', 'radio-station'); ?></option>
+	            			<option value="Saturday"<?php if($track['day'] == "Saturday") { echo ' selected="selected"'; } ?>><?php _e('Saturday', 'radio-station'); ?></option>
+	            			<option value="Sunday"<?php if($track['day'] == "Sunday") { echo ' selected="selected"'; } ?>><?php _e('Sunday', 'radio-station'); ?></option>
 	            		</select>
 	            		 - 
-	            		Start Time: 
+	            		<?php _e('Start Time', 'radio-station'); ?>: 
 	            		<select name="show_sched[<?php echo $c; ?>][start_hour]">
 	            			<option value=""></option>
 	            		<?php for($i=1; $i<=12; $i++): ?>
@@ -764,7 +765,7 @@ function myplaylist_inner_sched_custom_box() {
 	            		</select>
 	            		
 	            		 -  
-	            		End Time: 
+	            		<?php _e('End Time', 'radio-station'); ?>: 
 	            		<select name="show_sched[<?php echo $c; ?>][end_hour]">
 	            			<option value=""></option>
 	            		<?php for($i=1; $i<=12; $i++): ?>
@@ -788,8 +789,8 @@ function myplaylist_inner_sched_custom_box() {
 	            			<option value="am"<?php if($track['end_meridian'] == "am") { echo ' selected="selected"'; } ?>>am</option>
 	            			<option value="pm"<?php if($track['end_meridian'] == "pm") { echo ' selected="selected"'; } ?>>pm</option>
 	            		</select>
-	            		<input type="checkbox" name="show_sched[<?php echo $c; ?>][encore]" <?php if(isset($track['encore']) && $track['encore'] == 'on') { echo 'checked="checked"'; } ?>/> Encore Presentation
-	            		<span class="remove button-secondary" style="cursor: pointer;">Remove</span>
+	            		<input type="checkbox" name="show_sched[<?php echo $c; ?>][encore]" <?php if(isset($track['encore']) && $track['encore'] == 'on') { echo 'checked="checked"'; } ?>/> <?php _e('Encore Presentation', 'radio-station'); ?>
+	            		<span class="remove button-secondary" style="cursor: pointer;"><?php _e('Remove', 'radio-station'); ?></span>
 	            	</p>
 	            	<?php 
 	                $c = $c +1;
@@ -799,7 +800,7 @@ function myplaylist_inner_sched_custom_box() {
 	
 	    ?>
 	<span id="here"></span>
-	<a class="add button-primary" style="cursor: pointer; display:block; width: 75px; padding: 8px; text-align: center; line-height: 1em;"><?php echo __('Add Shift'); ?></a>
+	<a class="add button-primary" style="cursor: pointer; display:block; width: 150px; padding: 8px; text-align: center; line-height: 1em;"><?php echo __('Add Shift', 'radio-station'); ?></a>
 	<script>
 	    var $ =jQuery.noConflict();
 	    $(document).ready(function() {
@@ -809,15 +810,15 @@ function myplaylist_inner_sched_custom_box() {
 				output = '<p>Day: '; 
 				output += '<select name="show_sched[' + count + '][day]">';
 				output += '<option value=""></option>';
-				output += '<option value="Monday">Monday</option>';
-				output += '<option value="Tuesday">Tuesday</option>';
-				output += '<option value="Wednesday">Wednesday</option>';
-				output += '<option value="Thursday">Thursday</option>';
-				output += '<option value="Friday">Friday</option>';
-				output += '<option value="Saturday">Saturday</option>';
-				output += '<option value="Sunday">Sunday</option>';
+				output += '<option value="Monday"><?php _e('Monday', 'radio-station'); ?></option>';
+				output += '<option value="Tuesday"><?php _e('Tuesday', 'radio-station'); ?></option>';
+				output += '<option value="Wednesday"><?php _e('Wednesday', 'radio-station'); ?></option>';
+				output += '<option value="Thursday"><?php _e('Thursday', 'radio-station'); ?></option>';
+				output += '<option value="Friday"><?php _e('Friday', 'radio-station'); ?></option>';
+				output += '<option value="Saturday"><?php _e('Saturday', 'radio-station'); ?></option>';
+				output += '<option value="Sunday"><?php _e('Sunday', 'radio-station'); ?></option>';
 				output += '</select>';
-				output += ' - Start Time: ';
+				output += ' - <?php _e('Start Time', 'radio-station'); ?>: ';
 				
 				output += '<select name="show_sched[' + count + '][start_hour]">';
 				output += '<option value=""></option>';
@@ -843,7 +844,7 @@ function myplaylist_inner_sched_custom_box() {
     			output += '<option value="pm">pm</option>';
 				output += '</select> ';
 
-				output += ' - End Time: ';
+				output += ' - <?php _e('End Time', 'radio-station'); ?>: ';
 				output += '<select name="show_sched[' + count + '][end_hour]">';
 				output += '<option value=""></option>';
 				<?php for($i=1; $i<=12; $i++): ?>
@@ -868,9 +869,9 @@ function myplaylist_inner_sched_custom_box() {
     			output += '<option value="pm">pm</option>';
 				output += '</select> ';
 
-				output += '<input type="checkbox" name="show_sched[' + count + '][encore]" /> Encore Presentation ';
+				output += '<input type="checkbox" name="show_sched[' + count + '][encore]" /> <?php _e('Encore Presentation', 'radio-station'); ?> ';
 
-				output += '<span class="remove button-secondary" style="cursor: pointer;">Remove</span></p>';
+				output += '<span class="remove button-secondary" style="cursor: pointer;"><?php _e('Remove', 'radio-station'); ?></span></p>';
 	            $('#here').append( output );
 
 	            return false;
@@ -962,7 +963,7 @@ function myplaylist_get_playlists_for_show($atts) {
 	$params = array( 'show_id' => $show );
 	$playlist_archive = add_query_arg( $params, $playlist_archive );
 	
-	$output .= '<a href="'.$playlist_archive.'">More Playlists</a>';
+	$output .= '<a href="'.$playlist_archive.'">'.__('More Playlists', 'radio-station').'</a>';
 	
 	$output .= '</div>';
 
@@ -1023,14 +1024,18 @@ function myplaylist_get_posts_for_show($show_id = null, $title = '', $limit = 10
 		$params = array( 'show_id' => $show_id );
 		$blog_archive = add_query_arg( $params, $blog_archive );
 		
-		$output .= '<a href="'.$blog_archive.'">More Blog Posts</a>';
+		$output .= '<a href="'.$blog_archive.'">'.__('More Blog Posts', 'radio-station').'</a>';
 	}
 	
 	return $output;
 }
 
 //shortcode for displaying a list of all shows
-function myplaylist_list_shows() {
+function myplaylist_list_shows($atts) {
+	extract( shortcode_atts( array(
+			'genre' => ''
+	), $atts ) );
+	
 	//grab the published shows
 	$args = array(
 					'numberposts'     => -1,
@@ -1046,6 +1051,10 @@ function myplaylist_list_shows() {
 										)
 									)
 	);
+	
+	if($genre != '') {
+		$args['genres'] = $genre;
+	}
 	
 	$shows = get_posts($args);
 	

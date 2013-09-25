@@ -13,7 +13,7 @@ get_header(); ?>
 			<?php if ( have_posts() ) : ?>
 
 				<header class="page-header">
-					<h1 class="page-title">Playlist Archive</h1>
+					<h1 class="page-title"><?php _e('Playlist Archive', 'radio-station'); ?></h1>
 				</header>
 				<!-- this is the important part... be careful when you're changing this -->
 				<?php

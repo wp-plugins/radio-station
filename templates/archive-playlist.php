@@ -12,7 +12,7 @@ get_header(); ?>
 
 				<header class="page-header">
 					<h1 class="page-title">
-						Playlist Archive for <?php echo get_the_title($_GET['show_id']); ?>
+						<?php _e('Playlist Archive for', 'radio-station'); ?> <?php echo get_the_title($_GET['show_id']); ?>
 					</h1>
 				</header>
 

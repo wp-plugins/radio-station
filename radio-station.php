@@ -1,21 +1,44 @@
 <?php
 /**
  * @package Radio Station
- * @version 1.4.6
+ * @version 1.5.0
  */
 /*
 Plugin Name: Radio Station
 Plugin URI: http://nlb-creations.com/2013/02/25/wordpress-plugin-radio-station/ 
 Description: Adds playlist and on-air programming functionality to your site.
 Author: Nikki Blight <nblight@nlb-creations.com>
-Version: 1.4.6
+Version: 1.5.0
+Text Domain: radio-station
+Domain Path: /languages
 Author URI: http://www.nlb-creations.com
+
+Copyright 2013 Nikki Blight  (email : nblight@nlb-creations.com)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License, version 2, as 
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 //let's include some files
 include('includes/playlist.php');
 include('includes/dj-on-air.php');
 include('includes/master_schedule.php');
+
+//load the text domain
+function station_init() {
+	load_plugin_textdomain( 'radio-station', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+}
+add_action('plugins_loaded', 'station_init');
 
 //add the necessary stylesheets
 function station_load_styles() {
@@ -218,7 +241,7 @@ function station_admin_menu() {
 	if (function_exists('add_options_page')) {
 
 		//add to Announcements tab
-		add_submenu_page( 'edit.php?post_type=playlist', 'Export Playlists', 'Export', 'manage_options', 'radio-station', 'station_admin_export' );
+		add_submenu_page( 'edit.php?post_type=playlist', __('Export Playlists', 'radio-station'), __('Export', 'radio-station'), 'manage_options', 'radio-station', 'station_admin_export' );
 	}
 }
 add_action( 'admin_menu', 'station_admin_menu' );
@@ -253,7 +276,7 @@ function station_admin_export() {
 										AND TO_DAYS(`posts`.`post_date`) >= TO_DAYS('".$start." 00:00:00') AND TO_DAYS(`posts`.`post_date`) <= TO_DAYS('".$end." 23:59:59')  
 										ORDER BY `posts`.`post_date` ASC;");
 		
-		if(!$playlist) {
+		if(!$playlists) {
 			$list = 'No playlists found for this period.';
 		}
 		
@@ -297,14 +320,14 @@ function station_admin_export() {
 		fclose($f);
 		
 		//display link to file
-		echo '<div id="message" class="updated"><p><strong><a href="'.get_bloginfo('url').'/wp-content/plugins/radio-station/tmp/'.$file.'">Right-click and download this file to save your export</a></strong></p></div>';
+		echo '<div id="message" class="updated"><p><strong><a href="'.get_bloginfo('url').'/wp-content/plugins/radio-station/tmp/'.$file.'">'.__('Right-click and download this file to save your export', 'radio-station').'</a></strong></p></div>';
 	}
 
 	//display the page
 	?>
  
 <div style="width: 620px; padding: 10px">
-	<h2><?php _e('Export Playlists'); ?></h2>
+	<h2><?php _e('Export Playlists', 'radio-station'); ?></h2>
 	<form action="" method="post" id="export_form" accept-charset="utf-8" style="position:relative">
 		
 		<?php wp_nonce_field('station_export_valid'); ?>
@@ -314,7 +337,7 @@ function station_admin_export() {
 			
 			<tr valign="top">
 				<?php $smonth = isset($_POST['station_export_start_month']) ? $_POST['station_export_start_month'] : ''; ?>
-				<th scope="row">Start Date</th>
+				<th scope="row"><?php _e('Start Date', 'radio-station'); ?></th>
 				<td>
 					<select name="station_export_start_month" id="station_export_start_month">
 						<option value="01" <?php if($smonth == '01') { echo 'selected="selected"'; } ?>>Jan</option>
@@ -368,7 +391,7 @@ function station_admin_export() {
 			</tr>
 			
 			<tr valign="top">
-				<th scope="row">End Date</th>
+				<th scope="row"><?php _e('End Date', 'radio-station'); ?></th>
 				<td>
 					<?php $emonth = isset($_POST['station_export_end_month']) ? $_POST['station_export_end_month'] : ''; ?>
 					<select name="station_export_end_month" id="station_export_end_month">
@@ -425,7 +448,7 @@ function station_admin_export() {
 			<tr valign="top">
 				<th scope="row">&nbsp;</th>
 				<td>
-					<input type="submit" name="Submit" class="button-primary" value="<?php _e('Export') ?>"/>
+					<input type="submit" name="Submit" class="button-primary" value="<?php _e('Export', 'radio-station'); ?>"/>
 				</td>
 			</tr>
 		</table>
@@ -440,7 +463,7 @@ function station_admin_export() {
 function station_add_showblog_box() {
 	add_meta_box(
 			'dynamicShowBlog_sectionid',
-			__( 'Related to Show', 'myplugin_textdomain' ),
+			__( 'Related to Show', 'radio-station' ),
 			'station_inner_showblog_custom_box',
 			'post',
 			'side');
