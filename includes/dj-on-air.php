@@ -365,14 +365,14 @@ class DJ_Widget extends WP_Widget {
 		  	</p>
 		  	
 		  	<p>
-		  		<label for="<?php echo $this->get_field_id('default'); ?>">Default DJ Name: 
+		  		<label for="<?php echo $this->get_field_id('default'); ?>"><?php _e('Default DJ Name', 'radio-station'); ?>: 
 		  		<input class="widefat" id="<?php echo $this->get_field_id('default'); ?>" name="<?php echo $this->get_field_name('default'); ?>" type="text" value="<?php echo esc_attr($default); ?>" />
 		  		</label>
 		  		<small><?php _e('If no Show/DJ is scheduled for the current hour, display this name/text.', 'radio-station'); ?></small>
 		  	</p>
 		  	
 		  	<p>
-		  		<label for="<?php echo $this->get_field_id('time'); ?>">Time Format:<br /> 
+		  		<label for="<?php echo $this->get_field_id('time'); ?>"><?php _e('Time Format', 'radio-station'); ?>:<br /> 
 		  		<select id="<?php echo $this->get_field_id('time'); ?>" name="<?php echo $this->get_field_name('time'); ?>">
 		  			<option value="12" <?php if(esc_attr($time) == 12) { echo 'selected="selected"'; } ?>><?php _e('12-hour', 'radio-station'); ?></option>
 		  			<option value="24" <?php if(esc_attr($time) == 24) { echo 'selected="selected"'; } ?>><?php _e('24-hour', 'radio-station'); ?></option>
@@ -539,7 +539,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		  	</p>
 		  	
 		  	<p>
-		  		<label for="<?php echo $this->get_field_id('default'); ?>">No Additional Schedules: 
+		  		<label for="<?php echo $this->get_field_id('default'); ?>"><?php _e('No Additional Schedules', 'radio-station'); ?>: 
 		  		<input class="widefat" id="<?php echo $this->get_field_id('default'); ?>" name="<?php echo $this->get_field_name('default'); ?>" type="text" value="<?php echo esc_attr($default); ?>" />
 		  		</label>
 		  		<small><?php _e('If no Show/DJ is scheduled for the current hour, display this name/text.', 'radio-station'); ?></small>
@@ -553,17 +553,17 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		  	</p>
 		  	
 		  	<p>
-		  		<label for="<?php echo $this->get_field_id('limit'); ?>">Limit: 
+		  		<label for="<?php echo $this->get_field_id('limit'); ?>"><?php _e('Limit', 'radio-station'); ?>: 
 		  		<input class="widefat" id="<?php echo $this->get_field_id('limit'); ?>" name="<?php echo $this->get_field_name('limit'); ?>" type="text" value="<?php echo esc_attr($limit); ?>" />
 		  		</label>
 		  		<small><?php _e('Number of upcoming DJs/Shows to display.', 'radio-station'); ?></small>
 		  	</p>
 		  	
 		  	<p>
-		  		<label for="<?php echo $this->get_field_id('time'); ?>">Time Format:<br /> 
+		  		<label for="<?php echo $this->get_field_id('time'); ?>"><?php _e('Time Format', 'radio-station'); ?>:<br /> 
 		  		<select id="<?php echo $this->get_field_id('time'); ?>" name="<?php echo $this->get_field_name('time'); ?>">
-		  			<option value="12" <?php if(esc_attr($time) == 12) { echo 'selected="selected"'; } ?>>12-hour</option>
-		  			<option value="24" <?php if(esc_attr($time) == 24) { echo 'selected="selected"'; } ?>>24-hour</option>
+		  			<option value="12" <?php if(esc_attr($time) == 12) { echo 'selected="selected"'; } ?>><?php _e('12-hour', 'radio-station'); ?></option>
+		  			<option value="24" <?php if(esc_attr($time) == 24) { echo 'selected="selected"'; } ?>><?php _e('24-hour', 'radio-station'); ?></option>
 		  		</select>
 		  		</label><br />
 		  		<small><?php _e('Choose time format for displayed schedules.', 'radio-station'); ?></small>

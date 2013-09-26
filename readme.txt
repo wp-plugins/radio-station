@@ -194,6 +194,10 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 1.5.1 =
+* Fixed some localization bugs.
+* Added French translation (a big thank you to Dan over at BuddyPress France - http://bp-fr.net/)
+
 = 1.5.0 =
 * Plugin modified to allow for internationalization.
 * Spanish translation added.
@@ -286,6 +290,10 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.5.1 =
+* Fixed some localization bugs.
+* Added French translation (a big thank you to Dan over at BuddyPress France - http://bp-fr.net/)
 
 = 1.5.0 =
 * Plugin modified to allow for internationalization.

@@ -807,7 +807,7 @@ function myplaylist_inner_sched_custom_box() {
 	        var count = <?php echo $c; ?>;
 	        $(".add").click(function() {
 	            count = count + 1;
-				output = '<p>Day: '; 
+				output = '<p><?php _e('Day', 'radio-station'); ?>: '; 
 				output += '<select name="show_sched[' + count + '][day]">';
 				output += '<option value=""></option>';
 				output += '<option value="Monday"><?php _e('Monday', 'radio-station'); ?></option>';

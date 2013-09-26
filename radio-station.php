@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Radio Station
- * @version 1.5.0
+ * @version 1.5.1
  */
 /*
 Plugin Name: Radio Station
 Plugin URI: http://nlb-creations.com/2013/02/25/wordpress-plugin-radio-station/ 
 Description: Adds playlist and on-air programming functionality to your site.
 Author: Nikki Blight <nblight@nlb-creations.com>
-Version: 1.5.0
+Version: 1.5.1
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: http://www.nlb-creations.com
@@ -340,18 +340,18 @@ function station_admin_export() {
 				<th scope="row"><?php _e('Start Date', 'radio-station'); ?></th>
 				<td>
 					<select name="station_export_start_month" id="station_export_start_month">
-						<option value="01" <?php if($smonth == '01') { echo 'selected="selected"'; } ?>>Jan</option>
-						<option value="02" <?php if($smonth == '02') { echo 'selected="selected"'; } ?>>Feb</option>
-						<option value="03" <?php if($smonth == '03') { echo 'selected="selected"'; } ?>>Mar</option>
-						<option value="04" <?php if($smonth == '04') { echo 'selected="selected"'; } ?>>Apr</option>
-						<option value="05" <?php if($smonth == '05') { echo 'selected="selected"'; } ?>>May</option>
-						<option value="06" <?php if($smonth == '06') { echo 'selected="selected"'; } ?>>Jun</option>
-						<option value="07" <?php if($smonth == '07') { echo 'selected="selected"'; } ?>>Jul</option>
-						<option value="08" <?php if($smonth == '08') { echo 'selected="selected"'; } ?>>Aug</option>
-						<option value="09" <?php if($smonth == '09') { echo 'selected="selected"'; } ?>>Sep</option>
-						<option value="10" <?php if($smonth == '10') { echo 'selected="selected"'; } ?>>Oct</option>
-						<option value="11" <?php if($smonth == '11') { echo 'selected="selected"'; } ?>>Nov</option>
-						<option value="12" <?php if($smonth == '12') { echo 'selected="selected"'; } ?>>Dec</option>
+						<option value="01" <?php if($smonth == '01') { echo 'selected="selected"'; } ?>>01 (Jan)</option>
+						<option value="02" <?php if($smonth == '02') { echo 'selected="selected"'; } ?>>02 (Feb)</option>
+						<option value="03" <?php if($smonth == '03') { echo 'selected="selected"'; } ?>>03 (Mar)</option>
+						<option value="04" <?php if($smonth == '04') { echo 'selected="selected"'; } ?>>04 (Apr)</option>
+						<option value="05" <?php if($smonth == '05') { echo 'selected="selected"'; } ?>>05 (May)</option>
+						<option value="06" <?php if($smonth == '06') { echo 'selected="selected"'; } ?>>06 (Jun)</option>
+						<option value="07" <?php if($smonth == '07') { echo 'selected="selected"'; } ?>>07 (Jul)</option>
+						<option value="08" <?php if($smonth == '08') { echo 'selected="selected"'; } ?>>08 (Aug)</option>
+						<option value="09" <?php if($smonth == '09') { echo 'selected="selected"'; } ?>>09 (Sep)</option>
+						<option value="10" <?php if($smonth == '10') { echo 'selected="selected"'; } ?>>10 (Oct)</option>
+						<option value="11" <?php if($smonth == '11') { echo 'selected="selected"'; } ?>>11 (Nov)</option>
+						<option value="12" <?php if($smonth == '12') { echo 'selected="selected"'; } ?>>12 (Dec)</option>
 					</select>
 					
 					<?php $sday = isset($_POST['station_export_start_day']) ? $_POST['station_export_start_day'] : ''; ?>
@@ -395,18 +395,18 @@ function station_admin_export() {
 				<td>
 					<?php $emonth = isset($_POST['station_export_end_month']) ? $_POST['station_export_end_month'] : ''; ?>
 					<select name="station_export_end_month" id="station_export_end_month">
-						<option value="01" <?php if($emonth == '01') { echo 'selected="selected"'; } ?>>Jan</option>
-						<option value="02" <?php if($emonth == '02') { echo 'selected="selected"'; } ?>>Feb</option>
-						<option value="03" <?php if($emonth == '03') { echo 'selected="selected"'; } ?>>Mar</option>
-						<option value="04" <?php if($emonth == '04') { echo 'selected="selected"'; } ?>>Apr</option>
-						<option value="05" <?php if($emonth == '05') { echo 'selected="selected"'; } ?>>May</option>
-						<option value="06" <?php if($emonth == '06') { echo 'selected="selected"'; } ?>>Jun</option>
-						<option value="07" <?php if($emonth == '07') { echo 'selected="selected"'; } ?>>Jul</option>
-						<option value="08" <?php if($emonth == '08') { echo 'selected="selected"'; } ?>>Aug</option>
-						<option value="09" <?php if($emonth == '09') { echo 'selected="selected"'; } ?>>Sep</option>
-						<option value="10" <?php if($emonth == '10') { echo 'selected="selected"'; } ?>>Oct</option>
-						<option value="11" <?php if($emonth == '11') { echo 'selected="selected"'; } ?>>Nov</option>
-						<option value="12" <?php if($emonth == '12') { echo 'selected="selected"'; } ?>>Dec</option>
+						<option value="01" <?php if($emonth == '01') { echo 'selected="selected"'; } ?>>01 (Jan)</option>
+						<option value="02" <?php if($emonth == '02') { echo 'selected="selected"'; } ?>>02 (Feb)</option>
+						<option value="03" <?php if($emonth == '03') { echo 'selected="selected"'; } ?>>03 (Mar)</option>
+						<option value="04" <?php if($emonth == '04') { echo 'selected="selected"'; } ?>>04 (Apr)</option>
+						<option value="05" <?php if($emonth == '05') { echo 'selected="selected"'; } ?>>05 (May)</option>
+						<option value="06" <?php if($emonth == '06') { echo 'selected="selected"'; } ?>>06 (Jun)</option>
+						<option value="07" <?php if($emonth == '07') { echo 'selected="selected"'; } ?>>07 (Jul)</option>
+						<option value="08" <?php if($emonth == '08') { echo 'selected="selected"'; } ?>>08 (Aug)</option>
+						<option value="09" <?php if($emonth == '09') { echo 'selected="selected"'; } ?>>09 (Sep)</option>
+						<option value="10" <?php if($emonth == '10') { echo 'selected="selected"'; } ?>>10 (Oct)</option>
+						<option value="11" <?php if($emonth == '11') { echo 'selected="selected"'; } ?>>11 (Nov)</option>
+						<option value="12" <?php if($emonth == '12') { echo 'selected="selected"'; } ?>>12 (Dec)</option>
 					</select>
 					
 					<?php $eday = isset($_POST['station_export_end_day']) ? $_POST['station_export_end_day'] : ''; ?>
