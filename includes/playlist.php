@@ -2,7 +2,7 @@
 /* 
  * Playlist and Show functionality
  * Author: Nikki Blight
- * Since: 1.3.8
+ * Since: 1.5.2
  */
 
 /* Playlists */
@@ -261,7 +261,6 @@ function myplaylist_inner_show_custom_box() {
     <div id="meta_inner">
     
     <select name="playlist_show_id">
-    	<option value=""></option>
     <?php
     	foreach($shows as $show) {
     		$selected = '';
@@ -357,7 +356,7 @@ function myplaylist_now_playing($atts) {
 		if($comments == 1) {
 			$output .= '<span class="myplaylist-comments">'.$most_recent['playlist_entry_comments'].'</span> ';
 		}
-		$output .= '<span class="myplaylist-link"><a href="'.$most_recent['playlist_permalink'].'">View Playlist</a></span> ';
+		$output .= '<span class="myplaylist-link"><a href="'.$most_recent['playlist_permalink'].'">'.__('View Playlist', 'radio-station').'</a></span> ';
 		$output .= '</div>';
 	
 	}
@@ -683,6 +682,7 @@ function myplaylist_inner_user_custom_box() {
     <div id="meta_inner">
     
     <select name="show_user_list[]" multiple="multiple" style="height: 150px;">
+    	<option value=""></option>
     <?php
     	foreach($users as $dj) {
     		$selected = '';

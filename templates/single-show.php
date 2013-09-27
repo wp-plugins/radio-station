@@ -32,6 +32,7 @@ get_header(); ?>
 						<h3><?php _e('Hosted by', 'radio-station'); ?>:</h3>
 						<?php 
 							$djs = get_post_meta(get_the_ID(), 'show_user_list', true);
+							print_r($djs);
 							$count = 0;
 							
 							if($djs) {
@@ -103,7 +104,7 @@ get_header(); ?>
 									if($shifts) {
 										foreach($shifts as $shift) {
 											echo '<li>';
-											echo __($shift['day'], 'radio-station').' - '.$shift['start_hour'].':'.$shift['start_min'].' '.$shift['start_meridian'].' to '.$shift['end_hour'].':'.$shift['end_min'].' '.$shift['end_meridian'];
+											echo __($shift['day'], 'radio-station').' - '.$shift['start_hour'].':'.$shift['start_min'].' '.$shift['start_meridian'].' - '.$shift['end_hour'].':'.$shift['end_min'].' '.$shift['end_meridian'];
 											echo '</li>';
 										}
 									}
@@ -122,7 +123,7 @@ get_header(); ?>
 											}
 											
 											echo '<li>';
-											echo __($shift['day'], 'radio-station').' - '.$shift['start_hour'].':'.$shift['start_min'].' to '.$shift['end_hour'].':'.$shift['end_min'];
+											echo __($shift['day'], 'radio-station').' - '.$shift['start_hour'].':'.$shift['start_min'].' - '.$shift['end_hour'].':'.$shift['end_min'];
 											echo '</li>';
 										}
 									}

@@ -194,13 +194,17 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 1.5.2 =
+* Fixed some localization bugs.
+* Added Albanian translation (sq_AL) (thank you to Lorenc!)
+
 = 1.5.1 =
 * Fixed some localization bugs.
-* Added French translation (a big thank you to Dan over at BuddyPress France - http://bp-fr.net/)
+* Added French translation (fr_FR) (a big thank you to Dan over at BuddyPress France - http://bp-fr.net/)
 
 = 1.5.0 =
 * Plugin modified to allow for internationalization.
-* Spanish translation added.
+* Spanish translation (es_ES) added.
 
 = 1.4.6 =
 * Fixed a bug with shows that start at midnight not displaying in the on-air sidebar widget.
@@ -290,6 +294,10 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.5.2 =
+* Fixed some localization bugs.
+* Added Albanian translation (thank you to Lorenc!)
 
 = 1.5.1 =
 * Fixed some localization bugs.

@@ -2,7 +2,7 @@
 /*
  * DJ and Show scheduling
  * Author: Nikki Blight
- * @Since: 1.4.6
+ * @Since: 1.5.2
  */
 
 //shortcode function for current DJ on-air
@@ -48,7 +48,7 @@ function dj_show_widget($atts) {
 			}
 			
 			if($show_playlist) {
-				$dj_str .= '<span class="on-air-dj-playlist"><a href="'.$playlist['playlist_permalink'].'">View Playlist</a></span>';
+				$dj_str .= '<span class="on-air-dj-playlist"><a href="'.$playlist['playlist_permalink'].'">'.__('View Playlist', 'radio-station').'</a></span>';
 			}
 			
 			$dj_str .= '<span class="radio-clear"></span>';
@@ -446,7 +446,7 @@ class DJ_Widget extends WP_Widget {
 						}
 						
 						if($show_playlist) {
-							echo '<span class="on-air-dj-playlist"><a href="'.$playlist['playlist_permalink'].'">View Playlist</a></span>';
+							echo '<span class="on-air-dj-playlist"><a href="'.$playlist['playlist_permalink'].'">'.__('View Playlist', 'radio-station').'</a></span>';
 						}
 						echo '<span class="radio-clear"></span>';
 						
