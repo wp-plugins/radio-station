@@ -32,7 +32,7 @@ get_header(); ?>
 						<h3><?php _e('Hosted by', 'radio-station'); ?>:</h3>
 						<?php 
 							$djs = get_post_meta(get_the_ID(), 'show_user_list', true);
-							print_r($djs);
+							
 							$count = 0;
 							
 							if($djs) {

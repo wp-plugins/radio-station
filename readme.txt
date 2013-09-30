@@ -194,6 +194,9 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 1.5.2.1 =
+* Removed some debug code from one of the template files
+
 = 1.5.2 =
 * Fixed some localization bugs.
 * Added Albanian translation (sq_AL) (thank you to Lorenc!)
@@ -294,6 +297,9 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.5.2.1 =
+* Removed some debug code from one of the template files
 
 = 1.5.2 =
 * Fixed some localization bugs.
