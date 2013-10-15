@@ -186,6 +186,15 @@ in the radio-station/templates/author.php file.  Like the other theme templates 
 Then you'll need to install a plugin that lets you add a different image to your DJ's user account and edit your author.php theme file accordingly.  That's a 
 little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  http://wordpress.org/extend/plugins/cimy-user-extra-fields/
 
+= What languages other than English is the plugin available in? =
+
+Right now:
+
+Spanish (es_ES)
+French (fr_FR)
+Albanian (sq_AL)
+Serbian (sr_RS)
+
 = Can you translate the plugin into my language? =
 
 My foreign language skills are rather lacking.  I managed a Spanish translation, sheerly due to the fact that I still remember at least some of what 
@@ -193,6 +202,9 @@ I learned in high school Spanish class.  But I've included the .pot file in the 
 you send me your finished translation, I'd love to include it.
 
 == Changelog ==
+
+= 1.5.4 =
+* Fixed some PHP notices that were being generated when there were no playlist entries in the system.
 
 = 1.5.3 =
 * Added Serbian translation (sr_RS) (thank you to Miodarag Zivkovic!)
@@ -300,6 +312,9 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.5.4 =
+* Fixed some PHP notices that were being generated when there were no playlist entries in the system.
 
 = 1.5.3 =
 * Added Serbian translation (sr_RS) (thank you to Miodarag Zivkovic!)

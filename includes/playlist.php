@@ -93,7 +93,7 @@ function myplaylist_inner_custom_box() {
     echo "<th></th><th>".__('Artist', 'radio-station')."</th><th>".__('Song', 'radio-station')."</th><th>".__('Album', 'radio-station')."</th><th>".__('Record Label', 'radio-station')."</th><th>".__('DJ Comments', 'radio-station')."</th><th>".__('New', 'radio-station')."</th><th>".__('Status', 'radio-station')."</th><th>".__('Remove', 'radio-station')."</th>";
     echo "</tr>";
     
-    if (isset($entries[0]) && count($entries[0]) > 0){
+    if (isset($entries[0]) && !empty($entries[0])){
     	
         foreach($entries[0] as $track ){
             if (isset($track['playlist_entry_artist']) || isset($track['playlist_entry_song']) || isset($track['playlist_entry_album']) || isset($track['playlist_entry_label']) || isset($track['playlist_entry_comments']) || isset($track['playlist_entry_new']) || isset($track['playlist_entry_status'])){
@@ -332,7 +332,7 @@ function myplaylist_now_playing($atts) {
 	
 	if($most_recent) {
 		$class = '';
-		if($most_recent['playlist_entry_new'] == 'on') {
+		if(isset($most_recent['playlist_entry_new']) && $most_recent['playlist_entry_new'] == 'on') {
 			$class = ' class="new"';
 		}
 
@@ -359,6 +359,9 @@ function myplaylist_now_playing($atts) {
 		$output .= '<span class="myplaylist-link"><a href="'.$most_recent['playlist_permalink'].'">'.__('View Playlist', 'radio-station').'</a></span> ';
 		$output .= '</div>';
 	
+	}
+	else {
+		echo 'No playlists available.';
 	}
 	return $output;
 }
@@ -388,20 +391,25 @@ function myplaylist_get_now_playing() {
 	
 	//print_r($songs);die();
 	
-	//removed any entries that are marked as 'queued'
-	foreach($songs[0] as $i => $entry) {
-		if($entry['playlist_entry_status'] == 'queued') {
-			unset($songs[0][$i]);
+	if(!empty($songs[0])) {
+		//removed any entries that are marked as 'queued'
+		foreach($songs[0] as $i => $entry) {
+			if($entry['playlist_entry_status'] == 'queued') {
+				unset($songs[0][$i]);
+			}
 		}
-	}
+			
+		//pop the last track off the list for display
+		$most_recent = array_pop($songs[0]);
 		
-	//pop the last track off the list for display
-	$most_recent = array_pop($songs[0]);
-	
-	//get the permalink for the playlist so it can be displayed
-	$most_recent['playlist_permalink'] = get_permalink($playlist[0]->ID);
-	
-	return $most_recent;
+		//get the permalink for the playlist so it can be displayed
+		$most_recent['playlist_permalink'] = get_permalink($playlist[0]->ID);
+		
+		return $most_recent;
+	}
+	else {
+		return false;
+	}
 }
 
 /* Sidebar playlist widget functions */
@@ -506,37 +514,43 @@ class Playlist_Widget extends WP_Widget {
 					echo $before_title.$after_title;
 				}
 				
-				$class= '';
-				if($most_recent['playlist_entry_new'] == 'on') {
-					$class= ' class="new"';	
+				if($most_recent) {
+					$class= '';
+					if(isset($most_recent['playlist_entry_new']) && $most_recent['playlist_entry_new'] == 'on') {
+						$class= ' class="new"';	
+					}
+					
+					echo '<div id="myplaylist-nowplaying"'.$class.'>';
+					
+					if($song) {
+						echo '<span class="myplaylist-song">'.$most_recent['playlist_entry_song'].'</span> ';
+					}
+					
+					if($artist) {
+						echo '<span class="myplaylist-artist">'.$most_recent['playlist_entry_artist'].'</span> ';
+					}
+					
+					if($album) {
+						echo '<span class="myplaylist-album">'.$most_recent['playlist_entry_album'].'</span> ';
+					}
+					
+					if($label) {
+						echo '<span class="myplaylist-label">'.$most_recent['playlist_entry_label'].'</span> ';
+					}
+					
+					if($comments) {
+						echo '<span class="myplaylist-comments">'.$most_recent['playlist_entry_comments'].'</span> ';
+					}
+					
+					echo '<span class="myplaylist-link">';
+					echo '<a href="'.$most_recent['playlist_permalink'].'">'.__('View Playlist', 'radio-station').'</a>';
+					echo '</span>';
+					echo '</div>';
+				}
+				else {
+					echo 'No playlists available.';
 				}
 				
-				echo '<div id="myplaylist-nowplaying"'.$class.'>';
-				
-				if($song) {
-					echo '<span class="myplaylist-song">'.$most_recent['playlist_entry_song'].'</span> ';
-				}
-				
-				if($artist) {
-					echo '<span class="myplaylist-artist">'.$most_recent['playlist_entry_artist'].'</span> ';
-				}
-				
-				if($album) {
-					echo '<span class="myplaylist-album">'.$most_recent['playlist_entry_album'].'</span> ';
-				}
-				
-				if($label) {
-					echo '<span class="myplaylist-label">'.$most_recent['playlist_entry_label'].'</span> ';
-				}
-				
-				if($comments) {
-					echo '<span class="myplaylist-comments">'.$most_recent['playlist_entry_comments'].'</span> ';
-				}
-				
-				echo '<span class="myplaylist-link">';
-				echo '<a href="'.$most_recent['playlist_permalink'].'">'.__('View Playlist', 'radio-station').'</a>';
-				echo '</span>';
-				echo '</div>';
 			?>
 			
 			
