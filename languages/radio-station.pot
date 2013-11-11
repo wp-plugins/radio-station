@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: radio station\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-26 09:09-0600\n"
-"PO-Revision-Date: 2013-09-26 09:09-0600\n"
+"POT-Creation-Date: 2013-11-08 08:27-0600\n"
+"PO-Revision-Date: 2013-11-08 08:27-0600\n"
 "Last-Translator: Nikki <nblight@nlb-creations.com>\n"
 "Language-Team: \n"
 "Language: es_ES\n"
@@ -19,133 +19,181 @@ msgstr ""
 "X-Poedit-SearchPath-1: templates\n"
 "X-Poedit-SearchPath-2: .\n"
 
-#: includes/dj-on-air.php:303
+#: includes/dj-on-air.php:90 includes/dj-on-air.php:664
+#: includes/playlist.php:22 includes/playlist.php:359
+#: includes/playlist.php:546
+msgid "View Playlist"
+msgstr ""
+
+#: includes/dj-on-air.php:480
 msgid "None Upcoming"
 msgstr ""
 
-#: includes/dj-on-air.php:318
+#: includes/dj-on-air.php:495
 msgid "The current on-air DJ."
 msgstr ""
 
-#: includes/dj-on-air.php:319
+#: includes/dj-on-air.php:496
 msgid "Radio Station: Show/DJ On-Air"
 msgstr ""
 
-#: includes/dj-on-air.php:334 includes/dj-on-air.php:522
-#: includes/playlist.php:429
+#: includes/dj-on-air.php:511 includes/dj-on-air.php:738
+#: includes/playlist.php:436
 msgid "Title"
 msgstr ""
 
-#: includes/dj-on-air.php:342 includes/dj-on-air.php:530
+#: includes/dj-on-air.php:519 includes/dj-on-air.php:746
 msgid "Show Avatars"
 msgstr ""
 
-#: includes/dj-on-air.php:349
+#: includes/dj-on-air.php:526
 msgid "Link to the Show/DJ's profile"
 msgstr ""
 
-#: includes/dj-on-air.php:356 includes/dj-on-air.php:551
+#: includes/dj-on-air.php:533 includes/dj-on-air.php:767
 msgid "Display schedule info for this show"
 msgstr ""
 
-#: includes/dj-on-air.php:363
+#: includes/dj-on-air.php:540
 msgid "Display link to show's playlist"
 msgstr ""
 
-#: includes/dj-on-air.php:368
+#: includes/dj-on-air.php:545
 msgid "Default DJ Name"
 msgstr ""
 
-#: includes/dj-on-air.php:371 includes/dj-on-air.php:545
+#: includes/dj-on-air.php:548 includes/dj-on-air.php:761
 msgid ""
 "If no Show/DJ is scheduled for the current hour, display this name/text."
 msgstr ""
 
-#: includes/dj-on-air.php:375 includes/dj-on-air.php:563
+#: includes/dj-on-air.php:552 includes/dj-on-air.php:779
 msgid "Time Format"
 msgstr ""
 
-#: includes/dj-on-air.php:377 includes/dj-on-air.php:565
+#: includes/dj-on-air.php:554 includes/dj-on-air.php:781
 msgid "12-hour"
 msgstr ""
 
-#: includes/dj-on-air.php:378 includes/dj-on-air.php:566
+#: includes/dj-on-air.php:555 includes/dj-on-air.php:782
 msgid "24-hour"
 msgstr ""
 
-#: includes/dj-on-air.php:381
+#: includes/dj-on-air.php:558
 msgid "Choose time format for displayed schedules"
 msgstr ""
 
-#: includes/dj-on-air.php:506
+#: includes/dj-on-air.php:722
 msgid "The upcoming DJs/Shows."
 msgstr ""
 
-#: includes/dj-on-air.php:507
+#: includes/dj-on-air.php:723
 msgid "Radio Station: Upcoming DJ On-Air"
 msgstr ""
 
-#: includes/dj-on-air.php:537
+#: includes/dj-on-air.php:753
 msgid "Link to Show/DJ's user profile"
 msgstr ""
 
-#: includes/dj-on-air.php:542
+#: includes/dj-on-air.php:758
 msgid "No Additional Schedules"
 msgstr ""
 
-#: includes/dj-on-air.php:556
+#: includes/dj-on-air.php:772
 msgid "Limit"
 msgstr ""
 
-#: includes/dj-on-air.php:559
+#: includes/dj-on-air.php:775
 msgid "Number of upcoming DJs/Shows to display."
 msgstr ""
 
-#: includes/dj-on-air.php:569
+#: includes/dj-on-air.php:785
 msgid "Choose time format for displayed schedules."
 msgstr ""
 
-#: includes/master_schedule.php:146
-msgid "Sun"
+#: includes/master_schedule.php:21 includes/master_schedule.php:22
+msgid "Schedule Override"
 msgstr ""
 
-#: includes/master_schedule.php:146
-msgid "Mon"
+#: includes/master_schedule.php:23 includes/master_schedule.php:24
+msgid "Add Schedule Override"
 msgstr ""
 
-#: includes/master_schedule.php:146
-msgid "Tue"
+#: includes/master_schedule.php:25
+msgid "Edit Schedule Override"
 msgstr ""
 
-#: includes/master_schedule.php:146
-msgid "Wed"
+#: includes/master_schedule.php:26
+msgid "New Schedule Override"
 msgstr ""
 
-#: includes/master_schedule.php:146
-msgid "Thu"
+#: includes/master_schedule.php:27
+msgid "View Schedule Override"
 msgstr ""
 
-#: includes/master_schedule.php:146
-msgid "Fri"
+#: includes/master_schedule.php:30
+msgid "Post type for Schedule Override"
 msgstr ""
 
-#: includes/master_schedule.php:146
-msgid "Sat"
+#: includes/master_schedule.php:49
+msgid "Override Schedule"
 msgstr ""
 
-#: includes/master_schedule.php:287
+#: includes/master_schedule.php:79
+msgid "Date"
+msgstr ""
+
+#: includes/master_schedule.php:82 includes/playlist.php:756
+#: includes/playlist.php:835
+msgid "Start Time"
+msgstr ""
+
+#: includes/master_schedule.php:108 includes/playlist.php:782
+#: includes/playlist.php:861
+msgid "End Time"
+msgstr ""
+
+#: includes/master_schedule.php:432 includes/master_schedule.php:595
 msgid "encore airing"
 msgstr ""
 
-#: includes/master_schedule.php:292
+#: includes/master_schedule.php:437 includes/master_schedule.php:600
 msgid "Audio File"
 msgstr ""
 
-#: includes/master_schedule.php:310 includes/playlist.php:559
+#: includes/master_schedule.php:454
+msgid "Sun"
+msgstr ""
+
+#: includes/master_schedule.php:454
+msgid "Mon"
+msgstr ""
+
+#: includes/master_schedule.php:454
+msgid "Tue"
+msgstr ""
+
+#: includes/master_schedule.php:454
+msgid "Wed"
+msgstr ""
+
+#: includes/master_schedule.php:454
+msgid "Thu"
+msgstr ""
+
+#: includes/master_schedule.php:454
+msgid "Fri"
+msgstr ""
+
+#: includes/master_schedule.php:454
+msgid "Sat"
+msgstr ""
+
+#: includes/master_schedule.php:619 includes/playlist.php:572
 msgid "Genres"
 msgstr ""
 
-#: includes/playlist.php:16 templates/single-show.php:135
+#: includes/playlist.php:16 templates/single-show.php:136
 msgid "Playlists"
 msgstr ""
 
@@ -163,10 +211,6 @@ msgstr ""
 
 #: includes/playlist.php:21
 msgid "New Playlist"
-msgstr ""
-
-#: includes/playlist.php:22 includes/playlist.php:538
-msgid "View Playlist"
 msgstr ""
 
 #: includes/playlist.php:25
@@ -234,8 +278,8 @@ msgid "Status"
 msgstr ""
 
 #: includes/playlist.php:93 includes/playlist.php:127
-#: includes/playlist.php:144 includes/playlist.php:793
-#: includes/playlist.php:874
+#: includes/playlist.php:144 includes/playlist.php:807
+#: includes/playlist.php:888
 msgid "Remove"
 msgstr ""
 
@@ -252,7 +296,7 @@ msgid "Add Entry"
 msgstr ""
 
 #: includes/playlist.php:163 includes/playlist.php:164
-#: templates/single-show.php:98
+#: templates/single-show.php:99
 msgid "Schedule"
 msgstr ""
 
@@ -272,125 +316,117 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
-#: includes/playlist.php:413
+#: includes/playlist.php:420
 msgid "Display the current song."
 msgstr ""
 
-#: includes/playlist.php:414
+#: includes/playlist.php:421
 msgid "Radio Station: Now Playing"
 msgstr ""
 
-#: includes/playlist.php:437
+#: includes/playlist.php:444
 msgid "Show Artist Name"
 msgstr ""
 
-#: includes/playlist.php:444
+#: includes/playlist.php:451
 msgid "Show Song Title"
 msgstr ""
 
-#: includes/playlist.php:451
+#: includes/playlist.php:458
 msgid "Show Album Name"
 msgstr ""
 
-#: includes/playlist.php:458
+#: includes/playlist.php:465
 msgid "Show Record Label Name"
 msgstr ""
 
-#: includes/playlist.php:465
+#: includes/playlist.php:472
 msgid "Show DJ Comments"
 msgstr ""
 
-#: includes/playlist.php:560 templates/single-show.php:59
+#: includes/playlist.php:573 templates/single-show.php:60
 msgid "Genre"
 msgstr ""
 
-#: includes/playlist.php:581
+#: includes/playlist.php:594
 msgid "Information"
 msgstr ""
 
-#: includes/playlist.php:599
+#: includes/playlist.php:612
 msgid "Active"
 msgstr ""
 
-#: includes/playlist.php:601
+#: includes/playlist.php:614
 msgid ""
 "Check this box if show is currently active (Show will not appear on "
 "programming schedule if unchecked)"
 msgstr ""
 
-#: includes/playlist.php:603
+#: includes/playlist.php:616
 msgid "Current Audio File"
 msgstr ""
 
-#: includes/playlist.php:606
+#: includes/playlist.php:619
 msgid "DJ Email"
 msgstr ""
 
-#: includes/playlist.php:609
+#: includes/playlist.php:622
 msgid "Website Link"
 msgstr ""
 
-#: includes/playlist.php:620
+#: includes/playlist.php:633
 msgid "DJs"
 msgstr ""
 
-#: includes/playlist.php:705
+#: includes/playlist.php:719
 msgid "Schedules"
 msgstr ""
 
-#: includes/playlist.php:730 includes/playlist.php:810
+#: includes/playlist.php:744 includes/playlist.php:824
 msgid "Day"
 msgstr ""
 
-#: includes/playlist.php:733 includes/playlist.php:813
+#: includes/playlist.php:747 includes/playlist.php:827
 msgid "Monday"
 msgstr ""
 
-#: includes/playlist.php:734 includes/playlist.php:814
+#: includes/playlist.php:748 includes/playlist.php:828
 msgid "Tuesday"
 msgstr ""
 
-#: includes/playlist.php:735 includes/playlist.php:815
+#: includes/playlist.php:749 includes/playlist.php:829
 msgid "Wednesday"
 msgstr ""
 
-#: includes/playlist.php:736 includes/playlist.php:816
+#: includes/playlist.php:750 includes/playlist.php:830
 msgid "Thursday"
 msgstr ""
 
-#: includes/playlist.php:737 includes/playlist.php:817
+#: includes/playlist.php:751 includes/playlist.php:831
 msgid "Friday"
 msgstr ""
 
-#: includes/playlist.php:738 includes/playlist.php:818
+#: includes/playlist.php:752 includes/playlist.php:832
 msgid "Saturday"
 msgstr ""
 
-#: includes/playlist.php:739 includes/playlist.php:819
+#: includes/playlist.php:753 includes/playlist.php:833
 msgid "Sunday"
 msgstr ""
 
-#: includes/playlist.php:742 includes/playlist.php:821
-msgid "Start Time"
-msgstr ""
-
-#: includes/playlist.php:768 includes/playlist.php:847
-msgid "End Time"
-msgstr ""
-
-#: includes/playlist.php:792 includes/playlist.php:872
+#: includes/playlist.php:806 includes/playlist.php:886
 msgid "Encore Presentation"
 msgstr ""
 
-#: includes/playlist.php:803
+#: includes/playlist.php:817
 msgid "Add Shift"
 msgstr ""
 
-#: includes/playlist.php:966
+#: includes/playlist.php:980
 msgid "More Playlists"
 msgstr ""
 
-#: includes/playlist.php:1027
+#: includes/playlist.php:1041
 msgid "More Blog Posts"
 msgstr ""
 
@@ -455,7 +491,7 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: templates/single-playlist.php:32 templates/single-show.php:143
+#: templates/single-playlist.php:32 templates/single-show.php:144
 msgid "Pages:"
 msgstr ""
 
@@ -467,19 +503,19 @@ msgstr ""
 msgid "Hosted by"
 msgstr ""
 
-#: templates/single-show.php:83
+#: templates/single-show.php:84
 msgid "Email the DJ"
 msgstr ""
 
-#: templates/single-show.php:87
+#: templates/single-show.php:88
 msgid "Show Website"
 msgstr ""
 
-#: templates/single-show.php:94
+#: templates/single-show.php:95
 msgid "Most recent broadcast"
 msgstr ""
 
-#: templates/single-show.php:139
+#: templates/single-show.php:140
 msgid "Blog Posts"
 msgstr ""
 

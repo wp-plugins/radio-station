@@ -3,7 +3,7 @@ Contributors: kionae
 Donate link: http://www.nlb-creations.com/donate
 Tags: dj, music, playlist, radio, scheduling
 Requires at least: 3.3.1
-Tested up to: 3.6.1
+Tested up to: 3.7.1
 Stable tag: trunk
 
 Radio Station is a plugin to run a radio station's website. It's functionality is based on Drupal 6's Station plugin.
@@ -36,8 +36,19 @@ The following attributes are available for the shortcode:
 			'time' => The time format you with to use.  Valid values are 12 and 24.  Default is 12.
 			'show_link' => Display the title of the show as a link to its profile page.  Valid values are 0 for hide, 1 for show.  Default is 1.
 			'display_show_time' => Display start and end times of each show after the title in the grid.  Valid values are 0 for hide, 1 for show.  Default is 1.
-
+			'list' => If set to a value of 1, the schedule will display in list format rather than table format.  Default value is 0.
+			
 For example, if you wish to display the schedule in 24-hour time format, use `[master-schedule time="24"]`.
+
+= How do I schedule a show? =
+
+Simply create a new show.  You will be able to aside it to any timeslot you wish on the edit page.
+
+= What if I have a special event? =
+
+If you have a one-off event that you need to show up in the On-Air or Coming Up Next widgets, you can create a Schedule Override by clicking the Schedule Override tab
+in the Dashboard menu.  This will allow you to set aside a block of time on a specific date, and will display the title you give it in the widgets.  Please note that 
+this will only override the widgets and their corresponding shortcodes.  If you are using the weekly master schedule shortcode on a page, its output will not be altered.
 
 = How do I get the last song played to show up? = 
 
@@ -203,6 +214,11 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 1.6.0 =
+* Added the ability to override the weekly schedule to allow one-off events to be scheduled
+* Added a list format option to the master schedule shortcode
+* Added Italian translation (it_IT) (thank you to Cristofaro Giuseppe!)
+
 = 1.5.4 =
 * Fixed some PHP notices that were being generated when there were no playlist entries in the system.
 
@@ -312,6 +328,11 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.6.0 =
+* Added the ability to override the weekly schedule to allow one-off events to be scheduled
+* Added a list format option to the master schedule shortcode
+* Added Italian translation (it_IT) (thank you to Cristofaro Giuseppe!)
 
 = 1.5.4 =
 * Fixed some PHP notices that were being generated when there were no playlist entries in the system.
