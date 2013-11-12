@@ -2,7 +2,7 @@
 /*
  * DJ and Show scheduling
  * Author: Nikki Blight
- * @Since: 1.6.0
+ * @Since: 1.6.1
  */
 
 //shortcode function for current DJ on-air
@@ -352,6 +352,21 @@ function dj_get_next($limit = 1) {
 			
 		}
 	}
+	
+	// Fallback function if the PHP Server does not have the array_replace function (i.e. prior to PHP 5.3)
+	if ( !function_exists('array_replace') ) {
+	
+		function array_replace() {
+			$array = array();
+			$n = func_num_args();
+	
+			while ( $n-- >0 ) {
+				$array+=func_get_arg($n);
+			}
+			return $array;
+		}
+	}
+	
 	$combined = array_replace($show_ids, $overrides);
 	ksort($combined);
 	

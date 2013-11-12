@@ -214,6 +214,9 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 1.6.1 =
+* Bug fix: Some of the code added in the previous update uses the array_replace() function that is only available in PHP 5.3+.  Added a fallback for older PHP versions.
+
 = 1.6.0 =
 * Added the ability to override the weekly schedule to allow one-off events to be scheduled
 * Added a list format option to the master schedule shortcode
@@ -328,6 +331,9 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.6.1 =
+* Bug fix: Some of the code added in the previous update uses the array_replace() function that is only available in PHP 5.3+.  Added a fallback for older PHP versions.
 
 = 1.6.0 =
 * Added the ability to override the weekly schedule to allow one-off events to be scheduled
