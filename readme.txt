@@ -205,6 +205,7 @@ Spanish (es_ES)
 French (fr_FR)
 Albanian (sq_AL)
 Serbian (sr_RS)
+Italian (it_IT)
 
 = Can you translate the plugin into my language? =
 
@@ -213,6 +214,9 @@ I learned in high school Spanish class.  But I've included the .pot file in the 
 you send me your finished translation, I'd love to include it.
 
 == Changelog ==
+
+= 1.6.2 =
+* Minor PHP warning fixes
 
 = 1.6.1 =
 * Bug fix: Some of the code added in the previous update uses the array_replace() function that is only available in PHP 5.3+.  Added a fallback for older PHP versions.
@@ -331,6 +335,9 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.6.2 =
+* Minor PHP warning fixes
 
 = 1.6.1 =
 * Bug fix: Some of the code added in the previous update uses the array_replace() function that is only available in PHP 5.3+.  Added a fallback for older PHP versions.

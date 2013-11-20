@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Radio Station
- * @version 1.6.1
+ * @version 1.6.2
  */
 /*
 Plugin Name: Radio Station
 Plugin URI: http://nlb-creations.com/2013/02/25/wordpress-plugin-radio-station/ 
 Description: Adds playlist and on-air programming functionality to your site.
 Author: Nikki Blight <nblight@nlb-creations.com>
-Version: 1.6.1
+Version: 1.6.2
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: http://www.nlb-creations.com
@@ -176,10 +176,12 @@ function revoke_show_edit_cap($allcaps, $cap = 'edit_shows', $args) {
 	
 	//determine which roles should have full access aside from administrator
 	$add_roles = array('administrator');
-	foreach($wp_roles->roles as $name => $role) {
-		foreach($role['capabilities'] as $capname => $capstatus) {
-			if($capname == "publish_shows" && ($capstatus == 1 || $capstatus == true)) {
-				$add_roles[] = $name;
+	if(isset($wp_roles->roles)) {
+		foreach($wp_roles->roles as $name => $role) {
+			foreach($role['capabilities'] as $capname => $capstatus) {
+				if($capname == "publish_shows" && ($capstatus == 1 || $capstatus == true)) {
+					$add_roles[] = $name;
+				}
 			}
 		}
 	}

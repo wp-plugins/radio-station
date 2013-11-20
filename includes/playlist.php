@@ -2,7 +2,7 @@
 /* 
  * Playlist and Show functionality
  * Author: Nikki Blight
- * Since: 1.5.2
+ * Since: 1.6.2
  */
 
 /* Playlists */
@@ -736,7 +736,7 @@ function myplaylist_inner_sched_custom_box() {
 		//print_r($shifts);
 
 	    $c = 0;
-	    if (is_array($shifts[0])){
+	    if (isset($shifts[0]) && is_array($shifts[0])){
 	        foreach($shifts[0] as $track ){
 	            if (isset($track['day']) || isset($track['time'])){
 	            	?>
