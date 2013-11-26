@@ -1,14 +1,14 @@
 <?php
 /* 
- * Playlist and Show functionality
+ * Define all new post types and create custom fields for them
  * Author: Nikki Blight
- * Since: 1.6.2
+ * Since: 2.0.0
  */
 
-/* Playlists */
+/* Post types */
 
 //create post types for playlists and shows
-function myplaylist_create_post_types() {
+function station_create_post_types() {
 	
 	register_post_type( 'playlist',
 		array(
@@ -27,7 +27,7 @@ function myplaylist_create_post_types() {
 			'menu_icon' => WP_PLUGIN_URL.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__)) . 'images/playlist-menu-icon.png',
 			'public' => true,
 			'hierarchical' => false,
-			'supports' => array('title', 'editor'),
+			'supports' => array('title', 'editor', 'comments'),
 			'can_export' => true,
 			'has_archive' => 'playlists-archive',
 			'rewrite' => array('slug' => 'playlists'),
@@ -54,14 +54,41 @@ function myplaylist_create_post_types() {
 			'public' => true,
 			'taxonomies' => array('genres'),
 			'hierarchical' => false,
-			'supports' => array('title', 'editor', 'thumbnail'),
+			'supports' => array('title', 'editor', 'thumbnail', 'comments'),
 			'can_export' => true,
 			'capability_type' => 'show',
 			'map_meta_cap' => true
 		)
 	);
+	
+	register_post_type( 'override',
+			array(
+					'labels' => array(
+							'name' => __( 'Schedule Override', 'radio-station' ),
+							'singular_name' => __( 'Schedule Override', 'radio-station' ),
+							'add_new' => __( 'Add Schedule Override', 'radio-station' ),
+							'add_new_item' => __( 'Add Schedule Override', 'radio-station' ),
+							'edit_item' => __( 'Edit Schedule Override', 'radio-station' ),
+							'new_item' => __( 'New Schedule Override', 'radio-station' ),
+							'view_item' => __( 'View Schedule Override', 'radio-station' )
+					),
+					'show_ui' => true,
+					'description' => __('Post type for Schedule Override', 'radio-station'),
+					'menu_position' => 5,
+					'menu_icon' => WP_PLUGIN_URL.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__)) . 'images/show-menu-icon.png',
+					'public' => true,
+					'hierarchical' => false,
+					'supports' => array('title'),
+					'can_export' => true,
+					'rewrite' => array('slug' => 'show-override'),
+					'capability_type' => 'show',
+					'map_meta_cap' => true
+			)
+	);
 }
-add_action( 'init', 'myplaylist_create_post_types' );
+add_action( 'init', 'station_create_post_types' );
+
+/* Playlists */
 
 //Add custom repeating meta field for the playlist edit form... Stores multiple associated values as a serialized string
 //Borrowed and adapted from http://wordpress.stackexchange.com/questions/19838/create-more-meta-boxes-as-needed/19852#19852
@@ -178,11 +205,52 @@ function myplaylist_inner_custom_box() {
 	} ?>
 </div>
 
-
-
 <?php
+}
+
+//When a playlist is saved, saves our custom data
+function myplaylist_save_postdata( $post_id ) {
+	// verify if this is an auto save routine.
+	// If it is our form has not been submitted, so we dont want to do anything
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
+		return;
+
+	if(isset($_POST['playlist']) || isset($_POST['playlist_show_id'])) {
+		// verify this came from the our screen and with proper authorization,
+		// because save_post can be triggered at other times
+		if (isset($_POST['dynamicMeta_noncename'])){
+			if ( !wp_verify_nonce( $_POST['dynamicMeta_noncename'], plugin_basename( __FILE__ ) ) )
+				return;
+		}else{return;
+		}
+	  
+		if (isset($_POST['dynamicMetaShow_noncename'])){
+			if ( !wp_verify_nonce( $_POST['dynamicMetaShow_noncename'], plugin_basename( __FILE__ ) ) )
+				return;
+		}else{return;
+		}
+	  
+		// OK, we're authenticated: we need to find and save the data
+		$playlist = $_POST['playlist'];
+
+		//move songs that are still queued to the end of the list so that order is maintained
+		foreach($playlist as $i => $song) {
+			if($song['playlist_entry_status'] == 'queued') {
+				$playlist[] = $song;
+				unset($playlist[$i]);
+			}
+		}
+	  
+		$show = $_POST['playlist_show_id'];
+	  
+		update_post_meta($post_id,'playlist',$playlist);
+		update_post_meta($post_id,'playlist_show_id',$show);
+	}
 
 }
+add_action( 'save_post', 'myplaylist_save_postdata' );
+
+/* Shows*/
 
 //Add custom meta box for show assigment
 function myplaylist_add_show_box() {
@@ -275,294 +343,6 @@ function myplaylist_inner_show_custom_box() {
 	</div>
    <?php
 }
-
-//When a playlist is saved, saves our custom data
-function myplaylist_save_postdata( $post_id ) {
-    // verify if this is an auto save routine. 
-    // If it is our form has not been submitted, so we dont want to do anything
-    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) 
-        return;
-
-    if(isset($_POST['playlist']) || isset($_POST['playlist_show_id'])) {
-	    // verify this came from the our screen and with proper authorization,
-	    // because save_post can be triggered at other times
-	    if (isset($_POST['dynamicMeta_noncename'])){
-	        if ( !wp_verify_nonce( $_POST['dynamicMeta_noncename'], plugin_basename( __FILE__ ) ) )
-	            return;
-	    }else{return;}
-	    
-	    if (isset($_POST['dynamicMetaShow_noncename'])){
-	    	if ( !wp_verify_nonce( $_POST['dynamicMetaShow_noncename'], plugin_basename( __FILE__ ) ) )
-	    	return;
-	    }else{return;}
-	    
-	    // OK, we're authenticated: we need to find and save the data
-	    $playlist = $_POST['playlist'];
-	   
-	    //move songs that are still queued to the end of the list so that order is maintained
-	    foreach($playlist as $i => $song) {
-	    	if($song['playlist_entry_status'] == 'queued') {
-	    		$playlist[] = $song;
-	    		unset($playlist[$i]);
-	    	}
-	    }
-	    
-	    $show = $_POST['playlist_show_id'];
-	    
-	    update_post_meta($post_id,'playlist',$playlist);
-	    update_post_meta($post_id,'playlist_show_id',$show);
-    }
-    
-}
-add_action( 'save_post', 'myplaylist_save_postdata' );
-
-//shortcode for displaying the current song
-function myplaylist_now_playing($atts) {
-	extract( shortcode_atts( array(
-			'title' => '',
-			'artist' => 1,
-			'song' => 1,
-			'album' => 0,
-			'label' => 0,
-			'comments' => 0
-	), $atts ) );
-	
-	$most_recent = myplaylist_get_now_playing();
-	$output = '';
-	
-	if($most_recent) {
-		$class = '';
-		if(isset($most_recent['playlist_entry_new']) && $most_recent['playlist_entry_new'] == 'on') {
-			$class = ' class="new"';
-		}
-
-		$output .= '<div id="myplaylist-nowplaying"'.$class.'>';
-		if($title != '') {
-			$output .= '<h3>'.$title.'</h3>';
-		}
-		
-		if($song == 1) {
-			$output .= '<span class="myplaylist-song">'.$most_recent['playlist_entry_song'].'</span> ';
-		}
-		if($artist == 1) {
-			$output .= '<span class="myplaylist-artist">'.$most_recent['playlist_entry_artist'].'</span> ';
-		}
-		if($album == 1) {
-			$output .= '<span class="myplaylist-album">'.$most_recent['playlist_entry_album'].'</span> ';
-		}
-		if($label == 1) {
-			$output .= '<span class="myplaylist-label">'.$most_recent['playlist_entry_label'].'</span> ';
-		}
-		if($comments == 1) {
-			$output .= '<span class="myplaylist-comments">'.$most_recent['playlist_entry_comments'].'</span> ';
-		}
-		$output .= '<span class="myplaylist-link"><a href="'.$most_recent['playlist_permalink'].'">'.__('View Playlist', 'radio-station').'</a></span> ';
-		$output .= '</div>';
-	
-	}
-	else {
-		echo 'No playlists available.';
-	}
-	return $output;
-}
-add_shortcode('now-playing', 'myplaylist_now_playing');
-
-//get the most recently entered song
-function myplaylist_get_now_playing() {
-	//grab the most recent playlist
-	$args = array(
-				'numberposts'     => 1,
-				'offset'          => 0,
-				'orderby'         => 'post_date',
-				'order'           => 'DESC',
-				'post_type'       => 'playlist',
-				'post_status'     => 'publish'
-			);
-	
-	$playlist = get_posts($args);
-	
-	//if there are no playlists saved, return nothing
-	if(!$playlist) {
-		return false;
-	}
-	
-	//fetch the tracks for each playlist from the wp_postmeta table
-	$songs = get_post_meta($playlist[0]->ID, 'playlist');
-	
-	//print_r($songs);die();
-	
-	if(!empty($songs[0])) {
-		//removed any entries that are marked as 'queued'
-		foreach($songs[0] as $i => $entry) {
-			if($entry['playlist_entry_status'] == 'queued') {
-				unset($songs[0][$i]);
-			}
-		}
-			
-		//pop the last track off the list for display
-		$most_recent = array_pop($songs[0]);
-		
-		//get the permalink for the playlist so it can be displayed
-		$most_recent['playlist_permalink'] = get_permalink($playlist[0]->ID);
-		
-		return $most_recent;
-	}
-	else {
-		return false;
-	}
-}
-
-/* Sidebar playlist widget functions */
-class Playlist_Widget extends WP_Widget {
-	
-	//define the widget
-	function Playlist_Widget() {
-		$widget_ops = array('classname' => 'Playlist_Widget', 'description' => __('Display the current song.', 'radio-station'));
-		$this->WP_Widget('Playlist_Widget', __('Radio Station: Now Playing', 'radio-station'), $widget_ops);
-	}
- 	
-	//build the backend widget form
-	function form($instance) {
-		$instance = wp_parse_args((array) $instance, array( 'title' => '' ));
-		$title = $instance['title'];
-		$artist = $instance['artist'];
-		$song = $instance['song'];
-		$album = $instance['album'];
-		$label = $instance['label'];
-		$comments = $instance['comments'];
-		
-		?>
-			<p>
-		  		<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title', 'radio-station'); ?>: 
-		  		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" />
-		  		</label>
-		  	</p>
-		  	
-		  	<p>
-		  		<label for="<?php echo $this->get_field_id('artist'); ?>"> 
-		  		<input id="<?php echo $this->get_field_id('artist'); ?>" name="<?php echo $this->get_field_name('artist'); ?>" type="checkbox" <?php if($artist) { echo 'checked="checked"'; } ?> /> 
-		  		<?php _e('Show Artist Name', 'radio-station'); ?>
-		  		</label>
-		  	</p>
-		  	
-		  	<p>
-		  		<label for="<?php echo $this->get_field_id('song'); ?>"> 
-		  		<input id="<?php echo $this->get_field_id('song'); ?>" name="<?php echo $this->get_field_name('song'); ?>" type="checkbox" <?php if($song) { echo 'checked="checked"'; } ?> /> 
-		  		<?php _e('Show Song Title', 'radio-station'); ?>
-		  		</label>
-		  	</p>
-		  	
-		  	<p>
-		  		<label for="<?php echo $this->get_field_id('album'); ?>"> 
-		  		<input id="<?php echo $this->get_field_id('album'); ?>" name="<?php echo $this->get_field_name('album'); ?>" type="checkbox" <?php if($album) { echo 'checked="checked"'; } ?> /> 
-		  		<?php _e('Show Album Name', 'radio-station'); ?>
-		  		</label>
-		  	</p>
-		  	
-		  	<p>
-		  		<label for="<?php echo $this->get_field_id('label'); ?>"> 
-		  		<input id="<?php echo $this->get_field_id('label'); ?>" name="<?php echo $this->get_field_name('label'); ?>" type="checkbox" <?php if($label) { echo 'checked="checked"'; } ?> /> 
-		  		<?php _e('Show Record Label Name', 'radio-station'); ?>
-		  		</label>
-		  	</p>
-		  	
-		  	<p>
-		  		<label for="<?php echo $this->get_field_id('comments'); ?>"> 
-		  		<input id="<?php echo $this->get_field_id('comments'); ?>" name="<?php echo $this->get_field_name('comments'); ?>" type="checkbox" <?php if($comments) { echo 'checked="checked"'; } ?> /> 
-		  		<?php _e('Show DJ Comments', 'radio-station'); ?>
-		  		</label>
-		  	</p>
-		<?php
-	}
- 
-	//handle saves and updates
-	function update($new_instance, $old_instance) {
-		$instance = $old_instance;
-		$instance['title'] = $new_instance['title'];
-		$instance['artist'] = ( isset( $new_instance['artist'] ) ? 1 : 0 );
-		$instance['song'] = ( isset( $new_instance['song'] ) ? 1 : 0 );
-		$instance['album'] = ( isset( $new_instance['album'] ) ? 1 : 0 );
-		$instance['label'] = ( isset( $new_instance['label'] ) ? 1 : 0 );
-		$instance['comments'] = ( isset( $new_instance['comments'] ) ? 1 : 0 );
-		 
-		return $instance;
-	}
- 
-	//display the widget in the front end
-	function widget($args, $instance) {
-		extract($args, EXTR_SKIP);
- 
-		echo $before_widget;
-		$title = empty($instance['title']) ? '' : apply_filters('widget_title', $instance['title']);
-		$artist = $instance['artist'];
-		$song = $instance['song'];
-		$album = $instance['album'];
-		$label = $instance['label'];
-		$comments = $instance['comments'];
- 		
-		
- 		//fetch the current song
-		$most_recent = myplaylist_get_now_playing();
-		
-		?>
-		<div class="widget">
-			<?php 
-				if (!empty($title)) {
-					echo $before_title . $title . $after_title;
-				}
-				else {
-					echo $before_title.$after_title;
-				}
-				
-				if($most_recent) {
-					$class= '';
-					if(isset($most_recent['playlist_entry_new']) && $most_recent['playlist_entry_new'] == 'on') {
-						$class= ' class="new"';	
-					}
-					
-					echo '<div id="myplaylist-nowplaying"'.$class.'>';
-					
-					if($song) {
-						echo '<span class="myplaylist-song">'.$most_recent['playlist_entry_song'].'</span> ';
-					}
-					
-					if($artist) {
-						echo '<span class="myplaylist-artist">'.$most_recent['playlist_entry_artist'].'</span> ';
-					}
-					
-					if($album) {
-						echo '<span class="myplaylist-album">'.$most_recent['playlist_entry_album'].'</span> ';
-					}
-					
-					if($label) {
-						echo '<span class="myplaylist-label">'.$most_recent['playlist_entry_label'].'</span> ';
-					}
-					
-					if($comments) {
-						echo '<span class="myplaylist-comments">'.$most_recent['playlist_entry_comments'].'</span> ';
-					}
-					
-					echo '<span class="myplaylist-link">';
-					echo '<a href="'.$most_recent['playlist_permalink'].'">'.__('View Playlist', 'radio-station').'</a>';
-					echo '</span>';
-					echo '</div>';
-				}
-				else {
-					echo 'No playlists available.';
-				}
-				
-			?>
-			
-			
-		</div>
-		<?php
- 
-		echo $after_widget;
-	}
-}
-add_action( 'widgets_init', create_function('', 'return register_widget("Playlist_Widget");') );
-
-/* Shows */
 
 //create custom taxonomies for the Show post type
 function myplaylist_create_show_taxonomy() {
@@ -937,159 +717,120 @@ function myplaylist_save_showpostdata( $post_id ) {
 }
 add_action( 'save_post', 'myplaylist_save_showpostdata' );
 
-//shortcode to fetch all playlists for a given show id
-function myplaylist_get_playlists_for_show($atts) {
-	extract( shortcode_atts( array(
-		'show' => '',
-		'limit' => -1
-	), $atts ) );
+/* Schedule Overrides */
 
-	//don't return anything if we don't have a show
-	if($show == '') {
-		return false;
-	}
-
-	$args = array(
-				'numberposts' => $limit,
-				'offset' => 0,
-				'orderby' => 'post_date',
-				'order' => 'DESC',
-				'post_type' => 'playlist',
-				'post_status' => 'publish',
-				'meta_key' => 'playlist_show_id',
-				'meta_value' => $show
-	);
-
-	$playlists = get_posts($args);
-
-	$output = '';
-
-	$output .= '<div id="myplaylist-playlistlinks">';
-	$output .= '<ul class="myplaylist-linklist">';
-	foreach($playlists as $playlist) {
-		$output .= '<li><a href="';
-		$output .= get_permalink($playlist->ID);
-		$output .= '">'.$playlist->post_title.'</a></li>';
-	}
-	$output .= '</ul>';
-	
-	$playlist_archive = get_post_type_archive_link('playlist');
-	$params = array( 'show_id' => $show );
-	$playlist_archive = add_query_arg( $params, $playlist_archive );
-	
-	$output .= '<a href="'.$playlist_archive.'">'.__('More Playlists', 'radio-station').'</a>';
-	
-	$output .= '</div>';
-
-	return $output;
+//Adds a box to the side column of the show edit screens
+function master_override_add_sched_box() {
+	add_meta_box(
+			'dynamicSchedOver_sectionid',
+			__( 'Override Schedule', 'radio-station' ),
+			'master_override_inner_sched_custom_box',
+			'override');
 }
-add_shortcode('get-playlists', 'myplaylist_get_playlists_for_show');
+add_action( 'add_meta_boxes', 'master_override_add_sched_box' );
 
-//fetch all blog posts for a show's DJs
-function myplaylist_get_posts_for_show($show_id = null, $title = '', $limit = 10) {
-	global $wpdb;
-	
-	
-	//don't return anything if we don't have a show
-	if(!$show_id) {
-		return false;
-	}
-	
-	$fetch_posts = $wpdb->get_results("SELECT `meta`.`post_id` FROM ".$wpdb->prefix."postmeta AS `meta`
-			WHERE `meta`.`meta_key` = 'post_showblog_id' AND `meta`.`meta_value` = ".$show_id.";");
-
-	$blog_array = array();
-	$blogposts = array();
-	foreach($fetch_posts as $f) {
-		$blog_array[] = $f->post_id;
-	}
-	
-	if($blog_array) {
-		$blog_array = implode(",", $blog_array);
+function master_override_inner_sched_custom_box() {
+	global $post;
+	// Use nonce for verification
+	wp_nonce_field( plugin_basename( __FILE__ ), 'dynamicMetaSchedOver_noncename' );
+	?>
+	    	<div id="meta_inner" class="sched-override">
+		    <?php
 		
-		$blogposts = $wpdb->get_results("SELECT `posts`.`ID`, `posts`.`post_title` FROM ".$wpdb->prefix."posts AS `posts`
-				WHERE `posts`.`ID` IN(".$blog_array.")
-				AND `posts`.`post_status` = 'publish'
-				ORDER BY `posts`.`post_date` DESC
-				LIMIT ".$limit.";");
-	}
-	
-	$output = '';
-
-	$output .= '<div id="myplaylist-blog-posts">';
-	$output .= '<h3>'.$title.'</h3>';
-	$output .= '<ul class="myplaylist-post-list">';
-	foreach($blogposts as $p) {
-		$output .= '<li><a href="';
-		$output .= get_permalink($p->ID);
-		$output .= '">'.$p->post_title.'</a></li>';
-	}
-	$output .= '</ul>';
-	$output .= '</div>';
-
-	//if the blog archive page has been created, add a link to the archive for this show
-	$page = $wpdb->get_results("SELECT `meta`.`post_id` FROM ".$wpdb->prefix."postmeta AS `meta`
-			WHERE `meta`.`meta_key` = '_wp_page_template' 
-			AND `meta`.`meta_value` = 'show-blog-archive-template.php'
-			LIMIT 1;");
-	
-	if($page) {
-		$blog_archive = get_permalink($page[0]->post_id);
-		$params = array( 'show_id' => $show_id );
-		$blog_archive = add_query_arg( $params, $blog_archive );
-		
-		$output .= '<a href="'.$blog_archive.'">'.__('More Blog Posts', 'radio-station').'</a>';
-	}
-	
-	return $output;
+		    //get the saved meta as an array
+		    $track = get_post_meta($post->ID,'show_override_sched',false);
+		    if($track) {
+		    	$track = $track[0];
+		    }
+		            
+			?>
+			<script type="text/javascript">
+			jQuery(document).ready(function() {
+			    jQuery('#OverrideDate').datepicker({
+			        dateFormat : 'yy-mm-dd'
+			    });
+			});
+			</script>
+						
+            	<p>
+            		<?php _e('Date', 'radio-station'); ?>: 
+            		<input type="text" id="OverrideDate" name="show_sched[date]" value="<?php if(isset($track['date']) && $track['date'] != '') { echo $track['date']; } ?>"/>
+            		 - 
+            		<?php _e('Start Time', 'radio-station'); ?>: 
+            		<select name="show_sched[start_hour]">
+            			<option value=""></option>
+            		<?php for($i=1; $i<=12; $i++): ?>
+            			<option value="<?php echo $i; ?>"<?php if(isset($track['start_hour']) && $track['start_hour'] == $i) { echo ' selected="selected"'; } ?>><?php echo $i; ?></option>
+            		<?php endfor; ?>
+            		</select>
+            		<select name="show_sched[start_min]">
+            			<option value=""></option>
+            		<?php for($i=0; $i<60; $i++): ?>
+            			<?php 
+							$min = $i;
+							if($i < 10) {
+								$min = '0'.$i;
+							}
+						?>
+            			<option value="<?php echo $min; ?>"<?php if(isset($track['start_min']) && $track['start_min'] == $min) { echo ' selected="selected"'; } ?>><?php echo $min; ?></option>
+            		<?php endfor; ?>
+            		</select>
+            		<select name="show_sched[start_meridian]">
+            			<option value=""></option>
+            			<option value="am"<?php if(isset($track['start_meridian']) && $track['start_meridian'] == "am") { echo ' selected="selected"'; } ?>>am</option>
+            			<option value="pm"<?php if(isset($track['start_meridian']) && $track['start_meridian'] == "pm") { echo ' selected="selected"'; } ?>>pm</option>
+            		</select>
+            		
+            		 -  
+            		<?php _e('End Time', 'radio-station'); ?>: 
+            		<select name="show_sched[end_hour]">
+            			<option value=""></option>
+            		<?php for($i=1; $i<=12; $i++): ?>
+            			<option value="<?php echo $i; ?>"<?php if(isset($track['end_hour']) && $track['end_hour'] == $i) { echo ' selected="selected"'; } ?>><?php echo $i; ?></option>
+            		<?php endfor; ?>
+            		</select>
+            		<select name="show_sched[end_min]">
+            			<option value=""></option>
+            		<?php for($i=0; $i<60; $i++): ?>
+            			<?php 
+							$min = $i;
+							if($i < 10) {
+								$min = '0'.$i;
+							}
+						?>
+            			<option value="<?php echo $min; ?>"<?php if(isset($track['end_min']) && $track['end_min'] == $min) { echo ' selected="selected"'; } ?>><?php echo $min; ?></option>
+            		<?php endfor; ?>
+            		</select>
+            		<select name="show_sched[end_meridian]">
+            			<option value=""></option>
+            			<option value="am"<?php if(isset($track['end_meridian']) && $track['end_meridian'] == "am") { echo ' selected="selected"'; } ?>>am</option>
+            			<option value="pm"<?php if(isset($track['end_meridian']) && $track['end_meridian'] == "pm") { echo ' selected="selected"'; } ?>>pm</option>
+            		</select>
+            		
+            	</p>
+		</div>
+<?php
 }
 
-//shortcode for displaying a list of all shows
-function myplaylist_list_shows($atts) {
-	extract( shortcode_atts( array(
-			'genre' => ''
-	), $atts ) );
-	
-	//grab the published shows
-	$args = array(
-					'numberposts'     => -1,
-					'offset'          => 0,
-					'orderby'         => 'title',
-					'order'           => 'ASC',
-					'post_type'       => 'show',
-					'post_status'     => 'publish',
-					'meta_query' => array(
-										array(
-											'key' => 'show_active',
-											'value' => 'on',
-										)
-									)
-	);
-	
-	if($genre != '') {
-		$args['genres'] = $genre;
+//save the custom fields when a show override is saved
+function master_override_save_showpostdata( $post_id ) {
+	// verify if this is an auto save routine.
+	// If it is our form has not been submitted, so we dont want to do anything
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
+	return;
+
+	// verify this came from the our screen and with proper authorization,
+	// because save_post can be triggered at other times	
+	if (isset($_POST['dynamicMetaSchedOver_noncename'])){
+		if ( !wp_verify_nonce( $_POST['dynamicMetaSchedOver_noncename'], plugin_basename( __FILE__ ) ) )
+		return;
+	}else{return;
 	}
 	
-	$shows = get_posts($args);
-	
-	//if there are no shows saved, return nothing
-	if(!$shows) {
-		return false;
-	}
-	
-	$output = '';
-	
-	$output .= '<div id="station-show-list">';
-	$output .= '<ul>';
-	foreach($shows as $show) {
-		$output .= '<li>';
-		$output .= '<a href="'.get_permalink($show->ID).'">'.get_the_title($show->ID).'</a>';
-		$output .= '</li>';
-	}
-	$output .= '</ul>';
-	$output .= '</div>';
-	return $output;
+	// OK, we're authenticated: we need to find and save the data
+	$sched = $_POST['show_sched'];
+	update_post_meta($post_id,'show_override_sched',$sched);
 }
-add_shortcode('list-shows', 'myplaylist_list_shows');
+add_action( 'save_post', 'master_override_save_showpostdata' );
 
 ?>

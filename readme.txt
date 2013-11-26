@@ -78,6 +78,7 @@ The following attributes are available for the shortcode:
 		'time' => The time format used for displaying schedules.  Valid values are 12 and 24.  Default is 12.
 		'show_sched' => Display the show's schedules.  Valid values are 0 for hide schedule, 1 for show schedule.  Default is 1.
 		'show_playlist' => Display a link to the show's current playlist.  Valid values are 0 for hide link, 1 for show link.  Default is 1.
+		'show_all_sched' => Displays all schedules for a show if it airs on multiple days.  Valid values are 0 for current schedule, 1 for all schedules.  Default is 0.
 		
 Example:
 `[dj-widget title="Now On-Air" show_avatar="1" show_link="1" default_name="RadioBot" time="12" schow_sched="1" show_playlist="1"]`
@@ -215,6 +216,12 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 2.0.0 =
+* Major code reorganization for better future development
+* PHP warning fix
+* Enabled option to add comments on Shows and Playlists
+* Added option to show either single or multiple schedules in the On Air widget
+
 = 1.6.2 =
 * Minor PHP warning fixes
 
@@ -335,6 +342,12 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.0.0 =
+* Major code reorganization for better future development
+* PHP warning fix
+* Enabled option to add comments on Shows and Playlists
+* Added option to show either single or multiple schedules in the On Air widget
 
 = 1.6.2 =
 * Minor PHP warning fixes

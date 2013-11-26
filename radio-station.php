@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Radio Station
- * @version 1.6.2
+ * @version 2.0.0
  */
 /*
 Plugin Name: Radio Station
 Plugin URI: http://nlb-creations.com/2013/02/25/wordpress-plugin-radio-station/ 
 Description: Adds playlist and on-air programming functionality to your site.
 Author: Nikki Blight <nblight@nlb-creations.com>
-Version: 1.6.2
+Version: 2.0.0
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: http://www.nlb-creations.com
@@ -30,9 +30,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 //let's include some files
-include('includes/playlist.php');
-include('includes/dj-on-air.php');
+include('includes/post_types.php');
 include('includes/master_schedule.php');
+include('includes/shortcodes.php');
+include('includes/widget_nowplaying.php');
+include('includes/widget_djonair.php');
+include('includes/widget_djcomingup.php');
+include('includes/support_functions.php');
 
 //load the text domain
 function station_init() {
@@ -176,7 +180,7 @@ function revoke_show_edit_cap($allcaps, $cap = 'edit_shows', $args) {
 	
 	//determine which roles should have full access aside from administrator
 	$add_roles = array('administrator');
-	if(isset($wp_roles->roles)) {
+	if(isset($wp_roles->roles) && is_array($wp_roles->roles)) {
 		foreach($wp_roles->roles as $name => $role) {
 			foreach($role['capabilities'] as $capname => $capstatus) {
 				if($capname == "publish_shows" && ($capstatus == 1 || $capstatus == true)) {
