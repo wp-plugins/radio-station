@@ -81,7 +81,7 @@ The following attributes are available for the shortcode:
 		'show_all_sched' => Displays all schedules for a show if it airs on multiple days.  Valid values are 0 for current schedule, 1 for all schedules.  Default is 0.
 		
 Example:
-`[dj-widget title="Now On-Air" show_avatar="1" show_link="1" default_name="RadioBot" time="12" schow_sched="1" show_playlist="1"]`
+`[dj-widget title="Now On-Air" show_avatar="1" show_link="1" default_name="RadioBot" time="12" show_sched="1" show_playlist="1"]`
 
 
 = Can I display upcoming shows, too? =
@@ -216,6 +216,11 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 2.0.1 =
+* Bug fix: Fixed PHP error in Playlist save function that was triggered during preview
+* Bug fix: Fixed PHP notice in playlist template file
+* Bug fix: Fixed PHP error in dj-widget shortcode
+
 = 2.0.0 =
 * Major code reorganization for better future development
 * PHP warning fix
@@ -342,6 +347,11 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.0.1 =
+* Bug fix: Fixed PHP error in Playlist save function that was triggered during preview
+* Bug fix: Fixed PHP notice in playlist template file
+* Bug fix: Fixed PHP error in dj-widget shortcode
 
 = 2.0.0 =
 * Major code reorganization for better future development

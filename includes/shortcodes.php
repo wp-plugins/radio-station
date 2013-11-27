@@ -203,7 +203,7 @@ function station_shortcode_dj_on_air($atts) {
 		}
 	}
 	else {
-		if(count($djs['all']) > 0) {
+		if(isset($djs['all']) && count($djs['all']) > 0) {
 			foreach($djs['all'] as $dj) {
 				$dj_str .= '<li class="on-air-dj">';
 				if($show_avatar) {

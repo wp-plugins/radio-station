@@ -48,7 +48,7 @@ get_header(); ?>
 							</tr>
 							<?php foreach($playlist as $entry): ?>
 								<?php if($entry['playlist_entry_status'] == 'played'): ?>
-									<?php $myplaylist_class=''; if($entry['playlist_entry_new'] == 'on') { $myplaylist_class=' class="new"';} ?>
+									<?php $myplaylist_class=''; if(isset($entry['playlist_entry_new']) && $entry['playlist_entry_new'] == 'on') { $myplaylist_class=' class="new"';} ?>
 									<tr<?php echo $myplaylist_class; ?>>
 										<td><?php echo $entry['playlist_entry_artist']; ?></td>
 										<td><?php echo $entry['playlist_entry_song']; ?></td>

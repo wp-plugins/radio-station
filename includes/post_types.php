@@ -231,7 +231,7 @@ function myplaylist_save_postdata( $post_id ) {
 		}
 	  
 		// OK, we're authenticated: we need to find and save the data
-		$playlist = $_POST['playlist'];
+		$playlist = isset($_POST['playlist']) ? $_POST['playlist'] : array();
 
 		//move songs that are still queued to the end of the list so that order is maintained
 		foreach($playlist as $i => $song) {
