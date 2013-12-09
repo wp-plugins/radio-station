@@ -2,7 +2,7 @@
 /*
 * Support functions for shortcodes and widgets
 * Author: Nikki Blight
-* Since: 2.0.0
+* Since: 2.0.2
 */
 
 //get only the currently relevant schedule
@@ -19,7 +19,7 @@ function station_current_schedule($scheds = array()) {
 		$start = strtotime(date('Y-m-d', $now).$sched['start_hour'].':'.$sched['start_min'].' '.$sched['start_meridian']);
 			
 		if($sched['start_meridian'] ==  'pm' && $sched['end_meridian'] == 'am') { //check for shows that run overnight into the next morning
-			$end = strtotime(date('Y-m-d', ($now+36400)).$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian']);
+			$end = strtotime(date('Y-m-d', ($now+86400)).$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian']);
 		}
 		else {
 			$end = strtotime(date('Y-m-d', $now).$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian']);
@@ -45,7 +45,7 @@ function station_convert_time($time = array()) {
 	
 	$now = strtotime(current_time("mysql"));
 	$curDate = date('Y-m-d', $now);
-	$tomDate = date('Y-m-d', ( $now + 36400)); //get the date for tomorrow
+	$tomDate = date('Y-m-d', ( $now + 86400)); //get the date for tomorrow
 	
 	//convert to 24 hour time
 	$time = station_convert_schedule_to_24hour($time);
@@ -58,6 +58,11 @@ function station_convert_time($time = array()) {
 	}
 	else {
 		$time['end_timestamp'] = strtotime($curDate.' '.$time['end_hour'].':'.$time['end_min']);
+	}
+	
+	//a show can't end before it begins... if it does, it ends the following day.
+	if($time['end_timestamp'] <= $time['start_timestamp']) {
+		$time['end_timestamp'] = $time['end_timestamp'] + 86400;
 	}
 	
 	return $time;
@@ -99,11 +104,11 @@ function dj_get_current() {
 
 	//get the current time
 	$now = strtotime(current_time("mysql"));
+	
 	$hour = date('H', $now);
 	$min = date('i', $now);
 	$curDay = date('l', $now);
 	$curDate = date('Y-m-d', $now);
-	$tomDate = date('Y-m-d', ( $now + 36400)); //get the date for tomorrow
 
 	//first check to see if there are any shift overrides
 	$check = master_get_overrides(true);
@@ -400,7 +405,6 @@ function master_get_overrides($currenthour = false) {
 
 	$now = strtotime(current_time("mysql"));
 	$date = date('Y-m-d', $now);
-	$tomDate = date('Y-m-d', ( $now + 36400)); //get the date for tomorrow
 
 	$show_shifts = $wpdb->get_results("SELECT `meta`.`post_id` FROM ".$wpdb->prefix."postmeta AS `meta`
 			WHERE `meta_key` = 'show_override_sched'

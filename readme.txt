@@ -28,6 +28,22 @@ all show can also be generated.
 = I'm seeing 404 Not Found errors when I click on the link for a show! = 
 Try re-saving your site's permalink settings.  Wordpress sometimes gets confused with a custom post type is added.
 
+= My Shows don't have a place to add a featured image.  Is the plugin broken? =
+No.  This is usually a theme issue.
+
+It may be that you don't have post thumbnails enabled in your theme, or the theme you're using enables them only for specific post types.  Check your theme's 
+functions.php file and see if there is a line that looks like this:
+
+`add_theme_support( 'post-thumbnails' );`
+
+If not, you'll need to add that line in to enable featured images.  You may also see something like this:
+
+`add_theme_support( 'post-thumbnails', array( 'post', 'page' ) );`
+
+If that's the case, your theme is enabling featured images selectively, and you can turn them on for Shows by adding "show" to the array, like this:
+
+`add_theme_support( 'post-thumbnails', array( 'post', 'page', 'show' ) );`
+
 = How do I display a full schedule of my station's shows? =
 
 Use the shortcode `[master-schedule]` on any page.  This will generate a table containing your show details.
@@ -216,6 +232,9 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 2.0.2 =
+* Bug fix: Scheduling issue with overnight shows fixed
+
 = 2.0.1 =
 * Bug fix: Fixed PHP error in Playlist save function that was triggered during preview
 * Bug fix: Fixed PHP notice in playlist template file
@@ -347,6 +366,9 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.0.2 =
+* Bug fix: Scheduling issue with overnight shows fixed
 
 = 2.0.1 =
 * Bug fix: Fixed PHP error in Playlist save function that was triggered during preview
