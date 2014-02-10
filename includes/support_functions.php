@@ -24,6 +24,11 @@ function station_current_schedule($scheds = array()) {
 		else {
 			$end = strtotime(date('Y-m-d', $now).$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian']);
 		}
+		
+		//a show can't end before it begins... if it does, it ends the following day.
+		if($end <= $start) {
+			$end = $end + 86400;
+		}
 			
 		//compare to the current timestamp
 		if($start <= $now && $end >= $now) {

@@ -3,7 +3,7 @@ Contributors: kionae
 Donate link: http://www.nlb-creations.com/donate
 Tags: dj, music, playlist, radio, scheduling
 Requires at least: 3.3.1
-Tested up to: 3.7.1
+Tested up to: 3.8.1
 Stable tag: trunk
 
 Radio Station is a plugin to run a radio station's website. It's functionality is based on Drupal 6's Station plugin.
@@ -232,6 +232,9 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 2.0.3 =
+* Compatibility fix: Fixed a jquery conflict in the backend that was occuring in certain themes
+
 = 2.0.2 =
 * Bug fix: Scheduling issue with overnight shows fixed
 
@@ -366,6 +369,9 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.0.3 =
+* Compatibility fix: Fixed a jquery conflict in the backend that was occuring in certain themes
 
 = 2.0.2 =
 * Bug fix: Scheduling issue with overnight shows fixed

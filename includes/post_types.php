@@ -163,17 +163,17 @@ function myplaylist_inner_custom_box() {
 <a class="add button-primary" style="cursor: pointer; float: right; margin-top: 5px;"><?php echo __('Add Entry', 'radio-station'); ?></a>
 <div style="clear: both;"></div>
 <script>
-    var $ =jQuery.noConflict();
-    $(document).ready(function() {
+    var shiftadda =jQuery.noConflict();
+    shiftadda(document).ready(function() {
         var count = <?php echo $c; ?>;
-        $(".add").click(function() {
+        shiftadda(".add").click(function() {
             
-            $('#here').append('<tr><td>'+count+'</td><td><input type="text" name="playlist['+count+'][playlist_entry_artist]" value="" /></td><td><input type="text" name="playlist['+count+'][playlist_entry_song]" value="" /></td><td><input type="text" name="playlist['+count+'][playlist_entry_album]" value="" /></td><td><input type="text" name="playlist['+count+'][playlist_entry_label]" value="" /></td><td><textarea name="playlist['+count+'][playlist_entry_comments]"></textarea></td><td><input type="checkbox" name="playlist['+count+'][playlist_entry_new]" /></td><td><select name="playlist['+count+'][playlist_entry_status]"><option value="queued"><?php _e('Queued', 'radio-station'); ?></option><option value="played"><?php _e('Played', 'radio-station'); ?></option></select></td><td><span class="remove button-secondary" style="cursor: pointer;"><?php _e('Remove', 'radio-station'); ?></span></td></tr>' );
+        	shiftadda('#here').append('<tr><td>'+count+'</td><td><input type="text" name="playlist['+count+'][playlist_entry_artist]" value="" /></td><td><input type="text" name="playlist['+count+'][playlist_entry_song]" value="" /></td><td><input type="text" name="playlist['+count+'][playlist_entry_album]" value="" /></td><td><input type="text" name="playlist['+count+'][playlist_entry_label]" value="" /></td><td><textarea name="playlist['+count+'][playlist_entry_comments]"></textarea></td><td><input type="checkbox" name="playlist['+count+'][playlist_entry_new]" /></td><td><select name="playlist['+count+'][playlist_entry_status]"><option value="queued"><?php _e('Queued', 'radio-station'); ?></option><option value="played"><?php _e('Played', 'radio-station'); ?></option></select></td><td><span class="remove button-secondary" style="cursor: pointer;"><?php _e('Remove', 'radio-station'); ?></span></td></tr>' );
             count = count + 1;
             return false;
         });
-        $(".remove").live('click', function() {
-            $(this).parent().parent().remove();
+        shiftadda(".remove").live('click', function() {
+        	shiftadda(this).parent().parent().remove();
         });
     });
     </script>
@@ -596,10 +596,10 @@ function myplaylist_inner_sched_custom_box() {
 	<span id="here"></span>
 	<a class="add button-primary" style="cursor: pointer; display:block; width: 150px; padding: 8px; text-align: center; line-height: 1em;"><?php echo __('Add Shift', 'radio-station'); ?></a>
 	<script>
-	    var $ =jQuery.noConflict();
-	    $(document).ready(function() {
+	    var shiftaddb =jQuery.noConflict();
+	    shiftaddb(document).ready(function() {
 	        var count = <?php echo $c; ?>;
-	        $(".add").click(function() {
+	        shiftaddb(".add").click(function() {
 	            count = count + 1;
 				output = '<p><?php _e('Day', 'radio-station'); ?>: '; 
 				output += '<select name="show_sched[' + count + '][day]">';
@@ -642,7 +642,7 @@ function myplaylist_inner_sched_custom_box() {
 				output += '<select name="show_sched[' + count + '][end_hour]">';
 				output += '<option value=""></option>';
 				<?php for($i=1; $i<=12; $i++): ?>
-    			output += '<option value="<?php echo $i; ?>"><?php echo $i; ?></option>';
+				output += '<option value="<?php echo $i; ?>"><?php echo $i; ?></option>';
 				<?php endfor; ?>
 				output += '</select> ';
 				output += '<select name="show_sched[' + count + '][end_min]">';
@@ -666,12 +666,12 @@ function myplaylist_inner_sched_custom_box() {
 				output += '<input type="checkbox" name="show_sched[' + count + '][encore]" /> <?php _e('Encore Presentation', 'radio-station'); ?> ';
 
 				output += '<span class="remove button-secondary" style="cursor: pointer;"><?php _e('Remove', 'radio-station'); ?></span></p>';
-	            $('#here').append( output );
+				shiftaddb('#here').append( output );
 
 	            return false;
 	        });
-	        $(".remove").live('click', function() {
-	            $(this).parent().remove();
+	        shiftaddb(".remove").live('click', function() {
+	        	shiftaddb(this).parent().remove();
 	        });
 	    });
 	    </script>
