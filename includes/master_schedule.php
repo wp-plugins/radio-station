@@ -284,7 +284,7 @@ function master_schedule($atts) {
 				$rowspan = 0;
 				foreach($min as $shift) {
 					
-					if($shift['time']['end_hour'] == 0) { //fix shows that end at midnight, otherwise you could end up with a negative row span
+					if($shift['time']['end_hour'] == 0 && $shift['time']['start_hour'] != 0) { //fix shows that end at midnight (BUT take into account shows that start at midnight and end before the hour is up e.g. 12:00 - 12:30am), otherwise you could end up with a negative row span
 						$rowspan = $rowspan + (24 - $shift['time']['start_hour']);
 					}
 					elseif($shift['time']['start_hour'] > $shift['time']['end_hour']) { // show runs from before midnight night until the next morning

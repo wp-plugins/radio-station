@@ -232,6 +232,9 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 2.0.4 =
+* Master Schedule bug for shows that start at midnight and end before the hour is up fixed.
+
 = 2.0.3 =
 * Compatibility fix: Fixed a jquery conflict in the backend that was occuring in certain themes
 
@@ -369,6 +372,9 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.0.4 =
+* Master Schedule bug for shows that start at midnight and end before the hour is up fixed.
 
 = 2.0.3 =
 * Compatibility fix: Fixed a jquery conflict in the backend that was occuring in certain themes
