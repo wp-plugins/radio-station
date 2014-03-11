@@ -2,7 +2,7 @@
 /*
 * Support functions for shortcodes and widgets
 * Author: Nikki Blight
-* Since: 2.0.2
+* Since: 2.0.5
 */
 
 //get only the currently relevant schedule
@@ -114,7 +114,7 @@ function dj_get_current() {
 	$min = date('i', $now);
 	$curDay = date('l', $now);
 	$curDate = date('Y-m-d', $now);
-
+	
 	//first check to see if there are any shift overrides
 	$check = master_get_overrides(true);
 
@@ -128,8 +128,14 @@ function dj_get_current() {
 	}
 
 	//then check to see if a show is scheduled
+	//$show_shifts = $wpdb->get_results("SELECT `meta`.`post_id`, `meta`.`meta_value` FROM ".$wpdb->prefix."postmeta AS `meta`
+	//									WHERE `meta_key` = 'show_sched';");
+	
+	//we only want active shows
 	$show_shifts = $wpdb->get_results("SELECT `meta`.`post_id`, `meta`.`meta_value` FROM ".$wpdb->prefix."postmeta AS `meta`
-			WHERE `meta_key` = 'show_sched';");
+			JOIN ".$wpdb->prefix."postmeta AS `metab` ON `meta`.`post_id` = `metab`.`post_id`
+			WHERE `meta`.`meta_key` = 'show_sched'
+			AND ( `metab`.`meta_key` = 'show_active' AND `metab`.`meta_value` = 'on');");
 
 	$show_ids = array();
 	foreach($show_shifts as $shift) {
@@ -146,14 +152,30 @@ function dj_get_current() {
 			if($time['day'] == $curDay) {
 				//format the time so that it's more easily compared
 				$time = station_convert_time($time);
+				
 				//compare to the current timestamp
 				if($time['start_timestamp'] <= $now && $time['end_timestamp'] >= $now) {
 					$show_ids[] = $shift->post_id;
 				}
 			}
+			
+			//we need to make a special allowance for shows that run from one day into the next
+			if( date('w', strtotime($time['day']))+1 == date('w', strtotime($curDay)) ) {
+				
+				$time = station_convert_time($time);
+				//because station_convert_time assumes that the show STARTS on the current day, when, in this case, it ends on the current day, we have to subtract 1 day from the timestamps
+				$time['start_timestamp'] = $time['start_timestamp'] - 86400;
+				$time['end_timestamp'] = $time['end_timestamp'] - 86400;
+				
+				//compare to the current timestamp
+				if($time['start_timestamp'] <= $now && $time['end_timestamp'] >= $now) {
+					$show_ids[] = $shift->post_id;
+				}
+			}
+			
 		}
 	}
-
+	
 	$shows = array();
 	foreach($show_ids as $id) {
 		$shows['all'][] = get_post($id);

@@ -2,7 +2,7 @@
 /*
  * Master Show schedule
  * Author: Nikki Blight
- * @Since: 1.6.2
+ * @Since: 2.0.5
  */
 
 //jQuery is needed by the output of this code, so let's make sure we have it available
@@ -123,9 +123,9 @@ function master_schedule($atts) {
 						}
 						$time['time']['real_start'] = $pad_hour.$time['time']['start_hour'].':'.$time['time']['start_min'];
 					}
-					$time['time']['start_hour'] = "0";
-					$time['time']['start_min'] = "00";
-					$time['time']['start_meridian'] = "am";
+					//$time['time']['start_hour'] = "0";
+					//$time['time']['start_min'] = "00";
+					//$time['time']['start_meridian'] = "am";
 					
 					if($day == 'Sunday') { $nextday = 'Monday'; }
 					if($day == 'Monday') { $nextday = 'Tuesday'; }
@@ -345,10 +345,23 @@ function master_schedule($atts) {
 							if($shift['time']['end_meridian'] == 'am' && $shift['time']['end_hour'] == 0) {
 								$shift['time']['end_hour'] = 12;
 							}
+							
+							if(isset($shift['time']['real_start'])) {
+								//die(print_r($shift['time']));
+								$realstart = explode(':', $shift['time']['real_start']);
+								if( $realstart[0] > 12) {
+									$shift['time']['real_start'] = ($realstart[0] - 12).':'.$realstart[1];
+									
+								}
+								if($realstart[0] == 0) {
+									$shift['time']['real_start'] = '12:'.$realstart[1];
+								}
+							}
 						}
 						
 						$output .= '<span class="show-time">';
 						if(isset($shift['time']['real_start'])) {
+							
 							$output .= __($day, 'radio-station').'<br />'.$shift['time']['real_start'].' - '.$shift['time']['end_hour'].':'.$shift['time']['end_min'];
 							if($timeformat == 12) {
 								$output .= $shift['time']['end_meridian'];
@@ -357,7 +370,7 @@ function master_schedule($atts) {
 						else {
 							$output .= __($day, 'radio-station').'<br />'.$shift['time']['start_hour'].':'.$shift['time']['start_min'];
 							if($timeformat == 12) {
-								$output .= $shift['time']['start_meridian'];;
+								$output .= $shift['time']['start_meridian'];
 							}
 							
 							$output .= ' - '.$shift['time']['end_hour'].':'.$shift['time']['end_min'];
