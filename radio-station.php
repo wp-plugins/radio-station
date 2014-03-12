@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Radio Station
- * @version 2.0.4
+ * @version 2.0.5
  */
 /*
 Plugin Name: Radio Station
 Plugin URI: http://nlb-creations.com/2013/02/25/wordpress-plugin-radio-station/ 
 Description: Adds playlist and on-air programming functionality to your site.
 Author: Nikki Blight <nblight@nlb-creations.com>
-Version: 2.0.4
+Version: 2.0.5
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: http://www.nlb-creations.com
@@ -37,6 +37,20 @@ include('includes/widget_nowplaying.php');
 include('includes/widget_djonair.php');
 include('includes/widget_djcomingup.php');
 include('includes/support_functions.php');
+
+//add "show" as a post type that supports featured images
+function station_add_featured_image_support() {
+    $supportedTypes = get_theme_support( 'post-thumbnails' );
+    
+    if( $supportedTypes === false ) {
+        add_theme_support( 'post-thumbnails', array( 'show' ) );
+    }               
+    elseif( is_array( $supportedTypes ) ) {
+        $supportedTypes[0][] = 'show';
+        add_theme_support( 'post-thumbnails', $supportedTypes[0] );
+    }
+}
+add_action( 'init', 'station_add_featured_image_support' );
 
 //load the text domain
 function station_init() {

@@ -58,7 +58,7 @@ For example, if you wish to display the schedule in 24-hour time format, use `[m
 
 = How do I schedule a show? =
 
-Simply create a new show.  You will be able to aside it to any timeslot you wish on the edit page.
+Simply create a new show.  You will be able to assign it to any timeslot you wish on the edit page.
 
 = What if I have a special event? =
 
@@ -232,6 +232,11 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 2.0.5 =
+* Fixed an issue with some shows displaying in 24 hour time on master schedule grid even though 12-hour time is specified
+* Fixed a bug in the On-Air widget that was preventing shows spanning two day from displaying
+* Added code to enable theme support for post-thumbnails on the "show" post-type so users don't have to add it to their theme's functions.php file anymore.
+
 = 2.0.4 =
 * Master Schedule bug for shows that start at midnight and end before the hour is up fixed.
 
@@ -372,6 +377,11 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.0.5 =
+* Fixed an issue with some shows displaying in 24 hour time on master schedule grid even though 12-hour time is specified
+* Fixed a bug in the On-Air widget that was preventing shows spanning two day from displaying
+* Added code to enable theme support for post-thumbnails on the "show" post-type so users don't have to add it to their theme's functions.php file anymore.
 
 = 2.0.4 =
 * Master Schedule bug for shows that start at midnight and end before the hour is up fixed.
