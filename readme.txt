@@ -207,7 +207,9 @@ Under the Playlists menu in the dashboard is an Export link.  Simply specify the
 = Can my DJ's have customized user pages in addition to Show pages? = 
 
 Yes.  These pages are the same as any other author page (edit or create the author.php template file in your theme directory).  A sample can be found 
-in the radio-station/templates/author.php file.  Like the other theme templates included with this plugin, this file is based on the TwentyEleven theme.
+in the radio-station/templates/author.php file (please note that this file doesn't actually do anything unless you copy it over to your theme's
+directory).  Like the other theme templates included with this plugin, this file is based on the TwentyEleven theme and may need to be modified in
+order to work with your theme.
 
 = I don't want to use Gravatar for my DJ's image on their profile page. =
 
@@ -231,6 +233,13 @@ I learned in high school Spanish class.  But I've included the .pot file in the 
 you send me your finished translation, I'd love to include it.
 
 == Changelog ==
+
+= 2.0.6 =
+* Master Schedule now displays days starting with the start_of_week option set in the WordPress General Settings panel. 
+* Fixed issue with shows that have been unplublished still showing up on the master schedule.
+* Fixed missing am/pm text on shows that run overnight on the master schedule.
+* Fixed an issue with shows that run overnight not spanning the correct number of hours on the second day on the master schedule.
+* Fixed problem in Upcoming DJ Widget that wasn't displaying the correct upcoming shift.
 
 = 2.0.5 =
 * Fixed an issue with some shows displaying in 24 hour time on master schedule grid even though 12-hour time is specified
@@ -377,6 +386,13 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.0.6 =
+* Master Schedule now displays days starting with the start_of_week option set in the WordPress General Settings panel. 
+* Fixed issue with shows that have been unplublished still showing up on the master schedule.
+* Fixed missing am/pm text on shows that run overnight on the master schedule.
+* Fixed an issue with shows that run overnight not spanning the correct number of hours on the second day on the master schedule.
+* Fixed problem in Upcoming DJ Widget that wasn't displaying the correct upcoming shift.
 
 = 2.0.5 =
 * Fixed an issue with some shows displaying in 24 hour time on master schedule grid even though 12-hour time is specified

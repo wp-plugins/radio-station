@@ -275,7 +275,7 @@ function station_shortcode_dj_on_air($atts) {
 add_shortcode( 'dj-widget', 'station_shortcode_dj_on_air');
 
 /* Shortcode for displaying upcoming DJs/shows
- * Since 2.0.0
+ * Since 2.0.6
 */
 function station_shortcode_coming_up($atts) {
 	extract( shortcode_atts( array(
@@ -340,18 +340,40 @@ function station_shortcode_coming_up($atts) {
 				
 				if($show_sched) {
 					$scheds = get_post_meta($dj->ID, 'show_sched', true);
+
+					
+					$curDay = date('l', strtotime(current_time("mysql")));
+					$curHour = date('G', strtotime(current_time("mysql")));
+					$tomorrowDay = date( "l", (strtotime($curDate) + 86400) );
 					 
-					if(isset($scheds[0])) {
-						if($time == 12) {
-							$dj_str .= '<span class="on-air-dj-sched">'.__($scheds[0]['day'], 'radio-station').', '.$scheds[0]['start_hour'].':'.$scheds[0]['start_min'].' '.$scheds[0]['start_meridian'].'-'.$scheds[0]['end_hour'].':'.$scheds[0]['end_min'].' '.$scheds[0]['end_meridian'].'</span><br />';
-						}
-						else {
-								
-							$scheds[0] = station_convert_schedule_to_24hour($scheds[0]);
-				
-							$dj_str .= '<span class="on-air-dj-sched">'.__($scheds[0]['day'], 'radio-station').', '.$scheds[0]['start_hour'].':'.$scheds[0]['start_min'].' '.'-'.$scheds[0]['end_hour'].':'.$scheds[0]['end_min'].'</span><br />';
+					$found = 0;
+					foreach($scheds as $sched) {
+						if($found == 0) { //we only want to display one future schedule
+					
+							//check if the shift is for the current day or for tomorrow.  If it's not, skip it
+							if($sched['day'] != $curDay  && $sched['day'] != $tomorrowDay) {
+								continue;
+							}
+							 
+							$convert = station_convert_time($sched);
+							if($sched['day'] == $curDay && $convert['start_hour'] <= $curHour) {
+								continue;
+							}
+							 
+							if($time == 12) {
+								$dj_str .= '<span class="on-air-dj-sched">'.__($sched['day'], 'radio-station').', '.$sched['start_hour'].':'.$sched['start_min'].' '.$sched['start_meridian'].'-'.$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian'].'</span><br />';
+							}
+							else {
+									
+								$sched = station_convert_schedule_to_24hour($sched);
+								 
+								$dj_str .= '<span class="on-air-dj-sched">'.__($sched['day'], 'radio-station').', '.$sched['start_hour'].':'.$sched['start_min'].' '.'-'.$sched['end_hour'].':'.$sched['end_min'].'</span><br />';
+							}
+							 
+							$found = 1;
 						}
 					}
+					
 				}
 					
 				$dj_str .= '</li>';

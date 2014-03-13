@@ -2,7 +2,7 @@
 /*
  * Master Show schedule
  * Author: Nikki Blight
- * @Since: 2.0.5
+ * @Since: 2.0.6
  */
 
 //jQuery is needed by the output of this code, so let's make sure we have it available
@@ -30,42 +30,34 @@ function master_schedule($atts) {
 
 	//set up the structure of the master schedule
 	$default_dj = get_option('dj_default_name');
-	$master_list = array(
-					'0' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'1' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'2' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'3' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'4' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'5' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'6' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'7' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'8' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'9' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'10' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'11' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'12' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'13' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'14' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'15' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'16' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'17' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'18' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'19' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'20' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'21' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'22' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					'23' => array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array()),
-					);
-
 	
-	//get the shows schedules
-	//$show_shifts = $wpdb->get_results("SELECT `meta`.`post_id`, `meta`.`meta_value` FROM ".$wpdb->prefix."postmeta AS `meta`
-	//											WHERE `meta_key` = 'show_sched';");
+	//check to see what day of the week we need to start on
+	$start_of_week = get_option('start_of_week');
+	$days_of_the_week = array('Sunday' => array(), 'Monday' => array(), 'Tuesday' => array(), 'Wednesday' => array(), 'Thursday' => array(), 'Friday' => array(), 'Saturday' => array());
+	$week_start = array_slice($days_of_the_week, $start_of_week);
+
+	foreach($days_of_the_week as $i => $weekday) {
+		if($start_of_week > 0) {
+			$add = $days_of_the_week[$i];
+			unset($days_of_the_week[$i]);
+			
+			$days_of_the_week[$i] = $add;
+		}
+		$start_of_week--;
+	}
+	
+	//create the master_list array based on the start of the week
+	$master_list = array();
+	for($i=0; $i<24; $i++) {
+		$master_list[$i] = $days_of_the_week; 
+	}
 	
 	//get the show schedules, excluding shows marked as inactive
 	$show_shifts = $wpdb->get_results("SELECT `meta`.`post_id`, `meta`.`meta_value` FROM ".$wpdb->prefix."postmeta AS `meta`
 										JOIN ".$wpdb->prefix."postmeta AS `active` ON `meta`.`post_id` = `active`.`post_id`
+										JOIN ".$wpdb->prefix."posts as `posts` ON `posts`.`ID` = `meta`.`post_id` 
 													WHERE `meta`.`meta_key` = 'show_sched'
+													AND `posts`.`post_status` = 'publish' 
 													AND ( `active`.`meta_key` = 'show_active'
 													AND `active`.`meta_value` = 'on');");
 	
@@ -94,6 +86,12 @@ function master_schedule($atts) {
 				$time['end_hour'] = 0;
 			}
 			
+			//check if we're spanning multiple days
+			$time['multi-day'] = 0;
+			if( ($time['start_hour'] > $time['end_hour']) || ($time['start_hour'] == $time['end_hour']) ) {
+				$time['multi-day'] = 1;
+			}
+			
 			$master_list[$time['start_hour']][$time['day']][$time['start_min']] = array('id'=> $shift->post_id, 'time' => $time);
 		}
 	}
@@ -112,7 +110,9 @@ function master_schedule($atts) {
 				}
 				
 				//if it ends after midnight, fix it
-				if($time['time']['start_meridian'] ==  'pm' && $time['time']['end_meridian'] == 'am') {
+				if( ($time['time']['start_meridian'] ==  'pm' && $time['time']['end_meridian'] == 'am') ||
+						($time['time']['start_meridian'] ==  'am' && $time['time']['start_hour'] >= $time['time']['end_hour']) ) {
+					
 					if($time == 12) {
 						$time['time']['real_start'] = ($time['time']['start_hour']-12).':'.$time['time']['start_min'].$time['time']['start_meridian'];
 					}
@@ -136,6 +136,7 @@ function master_schedule($atts) {
 					if($day == 'Saturday') { $nextday = 'Sunday'; }
 					
 					$master_list[0][$nextday]['00'] = $time;
+					
 				}
 			}
 		}
@@ -145,7 +146,7 @@ function master_schedule($atts) {
 	//print_r($master_list);
 	if($list == 1) {
 		//output as a list	
-		$flip = array("Sunday" => array(), "Monday" => array(), "Tuesday" => array(), "Wednesday" => array(), "Thursday" => array(), "Friday" => array(), "Saturday" => array());
+		$flip = $days_of_the_week;
 		foreach($master_list as $hour => $days) {
 			foreach($days as $day => $mins) {
 				foreach($mins as $fmin => $fshow) {
@@ -192,12 +193,23 @@ function master_schedule($atts) {
 						}
 					
 						$output .= ' <span class="show-time">';
+							//if we're spanning days, this is going to look confusing, so add the day to the time for clarification
+							if($show['time']['day'] != $day) {
+								$output .= '<em>('.$show['time']['day'].')</em> ';
+							}
+						
 							$output .= $show['time']['start_hour'].':'.$show['time']['start_min'];
 							if($timeformat == 12) {
 								$output .= $show['time']['start_meridian'];;
 							}
 								
-							$output .= ' - '.$show['time']['end_hour'].':'.$show['time']['end_min'];
+							$output .= ' - ';
+							
+							if($show['time']['day'] != $day) {
+								$output .= '<em>('.$day.')</em> ';
+							}
+							
+							$output .= $show['time']['end_hour'].':'.$show['time']['end_min'];
 								
 							if($timeformat == 12) {
 								$output .= $show['time']['end_meridian'];
@@ -229,7 +241,14 @@ function master_schedule($atts) {
 		$output .= master_fetch_js_filter();
 		
 		$output .= '<table id="master-program-schedule">';
-		$output .= '<tr class="master-program-day-row"> <th></th> <th>'.__('Sun', 'radio-station').'</th> <th>'.__('Mon', 'radio-station').'</th> <th>'.__('Tue', 'radio-station').'</th> <th>'.__('Wed', 'radio-station').'</th> <th>'.__('Thu', 'radio-station').'</th> <th>'.__('Fri', 'radio-station').'</th> <th>'.__('Sat', 'radio-station').'</th> </tr>';
+		
+		//output the headings in the correct order
+		$output .= '<tr class="master-program-day-row"> <th></th>';
+		foreach($days_of_the_week as $heading => $info) {
+			$output .= '<th>'.__(substr($heading, 0, 3), 'radio-station').'</th>';
+		}
+		$output .= '</tr>';
+		//$output .= '<tr class="master-program-day-row"> <th></th> <th>'.__('Sun', 'radio-station').'</th> <th>'.__('Mon', 'radio-station').'</th> <th>'.__('Tue', 'radio-station').'</th> <th>'.__('Wed', 'radio-station').'</th> <th>'.__('Thu', 'radio-station').'</th> <th>'.__('Fri', 'radio-station').'</th> <th>'.__('Sat', 'radio-station').'</th> </tr>';
 		
 		if(!isset($nextskip)) {
 			$nextskip = array();
@@ -284,13 +303,24 @@ function master_schedule($atts) {
 				$rowspan = 0;
 				foreach($min as $shift) {
 					
+					if($shift['time']['start_hour'] == 0 && $shift['time']['end_hour'] == 0) { ///midnight to midnight shows
+						$rowspan = 24;
+					}
+					
 					if($shift['time']['end_hour'] == 0 && $shift['time']['start_hour'] != 0) { //fix shows that end at midnight (BUT take into account shows that start at midnight and end before the hour is up e.g. 12:00 - 12:30am), otherwise you could end up with a negative row span
 						$rowspan = $rowspan + (24 - $shift['time']['start_hour']);
 					}
 					elseif($shift['time']['start_hour'] > $shift['time']['end_hour']) { // show runs from before midnight night until the next morning
-						$rowspan = $rowspan + (24 - $shift['time']['start_hour']);
+						//print_r($shift);die('moo');
+						if(isset($shift['time']['real_start'])) { //if we're on the second day of a show that spans two days
+							
+							$rowspan = $shift['time']['end_hour'];
+						}
+						else {  //if we're on the first day of a show that spans two days
+							$rowspan = $rowspan + (24 - $shift['time']['start_hour']);
+						}
 					}
-					else {
+					else {  //all other shows
 						$rowspan = $rowspan + ($shift['time']['end_hour'] - $shift['time']['start_hour']);
 					}
 				}
@@ -362,7 +392,12 @@ function master_schedule($atts) {
 						$output .= '<span class="show-time">';
 						if(isset($shift['time']['real_start'])) {
 							
-							$output .= __($day, 'radio-station').'<br />'.$shift['time']['real_start'].' - '.$shift['time']['end_hour'].':'.$shift['time']['end_min'];
+							$output .= __($day, 'radio-station').'<br />'.$shift['time']['real_start'];
+							if($timeformat == 12) {
+								$output .= $shift['time']['start_meridian'];
+							}
+							
+							$output .= ' - '.$shift['time']['end_hour'].':'.$shift['time']['end_min'];
 							if($timeformat == 12) {
 								$output .= $shift['time']['end_meridian'];
 							}
