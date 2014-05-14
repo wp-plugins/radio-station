@@ -2,7 +2,7 @@
 /*
 * Support functions for shortcodes and widgets
 * Author: Nikki Blight
-* Since: 2.0.5
+* Since: 2.0.8
 */
 
 //get only the currently relevant schedule
@@ -192,6 +192,7 @@ function dj_get_next($limit = 1) {
 
 	//get the various times/dates we need
 	$curDay = date('l', strtotime(current_time("mysql")));
+	$curDayNum = date('N', strtotime(current_time("mysql")));
 	$curDate = date('Y-m-d', strtotime(current_time("mysql")));
 	$now = strtotime(current_time("mysql"));
 	$tomorrow = date( "Y-m-d", (strtotime($curDate) + 86400) );
@@ -234,30 +235,33 @@ function dj_get_next($limit = 1) {
 			WHERE `meta`.`meta_key` = 'show_sched' AND `posts`.`post_status` = 'publish';");
 
 	$show_ids = array();
-
+	
 	foreach($show_shifts as $shift) {
 		$shift->meta_value = unserialize($shift->meta_value);
-
+		//print_r($shift);
 		//if a show has no shifts, unserialize() will return false instead of an empty array... fix that to prevent errors in the foreach loop.
 		if(!is_array($shift->meta_value)) {
 			$shift->meta_value = array();
 		}
 
+		$days = array('Sunday' => 7, 'Monday' => 1, 'Tuesday' => 2, 'Wednesday' => 3, 'Thursday' => 4, 'Friday' => 5, 'Saturday' => 6);
 		foreach($shift->meta_value as $time) {
-
-			//check if the shift is for the current day or for tomorrow.  If it's not, skip it
-			if($time['day'] != $curDay  && $time['day'] != $tomorrowDay) {
-				continue;
-			}
-				
-			//determine is the particular shift is for today or tomorrow and assign a real timestamp accordingly
-			if($time['day'] == $tomorrowDay) {
-				$curShift = strtotime($tomorrow.' '.$time['start_hour'].':'.$time['start_min'].':00 '.$time['start_meridian']);
-				$endShift = strtotime($tomorrow.' '.$time['end_hour'].':'.$time['end_min'].':00 '.$time['end_meridian']);
-			}
-			else {
+			
+			if($time['day'] == $curDay) {
 				$curShift = strtotime($curDate.' '.$time['start_hour'].':'.$time['start_min'].':00 '.$time['start_meridian']);
 				$endShift = strtotime($curDate.' '.$time['end_hour'].':'.$time['end_min'].':00 '.$time['end_meridian']);
+			}
+			else {
+				if($curDayNum < $days[$time['day']]) {
+					$day_diff = $days[$time['day']]-$curDayNum;
+					$curShift = strtotime($curDate.' '.$time['start_hour'].':'.$time['start_min'].':00 '.$time['start_meridian']) + ($day_diff*86400);
+					$endShift = strtotime($curDate.' '.$time['end_hour'].':'.$time['end_min'].':00 '.$time['end_meridian']) + ($day_diff*86400);
+				}
+				else {
+					$day_diff = $curDayNum+$days[$time['day']]+1;
+					$curShift = strtotime($curDate.' '.$time['start_hour'].':'.$time['start_min'].':00 '.$time['start_meridian']) + ($day_diff*86400);
+					$endShift = strtotime($curDate.' '.$time['end_hour'].':'.$time['end_min'].':00 '.$time['end_meridian']) + ($day_diff*86400);
+				}
 			}
 				
 			//if the shift occurs later than the current time, we want it

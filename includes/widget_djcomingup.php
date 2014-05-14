@@ -1,7 +1,7 @@
 <?php
 /* Sidebar Widget - Upcoming DJ
  * Displays the the next show(s)/DJ(s) in the schedule 
- * Since 2.0.6
+ * Since 2.0.8
  */
 class DJ_Upcoming_Widget extends WP_Widget {
 
@@ -117,7 +117,9 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			<?php 
 		 		//echo the show/dj currently on-air
 		 		if(isset($djs['all']) && count($djs['all']) > 0) {
-		 			foreach($djs['all'] as $dj) {
+		 			//print_r($djs['all']);
+		 			
+		 			foreach($djs['all'] as $showtime => $dj) {
 		 				
 		 				if(is_array($dj) && $dj['type'] == 'override') {
 		 					echo '<li class="on-air-dj">';
@@ -128,16 +130,12 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		 							echo '<span class="on-air-dj-sched">'.$dj['sched']['start_hour'].':'.$dj['sched']['start_min'].' '.$dj['sched']['start_meridian'].'-'.$dj['sched']['end_hour'].':'.$dj['sched']['end_min'].' '.$dj['sched']['end_meridian'].'</span><br />';
 		 						}
 		 						else {
-		 							$dj['sched'] = station_convert_schedule_to_24hour($dj['sched']);
-		 						
 		 							echo '<span class="on-air-dj-sched">'.$dj['sched']['start_hour'].':'.$dj['sched']['start_min'].' '.'-'.$dj['sched']['end_hour'].':'.$dj['sched']['end_min'].'</span><br />';
-		 						
 		 						}
 		 					}
 		 					echo '</li>';
 		 				}
 		 				else { //print as normal
-			 				//print_r($dj);
 			 				echo '<li class="on-air-dj">';
 			 				if($djavatar) {
 			 					echo '<span class="on-air-dj-avatar">'.get_the_post_thumbnail($dj->ID, 'thumbnail').'</span>';
@@ -156,39 +154,16 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			 				echo '<span class="radio-clear"></span>';
 			 				
 			 				if($show_sched) {
-				 				$scheds = get_post_meta($dj->ID, 'show_sched', true);
+			 					$showtimes = explode("|", $showtime);
+			 					
+			 					if($time == 12) {
+			 						echo '<span class="on-air-dj-sched">'.__(date('l', $showtimes[0]), 'radio-station').', '.date('g:i a', $showtimes[0]).'-'.date('g:i a', $showtimes[1]).'</span><br />';
+			 					}
+			 					else {
+			 						echo '<span class="on-air-dj-sched">'.__(date('l', $showtimes[0]), 'radio-station').', '.date('H:i', $showtimes[0]).'-'.date('H:i', $showtimes[1]).'</span><br />';
+			 					}
 				 				
-				 				$curDay = date('l', strtotime(current_time("mysql")));
-				 				$curHour = date('G', strtotime(current_time("mysql")));
-				 				$tomorrowDay = date( "l", (strtotime($curDate) + 86400) );
 				 				
-				 				$found = 0;
-				 				foreach($scheds as $sched) {
-				 					if($found == 0) { //we only want to display one future schedule
-				 					
-					 					//check if the shift is for the current day or for tomorrow.  If it's not, skip it
-					 					if($sched['day'] != $curDay  && $sched['day'] != $tomorrowDay) {
-					 						continue;
-					 					}
-					 					
-					 					$convert = station_convert_time($sched);
-					 					if($sched['day'] == $curDay && $convert['start_hour'] <= $curHour) {
-					 						continue;
-					 					}
-					 					
-					 					if($time == 12) {
-					 						echo '<span class="on-air-dj-sched">'.__($sched['day'], 'radio-station').', '.$sched['start_hour'].':'.$sched['start_min'].' '.$sched['start_meridian'].'-'.$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian'].'</span><br />';
-					 					}
-					 					else {
-					 							
-					 						$sched = station_convert_schedule_to_24hour($sched);
-					 					
-					 						echo '<span class="on-air-dj-sched">'.__($sched['day'], 'radio-station').', '.$sched['start_hour'].':'.$sched['start_min'].' '.'-'.$sched['end_hour'].':'.$sched['end_min'].'</span><br />';
-					 					}
-					 					
-					 					$found = 1;
-				 					}
-				 				}
 			 				}
 			 		
 			 				echo '</li>';

@@ -3,7 +3,7 @@ Contributors: kionae
 Donate link: http://www.nlb-creations.com/donate
 Tags: dj, music, playlist, radio, scheduling
 Requires at least: 3.3.1
-Tested up to: 3.9
+Tested up to: 3.9.1
 Stable tag: trunk
 
 Radio Station is a plugin to run a radio station's website. It's functionality is based on Drupal 6's Station plugin.
@@ -234,6 +234,13 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 2.0.8 =
+* Fixed the display of schedules for upcoming shows in the widget and shortcode.
+* Fixed a bug in the dj_get_next function that was causing it to ignore the beginning of the next week at the end of the current week.
+
+= 2.0.7 =
+* Fixed scheduling bug in shortcode function
+
 = 2.0.6 =
 * Master Schedule now displays days starting with the start_of_week option set in the WordPress General Settings panel. 
 * Fixed issue with shows that have been unplublished still showing up on the master schedule.
@@ -386,6 +393,9 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.0.7 =
+* Fixed scheduling bug in shortcode function
 
 = 2.0.6 =
 * Master Schedule now displays days starting with the start_of_week option set in the WordPress General Settings panel. 

@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Radio Station
- * @version 2.0.6
+ * @version 2.0.8
  */
 /*
 Plugin Name: Radio Station
 Plugin URI: http://nlb-creations.com/2013/02/25/wordpress-plugin-radio-station/ 
 Description: Adds playlist and on-air programming functionality to your site.
 Author: Nikki Blight <nblight@nlb-creations.com>
-Version: 2.0.6
+Version: 2.0.8
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: http://www.nlb-creations.com
@@ -121,8 +121,6 @@ function station_load_custom_post_type_template( $archive_template ) {
 	return $archive_template;
 }
 add_filter( 'archive_template', 'station_load_custom_post_type_template' ) ;
-
-
 
 //add some style rules to certain parts of the admin area
 function station_load_admin_styles() {
