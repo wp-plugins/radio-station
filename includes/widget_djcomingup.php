@@ -1,7 +1,7 @@
 <?php
 /* Sidebar Widget - Upcoming DJ
  * Displays the the next show(s)/DJ(s) in the schedule 
- * Since 2.0.8
+ * Since 2.0.9
  */
 class DJ_Upcoming_Widget extends WP_Widget {
 
@@ -13,6 +13,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 	function form($instance) {
 		$instance = wp_parse_args((array) $instance, array( 'title' => '' ));
 		$title = $instance['title'];
+		$display_djs = $instance['display_djs'];
 		$djavatar = $instance['djavatar'];
 		$default = $instance['default'];
 		$link = $instance['link'];
@@ -24,6 +25,13 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			<p>
 		  		<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title', 'radio-station'); ?> 
 		  		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" />
+		  		</label>
+		  	</p>
+		  	
+		  	<p>
+		  		<label for="<?php echo $this->get_field_id('display_djs'); ?>"> 
+		  		<input id="<?php echo $this->get_field_id('display_djs'); ?>" name="<?php echo $this->get_field_name('display_djs'); ?>" type="checkbox" <?php if($display_djs) { echo 'checked="checked"'; } ?> /> 
+		  		<?php _e('Display names of the DJs on the show', 'radio-station'); ?>
 		  		</label>
 		  	</p>
 		  	
@@ -77,6 +85,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 	function update($new_instance, $old_instance) {
 		$instance = $old_instance;
 		$instance['title'] = $new_instance['title'];
+		$instance['display_djs'] = ( isset( $new_instance['display_djs'] ) ? 1 : 0 );
 		$instance['djavatar'] = ( isset( $new_instance['djavatar'] ) ? 1 : 0 );
 		$instance['link'] = ( isset( $new_instance['link'] ) ? 1 : 0 );
 		$instance['default'] = $new_instance['default'];
@@ -91,6 +100,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
  
 		echo $before_widget;
 		$title = empty($instance['title']) ? '' : apply_filters('widget_title', $instance['title']);
+		$display_djs = $instance['display_djs'];
 		$djavatar = $instance['djavatar'];
 		$link = $instance['link'];
  		$default = empty($instance['default']) ? '' : $instance['default'];
@@ -124,6 +134,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		 				if(is_array($dj) && $dj['type'] == 'override') {
 		 					echo '<li class="on-air-dj">';
 		 					echo $dj['title'];
+		 					
 		 					if($show_sched) {
 		 						
 		 						if($time == 12) {
@@ -149,6 +160,32 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			 				}
 			 				else {
 			 					echo $dj->post_title;
+			 				}
+			 				
+			 				if($display_djs) {
+			 					$names = get_post_meta($dj->ID, 'show_user_list', true);
+			 					$count = 0;
+			 				
+			 					if($names) {
+			 						echo '<div class="on-air-dj-names">With ';
+			 						foreach($names as $name) {
+			 							$count ++;
+			 							$user_info = get_userdata($name);
+			 				
+			 							echo $user_info->display_name;
+			 				
+			 							if( ($count == 1 && count($names) == 2) || (count($names) > 2 && $count == count($names)-1) ) {
+			 								echo ' and ';
+			 							}
+			 							elseif($count < count($names) && count($names) > 2) {
+			 								echo ', ';
+			 							}
+			 							else {
+			 								//do nothing
+			 							}
+			 						}
+			 						echo '</div>';
+			 					}
 			 				}
 			 				
 			 				echo '<span class="radio-clear"></span>';

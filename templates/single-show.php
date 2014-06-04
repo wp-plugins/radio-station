@@ -42,7 +42,7 @@ get_header(); ?>
 									
 									echo '<a href="'.get_author_posts_url($dj).'">'.$user_info->display_name.'</a>';
 									
-									if( ($count == 1 && count($djs) == 2) || (count($djs) > 2 && $count == count($djs)) ) {
+									if( ($count == 1 && count($djs) == 2) || (count($djs) > 2 && $count == count($djs)-1) ) {
 										echo ' and ';
 									}
 									elseif($count < count($djs) && count($djs) > 2) {

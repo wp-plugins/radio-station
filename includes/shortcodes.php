@@ -155,11 +155,12 @@ function station_shortcode_list_shows($atts) {
 add_shortcode('list-shows', 'station_shortcode_list_shows');
 
 /* Shortcode function for current DJ on-air
- * Since 2.0.0
+ * Since 2.0.9
  */
 function station_shortcode_dj_on_air($atts) {
 	extract( shortcode_atts( array(
 			'title' => '',
+			'display_djs' => 0,
 			'show_avatar' => 0,
 			'show_link' => 0,
 			'default_name' => '',
@@ -220,6 +221,32 @@ function station_shortcode_dj_on_air($atts) {
 					$dj_str .= $dj->post_title;
 				}
 
+				if($display_djs) {
+					$names = get_post_meta($dj->ID, 'show_user_list', true);
+					$count = 0;
+				
+					if($names) {
+						$dj_str .= '<div class="on-air-dj-names">With ';
+						foreach($names as $name) {
+							$count ++;
+							$user_info = get_userdata($name);
+				
+							$dj_str .= $user_info->display_name;
+				
+							if( ($count == 1 && count($names) == 2) || (count($names) > 2 && $count == count($names)-1) ) {
+								$dj_str .= ' and ';
+							}
+							elseif($count < count($names) && count($names) > 2) {
+								$dj_str .= ', ';
+							}
+							else {
+								//do nothing
+							}
+						}
+						$dj_str .= '</div>';
+					}
+				}
+				
 				if($show_playlist) {
 					$dj_str .= '<span class="on-air-dj-playlist"><a href="'.$playlist['playlist_permalink'].'">'.__('View Playlist', 'radio-station').'</a></span>';
 				}
@@ -275,11 +302,12 @@ function station_shortcode_dj_on_air($atts) {
 add_shortcode( 'dj-widget', 'station_shortcode_dj_on_air');
 
 /* Shortcode for displaying upcoming DJs/shows
- * Since 2.0.8
+ * Since 2.0.9
 */
 function station_shortcode_coming_up($atts) {
 	extract( shortcode_atts( array(
 			'title' => '',
+			'display_djs' => 0,
 			'show_avatar' => 0,
 			'show_link' => 0,
 			'limit' => 1,
@@ -289,6 +317,8 @@ function station_shortcode_coming_up($atts) {
 
 	//find out which DJ(s) are coming up today
 	$djs = dj_get_next($limit);
+	//print_r($djs);
+	
 	$now = strtotime(current_time("mysql"));
 	$curDate = date('Y-m-d', $now);
 
@@ -300,9 +330,9 @@ function station_shortcode_coming_up($atts) {
 	}
 	$dj_str .= '<ul class="on-air-list">';
 
-	//echo the show/dj currently on-air
+	//echo the show/dj coming up
 	if(isset($djs['all']) && count($djs['all']) > 0) {
-		foreach($djs['all'] as $showtimes => $dj) {
+		foreach($djs['all'] as $showtime => $dj) {
 				
 			if(is_array($dj) && $dj['type'] == 'override') {
 				echo '<li class="on-air-dj">';
@@ -322,7 +352,6 @@ function station_shortcode_coming_up($atts) {
 				echo '</li>';
 			}
 			else {
-				//print_r($dj);
 				$dj_str .= '<li class="on-air-dj">';
 				if($show_avatar) {
 					$dj_str .= '<span class="on-air-dj-avatar">'.get_the_post_thumbnail($dj->ID, 'thumbnail').'</span>';
@@ -337,19 +366,43 @@ function station_shortcode_coming_up($atts) {
 				else {
 					$dj_str .= $dj->post_title;
 				}
+				
+				if($display_djs) {
+					$names = get_post_meta($dj->ID, 'show_user_list', true);
+					$count = 0;
+				
+					if($names) {
+						$dj_str .= '<div class="on-air-dj-names">With ';
+						foreach($names as $name) {
+							$count ++;
+							$user_info = get_userdata($name);
+				
+							$dj_str .= $user_info->display_name;
+				
+							if( ($count == 1 && count($names) == 2) || (count($names) > 2 && $count == count($names)-1) ) {
+								$dj_str .= ' and ';
+							}
+							elseif($count < count($names) && count($names) > 2) {
+								$dj_str .= ', ';
+							}
+							else {
+								//do nothing
+							}
+						}
+						$dj_str .= '</div>';
+					}
+				}
 
 				$dj_str .= '<span class="radio-clear"></span>';
 				
 				if($show_sched) {
-				$showtimes = explode("|", $showtime);
-					
+					$showtimes = explode("|", $showtime);
 					if($time == 12) {
-						$dj_str .= '<span class="on-air-dj-sched">'.$dj['sched']['start_hour'].':'.$dj['sched']['start_min'].' '.$dj['sched']['start_meridian'].'-'.$dj['sched']['end_hour'].':'.$dj['sched']['end_min'].' '.$dj['sched']['end_meridian'].'</span><br />';
+						$dj_str .= '<span class="on-air-dj-sched">'.__(date('l', $showtimes[0]), 'radio-station').', '.date('g:i a', $showtimes[0]).'-'.date('g:i a', $showtimes[1]).'</span><br />';
 					}
 					else {
-						$dj_str .= '<span class="on-air-dj-sched">'.$dj['sched']['start_hour'].':'.$dj['sched']['start_min'].' '.'-'.$dj['sched']['end_hour'].':'.$dj['sched']['end_min'].'</span><br />';
+						$dj_str .= '<span class="on-air-dj-sched">'.__(date('l', $showtimes[0]), 'radio-station').', '.date('H:i', $showtimes[0]).'-'.date('H:i', $showtimes[1]).'</span><br />';
 					}
-					
 				}
 					
 				$dj_str .= '</li>';

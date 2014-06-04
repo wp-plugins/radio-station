@@ -88,6 +88,7 @@ You'll find a widget for just that purpose under the Widgets tab.  You can also 
 
 The following attributes are available for the shortcode:
 		'title' => The title you would like to appear over the on-air block 
+		'display_djs' => Display the names of the DJs on the show.  Valid values are 0 for hide names, 1 for show names.  Default is 0.
 		'show_avatar' => Display a show's thumbnail.  Valid values are 0 for hide avatar, 1 for show avatar.  Default is 0.
 		'show_link' => Display a link to a show's page.  Valid values are 0 for hide link, 1 for show link.  Default is 0.
 		'default_name' => The text you would like to display when no show is schedule for the current time.
@@ -97,7 +98,7 @@ The following attributes are available for the shortcode:
 		'show_all_sched' => Displays all schedules for a show if it airs on multiple days.  Valid values are 0 for current schedule, 1 for all schedules.  Default is 0.
 		
 Example:
-`[dj-widget title="Now On-Air" show_avatar="1" show_link="1" default_name="RadioBot" time="12" show_sched="1" show_playlist="1"]`
+`[dj-widget title="Now On-Air" display_djs="1" show_avatar="1" show_link="1" default_name="RadioBot" time="12" show_sched="1" show_playlist="1"]`
 
 
 = Can I display upcoming shows, too? =
@@ -107,6 +108,7 @@ You'll find a widget for just that purpose under the Widgets tab.  You can also 
 
 The following attributes are available for the shortcode:
 		'title' => The title you would like to appear over the on-air block 
+		'display_djs' => Display the names of the DJs on the show.  Valid values are 0 for hide names, 1 for show names.  Default is 0.
 		'show_avatar' => Display a show's thumbnail.  Valid values are 0 for hide avatar, 1 for show avatar.  Default is 0.
 		'show_link' => Display a link to a show's page.  Valid values are 0 for hide link, 1 for show link.  Default is 0.
 		'limit' => The number of upcoming shows to display.  Default is 1.
@@ -114,7 +116,7 @@ The following attributes are available for the shortcode:
 		'show_sched' => Display the show's schedules.  Valid values are 0 for hide schedule, 1 for show schedule.  Default is 1.
 		
 Example:
-`[dj-widget title="Coming Up On-Air" show_avatar="1" show_link="1" limit="3" time="12" schow_sched="1"]`
+`[dj-widget title="Coming Up On-Air" display_djs="1" show_avatar="1" show_link="1" limit="3" time="12" schow_sched="1"]`
 
 = Can I change how show pages are laid out/displayed? =
 
@@ -233,6 +235,10 @@ I learned in high school Spanish class.  But I've included the .pot file in the 
 you send me your finished translation, I'd love to include it.
 
 == Changelog ==
+
+= 2.0.9 = 
+* Fixed broken upcoming show shortcode.
+* Added ability to display DJ names along with the show title in the widgets.
 
 = 2.0.8 =
 * Fixed the display of schedules for upcoming shows in the widget and shortcode.
@@ -393,6 +399,14 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.0.9 = 
+* Fixed broken upcoming show shortcode.
+* Added ability to display DJ names along with the show title in the widgets.
+
+= 2.0.8 =
+* Fixed the display of schedules for upcoming shows in the widget and shortcode.
+* Fixed a bug in the dj_get_next function that was causing it to ignore the beginning of the next week at the end of the current week.
 
 = 2.0.7 =
 * Fixed scheduling bug in shortcode function
