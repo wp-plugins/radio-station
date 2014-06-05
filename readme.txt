@@ -236,6 +236,13 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 2.0.10 =
+* Fixed role/capability conflict with WP User Avatar plugin.
+* Added the missing leading zero to 24-hour time format on the master schedule.
+* Fixed dj_get_current function so that it no longer returns shows that have been moved to the trash.
+* Fixed dj_get_next function so that it no longer ignores the "Active" checkbox on a show.
+* Added some CSS ids and classes to the master program schedule list format to make it more useful
+
 = 2.0.9 = 
 * Fixed broken upcoming show shortcode.
 * Added ability to display DJ names along with the show title in the widgets.
@@ -399,6 +406,13 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.0.10 =
+* Fixed role/capability conflict with WP User Avatar plugin.
+* Added the missing leading zero to 24-hour time format on the master schedule.
+* Fixed dj_get_current function so that it no longer returns shows that have been moved to the trash.
+* Fixed dj_get_next function so that it no longer ignores the "Active" checkbox on a show.
+* Added some CSS ids and classes to the master program schedule list format to make it more useful
 
 = 2.0.9 = 
 * Fixed broken upcoming show shortcode.

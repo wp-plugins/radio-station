@@ -2,7 +2,7 @@
 /*
  * Master Show schedule
  * Author: Nikki Blight
- * @Since: 2.0.6
+ * @Since: 2.0.10
  */
 
 //jQuery is needed by the output of this code, so let's make sure we have it available
@@ -158,9 +158,9 @@ function master_schedule($atts) {
 		$output .= '<ul class="master-list">';
 		
 		foreach($flip as $day => $hours) {
-			$output .= '<li class="master-list-day">';
+			$output .= '<li class="master-list-day" id="list-header-'.strtolower($day).'">';
 			$output .= $day;
-			$output .= '<ul>';
+			$output .= '<ul class="master-list-day-'.strtolower($day).'-list">';
 			foreach($hours as $hour => $mins) {
 				
 				foreach($mins as $min => $show) {
@@ -189,6 +189,15 @@ function master_schedule($atts) {
 							}
 							if($show['time']['end_meridian'] == 'am' && $show['time']['end_hour'] == 0) {
 								$show['time']['end_hour'] = 12;
+							}
+						}
+						else {
+							//we need to add a leading 0 to times before 10 in 24-hour format
+							if($show['time']['start_hour'] < 10) {
+								$show['time']['start_hour'] = '0'.$show['time']['start_hour'];
+							}
+							if($show['time']['end_hour'] < 10) {
+								$show['time']['end_hour'] = '0'.$show['time']['end_hour'];
 							}
 						}
 					
@@ -386,6 +395,15 @@ function master_schedule($atts) {
 								if($realstart[0] == 0) {
 									$shift['time']['real_start'] = '12:'.$realstart[1];
 								}
+							}
+						}
+						else {
+							//we need to add a leading 0 to times before 10 in 24-hour format
+							if($shift['time']['start_hour'] < 10) {
+								$shift['time']['start_hour'] = '0'.$shift['time']['start_hour'];
+							}
+							if($shift['time']['end_hour'] < 10) {
+								$shift['time']['end_hour'] = '0'.$shift['time']['end_hour'];
 							}
 						}
 						

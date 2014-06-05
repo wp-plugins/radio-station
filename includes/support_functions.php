@@ -134,7 +134,9 @@ function dj_get_current() {
 	//we only want active shows
 	$show_shifts = $wpdb->get_results("SELECT `meta`.`post_id`, `meta`.`meta_value` FROM ".$wpdb->prefix."postmeta AS `meta`
 			JOIN ".$wpdb->prefix."postmeta AS `metab` ON `meta`.`post_id` = `metab`.`post_id`
+			JOIN ".$wpdb->prefix."posts as `posts` ON `posts`.`ID` = `meta`.`post_id`
 			WHERE `meta`.`meta_key` = 'show_sched'
+			AND `posts`.`post_status` = 'publish' 
 			AND ( `metab`.`meta_key` = 'show_active' AND `metab`.`meta_value` = 'on');");
 
 	$show_ids = array();
@@ -229,10 +231,14 @@ function dj_get_next($limit = 1) {
 		ksort($overrides);
 	}
 
-	//Fetch all schedules
+	//Fetch all schedules... we only want active shows
 	$show_shifts = $wpdb->get_results("SELECT `meta`.`post_id`, `meta`.`meta_value` FROM ".$wpdb->prefix."postmeta AS `meta`
-			JOIN ".$wpdb->prefix."posts AS `posts` ON `meta`.`post_id` = `posts`.`ID`
-			WHERE `meta`.`meta_key` = 'show_sched' AND `posts`.`post_status` = 'publish';");
+			JOIN ".$wpdb->prefix."postmeta AS `metab` ON `meta`.`post_id` = `metab`.`post_id`
+			JOIN ".$wpdb->prefix."posts as `posts` ON `posts`.`ID` = `meta`.`post_id`
+			WHERE `meta`.`meta_key` = 'show_sched'
+			AND `posts`.`post_status` = 'publish' 
+			AND ( `metab`.`meta_key` = 'show_active' AND `metab`.`meta_value` = 'on');");
+	
 
 	$show_ids = array();
 	
