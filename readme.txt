@@ -227,6 +227,7 @@ French (fr_FR)
 Albanian (sq_AL)
 Serbian (sr_RS)
 Italian (it_IT)
+Russion (ru_RU)
 
 = Can you translate the plugin into my language? =
 
@@ -235,6 +236,9 @@ I learned in high school Spanish class.  But I've included the .pot file in the 
 you send me your finished translation, I'd love to include it.
 
 == Changelog ==
+
+= 2.0.11 =
+* Russian translation added (Thank you to Alexander Esin for the file!)
 
 = 2.0.10 =
 * Fixed role/capability conflict with WP User Avatar plugin.
@@ -406,6 +410,9 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.0.11 =
+* Russian translation added (Thank you to Alexander Esin for the file!)
 
 = 2.0.10 =
 * Fixed role/capability conflict with WP User Avatar plugin.
