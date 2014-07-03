@@ -2,7 +2,7 @@
 /*
  * Master Show schedule
  * Author: Nikki Blight
- * @Since: 2.0.10
+ * @Since: 2.0.12
  */
 
 //jQuery is needed by the output of this code, so let's make sure we have it available
@@ -110,11 +110,13 @@ function master_schedule($atts) {
 				}
 				
 				//if it ends after midnight, fix it
-				if( ($time['time']['start_meridian'] ==  'pm' && $time['time']['end_meridian'] == 'am') ||
-						($time['time']['start_meridian'] ==  'am' && $time['time']['start_hour'] >= $time['time']['end_hour']) ) {
+				if( 	($time['time']['start_meridian'] ==  'pm' && $time['time']['end_meridian'] == 'am') || //if it starts at night and ends in the morning, end hour is on the following day
+						($time['time']['start_hour'].$time['time']['start_min'].$time['time']['start_meridian'] == $time['time']['end_hour'].$time['time']['end_min'].$time['time']['end_meridian']) || //if the start and end times are identical, assume the end time is the following day
+						($time['time']['start_meridian'] ==  'am' && $time['time']['start_hour'] > $time['time']['end_hour']) //if the start hour is in the morning, and greater than the end hour, assume end hour is the following day
+					) {
 					
-					if($time == 12) {
-						$time['time']['real_start'] = ($time['time']['start_hour']-12).':'.$time['time']['start_min'].$time['time']['start_meridian'];
+					if($timeformat == 12) {
+						$time['time']['real_start'] = ($time['time']['start_hour']-12).':'.$time['time']['start_min'];
 					}
 					else {
 						$pad_hour = "";

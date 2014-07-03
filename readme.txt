@@ -237,6 +237,9 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 2.0.12 =
+* Fixed a bug in the master schedule shortcode
+
 = 2.0.11 =
 * Russian translation added (Thank you to Alexander Esin for the file!)
 
@@ -410,6 +413,9 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.0.12 =
+* Fixed a bug in the master schedule shortcode
 
 = 2.0.11 =
 * Russian translation added (Thank you to Alexander Esin for the file!)
