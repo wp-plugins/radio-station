@@ -21,6 +21,7 @@ class DJ_Widget extends WP_Widget {
 		$show_sched = $instance['show_sched'];
 		$show_playlist = $instance['show_playlist'];
 		$show_all_sched = isset($instance['show_all_sched']) ? $instance['show_all_sched'] : false;
+		$show_desc = isset($instance['show_desc']) ? $instance['show_desc'] : false;
 
 		?>
 			<p>
@@ -65,6 +66,13 @@ class DJ_Widget extends WP_Widget {
 		  	</p>
 		  	
 		  	<p>
+		  		<label for="<?php echo $this->get_field_id('show_desc'); ?>"> 
+		  		<input id="<?php echo $this->get_field_id('show_desc'); ?>" name="<?php echo $this->get_field_name('show_desc'); ?>" type="checkbox" <?php if($show_desc) { echo 'checked="checked"'; } ?> /> 
+		  		<?php _e('Display description of show', 'radio-station'); ?>
+		  		</label>
+		  	</p>
+		  	
+		  	<p>
 		  		<label for="<?php echo $this->get_field_id('show_playlist'); ?>"> 
 		  		<input id="<?php echo $this->get_field_id('show_playlist'); ?>" name="<?php echo $this->get_field_name('show_playlist'); ?>" type="checkbox" <?php if($show_playlist) { echo 'checked="checked"'; } ?> /> 
 		  		<?php _e("Display link to show's playlist", 'radio-station'); ?>
@@ -101,6 +109,7 @@ class DJ_Widget extends WP_Widget {
 		$instance['show_sched'] = $new_instance['show_sched'];
 		$instance['show_playlist'] = $new_instance['show_playlist'];
 		$instance['show_all_sched'] = $new_instance['show_all_sched'];
+		$instance['show_desc'] = $new_instance['show_desc'];
 		return $instance;
 	}
  
@@ -117,6 +126,7 @@ class DJ_Widget extends WP_Widget {
  		$show_sched = $instance['show_sched'];
  		$show_playlist = $instance['show_playlist'];
  		$show_all_sched = isset($instance['show_all_sched']) ? $instance['show_all_sched'] : false; //keep the default settings for people updating from 1.6.2 or earlier
+ 		$show_desc = isset($instance['show_desc']) ? $instance['show_desc'] : false; //keep the default settings for people updating from 2.0.12 or earlier
  		
  		//fetch the current DJs
 		$djs = dj_get_current();
@@ -200,6 +210,11 @@ class DJ_Widget extends WP_Widget {
 									}
 									echo '</div>';
 								}
+							}
+							
+							if($show_desc) {
+								$desc_string = station_shorten_string(strip_tags($dj->post_content), 20);
+								echo '<span class="on-air-show-desc">'.$desc_string.'</span>';
 							}
 							
 							if($show_playlist) {

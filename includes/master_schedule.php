@@ -2,7 +2,7 @@
 /*
  * Master Show schedule
  * Author: Nikki Blight
- * @Since: 2.0.12
+ * @Since: 2.0.13
  */
 
 //jQuery is needed by the output of this code, so let's make sure we have it available
@@ -21,7 +21,8 @@ function master_schedule($atts) {
 			'time' => '12',
 			'show_link' => 1,
 			'display_show_time' => 1,
-			'list' => 0
+			'list' => 0,
+			'show_image' => 0
 	), $atts ) );
 	
 	$timeformat = $time;
@@ -161,12 +162,21 @@ function master_schedule($atts) {
 		
 		foreach($flip as $day => $hours) {
 			$output .= '<li class="master-list-day" id="list-header-'.strtolower($day).'">';
-			$output .= $day;
+			$output .= '<span class="master-list-day-name">'.$day.'</span>';
 			$output .= '<ul class="master-list-day-'.strtolower($day).'-list">';
 			foreach($hours as $hour => $mins) {
 				
 				foreach($mins as $min => $show) {
 					$output .= '<li>';
+					
+					if($show_image) {
+						$output .= '<span class="show-image">';
+						if(has_post_thumbnail($show['id'])) {
+							$output .= get_the_post_thumbnail($show['id'], 'thumbnail');
+						}
+						$output .= '</span>';
+					}
+					
 					$output .= '<span class="show-title">';
 					if($show_link) {
 						$output .= '<a href="'.get_permalink($show['id']).'">'.get_the_title($show['id']).'</a>';
@@ -361,6 +371,15 @@ function master_schedule($atts) {
 					}
 					
 					$output .= '<div class="master-show-entry'.$classes.'">';
+					
+					if($show_image) {
+						$output .= '<span class="show-image">';
+						if(has_post_thumbnail($shift['id'])) {
+							$output .= get_the_post_thumbnail($shift['id'], 'thumbnail');
+						}
+						$output .= '</span>';
+					}
+					
 					$output .= '<span class="show-title">';
 					if($show_link) {
 						$output .= '<a href="'.get_permalink($shift['id']).'">'.get_the_title($shift['id']).'</a>';

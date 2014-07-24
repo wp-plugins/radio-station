@@ -167,7 +167,8 @@ function station_shortcode_dj_on_air($atts) {
 			'time' => '12',
 			'show_sched' => 1,
 			'show_playlist' => 1,
-			'show_all_sched' => 0
+			'show_all_sched' => 0,
+			'show_desc' => 0
 	), $atts ) );
 
 	//find out which DJ(s) are currently scheduled to be on-air and display them
@@ -176,7 +177,7 @@ function station_shortcode_dj_on_air($atts) {
 
 	$dj_str = '';
 
-	$dj_str .= '<div class="on-air-embedded">';
+	$dj_str .= '<div class="on-air-embedded dj-on-air-embedded">';
 	if($title != '') {
 		$dj_str .= '<h3>'.$title.'</h3>';
 	}
@@ -211,6 +212,7 @@ function station_shortcode_dj_on_air($atts) {
 					$dj_str .= '<span class="on-air-dj-avatar">'.get_the_post_thumbnail($dj->ID, 'thumbnail').'</span>';
 				}
 
+				$dj_str .= '<span class="on-air-dj-title">';
 				if($show_link) {
 					$dj_str .= '<a href="';
 					$dj_str .= get_permalink($dj->ID);
@@ -220,6 +222,7 @@ function station_shortcode_dj_on_air($atts) {
 				else {
 					$dj_str .= $dj->post_title;
 				}
+				$dj_str .= '</span>';
 
 				if($display_djs) {
 					$names = get_post_meta($dj->ID, 'show_user_list', true);
@@ -245,6 +248,11 @@ function station_shortcode_dj_on_air($atts) {
 						}
 						$dj_str .= '</div>';
 					}
+				}
+				
+				if($show_desc) {
+					$desc_string = station_shorten_string(strip_tags($dj->post_content), 20);
+					$dj_str .= '<span class="on-air-show-desc">'.$desc_string.'</span>';
 				}
 				
 				if($show_playlist) {
@@ -324,7 +332,7 @@ function station_shortcode_coming_up($atts) {
 
 	$dj_str = '';
 
-	$dj_str .= '<div class="on-air-embedded">';
+	$dj_str .= '<div class="on-air-embedded dj-coming-up-embedded">';
 	if($title != '') {
 		$dj_str .= '<h3>'.$title.'</h3>';
 	}
@@ -357,6 +365,7 @@ function station_shortcode_coming_up($atts) {
 					$dj_str .= '<span class="on-air-dj-avatar">'.get_the_post_thumbnail($dj->ID, 'thumbnail').'</span>';
 				}
 
+				$dj_str .= '<span class="on-air-dj-title">';
 				if($show_link) {
 					$dj_str .= '<a href="';
 					$dj_str .= get_permalink($dj->ID);
@@ -366,6 +375,7 @@ function station_shortcode_coming_up($atts) {
 				else {
 					$dj_str .= $dj->post_title;
 				}
+				$dj_str .= '</span>';
 				
 				if($display_djs) {
 					$names = get_post_meta($dj->ID, 'show_user_list', true);
@@ -398,10 +408,10 @@ function station_shortcode_coming_up($atts) {
 				if($show_sched) {
 					$showtimes = explode("|", $showtime);
 					if($time == 12) {
-						$dj_str .= '<span class="on-air-dj-sched">'.__(date('l', $showtimes[0]), 'radio-station').', '.date('g:i a', $showtimes[0]).'-'.date('g:i a', $showtimes[1]).'</span><br />';
+						$dj_str .= '<span class="on-air-dj-sched"><span class="on-air-dj-sched-day">'.__(date('l', $showtimes[0]), 'radio-station').', </span>'.date('g:i a', $showtimes[0]).'-'.date('g:i a', $showtimes[1]).'</span><br />';
 					}
 					else {
-						$dj_str .= '<span class="on-air-dj-sched">'.__(date('l', $showtimes[0]), 'radio-station').', '.date('H:i', $showtimes[0]).'-'.date('H:i', $showtimes[1]).'</span><br />';
+						$dj_str .= '<span class="on-air-dj-sched"><span class="on-air-dj-sched-day">'.__(date('l', $showtimes[0]), 'radio-station').', </span>'.date('H:i', $showtimes[0]).'-'.date('H:i', $showtimes[1]).'</span><br />';
 					}
 				}
 					

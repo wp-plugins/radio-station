@@ -53,6 +53,7 @@ The following attributes are available for the shortcode:
 			'show_link' => Display the title of the show as a link to its profile page.  Valid values are 0 for hide, 1 for show.  Default is 1.
 			'display_show_time' => Display start and end times of each show after the title in the grid.  Valid values are 0 for hide, 1 for show.  Default is 1.
 			'list' => If set to a value of 1, the schedule will display in list format rather than table format.  Default value is 0.
+			'show_image' => If set to a value of 1, the show's avatar will be displayed.  Default value is 0.
 			
 For example, if you wish to display the schedule in 24-hour time format, use `[master-schedule time="24"]`.
 
@@ -96,6 +97,7 @@ The following attributes are available for the shortcode:
 		'show_sched' => Display the show's schedules.  Valid values are 0 for hide schedule, 1 for show schedule.  Default is 1.
 		'show_playlist' => Display a link to the show's current playlist.  Valid values are 0 for hide link, 1 for show link.  Default is 1.
 		'show_all_sched' => Displays all schedules for a show if it airs on multiple days.  Valid values are 0 for current schedule, 1 for all schedules.  Default is 0.
+		'show_desc' => Displays the first 20 words of the show's description. Valid values are 0 for hide descripion, 1 for show description.  Default is 0.
 		
 Example:
 `[dj-widget title="Now On-Air" display_djs="1" show_avatar="1" show_link="1" default_name="RadioBot" time="12" show_sched="1" show_playlist="1"]`
@@ -116,7 +118,7 @@ The following attributes are available for the shortcode:
 		'show_sched' => Display the show's schedules.  Valid values are 0 for hide schedule, 1 for show schedule.  Default is 1.
 		
 Example:
-`[dj-widget title="Coming Up On-Air" display_djs="1" show_avatar="1" show_link="1" limit="3" time="12" schow_sched="1"]`
+`[dj-coming-up-widget title="Coming Up On-Air" display_djs="1" show_avatar="1" show_link="1" limit="3" time="12" schow_sched="1"]`
 
 = Can I change how show pages are laid out/displayed? =
 
@@ -236,6 +238,10 @@ I learned in high school Spanish class.  But I've included the .pot file in the 
 you send me your finished translation, I'd love to include it.
 
 == Changelog ==
+
+= 2.0.13 =
+* Added the ability to display show avatars on the program grid.
+* Added the ability to display show description in the now on-air widget and short code. 
 
 = 2.0.12 =
 * Fixed a bug in the master schedule shortcode
@@ -413,6 +419,10 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.0.13 =
+* Added the ability to display show avatars on the program grid.
+* Added the ability to display show description in the now on-air widget and short code.
 
 = 2.0.12 =
 * Fixed a bug in the master schedule shortcode

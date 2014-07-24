@@ -482,4 +482,19 @@ function master_get_overrides($currenthour = false) {
 	return $scheds;
 }
 
+//shorten a string to a set number of words
+function station_shorten_string($string, $limit) {
+	$shortened = $string;      //Just in case of a problem
+
+	$array = explode(" ", $string);
+	if (count($array) <= $limit) { //already at or under the limit
+		$shortened = $string;
+	}
+	else {
+		array_splice($array, $limit);
+		$shortened = implode(" ", $array)." ...";
+	}
+	return $shortened;
+}
+
 ?>
