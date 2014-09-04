@@ -2,7 +2,7 @@
 /*
  * Master Show schedule
  * Author: Nikki Blight
- * @Since: 2.0.13
+ * @Since: 2.0.14
  */
 
 //jQuery is needed by the output of this code, so let's make sure we have it available
@@ -22,7 +22,8 @@ function master_schedule($atts) {
 			'show_link' => 1,
 			'display_show_time' => 1,
 			'list' => 0,
-			'show_image' => 0
+			'show_image' => 0,
+			'show_djs' => 0
 	), $atts ) );
 	
 	$timeformat = $time;
@@ -185,6 +186,35 @@ function master_schedule($atts) {
 						$output .= get_the_title($show['id']);
 					}
 					$output .= '</span>';
+					
+					if($show_djs) {
+						$output .= '<span class="show-dj-names">';
+					
+						$names = get_post_meta($show['id'], 'show_user_list', true);
+						$count = 0;
+							
+						if($names) {
+							$output .= '<span class="show-dj-names-leader"> with </span>';
+							foreach($names as $name) {
+								$count ++;
+								$user_info = get_userdata($name);
+									
+								$output .= $user_info->display_name;
+									
+								if( ($count == 1 && count($names) == 2) || (count($names) > 2 && $count == count($names)-1) ) {
+									$output .= ' and ';
+								}
+								elseif($count < count($names) && count($names) > 2) {
+									$output .= ', ';
+								}
+								else {
+									//do nothing
+								}
+							}
+						}
+					
+						$output .= '</span> ';
+					}
 					
 					if($display_show_time) {
 						//convert back to 12-hour time if 12-hour has been selected
@@ -367,7 +397,7 @@ function master_schedule($atts) {
 					$terms = wp_get_post_terms( $shift['id'], 'genres', array() );
 					$classes = ' show-id-'.$shift['id'].' '.sanitize_title_with_dashes(str_replace("_", "-", get_the_title($shift['id']))).' ';
 					foreach($terms as $term) {
-						$classes .= $term->name.' ';
+						$classes .= sanitize_title_with_dashes($term->name).' ';
 					}
 					
 					$output .= '<div class="master-show-entry'.$classes.'">';
@@ -388,6 +418,35 @@ function master_schedule($atts) {
 						$output .= get_the_title($shift['id']);
 					}
 					$output .= '</span>';
+					
+					if($show_djs) {
+						$output .= '<span class="show-dj-names">';
+						
+						$names = get_post_meta($shift['id'], 'show_user_list', true);
+						$count = 0;
+							
+						if($names) {
+							$output .= '<span class="show-dj-names-leader"> with </span>';
+							foreach($names as $name) {
+								$count ++;
+								$user_info = get_userdata($name);
+									
+								$output .= $user_info->display_name;
+									
+								if( ($count == 1 && count($names) == 2) || (count($names) > 2 && $count == count($names)-1) ) {
+									$output .= ' and ';
+								}
+								elseif($count < count($names) && count($names) > 2) {
+									$output .= ', ';
+								}
+								else {
+									//do nothing
+								}
+							}
+						}
+						
+						$output .= '</span>';
+					}
 					
 					if($display_show_time) {
 						//convert back to 12-hour time if 12-hour has been selected
@@ -485,7 +544,7 @@ function master_fetch_js_filter(){
 	
 	$taxes = get_terms('genres', array('hide_empty' => true, 'orderby' => 'name', 'order' => 'ASC'));
 	foreach($taxes as $i => $tax) {
-		$js .= '<a href="javascript:show_highlight(\''.$tax->name.'\')">'.$tax->name.'</a>';
+		$js .= '<a href="javascript:show_highlight(\''.sanitize_title_with_dashes($tax->name).'\')">'.$tax->name.'</a>';
 		if($i < count($taxes)) {
 			$js .= ' | ';
 		}

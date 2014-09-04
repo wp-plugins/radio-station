@@ -1,7 +1,7 @@
 <?php
 /* Sidebar Widget - DJ On Air
  * Displays the current on-air show/DJ 
- * Since 2.0.9
+ * Since 2.0.14
  */
 class DJ_Widget extends WP_Widget {
 
@@ -154,12 +154,22 @@ class DJ_Widget extends WP_Widget {
 					if($show_sched) {
 						
 						if($time == 12) {
-							echo '<span class="on-air-dj-sched">'.$djs['all'][0]['sched']['start_hour'].':'.$djs['all'][0]['sched']['start_min'].' '.$djs['all'][0]['sched']['start_meridian'].'-'.$djs['all'][0]['sched']['end_hour'].':'.$djs['all'][0]['sched']['end_min'].' '.$djs['all'][0]['sched']['end_meridian'].'</span><br />';
+							$start_hour = $djs['all'][0]['sched']['start_hour'];
+							if (substr($djs['all'][0]['sched']['start_hour'], 0, 1) === '0') {
+								$start_hour = substr($djs['all'][0]['sched']['start_hour'], 1);
+							}
+							
+							$end_hour = $djs['all'][0]['sched']['end_hour'];
+							if (substr($djs['all'][0]['sched']['end_hour'], 0, 1) === '0') {
+								$end_hour = substr($djs['all'][0]['sched']['end_hour'], 1);
+							}
+							
+							echo ' <span class="on-air-dj-sched">'.$start_hour.':'.$djs['all'][0]['sched']['start_min'].' '.$djs['all'][0]['sched']['start_meridian'].'-'.$end_hour.':'.$djs['all'][0]['sched']['end_min'].' '.$djs['all'][0]['sched']['end_meridian'].'</span><br />';
 						}
 						else {
 							$djs['all'][0]['sched'] = station_convert_schedule_to_24hour($djs['all'][0]['sched']);
 						
-							echo '<span class="on-air-dj-sched">'.$djs['all'][0]['sched']['start_hour'].':'.$djs['all'][0]['sched']['start_min'].' '.'-'.$djs['all'][0]['sched']['end_hour'].':'.$djs['all'][0]['sched']['end_min'].'</span><br />';
+							echo ' <span class="on-air-dj-sched">'.$djs['all'][0]['sched']['start_hour'].':'.$djs['all'][0]['sched']['start_min'].' '.'-'.$djs['all'][0]['sched']['end_hour'].':'.$djs['all'][0]['sched']['end_min'].'</span><br />';
 						}
 						
 						echo '</li>';

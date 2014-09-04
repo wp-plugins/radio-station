@@ -1,7 +1,7 @@
 <?php
 /* Sidebar Widget - Upcoming DJ
  * Displays the the next show(s)/DJ(s) in the schedule 
- * Since 2.0.9
+ * Since 2.0.14
  */
 class DJ_Upcoming_Widget extends WP_Widget {
 
@@ -138,10 +138,20 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		 					if($show_sched) {
 		 						
 		 						if($time == 12) {
-		 							echo '<span class="on-air-dj-sched">'.$dj['sched']['start_hour'].':'.$dj['sched']['start_min'].' '.$dj['sched']['start_meridian'].'-'.$dj['sched']['end_hour'].':'.$dj['sched']['end_min'].' '.$dj['sched']['end_meridian'].'</span><br />';
+		 							$start_hour = $dj['sched']['start_hour'];
+		 							if (substr($dj['sched']['start_hour'], 0, 1) === '0') {
+		 								$start_hour = substr($dj['sched']['start_hour'], 1);
+		 							}
+		 								
+		 							$end_hour = $dj['sched']['end_hour'];
+		 							if (substr($dj['sched']['end_hour'], 0, 1) === '0') {
+		 								$end_hour = substr($dj['sched']['end_hour'], 1);
+		 							}
+		 							
+		 							echo ' <span class="on-air-dj-sched">'.$start_hour.':'.$dj['sched']['start_min'].' '.$dj['sched']['start_meridian'].'-'.$end_hour.':'.$dj['sched']['end_min'].' '.$dj['sched']['end_meridian'].'</span><br />';
 		 						}
 		 						else {
-		 							echo '<span class="on-air-dj-sched">'.$dj['sched']['start_hour'].':'.$dj['sched']['start_min'].' '.'-'.$dj['sched']['end_hour'].':'.$dj['sched']['end_min'].'</span><br />';
+		 							echo ' <span class="on-air-dj-sched">'.$dj['sched']['start_hour'].':'.$dj['sched']['start_min'].' '.'-'.$dj['sched']['end_hour'].':'.$dj['sched']['end_min'].'</span><br />';
 		 						}
 		 					}
 		 					echo '</li>';

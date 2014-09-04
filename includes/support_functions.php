@@ -2,7 +2,7 @@
 /*
 * Support functions for shortcodes and widgets
 * Author: Nikki Blight
-* Since: 2.0.8
+* Since: 2.0.14
 */
 
 //get only the currently relevant schedule
@@ -215,8 +215,9 @@ function dj_get_next($limit = 1) {
 			
 				
 			//compare to the current timestamp
-			if($p['sched']['start_timestamp'] <= $now && $p['sched']['end_timestamp'] >= $now) { //show is on now
-				$overrides[$p['sched']['start_timestamp'].'|'.$p['sched']['end_timestamp']] = $p;
+			if($p['sched']['start_timestamp'] <= $now && $p['sched']['end_timestamp'] >= $now) { //show is on now, so we don't need it listed under upcoming
+				//$overrides[$p['sched']['start_timestamp'].'|'.$p['sched']['end_timestamp']] = $p;
+				unset($check[$i]);
 			}
 			elseif($p['sched']['start_timestamp'] > $now && $p['sched']['end_timestamp'] > $now) { //show is on later today
 				$overrides[$p['sched']['start_timestamp'].'|'.$p['sched']['end_timestamp']] = $p;

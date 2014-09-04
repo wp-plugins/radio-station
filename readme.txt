@@ -3,7 +3,7 @@ Contributors: kionae
 Donate link: http://www.nlb-creations.com/donate
 Tags: dj, music, playlist, radio, scheduling
 Requires at least: 3.3.1
-Tested up to: 3.9.1
+Tested up to: 4.0
 Stable tag: trunk
 
 Radio Station is a plugin to run a radio station's website. It's functionality is based on Drupal 6's Station plugin.
@@ -54,6 +54,7 @@ The following attributes are available for the shortcode:
 			'display_show_time' => Display start and end times of each show after the title in the grid.  Valid values are 0 for hide, 1 for show.  Default is 1.
 			'list' => If set to a value of 1, the schedule will display in list format rather than table format.  Default value is 0.
 			'show_image' => If set to a value of 1, the show's avatar will be displayed.  Default value is 0.
+			'show_djs' => If set to a value of 1, the names of the show's DJs will be displayed.  Default value is 0.
 			
 For example, if you wish to display the schedule in 24-hour time format, use `[master-schedule time="24"]`.
 
@@ -239,6 +240,12 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 2.0.14 =
+* Fixed issue on the master schedule where genres containing more than one work wouldn't highlight when clicked
+* Added ability to display DJ names on the master schedule.
+* Fixed bug in the Upcoming widget.  Override Schedule no longer display as upcoming when they are on-air.
+* Verified compatibility woth WordPress 4.0
+
 = 2.0.13 =
 * Added the ability to display show avatars on the program grid.
 * Added the ability to display show description in the now on-air widget and short code. 
@@ -419,6 +426,12 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.0.14 =
+* Fixed issue on the master schedule where genres containing more than one work wouldn't highlight when clicked
+* Added ability to display DJ names on the master schedule.
+* Fixed bug in the Upcoming widget.  Override Schedule no longer display as upcoming when they are on-air.
+* Verified compatibility woth WordPress 4.0
 
 = 2.0.13 =
 * Added the ability to display show avatars on the program grid.
