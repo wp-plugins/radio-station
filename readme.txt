@@ -225,12 +225,13 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 
 Right now:
 
-Spanish (es_ES)
-French (fr_FR)
 Albanian (sq_AL)
-Serbian (sr_RS)
+French (fr_FR)
+German (de_DE)
 Italian (it_IT)
 Russion (ru_RU)
+Serbian (sr_RS)
+Spanish (es_ES)
 
 = Can you translate the plugin into my language? =
 
@@ -239,6 +240,9 @@ I learned in high school Spanish class.  But I've included the .pot file in the 
 you send me your finished translation, I'd love to include it.
 
 == Changelog ==
+
+= 2.0.15 =
+* German translation added (Thank you to Arsimael Inshan for the file!)
 
 = 2.0.14 =
 * Fixed issue on the master schedule where genres containing more than one work wouldn't highlight when clicked
@@ -426,6 +430,9 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.0.15 =
+* German translation added (Thank you to Arsimael Inshan for the file!)
 
 = 2.0.14 =
 * Fixed issue on the master schedule where genres containing more than one work wouldn't highlight when clicked
