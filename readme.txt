@@ -432,7 +432,7 @@ you send me your finished translation, I'd love to include it.
 == Upgrade Notice ==
 
 = 2.0.15 =
-* German translation added (Thank you to Arsimael Inshan for the file!)
+* German translation added (Thank you to Ian Hook for the file!)
 
 = 2.0.14 =
 * Fixed issue on the master schedule where genres containing more than one work wouldn't highlight when clicked
