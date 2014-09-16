@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: radio station\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-11-08 08:27-0600\n"
-"PO-Revision-Date: 2014-09-09 10:17-0600\n"
+"PO-Revision-Date: 2014-09-16 08:24-0600\n"
 "Last-Translator: Nikki <nblight@nlb-creations.com>\n"
 "Language-Team: \n"
 "Language: es_ES\n"
@@ -27,7 +27,7 @@ msgstr "Playliste ansehen"
 
 #: includes/dj-on-air.php:480
 msgid "None Upcoming"
-msgstr "Keine anstehende Sendung"
+msgstr "Keine anstehenden Sendungen"
 
 #: includes/dj-on-air.php:495
 msgid "The current on-air DJ."
@@ -69,7 +69,7 @@ msgstr "Wenn keine Sendung/DJ geplant ist, zeige den folgenden Text/Name."
 
 #: includes/dj-on-air.php:552 includes/dj-on-air.php:779
 msgid "Time Format"
-msgstr "Zeitsystem"
+msgstr "Zeitanzeige"
 
 #: includes/dj-on-air.php:554 includes/dj-on-air.php:781
 msgid "12-hour"
@@ -113,27 +113,27 @@ msgstr "Wähle das Zeitformat für den angezeigten Plan"
 
 #: includes/master_schedule.php:21 includes/master_schedule.php:22
 msgid "Schedule Override"
-msgstr "Planungs-Override"
+msgstr "Sendungs-Override"
 
 #: includes/master_schedule.php:23 includes/master_schedule.php:24
 msgid "Add Schedule Override"
-msgstr "Planungs-Override hinzufügen"
+msgstr "Sendungs-Override hinzufügen"
 
 #: includes/master_schedule.php:25
 msgid "Edit Schedule Override"
-msgstr "Planungs-Override bearbeiten"
+msgstr "Sendungs-Override bearbeiten"
 
 #: includes/master_schedule.php:26
 msgid "New Schedule Override"
-msgstr "Neuen Planungs-Override"
+msgstr "Neuen Sendungs-Override"
 
 #: includes/master_schedule.php:27
 msgid "View Schedule Override"
-msgstr "Planungs-Override Anzeigen"
+msgstr "Sendungs-Override Anzeigen"
 
 #: includes/master_schedule.php:30
 msgid "Post type for Schedule Override"
-msgstr "Art des Planungs-Override"
+msgstr "Art des Sendungs-Override"
 
 #: includes/master_schedule.php:49
 msgid "Override Schedule"
@@ -146,12 +146,12 @@ msgstr "Datum"
 #: includes/master_schedule.php:82 includes/playlist.php:756
 #: includes/playlist.php:835
 msgid "Start Time"
-msgstr "Startzeitpunkt"
+msgstr "Start"
 
 #: includes/master_schedule.php:108 includes/playlist.php:782
 #: includes/playlist.php:861
 msgid "End Time"
-msgstr "Endzeitpunkt"
+msgstr "Ende"
 
 #: includes/master_schedule.php:432 includes/master_schedule.php:595
 msgid "encore airing"
@@ -163,31 +163,31 @@ msgstr "Audiodatei"
 
 #: includes/master_schedule.php:454
 msgid "Sun"
-msgstr "Son"
+msgstr "So"
 
 #: includes/master_schedule.php:454
 msgid "Mon"
-msgstr "Mon"
+msgstr "Mo"
 
 #: includes/master_schedule.php:454
 msgid "Tue"
-msgstr "Die"
+msgstr "Di"
 
 #: includes/master_schedule.php:454
 msgid "Wed"
-msgstr "Mit"
+msgstr "Mi"
 
 #: includes/master_schedule.php:454
 msgid "Thu"
-msgstr "Don"
+msgstr "Do"
 
 #: includes/master_schedule.php:454
-msgid "Fri"
-msgstr "Fre"
+msgid "Fre"
+msgstr "Fr"
 
 #: includes/master_schedule.php:454
 msgid "Sat"
-msgstr "Sam"
+msgstr "Sa"
 
 #: includes/master_schedule.php:619 includes/playlist.php:572
 msgid "Genres"
@@ -195,7 +195,7 @@ msgstr "Genres"
 
 #: includes/playlist.php:16 templates/single-show.php:136
 msgid "Playlists"
-msgstr "Playlists"
+msgstr "Playlisten"
 
 #: includes/playlist.php:17
 msgid "Playlist"
@@ -239,7 +239,7 @@ msgstr "Neue Sendung"
 
 #: includes/playlist.php:48
 msgid "View Show"
-msgstr "Sendung Anzeigen"
+msgstr "Sendung anzeigen"
 
 #: includes/playlist.php:51
 msgid "Post type for Show descriptions"
@@ -314,7 +314,7 @@ msgstr "Aktualisiere Playlist"
 
 #: includes/playlist.php:175
 msgid "Update"
-msgstr "Aktualisiere"
+msgstr "Aktualisieren"
 
 #: includes/playlist.php:420
 msgid "Display the current song."
@@ -334,7 +334,7 @@ msgstr "Zeige Songtitel"
 
 #: includes/playlist.php:458
 msgid "Show Album Name"
-msgstr "Zeige Albumsname"
+msgstr "Zeige Albumtitel"
 
 #: includes/playlist.php:465
 msgid "Show Record Label Name"
@@ -362,19 +362,19 @@ msgid ""
 "programming schedule if unchecked)"
 msgstr ""
 "Bitte mache hier einen Hacken wenn die Sendung aktiv ist. (Die Sendung wird "
-"nicht in der Übersicht gezeigt wenn der hacken nicht gesetzt ist)"
+"nicht in der Übersicht gezeigt wenn der Hacken nicht gesetzt ist)"
 
 #: includes/playlist.php:616
 msgid "Current Audio File"
-msgstr "Gegenwärtige Audiodatei"
+msgstr "Link zum Stream"
 
 #: includes/playlist.php:619
 msgid "DJ Email"
-msgstr "DJ eMail"
+msgstr "DJ Mail"
 
 #: includes/playlist.php:622
 msgid "Website Link"
-msgstr "Homepage Link"
+msgstr "HLink zur Homepage"
 
 #: includes/playlist.php:633
 msgid "DJs"
@@ -418,11 +418,11 @@ msgstr "Sonntag"
 
 #: includes/playlist.php:806 includes/playlist.php:886
 msgid "Encore Presentation"
-msgstr "Überziehe Präsentation"
+msgstr "evtl. länger"
 
 #: includes/playlist.php:817
 msgid "Add Shift"
-msgstr "Schicht hinzufügen"
+msgstr "Sendungszeitpunkt hinzufügen (wiederholt sich jede Woche)"
 
 #: includes/playlist.php:980
 msgid "More Playlists"
@@ -529,7 +529,7 @@ msgstr "Exportiere Playlisten"
 
 #: radio-station.php:244 radio-station.php:451
 msgid "Export"
-msgstr "Exportiere"
+msgstr "Export"
 
 #: radio-station.php:323
 msgid "Right-click and download this file to save your export"

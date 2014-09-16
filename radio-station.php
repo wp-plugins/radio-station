@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Radio Station
- * @version 2.0.15
+ * @version 2.0.16
  */
 /*
 Plugin Name: Radio Station
 Plugin URI: http://nlb-creations.com/2013/02/25/wordpress-plugin-radio-station/ 
 Description: Adds playlist and on-air programming functionality to your site.
 Author: Nikki Blight <nblight@nlb-creations.com>
-Version: 2.0.15
+Version: 2.0.16
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: http://www.nlb-creations.com
@@ -158,7 +158,7 @@ function set_station_roles() {
 				'publish_posts' => true,
 				'delete_posts' => true
 			);
-	$wp_roles->remove_role('dj'); //we need this here in case we ever update the capabilities list
+	//$wp_roles->remove_role('dj'); //we need this here in case we ever update the capabilities list
 	$wp_roles->add_role( 'dj', 'DJ', $caps );
 	
 	//grant all new capabilities to admin users

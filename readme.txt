@@ -241,6 +241,10 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 2.0.16 =
+* Minor revisions to German translation.
+* Fixed a bug that was resetting custom-sert role capabilities for the DJ role.
+
 = 2.0.15 =
 * German translation added (Thank you to Ian Hook for the file!)
 
@@ -430,6 +434,10 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.0.16 =
+* Minor revisions to German translation.
+* Fixed a bug that was resetting custom-sert role capabilities for the DJ role.
 
 = 2.0.15 =
 * German translation added (Thank you to Ian Hook for the file!)
