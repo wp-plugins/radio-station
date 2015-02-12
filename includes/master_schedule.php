@@ -2,7 +2,7 @@
 /*
  * Master Show schedule
  * Author: Nikki Blight
- * @Since: 2.0.14
+ * @Since: 2.1
  */
 
 //jQuery is needed by the output of this code, so let's make sure we have it available
@@ -21,9 +21,10 @@ function master_schedule($atts) {
 			'time' => '12',
 			'show_link' => 1,
 			'display_show_time' => 1,
-			'list' => 0,
+			'list' => 'table',
 			'show_image' => 0,
-			'show_djs' => 0
+			'show_djs' => 0,
+			'divheight' => 45
 	), $atts ) );
 	
 	$timeformat = $time;
@@ -130,6 +131,7 @@ function master_schedule($atts) {
 					//$time['time']['start_hour'] = "0";
 					//$time['time']['start_min'] = "00";
 					//$time['time']['start_meridian'] = "am";
+					$time['time']['rollover'] = 1;
 					
 					if($day == 'Sunday') { $nextday = 'Monday'; }
 					if($day == 'Monday') { $nextday = 'Tuesday'; }
@@ -147,8 +149,8 @@ function master_schedule($atts) {
 	}
 	
 	$output = '';
-	//print_r($master_list);
-	if($list == 1) {
+
+	if($list == 1 || $list == 'list') {
 		//output as a list	
 		$flip = $days_of_the_week;
 		foreach($master_list as $hour => $days) {
@@ -217,56 +219,20 @@ function master_schedule($atts) {
 					}
 					
 					if($display_show_time) {
-						//convert back to 12-hour time if 12-hour has been selected
-						if($timeformat == 12) {
-							if($show['time']['start_meridian'] == 'pm' && $show['time']['start_hour'] != 12) {
-								$show['time']['start_hour'] = $show['time']['start_hour'] - 12;
-							}
-							if($show['time']['start_meridian'] == 'am' && $show['time']['start_hour'] == 0) {
-								$show['time']['start_hour'] = 12;
-							}
-								
-							if($show['time']['end_meridian'] == 'pm' && $show['time']['end_hour'] != 12) {
-								$show['time']['end_hour'] = $show['time']['end_hour'] - 12;
-							}
-							if($show['time']['end_meridian'] == 'am' && $show['time']['end_hour'] == 0) {
-								$show['time']['end_hour'] = 12;
-							}
-						}
-						else {
-							//we need to add a leading 0 to times before 10 in 24-hour format
-							if($show['time']['start_hour'] < 10) {
-								$show['time']['start_hour'] = '0'.$show['time']['start_hour'];
-							}
-							if($show['time']['end_hour'] < 10) {
-								$show['time']['end_hour'] = '0'.$show['time']['end_hour'];
-							}
-						}
-					
-						$output .= ' <span class="show-time">';
-							//if we're spanning days, this is going to look confusing, so add the day to the time for clarification
-							if($show['time']['day'] != $day) {
-								$output .= '<em>('.$show['time']['day'].')</em> ';
-							}
-						
-							$output .= $show['time']['start_hour'].':'.$show['time']['start_min'];
+						$output .= '<span class="show-time">';
 							if($timeformat == 12) {
-								$output .= $show['time']['start_meridian'];;
-							}
+								//$output .= $weekday.' ';
+								$output .= date('g:i a', strtotime('1981-04-28 '.$show['time']['start_hour'].':'.$show['time']['start_min'].':00 '));
+								$output .= ' - ';
+								$output .= date('g:i a', strtotime('1981-04-28 '.$show['time']['end_hour'].':'.$show['time']['end_min'].':00 '));
 								
-							$output .= ' - ';
-							
-							if($show['time']['day'] != $day) {
-								$output .= '<em>('.$day.')</em> ';
 							}
-							
-							$output .= $show['time']['end_hour'].':'.$show['time']['end_min'];
-								
-							if($timeformat == 12) {
-								$output .= $show['time']['end_meridian'];
+							else {
+								$output .= date('H:i', strtotime('1981-04-28 '.$show['time']['start_hour'].':'.$show['time']['start_min'].':00 '));
+								$output .= ' - ';
+								$output .= date('H:i', strtotime('1981-04-28 '.$show['time']['end_hour'].':'.$show['time']['end_min'].':00 '));
 							}
-						
-						$output .= '</span>';
+							$output .= '</span>';
 					}
 					
 					if(isset($show['time']['encore']) && $show['time']['encore'] == 'on') {
@@ -286,6 +252,170 @@ function master_schedule($atts) {
 		}
 		
 		$output .= '</ul>';
+	}
+	elseif($list == 'divs') {
+		
+		//output some dynamic styles
+		$output .= '<style type="text/css">';
+		for($i=2; $i<24; $i++) {
+			$rowheight = $divheight*$i;
+			
+			$output .= '#master-schedule-divs .rowspan'.$i.' { ';
+			$output .= 'height: '.($rowheight).'px; }';
+		}
+		
+		$output .= '#master-schedule-divs .rowspan-half { height: 15px; margin-top: -7px; }';
+		$output .= '#master-schedule-divs .rowspan { top: '.$divheight.'px; }';
+		$output .= '</style>';
+		
+		//output the schedule
+		$output .= master_fetch_js_filter();
+		$output .= '<div id="master-schedule-divs">';
+		$weekdays = array_keys($days_of_the_week);
+		
+		$output .= '<div class="master-schedule-hour">';
+		$output .= '<div class="master-schedule-hour-header">&nbsp;</div>';
+		foreach($weekdays as $weekday) {
+			$output .= '<div class="master-schedule-weekday-header master-schedule-weekday">'.$weekday.'</div>';
+		}
+		$output .= '</div>';
+		
+		foreach($master_list as $hour => $days) {
+			
+			$output .= '<div class="master-schedule-'.$hour.' master-schedule-hour">';
+			
+			//output the hour labels
+			$output .= '<div class="master-schedule-hour-header">';
+			if($timeformat == 12) {
+				$output .= date('ga', strtotime('1981-04-28 '.$hour.':00:00')); //random date needed to convert time to 12-hour format
+			}
+			else {
+				$output .= date('H:i', strtotime('1981-04-28 '.$hour.':00:00')); //random date needed to convert time to 24-hour format
+			}
+			$output .= '</div>';
+		
+			
+			foreach($weekdays as $weekday) {
+				$output .= '<div class="master-schedule-'.strtolower($weekday).' master-schedule-weekday" style="height: '.$divheight.'px;">';
+				if(isset($days[$weekday])) {
+					foreach($days[$weekday] as $min => $showdata) {
+					
+						$terms = wp_get_post_terms( $showdata['id'], 'genres', array() );
+						$classes = ' show-id-'.$showdata['id'].' '.sanitize_title_with_dashes(str_replace("_", "-", get_the_title($showdata['id']))).' ';
+						foreach($terms as $term) {
+							$classes .= sanitize_title_with_dashes($term->name).' ';
+						}
+							
+						$output .= '<div class="master-show-entry'.$classes.'">';
+						
+						//featured image
+						if($show_image) {
+							$output .= '<span class="show-image">';
+							if(has_post_thumbnail($showdata['id'])) {
+								$output .= get_the_post_thumbnail($showdata['id'], 'thumbnail');
+							}
+							$output .= '</span>';
+						}
+						
+						//title + link to page if requested
+						$output .= '<span class="show-title">';
+						if($show_link) {
+							$output .= '<a href="'.get_permalink($showdata['id']).'">'.get_the_title($showdata['id']).'</a>';
+						}
+						else {
+							$output .= get_the_title($showdata['id']);
+						}
+						$output .= '</span>';
+							
+						//list of DJs
+						if($show_djs) {
+							$output .= '<span class="show-dj-names">';
+						
+							$names = get_post_meta($showdata['id'], 'show_user_list', true);
+							$count = 0;
+								
+							if($names) {
+								$output .= '<span class="show-dj-names-leader"> with </span>';
+								foreach($names as $name) {
+									$count ++;
+									$user_info = get_userdata($name);
+										
+									$output .= $user_info->display_name;
+										
+									if( ($count == 1 && count($names) == 2) || (count($names) > 2 && $count == count($names)-1) ) {
+										$output .= ' and ';
+									}
+									elseif($count < count($names) && count($names) > 2) {
+										$output .= ', ';
+									}
+									else {
+										//do nothing
+									}
+								}
+							}
+						
+							$output .= '</span>';
+						}
+						
+						//show's schedule
+						if($display_show_time) {
+							$output .= '<span class="show-time">';
+							if($timeformat == 12) {
+								//$output .= $weekday.' ';
+								$output .= date('g:i a', strtotime('1981-04-28 '.$showdata['time']['start_hour'].':'.$showdata['time']['start_min'].':00 '));
+								$output .= ' - ';
+								$output .= date('g:i a', strtotime('1981-04-28 '.$showdata['time']['end_hour'].':'.$showdata['time']['end_min'].':00 '));
+							}
+							else {
+								$output .= date('H:i', strtotime('1981-04-28 '.$showdata['time']['start_hour'].':'.$showdata['time']['start_min'].':00 '));
+								$output .= ' - ';
+								$output .= date('H:i', strtotime('1981-04-28 '.$showdata['time']['end_hour'].':'.$showdata['time']['end_min'].':00 '));
+							}
+							$output .= '</span>';
+						}
+						
+						//designate as encore
+						if(isset($showdata['time']['encore']) && $showdata['time']['encore'] == 'on') {
+							$output .= '<span class="show-encore">'.__('encore airing', 'radio-station').'</span>';
+						}
+							
+						//link to media file
+						$link = get_post_meta($showdata['id'], 'show_file', true);
+						if($link != '') {
+							$output .= '<span class="show-file"><a href="'.$link.'">'.__('Audio File', 'radio-station').'</a>';
+						}
+						
+						//calculate duration of show for rowspanning
+						if(isset($showdata['time']['rollover'])) { //show started on the previous day
+							$duration = $showdata['time']['end_hour'];
+						}
+						else {
+							if($showdata['time']['end_hour'] >=  $showdata['time']['start_hour']) {
+								$duration = $showdata['time']['end_hour'] - $showdata['time']['start_hour'];
+							}
+							else {
+								$duration =  23 - $showdata['time']['start_hour'];
+							}
+						}
+						
+						if($duration >= 1) {
+							$output .= '<div class="rowspan rowspan'.$duration.'"></div>';
+							
+							if($showdata['time']['end_min'] != '00') {
+								$output .= '<div class="rowspan rowspan-half"></div>';
+							}
+						}
+						
+						
+						
+						$output .= '</div>'; //end master-show-entry
+					}
+				}
+				$output .= '</div>'; //end master-schedule-weekday
+			}
+			$output .= '</div>'; //end master-schedule-hour
+		}
+		$output .= '</div>'; //end master-schedule-divs
 	}
 	else {
 		//create the output in a table
@@ -355,7 +485,9 @@ function master_schedule($atts) {
 				foreach($min as $shift) {
 					
 					if($shift['time']['start_hour'] == 0 && $shift['time']['end_hour'] == 0) { ///midnight to midnight shows
-						$rowspan = 24;
+						if($shift['time']['start_min'] == $shift['time']['end_min']) { //accomodate shows that end midway through the 12am hour 
+							$rowspan = 24;
+						}
 					}
 					
 					if($shift['time']['end_hour'] == 0 && $shift['time']['start_hour'] != 0) { //fix shows that end at midnight (BUT take into account shows that start at midnight and end before the hour is up e.g. 12:00 - 12:30am), otherwise you could end up with a negative row span
@@ -449,68 +581,17 @@ function master_schedule($atts) {
 					}
 					
 					if($display_show_time) {
-						//convert back to 12-hour time if 12-hour has been selected
-						if($timeformat == 12) {
-							if($shift['time']['start_meridian'] == 'pm' && $shift['time']['start_hour'] != 12) {
-								$shift['time']['start_hour'] = $shift['time']['start_hour'] - 12;
-							}
-							if($shift['time']['start_meridian'] == 'am' && $shift['time']['start_hour'] == 0) {
-								$shift['time']['start_hour'] = 12;
-							}
-							
-							if($shift['time']['end_meridian'] == 'pm' && $shift['time']['end_hour'] != 12) {
-								$shift['time']['end_hour'] = $shift['time']['end_hour'] - 12;
-							}
-							if($shift['time']['end_meridian'] == 'am' && $shift['time']['end_hour'] == 0) {
-								$shift['time']['end_hour'] = 12;
-							}
-							
-							if(isset($shift['time']['real_start'])) {
-								//die(print_r($shift['time']));
-								$realstart = explode(':', $shift['time']['real_start']);
-								if( $realstart[0] > 12) {
-									$shift['time']['real_start'] = ($realstart[0] - 12).':'.$realstart[1];
-									
-								}
-								if($realstart[0] == 0) {
-									$shift['time']['real_start'] = '12:'.$realstart[1];
-								}
-							}
-						}
-						else {
-							//we need to add a leading 0 to times before 10 in 24-hour format
-							if($shift['time']['start_hour'] < 10) {
-								$shift['time']['start_hour'] = '0'.$shift['time']['start_hour'];
-							}
-							if($shift['time']['end_hour'] < 10) {
-								$shift['time']['end_hour'] = '0'.$shift['time']['end_hour'];
-							}
-						}
-						
 						$output .= '<span class="show-time">';
-						if(isset($shift['time']['real_start'])) {
-							
-							$output .= __($day, 'radio-station').'<br />'.$shift['time']['real_start'];
-							if($timeformat == 12) {
-								$output .= $shift['time']['start_meridian'];
-							}
-							
-							$output .= ' - '.$shift['time']['end_hour'].':'.$shift['time']['end_min'];
-							if($timeformat == 12) {
-								$output .= $shift['time']['end_meridian'];
-							}
+						if($timeformat == 12) {
+							//$output .= $weekday.' ';
+							$output .= date('g:i a', strtotime('1981-04-28 '.$shift['time']['start_hour'].':'.$shift['time']['start_min'].':00 '));
+							$output .= ' - ';
+							$output .= date('g:i a', strtotime('1981-04-28 '.$shift['time']['end_hour'].':'.$shift['time']['end_min'].' '));
 						}
 						else {
-							$output .= __($day, 'radio-station').'<br />'.$shift['time']['start_hour'].':'.$shift['time']['start_min'];
-							if($timeformat == 12) {
-								$output .= $shift['time']['start_meridian'];
-							}
-							
-							$output .= ' - '.$shift['time']['end_hour'].':'.$shift['time']['end_min'];
-							
-							if($timeformat == 12) {
-								$output .= $shift['time']['end_meridian'];
-							}
+							$output .= date('H:i', strtotime('1981-04-28 '.$shift['time']['start_hour'].':'.$shift['time']['start_min'].':00 '));
+							$output .= ' - ';
+							$output .= date('H:i', strtotime('1981-04-28 '.$shift['time']['end_hour'].':'.$shift['time']['end_min'].':00 '));
 						}
 						$output .= '</span>';
 					}
@@ -539,6 +620,7 @@ function master_schedule($atts) {
 }
 add_shortcode( 'master-schedule', 'master_schedule');
 
+//add javascript for highlighting shows based on genre
 function master_fetch_js_filter(){
 	$js = '<div id="master-genre-list"><span class="heading">'.__('Genres', 'radio-station').': </span>';
 	
@@ -554,7 +636,7 @@ function master_fetch_js_filter(){
 	
 	$js .= '<script type="text/javascript">';
 	$js .= 'function show_highlight(myclass) {';
-	$js .= '	jQuery(".master-show-entry").css("border","1px solid white");';
+	$js .= '	jQuery(".master-show-entry").css("border","none");';
 	$js .= '	jQuery("." + myclass).css("border","3px solid red");';
 	$js .= '}';
 	$js .= '</script>';

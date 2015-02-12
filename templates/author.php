@@ -9,7 +9,7 @@ get_header(); ?>
 	$curauth = (get_query_var('author_name')) ? get_user_by('slug', get_query_var('author_name')) : get_userdata(get_query_var('author'));
 ?>
 
-		<section id="primary">
+		<section>
 			<div id="content" role="main">
 			
 			<?php if(in_array("dj", $curauth->roles)): ?>

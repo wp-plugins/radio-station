@@ -1,3 +1,5 @@
+/* Table Style Gird */
+
 #master-program-schedule {
 	width: 100%;
 }
@@ -65,3 +67,61 @@
 #master-genre-list span.heading {
 	font-weight: bold;
 }
+
+/* Div Style Grid */
+#master-schedule-divs {
+	width: 100%;
+}
+
+#master-schedule-divs .master-schedule-hour {
+	width: 100%;
+	clear: both;
+}
+
+#master-schedule-divs .master-schedule-hour-header {
+	width: 12%;
+	float: left;
+	text-align: center;
+	font-weight: bold;
+	font-size: 0.7em;
+}
+
+#master-schedule-divs .master-schedule-weekday {
+	width: 10%;
+	float: left;
+	border: 1px solid #dddddd;
+}
+
+#master-schedule-divs .master-schedule-weekday-header {
+	text-align: center;
+	font-weight: bold;
+	font-size: 0.7em;
+	display: block;
+}
+
+#master-schedule-divs .master-show-entry {
+	padding: 8px 5px 5px 5px;
+	position: relative;
+}
+
+#master-schedule-divs .show-dj-names,
+#master-schedule-divs .show-time,
+#master-schedule-divs .show-title {
+	display: block;
+	font-size: 0.6em;
+	line-height: 1em;
+}
+
+#master-schedule-divs .show-image img {
+	width: 100%;
+	height: auto;	
+}
+
+#master-schedule-divs .rowspan {
+	background-color: #dddddd;
+    margin-left: -1px;
+    position: absolute;
+    width: 50px;
+    z-index: 5;
+}
+

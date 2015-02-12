@@ -4,25 +4,14 @@
  */
 
 get_header(); ?>
-		<div id="primary">
+
+		<div>
 			<div id="content" role="main">
 
 				<?php while ( have_posts() ) : the_post(); ?>
-
-					<nav id="nav-single">
-						<h3 class="assistive-text"><?php _e( 'Post navigation', 'radio-station' ); ?></h3>
-						<span class="nav-previous"><?php previous_post_link( '%link', '<span class="meta-nav">&larr;</span>'.__( 'Previous', 'radio-station' ) ); ?></span>
-						<span class="nav-next"><?php next_post_link( '%link', __( 'Next', 'radio-station' ).' <span class="meta-nav">&rarr;</span>' ); ?></span>
-					</nav><!-- #nav-single -->
-
 					<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 					<header class="entry-header">
 						<h1 class="entry-title"><?php the_title(); ?></h1>
-					<?php if ( 'post' == get_post_type() ) : ?>
-						<div class="entry-meta">
-							<?php radio-station_posted_on(); ?>
-						</div><!-- .entry-meta -->
-						<?php endif; ?>
 					</header><!-- .entry-header -->
 					
 					<div class="entry-content">
@@ -114,16 +103,11 @@ get_header(); ?>
 									$shifts = get_post_meta(get_the_ID(), 'show_sched', true);
 									if($shifts) {
 										foreach($shifts as $shift) {
-											if($shift['start_hour'] != 12 && $shift['start_meridian'] == 'pm') {
-												$shift['start_hour'] = $shift['start_hour'] + 12;
-											}
-											
-											if($shift['end_hour'] != 12 && $shift['end_meridian'] == 'pm') {
-												$shift['end_hour'] = $shift['end_hour'] + 12;
-											}
-											
+											$start = date('H:i', strtotime('1981-04-28 '.$shift['start_hour'].':'.$shift['start_min'].':00 '));
+											$end = date('H:i', strtotime('1981-04-28 '.$shift['end_hour'].':'.$shift['end_min'].':00 '));
+							
 											echo '<li>';
-											echo __($shift['day'], 'radio-station').' - '.$shift['start_hour'].':'.$shift['start_min'].' - '.$shift['end_hour'].':'.$shift['end_min'];
+											echo __($shift['day'], 'radio-station').' - '.$start.' - '.$end;
 											echo '</li>';
 										}
 									}

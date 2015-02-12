@@ -3,7 +3,7 @@ Contributors: kionae
 Donate link: http://www.nlb-creations.com/donate
 Tags: dj, music, playlist, radio, scheduling
 Requires at least: 3.3.1
-Tested up to: 4.0
+Tested up to: 4.1
 Stable tag: trunk
 
 Radio Station is a plugin to run a radio station's website. It's functionality is based on Drupal 6's Station plugin.
@@ -26,35 +26,19 @@ all show can also be generated.
 == Frequently Asked Questions ==
 
 = I'm seeing 404 Not Found errors when I click on the link for a show! = 
-Try re-saving your site's permalink settings.  Wordpress sometimes gets confused with a custom post type is added.
-
-= My Shows don't have a place to add a featured image.  Is the plugin broken? =
-No.  This is usually a theme issue.
-
-It may be that you don't have post thumbnails enabled in your theme, or the theme you're using enables them only for specific post types.  Check your theme's 
-functions.php file and see if there is a line that looks like this:
-
-`add_theme_support( 'post-thumbnails' );`
-
-If not, you'll need to add that line in to enable featured images.  You may also see something like this:
-
-`add_theme_support( 'post-thumbnails', array( 'post', 'page' ) );`
-
-If that's the case, your theme is enabling featured images selectively, and you can turn them on for Shows by adding "show" to the array, like this:
-
-`add_theme_support( 'post-thumbnails', array( 'post', 'page', 'show' ) );`
+Try re-saving your site's permalink settings.  Wordpress sometimes gets confused with a new custom post type is added.
 
 = How do I display a full schedule of my station's shows? =
-
-Use the shortcode `[master-schedule]` on any page.  This will generate a table containing your show details.
+Use the shortcode `[master-schedule]` on any page.  This will generate a full-page schedule in one of three formats.
 
 The following attributes are available for the shortcode:
+			'list' => If set to a value of 'list', the schedule will display in list format rather than table or div format. Valid values are 'list', 'divs', 'table'.  Default value is 'table'.
 			'time' => The time format you with to use.  Valid values are 12 and 24.  Default is 12.
 			'show_link' => Display the title of the show as a link to its profile page.  Valid values are 0 for hide, 1 for show.  Default is 1.
 			'display_show_time' => Display start and end times of each show after the title in the grid.  Valid values are 0 for hide, 1 for show.  Default is 1.
-			'list' => If set to a value of 1, the schedule will display in list format rather than table format.  Default value is 0.
 			'show_image' => If set to a value of 1, the show's avatar will be displayed.  Default value is 0.
 			'show_djs' => If set to a value of 1, the names of the show's DJs will be displayed.  Default value is 0.
+			'divheight' => Set the height, in pixels, of the individual divs in the 'divs' layout.  Default is 45.
 			
 For example, if you wish to display the schedule in 24-hour time format, use `[master-schedule time="24"]`.
 
@@ -240,6 +224,11 @@ I learned in high school Spanish class.  But I've included the .pot file in the 
 you send me your finished translation, I'd love to include it.
 
 == Changelog ==
+
+= 2.1 =
+* General code cleanup, 4.1 compatibility testing, and changes for better efficiency.
+* Bug fix - Fixed issue with early morning shows spanning entire column in the programming grid shortcode
+* New Feature - Master programming grid can now be displayed in div format, as well as the original table and list formats.
 
 = 2.0.16 =
 * Minor revisions to German translation.
@@ -434,6 +423,11 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.1 =
+* General code cleanup, 4.1 compatibility testing, and changes for better efficiency.
+* Bug fix - Fixed issue with early morning shows spanning entire column in the programming grid shortcode
+* New Feature - Master programming grid can now be displayed in div format, as well as the original table and list formats.
 
 = 2.0.16 =
 * Minor revisions to German translation.

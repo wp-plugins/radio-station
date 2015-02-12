@@ -4,27 +4,16 @@
  */
 
 get_header(); ?>
-		<div id="primary">
+		<div>
 			<div id="content" role="main">
 
 				<?php while ( have_posts() ) : the_post(); ?>
-
-					<nav id="nav-single">
-						<h3 class="assistive-text"><?php _e( 'Post navigation', 'radio-station' ); ?></h3>
-						<span class="nav-previous"><?php previous_post_link( '%link', '<span class="meta-nav">&larr;</span> '.__( 'Previous', 'radio-station' ) ); ?></span>
-						<span class="nav-next"><?php next_post_link( '%link', __( 'Next', 'radio-station' ).' <span class="meta-nav">&rarr;</span>' ); ?></span>
-					</nav><!-- #nav-single -->
 
 					<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 					<header class="entry-header">
 						<?php $show = get_post_meta($post->ID, 'playlist_show_id', true); ?>
 						<h1 class="entry-title"><?php the_title(); ?></h1>
 						<h2><a href="<?php echo get_permalink($show); ?>"><?php echo get_the_title($show); ?></a></h2>
-					<?php if ( 'post' == get_post_type() ) : ?>
-						<div class="entry-meta">
-							<?php radio-station_posted_on(); ?>
-						</div><!-- .entry-meta -->
-						<?php endif; ?>
 					</header><!-- .entry-header -->
 					
 					<div class="entry-content">
@@ -71,8 +60,6 @@ get_header(); ?>
 						
 					</div><!-- .entry-content -->
 					</article>
-
-					<?php //comments_template( '', true ); ?>
 
 				<?php endwhile; // end of the loop. ?>
 
