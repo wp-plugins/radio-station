@@ -187,6 +187,12 @@ function station_shortcode_dj_on_air($atts) {
 	if($djs['type'] == 'override') {
 
 		$dj_str .= '<li class="on-air-dj">';
+		if($show_avatar) {
+			if(has_post_thumbnail($djs['all'][0]['post_id'])) {
+				$dj_str .= '<span class="on-air-dj-avatar">'.get_the_post_thumbnail($djs['all'][0]['post_id'], 'thumbnail').'</span>';
+			}
+		}
+		
 		$dj_str .= $djs['all'][0]['title'];
 			
 		//display the override's schedule if requested
@@ -344,6 +350,13 @@ function station_shortcode_coming_up($atts) {
 				
 			if(is_array($dj) && $dj['type'] == 'override') {
 				echo '<li class="on-air-dj">';
+				
+				if($show_avatar) {
+					if(has_post_thumbnail($dj['post_id'])) {
+						$dj_str .= '<span class="on-air-dj-avatar">'.get_the_post_thumbnail($dj['post_id'], 'thumbnail').'</span>';
+					}
+				}
+				
 				echo $dj['title'];
 				if($show_sched) {
 

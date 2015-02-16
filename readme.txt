@@ -25,6 +25,10 @@ all show can also be generated.
 
 == Frequently Asked Questions ==
 
+= I've scheduled all my shows, but they're not showing up on the programming grid! =
+Did you remember to check the "Active" checkbox for each show?  If a show is not marked active, the plugin assumes that it's not currently in production and 
+hides it on the grid.
+
 = I'm seeing 404 Not Found errors when I click on the link for a show! = 
 Try re-saving your site's permalink settings.  Wordpress sometimes gets confused with a new custom post type is added.
 
@@ -225,6 +229,12 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 2.1.1 = 
+* Bug fix - Fixed day of the week language translation issue in master schedule shortcode
+* Bug fix - Added some error checking in the sidebar widgets
+* New Feature - Added ability to give schedule overrides a featured image
+* New Feature - Added built-in help page
+
 = 2.1 =
 * General code cleanup, 4.1 compatibility testing, and changes for better efficiency.
 * Bug fix - Fixed issue with early morning shows spanning entire column in the programming grid shortcode
@@ -423,6 +433,12 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.1.1 = 
+* Bug fix - Fixed day of the week language translation issue in master schedule shortcode
+* Bug fix - Added some error checking in the sidebar widgets
+* New Feature - Added ability to give schedule overrides a featured image
+* New Feature - Added built-in help page
 
 = 2.1 =
 * General code cleanup, 4.1 compatibility testing, and changes for better efficiency.

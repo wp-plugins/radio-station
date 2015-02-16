@@ -78,7 +78,7 @@ function station_create_post_types() {
 					'menu_icon' => WP_PLUGIN_URL.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__)) . 'images/show-menu-icon.png',
 					'public' => true,
 					'hierarchical' => false,
-					'supports' => array('title'),
+					'supports' => array('title', 'thumbnail'),
 					'can_export' => true,
 					'rewrite' => array('slug' => 'show-override'),
 					'capability_type' => 'show',

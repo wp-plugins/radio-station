@@ -1,7 +1,7 @@
 <?php
 /* Sidebar Widget - Now Playing
  * Displays the currently playing song according to the entered playlists 
- * Since 2.0.0
+ * Since 2.1.1
  */
 class Playlist_Widget extends WP_Widget {
 
@@ -15,11 +15,11 @@ class Playlist_Widget extends WP_Widget {
 	function form($instance) {
 		$instance = wp_parse_args((array) $instance, array( 'title' => '' ));
 		$title = $instance['title'];
-		$artist = $instance['artist'];
-		$song = $instance['song'];
-		$album = $instance['album'];
-		$label = $instance['label'];
-		$comments = $instance['comments'];
+		$artist = isset($instance['artist']) ? $instance['artist'] : true;
+		$song = isset($instance['song']) ? $instance['song'] : true;
+		$album = isset($instance['album']) ? $instance['album'] : false;
+		$label = isset($instance['label']) ? $instance['label'] : false;
+		$comments = isset($instance['comments']) ? $instance['comments'] : false;
 
 		?>
 			<p>

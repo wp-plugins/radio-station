@@ -2,7 +2,7 @@
 /*
  * Master Show schedule
  * Author: Nikki Blight
- * @Since: 2.1
+ * @Since: 2.1.1
  */
 
 //jQuery is needed by the output of this code, so let's make sure we have it available
@@ -165,7 +165,7 @@ function master_schedule($atts) {
 		
 		foreach($flip as $day => $hours) {
 			$output .= '<li class="master-list-day" id="list-header-'.strtolower($day).'">';
-			$output .= '<span class="master-list-day-name">'.$day.'</span>';
+			$output .= '<span class="master-list-day-name">'.__($day, 'radio-station').'</span>';
 			$output .= '<ul class="master-list-day-'.strtolower($day).'-list">';
 			foreach($hours as $hour => $mins) {
 				
@@ -276,7 +276,7 @@ function master_schedule($atts) {
 		$output .= '<div class="master-schedule-hour">';
 		$output .= '<div class="master-schedule-hour-header">&nbsp;</div>';
 		foreach($weekdays as $weekday) {
-			$output .= '<div class="master-schedule-weekday-header master-schedule-weekday">'.$weekday.'</div>';
+			$output .= '<div class="master-schedule-weekday-header master-schedule-weekday">'.__($weekday, 'radio-station').'</div>';
 		}
 		$output .= '</div>';
 		

@@ -1,7 +1,7 @@
 <?php
 /* Sidebar Widget - DJ On Air
  * Displays the current on-air show/DJ 
- * Since 2.0.14
+ * Since 2.1.1
  */
 class DJ_Widget extends WP_Widget {
 
@@ -13,13 +13,13 @@ class DJ_Widget extends WP_Widget {
 	function form($instance) {
 		$instance = wp_parse_args((array) $instance, array( 'title' => '' ));
 		$title = $instance['title'];
-		$display_djs = $instance['display_djs'];
-		$djavatar = $instance['djavatar'];
-		$default = $instance['default'];
-		$link = $instance['link'];
-		$time = $instance['time'];
-		$show_sched = $instance['show_sched'];
-		$show_playlist = $instance['show_playlist'];
+		$display_djs = isset($instance['show_desc']) ? $instance['display_djs'] : false;
+		$djavatar = isset($instance['djavatar']) ? $instance['djavatar'] : false;
+		$default = isset($instance['default']) ? $instance['default'] : '';
+		$link = isset($instance['link']) ? $instance['link'] : false;
+		$time = isset($instance['time']) ? $instance['time'] : 12;
+		$show_sched = isset($instance['show_sched']) ? $instance['show_sched'] : false;
+		$show_playlist = isset($instance['show_playlist']) ? $instance['show_playlist']: false;
 		$show_all_sched = isset($instance['show_all_sched']) ? $instance['show_all_sched'] : false;
 		$show_desc = isset($instance['show_desc']) ? $instance['show_desc'] : false;
 
@@ -148,6 +148,13 @@ class DJ_Widget extends WP_Widget {
 				if($djs['type'] == 'override') {
 					//print_r($djs);
 					echo '<li class="on-air-dj">';
+					
+					if($djavatar) {
+						if(has_post_thumbnail($djs['all'][0]['post_id'])) {
+							echo '<span class="on-air-dj-avatar">'.get_the_post_thumbnail($djs['all'][0]['post_id'], 'thumbnail').'</span>';
+						}
+					}
+					
 					echo $djs['all'][0]['title'];
 					
 					//display the override's schedule if requested
