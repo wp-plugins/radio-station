@@ -1,19 +1,26 @@
 === Radio Station ===
-Contributors: kionae
-Donate link: http://www.nlb-creations.com/donate
+Contributors: kionae, tonyzeoli
+Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, scheduling
 Requires at least: 3.3.1
-Tested up to: 4.1
+Tested up to: 4.3.1
 Stable tag: trunk
 
 Radio Station is a plugin to run a radio station's website. It's functionality is based on Drupal 6's Station plugin.
 
 == Description ==
 
-Radio Station is a plugin to run a radio station's website. It's functionality is based on Drupal 6's Station plugin, reworked for use in Wordpress.  The plugin 
-includes the ability to associate users with "shows" (schedulable blocks of time that contain a description, and other meta information), and generate playlists
-associated with those shows.  The plugin contains a widget to display the currently on-air DJ with a link to the DJ's show and current playlist.  A schedule of
-all show can also be generated.
+Radio Station is a plugin to run a radio station's website. It's functionality is based on Drupal 6's Station plugin, reworked for use in Wordpress. The plugin includes the ability to associate users with the included custom post type of "Shows" (schedulable blocks of time that contain a Show description, and other meta information), and generate playlists associated with those shows. The plugin contains a widget to display the currently on-air DJ with a link to the DJ's Show page and current playlist.  A schedule of all Shows can also be generated and added to a page with a short code.
+
+We are grateful to Nikki Blight for her contribution to creating and developing this plugin for as long as she could maintain the codebase. As of June 22, 2019, Radio Station will will managed by Tony Zeoli.
+
+If you are a WordPress developer interested in contributing to this plugin, please follow plugin development on Github: https://github.com/netmix/radio-station.
+
+You may also submit feature requests here: https://github.com/netmix/radio-station/issues
+
+We are actively seeking donations to fund further development of the free, open source version of this plugin at: https://netmix.co/donate
+
+Please give 24-48 hours to answer support questions, which will be handled in the Wordpress Support Forums for this free version of the plugin.
 
 == Installation ==
 
@@ -43,8 +50,9 @@ The following attributes are available for the shortcode:
 			'show_image' => If set to a value of 1, the show's avatar will be displayed.  Default value is 0.
 			'show_djs' => If set to a value of 1, the names of the show's DJs will be displayed.  Default value is 0.
 			'divheight' => Set the height, in pixels, of the individual divs in the 'divs' layout.  Default is 45.
+			'single_day' => Display schedule for only a single day of the week.  Only works if you are using the 'list' format.  Valid values are sunday, monday, tuesday, wednesday, thursday, friday, saturday.
 			
-For example, if you wish to display the schedule in 24-hour time format, use `[master-schedule time="24"]`.
+For example, if you wish to display the schedule in 24-hour time format, use `[master-schedule time="24"]`.  If you want to only show Sunday's schedule, use `[master-schedule list="list" single_day="sunday"]`.
 
 = How do I schedule a show? =
 
@@ -220,6 +228,7 @@ Italian (it_IT)
 Russion (ru_RU)
 Serbian (sr_RS)
 Spanish (es_ES)
+Catalan (ca)
 
 = Can you translate the plugin into my language? =
 
@@ -228,6 +237,13 @@ I learned in high school Spanish class.  But I've included the .pot file in the 
 you send me your finished translation, I'd love to include it.
 
 == Changelog ==
+
+= 2.1.3 =
+* Added method for displaying schedule for only a single day (see readme section for the master-schedule shortcode for details).
+
+= 2.1.2 =
+* Compatibility fix for Wordpress 4.3.x - Updated the widgets to use PHP5 constructors instead of the deprecated PHP4 constructors.
+* Catalan translation added (Thank you to Victor Riera for the file!)
 
 = 2.1.1 = 
 * Bug fix - Fixed day of the week language translation issue in master schedule shortcode
@@ -433,6 +449,13 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.1.3 =
+* Added method for displaying schedule for only a single day (see readme section for the master-schedule shortcode for details).
+
+= 2.1.2 =
+* Compatibility fix for Wordpress 4.3.x - Updated the widgets to use PHP5 constructors instead of the deprecated PHP4 constructors.
+* Catalan translation added (Thank you to Victor Riera for the file!)
 
 = 2.1.1 = 
 * Bug fix - Fixed day of the week language translation issue in master schedule shortcode
