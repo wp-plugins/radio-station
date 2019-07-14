@@ -10,30 +10,33 @@ get_header(); ?>
 
 			<?php if ( have_posts() ) : ?>
 
+				<?php // sanitize show_id
+					$show_id = absint( $_GET['show_id'] );
+				?>
 				<header class="page-header">
 					<h1 class="page-title">
-						<?php _e('Playlist Archive for', 'radio-station'); ?> <?php echo get_the_title($_GET['show_id']); ?>
+						<?php _e( 'Playlist Archive for', 'radio-station' ); ?> <?php echo get_the_title( $show_id ); ?>
 					</h1>
 				</header>
 
 				<!-- custom output : This portion can be edited or inserted into your own theme files -->
-				<?php 
-				$args = array( 
-							'post_type' => 'playlist', 
-							'posts_per_page' => 10, 
-							'orderby' => 'post_date', 
-							'order' => 'desc',
-							'meta_query' => array(
-												array( 
-													'key' => 'playlist_show_id', 
-													'value' => $_GET['show_id']
-												)
-											), 
-							'paged' => $paged
-						);
+				<?php
+				$args = array(
+					'post_type'			=> 'playlist',
+					'posts_per_page'	=> 10,
+					'orderby'			=> 'post_date',
+					'order'				=> 'desc',
+					'meta_query'		=> array(
+											array(
+												'key' => 'playlist_show_id',
+												'value' => $show_id
+											)
+										),
+					'paged'				=> $paged
+				);
 				$loop = new WP_Query( $args );
+				// query_posts( $query_string.'&post_type=playlist&orderby=post_date&order=desc&posts_per_page=5&meta_key=playlist_show_id&meta_value='.$show_id );
 				?>
-				<?php //query_posts($query_string.'&post_type=playlist&orderby=post_date&order=desc&posts_per_page=5&meta_key=playlist_show_id&meta_value='.$_GET['show_id']); ?>
 				<?php while ( $loop->have_posts() ) : $loop->the_post(); ?>
 
 					<?php
@@ -50,8 +53,8 @@ get_header(); ?>
 					<h3 class="assistive-text"><?php _e( 'Post navigation', 'radio-station' ); ?></h3>
 					<div class="nav-previous"><?php next_posts_link( '<span class="meta-nav">&larr;</span> '.__( 'Older posts', 'radio-station' ) ); ?></div>
 					<div class="nav-next"><?php previous_posts_link( __( 'Newer posts', 'radio-station' ).' <span class="meta-nav">&rarr;</span>' ); ?></div>
-				</nav> 
-				
+				</nav>
+
 				<!-- end of custom output : This portion can be edited or inserted into your own theme files -->
 
 			<?php else : ?>
