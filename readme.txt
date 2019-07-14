@@ -3,7 +3,7 @@ Contributors: kionae, tonyzeoli
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, scheduling
 Requires at least: 3.3.1
-Tested up to: 4.3.1
+Tested up to: 4.9.10
 Stable tag: trunk
 
 Radio Station is a plugin to run a radio station's website. It's functionality is based on Drupal 6's Station plugin.
