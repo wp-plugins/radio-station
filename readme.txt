@@ -1,6 +1,6 @@
 === Radio Station ===
-Contributors: kionae, tonyzeoli
-Donate link: https://netmix.co/donate
+Contributors: tonyzeoli, kionae
+Donate link: https://netmix.com/radio-station
 Tags: dj, music, playlist, radio, scheduling
 Requires at least: 3.3.1
 Tested up to: 4.3.1
@@ -14,13 +14,15 @@ Radio Station is a plugin to run a radio station's website. It's functionality i
 
 We are grateful to Nikki Blight for her contribution to creating and developing this plugin for as long as she could maintain the codebase. As of June 22, 2019, Radio Station will will managed by Tony Zeoli.
 
-If you are a WordPress developer interested in contributing to this plugin, please follow plugin development on Github: https://github.com/netmix/radio-station.
+If you are a WordPress developer interested in contributing to this plugin, please follow plugin development on Github here: https://github.com/netmix/radio-station.
 
-You may also submit feature requests here: https://github.com/netmix/radio-station/issues
+You may also submit feature requests and bugs on Github here: https://github.com/netmix/radio-station/issues
 
-We are actively seeking donations to fund further development of the free, open source version of this plugin at: https://netmix.co/donate
+Join our Slack at netmix.slack.com and channel: #radio-station
 
-Please give 24-48 hours to answer support questions, which will be handled in the Wordpress Support Forums for this free version of the plugin.
+We are actively seeking donations to fund further development of the free, open source version of this plugin at: <a href="https://netmix.com/radio-station">https://netmix.com/radio-station</a>.
+
+Please give 24-48 hours to answer support questions, which will be handled in the Wordpress Support Forums for this free version of the plugin here: <a href="https://wordpress.org/support/plugin/radio-station/">https://wordpress.org/support/plugin/radio-station/</a>
 
 == Installation ==
 
