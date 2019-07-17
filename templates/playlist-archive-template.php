@@ -5,7 +5,7 @@
  */
 
 get_header(); ?>
-		
+
 
 		<section>
 			<div id="content" role="main">
@@ -13,47 +13,45 @@ get_header(); ?>
 			<?php if ( have_posts() ) : ?>
 
 				<header class="page-header">
-					<h1 class="page-title"><?php _e('Playlist Archive', 'radio-station'); ?></h1>
+					<h1 class="page-title"><?php _e( 'Playlist Archive', 'radio-station' ); ?></h1>
 				</header>
 				<!-- this is the important part... be careful when you're changing this -->
 				<?php
 					//since this is a custom query, we have to do a little trickery to get pagination to work
 				$args = array(
-						'post_type' => 'playlist',
-						'posts_per_page' => 10,
-						'orderby' => 'post_date',
-						'order' => 'desc',
-						'paged' => $paged,
-						'post_status' => 'publish'
+						'post_type'			=> 'playlist',
+						'posts_per_page'	=> 10,
+						'orderby'			=> 'post_date',
+						'order'				=> 'desc',
+						'paged'				=> $paged,
+						'post_status'		=> 'publish'
 				);
 				$loop = new WP_Query( $args );
 				?>
 				<?php while ($loop->have_posts()) : $loop->the_post(); ?>
-					
+
 				<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 					<header class="entry-header">
 							<h1 class="entry-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h1>
 
 							<div class="playlist-date-and-show">
-								<?php 
-									$show_id = (get_post_meta(get_the_ID(), 'playlist_show_id', true));
-									if($show_id) {
-										echo get_the_title($show_id);
-									}
+								<?php
+									$show_id = get_post_meta( get_the_ID(), 'playlist_show_id', true );
+									if ( $show_id ) {echo get_the_title( $show_id );}
 								?>
-								 - 
+								 -
 								<?php echo date("M. d, Y", strtotime($post->post_date)); ?>
 							</div>
 					</header><!-- .entry-header -->
 				</article>
 				<?php endwhile; ?>
-				
+
 				<div class="navigation">
-				  <div class="alignleft"><?php next_posts_link('&laquo; Older') ?></div>
-				  <div class="alignright"><?php previous_posts_link('Newer &raquo;') ?></div>
+				  <div class="alignleft"><?php next_posts_link( '&laquo; Older' ) ?></div>
+				  <div class="alignright"><?php previous_posts_link( 'Newer &raquo;' ) ?></div>
 				</div>
-				
-				
+
+
 				<!-- /end important part -->
 
 			<?php else : ?>
