@@ -238,6 +238,22 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 2.2.0 =
+* WordPress coding standards refactoring for WP 5 (thanks to Tony Hayes @majick777)
+* fixed the protocol in jQuery UI style Google URL
+* reprefixed all functions for consistency (radio_station_)
+* updated all the widget constructor methods
+* merged the menu items into a single main menu
+* updated the capability checks for the menu items
+* moved the help and export pages to /templates/
+* moved all the css files to /css/
+* enqeued the djonair css from within the widget
+* use plugins_url for all resource URLs
+* added $wpdb->prepare to sanitize a query
+* added some sanization for metabox save values
+* added a week and month translation helper
+* added a radio station antenna icon
+
 = 2.1.3 =
 * Added method for displaying schedule for only a single day (see readme section for the master-schedule shortcode for details).
 
@@ -449,6 +465,9 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.2.0 =
+* WordPress coding standards refactoring for WP 5 (thanks to Tony Hayes @majick777)
 
 = 2.1.3 =
 * Added method for displaying schedule for only a single day (see readme section for the master-schedule shortcode for details).
