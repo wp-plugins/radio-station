@@ -3,24 +3,24 @@ Contributors: tonyzeoli
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, scheduling
 Requires at least: 3.3.1
-Tested up to: 5.2.2
+Tested up to: 4.9.10
 Stable tag: trunk
 
 Radio Station is a plugin to build and manage a Show Calendar in a radio station's WordPress website. It's functionality is based on Drupal 6's Station plugin.
 
 == Description ==
 
-Radio Station is a plugin to build and manage a Show Calendar in radio station's WordPress website. It's functionality is based on Drupal 6's Station plugin, reworked for use in Wordpress. The plugin includes the ability to associate users with the included custom post type of "Shows" (schedulable blocks of time that contain a Show description, and other meta information), and generate playlists associated with those shows. The plugin contains a widget to display the currently on-air DJ with a link to the DJ's Show page and current playlist.  A schedule of all Shows can also be generated and added to a page with a short code.
+Radio Station is a plugin to build and manage a Show Calendar in radio station's WordPress website. It's functionality is based on Drupal 6's Station plugin, reworked for use in Wordpress. The plugin includes the ability to associate users (as member role "DJ"") with the included custom post type of "Shows" (schedulable blocks of time that contain a Show description, and other meta information), and generate playlists associated with those shows. The plugin contains a widget to display the currently on-air DJ with a link to the DJ's Show page and current playlist.  A schedule of all Shows can also be generated and added to a page with a short code. Shows can be categorized and a category filter appears when the Calendar is added using a short code to a WordPress page or post.
 
 We are grateful to Nikki Blight for her contribution to creating and developing this plugin for as long as she could maintain the codebase. As of June 22, 2019, Radio Station will will managed by Tony Zeoli and developed by contributing committers to the project.
 
-If you are a WordPress developer interested in contributing to this plugin, please follow plugin development on Github: https://github.com/netmix/radio-station.
+If you are a WordPress developer interested in contributing to this plugin, please follow plugin development on Github: <a href="https://github.com/netmix/radio-station">https://github.com/netmix/radio-station</a>.
 
-You may also submit feature requests here: https://github.com/netmix/radio-station/issues
+You may also submit feature requests here: <a href="https://github.com/netmix/radio-station/issues">https://github.com/netmix/radio-station/issues<a/>
 
-We are actively seeking donations to fund further development of the free, open source version of this plugin at: https://netmix.co/donate
+We are actively seeking radio station partners and donations to fund further development of the free, open source version of this plugin at: <a href="https://netmix.co/donate">https://netmix.co/donate</a>.
 
-Please give 24-48 hours to answer support questions, which will be handled in the Wordpress Support Forums for this free version of the plugin.
+Please give 24-48 hours to answer support questions, which will be handled in the Wordpress Support Forums for this free version of the plugin here: <a href="https://wordpress.org/support/plugin/radio-station/">https://wordpress.org/support/plugin/radio-station/</a>
 
 == Installation ==
 
