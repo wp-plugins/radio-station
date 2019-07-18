@@ -7,7 +7,7 @@
 Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station 
 Description: Adds show page, show schedule, DJ member role, playlist and on-air programming functionality to your site.
-Author: Nikki Blight <nblight@nlb-creations.com>, Tony Zeoli <tonyzeoli@netmix.com>
+Author: Tony Zeoli <tonyzeoli@netmix.com>
 Version: 2.1.1
 Text Domain: radio-station
 Domain Path: /languages
