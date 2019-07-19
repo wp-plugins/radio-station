@@ -238,6 +238,10 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 2.2.1 =
+
+* Re-commit all missing files via SVN
+
 = 2.2.0 =
 * WordPress coding standards refactoring for WP 5 (thanks to Tony Hayes @majick777)
 * fixed the protocol in jQuery UI style Google URL
