@@ -1,6 +1,6 @@
 === Radio Station ===
 Contributors: tonyzeoli
-Donate link: https://netmix.co/donate
+Donate link: https://www.patreon.com/radiostation
 Tags: dj, music, playlist, radio, scheduling
 Requires at least: 3.3.1
 Tested up to: 4.9.10
