@@ -470,6 +470,10 @@ you send me your finished translation, I'd love to include it.
 
 == Upgrade Notice ==
 
+= 2.2.1 =
+
+* Re-commit all missing files via SVN
+
 = 2.2.0 =
 * WordPress coding standards refactoring for WP 5 (thanks to Tony Hayes @majick777)
 
