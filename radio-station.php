@@ -1,19 +1,19 @@
 <?php
 /**
  * @package Radio Station
- * @version 2.1.1
+ * @version 2.2.1
  */
 /*
 Plugin Name: Radio Station
-Plugin URI: http://nlb-creations.com/2013/02/25/wordpress-plugin-radio-station/
-Description: Adds playlist and on-air programming functionality to your site.
-Author: Nikki Blight <nblight@nlb-creations.com>
-Version: 2.1.1
+Plugin URI: https://netmix.com/radio-station
+Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
+Author: Tony Zeoli <tonyzeoli@netmix.com>
+Version: 2.2.1
 Text Domain: radio-station
 Domain Path: /languages
-Author URI: http://www.nlb-creations.com
+Author URI: https://netmix.com/radio-station
 
-Copyright 2013 Nikki Blight  (email : nblight@nlb-creations.com)
+Copyright 2019 Digital Strategy Works  (email : info@digitalstrategyworks.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 2, as
