@@ -245,6 +245,8 @@ you send me your finished translation, I'd love to include it.
 * added dismissable development changeover admin notice
 * added simple Patreon supporter image button and blurb
 * added filter for DJ Avatar size on Author page template
+* fix to Schedule Override metabox value saving
+* fix to missing day of week headings in master schedule
 * fix to file_exists check for DJ on Air stylesheet path
 * fix to make DJ multi-select input full metabox width
 * fix to expand admin menu when on genre taxonomy page
