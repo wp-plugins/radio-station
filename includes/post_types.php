@@ -10,6 +10,7 @@
 // - Register Post Types
 // - Set CPTs to Classic Editor
 // - Add Show Thumbnail Support
+// - Metaboxes Above Content Area
 // === Taxonomies ===
 // - Add Genre Taxonomy
 // - Shift Genre Metabox
@@ -777,68 +778,74 @@ function radio_station_myplaylist_inner_sched_custom_box() {
 	        foreach ( $shifts[0] as $track ){
 	            if ( isset( $track['day'] ) || isset( $track['time'] ) ){
 	            	?>
-	            	<p>
-	            		<?php _e('Day', 'radio-station'); ?>:
-	            		<select name="show_sched[<?php echo $c; ?>][day]">
-	            			<option value=""></option>
-	            			<option value="Monday"<?php if($track['day'] == "Monday") { echo ' selected="selected"'; } ?>><?php _e('Monday', 'radio-station'); ?></option>
-	            			<option value="Tuesday"<?php if($track['day'] == "Tuesday") { echo ' selected="selected"'; } ?>><?php _e('Tuesday', 'radio-station'); ?></option>
-	            			<option value="Wednesday"<?php if($track['day'] == "Wednesday") { echo ' selected="selected"'; } ?>><?php _e('Wednesday', 'radio-station'); ?></option>
-	            			<option value="Thursday"<?php if($track['day'] == "Thursday") { echo ' selected="selected"'; } ?>><?php _e('Thursday', 'radio-station'); ?></option>
-	            			<option value="Friday"<?php if($track['day'] == "Friday") { echo ' selected="selected"'; } ?>><?php _e('Friday', 'radio-station'); ?></option>
-	            			<option value="Saturday"<?php if($track['day'] == "Saturday") { echo ' selected="selected"'; } ?>><?php _e('Saturday', 'radio-station'); ?></option>
-	            			<option value="Sunday"<?php if($track['day'] == "Sunday") { echo ' selected="selected"'; } ?>><?php _e('Sunday', 'radio-station'); ?></option>
-	            		</select>
-	            		 -
-	            		<?php _e('Start Time', 'radio-station'); ?>:
-	            		<select name="show_sched[<?php echo $c; ?>][start_hour]">
-	            			<option value=""></option>
-	            		<?php for ( $i=1; $i <= 12; $i++ ) {
-	            			if ($track['start_hour'] == $i) {$selected = ' selected="selected"';} else {$selected = '';}
-	            			echo '<option value="'.$i.'"'.$selected.'>'.$i.'</option>';
-	            		} ?>
-	            		</select>
-	            		<select name="show_sched[<?php echo $c; ?>][start_min]">
-	            			<option value=""></option>
-	            		<?php for ( $i = 0; $i < 60; $i++ ){
-								$min = $i;
-								if ($i < 10) {$min = '0'.$i;}
-								if ( $track['start_min'] == $min ) {$selected = ' selected="selected"';} else {$selected = '';}
-	            				echo '<option value="'.$min.'"'.$selected.'>'.$min.'</option>';
-	            		} ?>
-	            		</select>
-	            		<select name="show_sched[<?php echo $c; ?>][start_meridian]">
-	            			<option value=""></option>
-	            			<option value="am"<?php if($track['start_meridian'] == "am") { echo ' selected="selected"'; } ?>>am</option>
-	            			<option value="pm"<?php if($track['start_meridian'] == "pm") { echo ' selected="selected"'; } ?>>pm</option>
-	            		</select>
+	            	<ul style="list-style:none;">
 
-	            		 -
-	            		<?php _e('End Time', 'radio-station'); ?>:
-	            		<select name="show_sched[<?php echo $c; ?>][end_hour]">
-	            			<option value=""></option>
-	            		<?php for ( $i = 1; $i <= 12; $i++ ) {
-	            			if ( $track['end_hour'] == $i ) {$selected = ' selected="selected"';} else {$selected = '';}
-	            			echo '<option value="'.$i.'"'.$selected.'>'.$i.'</option>';
-	            		} ?>
-	            		</select>
-	            		<select name="show_sched[<?php echo $c; ?>][end_min]">
-	            			<option value=""></option>
-	            		<?php for ( $i = 0; $i < 60; $i++ ) {
-							$min = $i;
-							if ( $i < 10 ) {$min = '0'.$i;}
-							if ( $track['end_min'] == $min ) {$selected = ' selected="selected"';} else {$selected = '';}
-							echo '<option value="'.$min.'"'.$selected.'>'.$min.'</option>';
-	            		} ?>
-	            		</select>
-	            		<select name="show_sched[<?php echo $c; ?>][end_meridian]">
-	            			<option value=""></option>
-	            			<option value="am"<?php if ( $track['end_meridian'] == "am" ) {echo ' selected="selected"';} ?>>am</option>
-	            			<option value="pm"<?php if ( $track['end_meridian'] == "pm" ) {echo ' selected="selected"';} ?>>pm</option>
-	            		</select>
-	            		<input type="checkbox" name="show_sched[<?php echo $c; ?>][encore]" <?php if ( isset( $track['encore'] ) && ( $track['encore'] == 'on' ) ) {echo 'checked="checked"';} ?>/> <?php _e( 'Encore Presentation', 'radio-station' ); ?>
-	            		<span class="remove button-secondary" style="cursor: pointer;"><?php _e( 'Remove', 'radio-station' ); ?></span>
-	            	</p>
+	            		<li style="display:inline-block;">
+							<?php _e('Day', 'radio-station'); ?>:
+							<select name="show_sched[<?php echo $c; ?>][day]">
+								<option value=""></option>
+								<option value="Monday"<?php if ( $track['day'] == "Monday" ) { echo ' selected="selected"'; } ?>><?php _e('Monday', 'radio-station'); ?></option>
+								<option value="Tuesday"<?php if ( $track['day'] == "Tuesday" ) { echo ' selected="selected"'; } ?>><?php _e('Tuesday', 'radio-station'); ?></option>
+								<option value="Wednesday"<?php if ( $track['day'] == "Wednesday" ) { echo ' selected="selected"'; } ?>><?php _e('Wednesday', 'radio-station'); ?></option>
+								<option value="Thursday"<?php if ( $track['day'] == "Thursday" ) { echo ' selected="selected"'; } ?>><?php _e('Thursday', 'radio-station'); ?></option>
+								<option value="Friday"<?php if ( $track['day'] == "Friday" ) { echo ' selected="selected"'; } ?>><?php _e('Friday', 'radio-station'); ?></option>
+								<option value="Saturday"<?php if ( $track['day'] == "Saturday" ) { echo ' selected="selected"'; } ?>><?php _e('Saturday', 'radio-station'); ?></option>
+								<option value="Sunday"<?php if ( $track['day'] == "Sunday" ) { echo ' selected="selected"'; } ?>><?php _e('Sunday', 'radio-station'); ?></option>
+							</select>
+						</li>
+
+	            		<li style="display:inline-block; margin-left:20px;">
+							<?php _e('Start Time', 'radio-station'); ?>:
+							<select name="show_sched[<?php echo $c; ?>][start_hour]" style="min-width:35px;">
+								<option value=""></option>
+							<?php for ( $i=1; $i <= 12; $i++ ) {
+								if ($track['start_hour'] == $i) {$selected = ' selected="selected"';} else {$selected = '';}
+								echo '<option value="'.$i.'"'.$selected.'>'.$i.'</option>';
+							} ?>
+							</select>
+							<select name="show_sched[<?php echo $c; ?>][start_min]" style="min-width:35px;">
+								<option value=""></option>
+							<?php for ( $i = 0; $i < 60; $i++ ){
+									$min = $i;
+									if ($i < 10) {$min = '0'.$i;}
+									if ( $track['start_min'] == $min ) {$selected = ' selected="selected"';} else {$selected = '';}
+									echo '<option value="'.$min.'"'.$selected.'>'.$min.'</option>';
+							} ?>
+							</select>
+							<select name="show_sched[<?php echo $c; ?>][start_meridian]" style="min-width:35px;">
+								<option value=""></option>
+								<option value="am"<?php if($track['start_meridian'] == "am") { echo ' selected="selected"'; } ?>>am</option>
+								<option value="pm"<?php if($track['start_meridian'] == "pm") { echo ' selected="selected"'; } ?>>pm</option>
+							</select>
+						</li>
+
+	            		<li style="display:inline-block; margin-left:20px;">
+							<?php _e('End Time', 'radio-station'); ?>:
+							<select name="show_sched[<?php echo $c; ?>][end_hour]" style="min-width:35px;">
+								<option value=""></option>
+							<?php for ( $i = 1; $i <= 12; $i++ ) {
+								if ( $track['end_hour'] == $i ) {$selected = ' selected="selected"';} else {$selected = '';}
+								echo '<option value="'.$i.'"'.$selected.'>'.$i.'</option>';
+							} ?>
+							</select>
+							<select name="show_sched[<?php echo $c; ?>][end_min]" style="min-width:35px;">
+								<option value=""></option>
+							<?php for ( $i = 0; $i < 60; $i++ ) {
+								$min = $i;
+								if ( $i < 10 ) {$min = '0'.$i;}
+								if ( $track['end_min'] == $min ) {$selected = ' selected="selected"';} else {$selected = '';}
+								echo '<option value="'.$min.'"'.$selected.'>'.$min.'</option>';
+							} ?>
+							</select>
+							<select name="show_sched[<?php echo $c; ?>][end_meridian]" style="min-width:35px;">
+								<option value=""></option>
+								<option value="am"<?php if ( $track['end_meridian'] == "am" ) {echo ' selected="selected"';} ?>>am</option>
+								<option value="pm"<?php if ( $track['end_meridian'] == "pm" ) {echo ' selected="selected"';} ?>>pm</option>
+							</select>
+							<input type="checkbox" name="show_sched[<?php echo $c; ?>][encore]" <?php if ( isset( $track['encore'] ) && ( $track['encore'] == 'on' ) ) {echo 'checked="checked"';} ?>/> <?php _e( 'Encore Presentation', 'radio-station' ); ?>
+							<span class="remove button-secondary" style="cursor: pointer;"><?php _e( 'Remove', 'radio-station' ); ?></span>
+						</li>
+		            </ul>
 	            	<?php
 	                $c++;
 	            }
@@ -854,7 +861,9 @@ function radio_station_myplaylist_inner_sched_custom_box() {
 	        var count = <?php echo $c; ?>;
 	        shiftaddb(".add").click(function() {
 	            count = count + 1;
-				output = '<p><?php _e( 'Day', 'radio-station' ); ?>: ';
+				output = '<ul style="list-style:none;">';
+				output += '<li style="display:inline-block;">';
+				output += '<?php _e( 'Day', 'radio-station' ); ?>: ';
 				output += '<select name="show_sched[' + count + '][day]">';
 				output += '<option value=""></option>';
 				output += '<option value="Monday"><?php _e( 'Monday', 'radio-station' ); ?></option>';
@@ -865,15 +874,18 @@ function radio_station_myplaylist_inner_sched_custom_box() {
 				output += '<option value="Saturday"><?php _e( 'Saturday', 'radio-station' ); ?></option>';
 				output += '<option value="Sunday"><?php _e( 'Sunday', 'radio-station' ); ?></option>';
 				output += '</select>';
-				output += ' - <?php _e('Start Time', 'radio-station'); ?>: ';
+				output += '</li>';
 
-				output += '<select name="show_sched[' + count + '][start_hour]">';
+				output += '<li style="display:inline-block; margin-left:20px;">';
+				output += '<?php _e('Start Time', 'radio-station'); ?>: ';
+
+				output += '<select name="show_sched[' + count + '][start_hour]" style="min-width:35px;">';
 				output += '<option value=""></option>';
 	    		<?php for ( $i = 1; $i <= 12; $i++) { ?>
     			output += '<option value="<?php echo $i; ?>"><?php echo $i; ?></option>';
 				<?php } ?>
 				output += '</select> ';
-				output += '<select name="show_sched[' + count + '][start_min]">';
+				output += '<select name="show_sched[' + count + '][start_min]" style="min-width:35px;">';
 				output += '<option value=""></option>';
 				<?php for ($i=0; $i<60; $i++) :
 					$min = $i;
@@ -882,20 +894,22 @@ function radio_station_myplaylist_inner_sched_custom_box() {
     			output += '<option value="<?php echo $min; ?>"><?php echo $min; ?></option>';
 				<?php endfor; ?>
 				output += '</select> ';
-				output += '<select name="show_sched[' + count + '][start_meridian]">';
+				output += '<select name="show_sched[' + count + '][start_meridian]" style="min-width:35px;">';
 				output += '<option value=""></option>';
     			output += '<option value="am">am</option>';
     			output += '<option value="pm">pm</option>';
 				output += '</select> ';
+				output += '</li>';
 
-				output += ' - <?php _e( 'End Time', 'radio-station' ); ?>: ';
-				output += '<select name="show_sched[' + count + '][end_hour]">';
+				output += '<li style="display:inline-block; margin-left:20px;">';
+				output += '<?php _e( 'End Time', 'radio-station' ); ?>: ';
+				output += '<select name="show_sched[' + count + '][end_hour]" style="min-width:35px;">';
 				output += '<option value=""></option>';
 				<?php for ( $i = 1; $i <= 12; $i++ ) : ?>
 				output += '<option value="<?php echo $i; ?>"><?php echo $i; ?></option>';
 				<?php endfor; ?>
 				output += '</select> ';
-				output += '<select name="show_sched[' + count + '][end_min]">';
+				output += '<select name="show_sched[' + count + '][end_min]" style="min-width:35px;">';
 				output += '<option value=""></option>';
 				<?php for ( $i = 0; $i < 60 ; $i++ ) :
 					$min = $i;
@@ -904,21 +918,26 @@ function radio_station_myplaylist_inner_sched_custom_box() {
     			output += '<option value="<?php echo $min; ?>"><?php echo $min; ?></option>';
 				<?php endfor; ?>
 				output += '</select> ';
-				output += '<select name="show_sched[' + count + '][end_meridian]">';
+				output += '<select name="show_sched[' + count + '][end_meridian]" style="min-width:35px;">';
 				output += '<option value=""></option>';
     			output += '<option value="am">am</option>';
     			output += '<option value="pm">pm</option>';
 				output += '</select> ';
+				output += '</li>';
 
-				output += '<input type="checkbox" name="show_sched[' + count + '][encore]" /> <?php _e( 'Encore Presentation', 'radio-station' ); ?> ';
+				output += '<li style="display:inline-block; margin-left:20px;">';
+				output += '<input type="checkbox" name="show_sched[' + count + '][encore]" /> <?php _e( 'Encore Presentation', 'radio-station' ); ?></li>';
 
-				output += '<span class="remove button-secondary" style="cursor: pointer;"><?php _e( 'Remove', 'radio-station' ); ?></span></p>';
+				output += '<li style="display:inline-block; margin-left:20px;">';
+				output += '<span class="remove button-secondary" style="cursor: pointer;"><?php _e( 'Remove', 'radio-station' ); ?></span></li>';
+
+				output += '</ul>';
 				shiftaddb('#here').append( output );
 
 	            return false;
 	        });
 	        shiftaddb(".remove").live('click', function() {
-	        	shiftaddb(this).parent().remove();
+	        	shiftaddb(this).parent().parent().remove();
 	        });
 	    });
 	    </script>
@@ -947,18 +966,20 @@ function radio_station_myplaylist_save_showpostdata( $post_id ) {
 
 	// OK, we are authenticated: we need to find and save the data
 	$djs = $_POST['show_user_list'];
-	$sched = $_POST['show_sched'];
 	$file = $_POST['show_file'];
 	$email = $_POST['show_email'];
 	$active = $_POST['show_active'];
 	$link = $_POST['show_link'];
 
 	update_post_meta( $post_id, 'show_user_list', $djs );
-	update_post_meta( $post_id, 'show_sched', $sched );
 	update_post_meta( $post_id, 'show_file', $file );
 	update_post_meta( $post_id, 'show_email', $email );
 	update_post_meta( $post_id, 'show_active', $active );
 	update_post_meta( $post_id, 'show_link', $link );
+
+	$sched = $_POST['show_sched'];
+	update_post_meta( $post_id, 'show_sched', $sched );
+
 }
 add_action( 'save_post', 'radio_station_myplaylist_save_showpostdata' );
 
@@ -996,7 +1017,7 @@ function radio_station_master_override_inner_sched_custom_box() {
 		    <?php
 
 		    // get the saved meta as an array
-		    $track = get_post_meta($post->ID,'show_override_sched',false);
+		    $track = get_post_meta( $post->ID, 'show_override_sched', false);
 		    if ($track) {$track = $track[0];}
 
 			?>
@@ -1008,58 +1029,62 @@ function radio_station_master_override_inner_sched_custom_box() {
 			});
 			</script>
 
-            	<p>
-            		<?php _e('Date', 'radio-station'); ?>:
-            		<input type="text" id="OverrideDate" name="show_sched[date]" value="<?php if ( isset( $track['date'] ) && ( $track['date'] != '' ) ) {echo $track['date'];} ?>"/>
-            		 -
-            		<?php _e('Start Time', 'radio-station'); ?>:
-            		<select name="show_sched[start_hour]">
-            			<option value=""></option>
-            		<?php for ( $i = 1; $i <= 12; $i++ ) {
-            			if ( isset( $track['start_hour'] ) && ( $track['start_hour'] == $i ) ) {$selected = ' selected="selected"';} else {$selected = '';}
-            			echo '<option value="'.$i.'"'.$selected.'>'.$i.'</option>';
-            		} ?>
-            		</select>
-            		<select name="show_sched[start_min]">
-            			<option value=""></option>
-            		<?php for ( $i = 0; $i < 60; $i++ ) {
-						$min = $i;
-						if ( $i < 10 ) {$min = '0'.$i;}
-						if ( isset( $track['start_min'] ) && ( $track['start_min'] == $min ) ) {$selected = ' selected="selected"';} else {$selected = '';}
-            			echo '<option value="'.$min.'"'.$selected.'>'.$min.'</option>';
-            		} ?>
-            		</select>
-            		<select name="show_sched[start_meridian]">
-            			<option value=""></option>
-            			<option value="am"<?php if ( isset( $track['start_meridian'] ) && ( $track['start_meridian'] == 'am' ) ) {echo ' selected="selected"';} ?>>am</option>
-            			<option value="pm"<?php if ( isset( $track['start_meridian'] ) && ( $track['start_meridian'] == 'pm' ) ) {echo ' selected="selected"';} ?>>pm</option>
-            		</select>
+            	<ul style="list-style:none;">
+            		<li style="display:inline-block;">
+	            		<?php _e('Date', 'radio-station'); ?>:
+	            		<input type="text" id="OverrideDate" name="show_sched[date]" value="<?php if ( isset( $track['date'] ) && ( $track['date'] != '' ) ) {echo $track['date'];} ?>"/>
+	            	</li>
 
-            		 -
-            		<?php _e('End Time', 'radio-station'); ?>:
-            		<select name="show_sched[end_hour]">
-            			<option value=""></option>
-            		<?php for ( $i = 1; $i <= 12; $i++) {
-            			if ( isset( $track['end_hour'] ) && ( $track['end_hour'] == $i ) ) {$selected = ' selected="selected"';} else {$selected = '';}
-            			echo '<option value="'.$i.'"'.$selected.'>'.$i.'</option>';
-            		} ?>
-            		</select>
-            		<select name="show_sched[end_min]">
-            			<option value=""></option>
-            		<?php for ( $i = 0; $i < 60; $i++ ) {
-						$min = $i;
-						if ( $i < 10 ) {$min = '0'.$i;}
-						if ( isset( $track['end_min'] ) && ( $track['end_min'] == $min ) ) {$selected = ' selected="selected"';} else {$selected = '';}
-            			echo '<option value="'.$min.'"'.$selected.'>'.$min.'</option>';
-            		} ?>
-            		</select>
-            		<select name="show_sched[end_meridian]">
-            			<option value=""></option>
-            			<option value="am"<?php if ( isset( $track['end_meridian'] ) && ( $track['end_meridian'] == 'am' ) ) {echo ' selected="selected"'; } ?>>am</option>
-            			<option value="pm"<?php if ( isset( $track['end_meridian'] ) && ( $track['end_meridian'] == 'pm' ) ) {echo ' selected="selected"'; } ?>>pm</option>
-            		</select>
+            		<li style="display:inline-block; margin-left:20px;">
+						<?php _e('Start Time', 'radio-station'); ?>:
+						<select name="show_sched[start_hour]" style="min-width:35px;">
+							<option value=""></option>
+						<?php for ( $i = 1; $i <= 12; $i++ ) {
+							if ( isset( $track['start_hour'] ) && ( $track['start_hour'] == $i ) ) {$selected = ' selected="selected"';} else {$selected = '';}
+							echo '<option value="'.$i.'"'.$selected.'>'.$i.'</option>';
+						} ?>
+						</select>
+						<select name="show_sched[start_min]" style="min-width:35px;">
+							<option value=""></option>
+						<?php for ( $i = 0; $i < 60; $i++ ) {
+							$min = $i;
+							if ( $i < 10 ) {$min = '0'.$i;}
+							if ( isset( $track['start_min'] ) && ( $track['start_min'] == $min ) ) {$selected = ' selected="selected"';} else {$selected = '';}
+							echo '<option value="'.$min.'"'.$selected.'>'.$min.'</option>';
+						} ?>
+						</select>
+						<select name="show_sched[start_meridian]" style="min-width:35px;">
+							<option value=""></option>
+							<option value="am"<?php if ( isset( $track['start_meridian'] ) && ( $track['start_meridian'] == 'am' ) ) {echo ' selected="selected"';} ?>>am</option>
+							<option value="pm"<?php if ( isset( $track['start_meridian'] ) && ( $track['start_meridian'] == 'pm' ) ) {echo ' selected="selected"';} ?>>pm</option>
+						</select>
+					</li>
 
-            	</p>
+            		<li style="display:inline-block; margin-left:20px;">
+						<?php _e('End Time', 'radio-station'); ?>:
+						<select name="show_sched[end_hour]" style="min-width:35px;">
+							<option value=""></option>
+						<?php for ( $i = 1; $i <= 12; $i++) {
+							if ( isset( $track['end_hour'] ) && ( $track['end_hour'] == $i ) ) {$selected = ' selected="selected"';} else {$selected = '';}
+							echo '<option value="'.$i.'"'.$selected.'>'.$i.'</option>';
+						} ?>
+						</select>
+						<select name="show_sched[end_min]" style="min-width:35px;">
+							<option value=""></option>
+						<?php for ( $i = 0; $i < 60; $i++ ) {
+							$min = $i;
+							if ( $i < 10 ) {$min = '0'.$i;}
+							if ( isset( $track['end_min'] ) && ( $track['end_min'] == $min ) ) {$selected = ' selected="selected"';} else {$selected = '';}
+							echo '<option value="'.$min.'"'.$selected.'>'.$min.'</option>';
+						} ?>
+						</select>
+						<select name="show_sched[end_meridian]" style="min-width:35px;">
+							<option value=""></option>
+							<option value="am"<?php if ( isset( $track['end_meridian'] ) && ( $track['end_meridian'] == 'am' ) ) {echo ' selected="selected"'; } ?>>am</option>
+							<option value="pm"<?php if ( isset( $track['end_meridian'] ) && ( $track['end_meridian'] == 'pm' ) ) {echo ' selected="selected"'; } ?>>pm</option>
+						</select>
+					</li>
+            	</ul>
 		</div>
 <?php
 }
@@ -1080,12 +1105,52 @@ function radio_station_master_override_save_showpostdata( $post_id ) {
 
 	// OK, we are authenticated: we need to find and save the data
 	$sched = $_POST['show_sched'];
+	if ( !is_array( $sched ) ) {return;}
 
-	// sanitize value before saving
-	$valid = array( '', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday' );
-	if ( !in_array( $sched, $valid ) ) {return;}
-	if ( $sched == '' ) {delete_post_meta( $post_id, 'show_override_sched' );}
-	else {update_post_meta( $post_id, 'show_override_sched', $sched );}
+	// 2.2.2: get/set current schedule for merging
+	$current_sched = get_post_meta( $post_id, 'show_override_sched', true );
+	if ( !$current_sched || !is_array( $current_sched ) ) {
+		$current_sched = array(
+			'date'				=> '',
+			'start_hour'		=> '',
+			'start_min'			=> '',
+			'start_meridian'	=> '',
+			'end_hour'			=> '',
+			'end_min'			=> '',
+			'end_meridian'		=> '',
+		);
+	}
+
+	// sanitize values before saving
+	// 2.2.2: loop and validate schedule override values
+	$changed = false;
+	foreach ( $sched as $key => $value ) {
+		$isvalid = false;
+
+		// validate according to key
+		if ( $key == 'date' ) {
+			// check posted date format (yyyy-mm-dd) with checkdate (month, date, year)
+			$parts = explode( '-', $value );
+			if ( checkdate( $parts[1], $parts[2], $parts[0] ) ) {$isvalid = true;}
+		} elseif ( ( $key == 'start_hour' ) || ( $key == 'end_hour' ) ) {
+			if ( $value == '' ) {$isvalid = true;}
+			elseif ( ( absint($value) > 0 ) && ( absint($value) < 13 ) ) {$isvalid = true;}
+		} elseif ( ( $key == 'start_min' ) || ( $key == 'end_min' ) ) {
+			if ( $value == '' ) {$isvalid = true;}
+			elseif ( ( absint($value) > 0 ) && ( absint($value) < 61 ) ) {$isvalid = true;}
+		} elseif ( ($key == 'start_meridian') || ( $key == 'end_meridian' ) ) {
+			$valid = array( '', 'am', 'pm' );
+			if ( in_array( $value, $valid ) ) {$isvalid = true;}
+		}
+
+		// if value override current schedule setting
+		if ( $isvalid && ( $value != $current_sched[$key] ) ) {
+			$current_sched[$key] = $value; $changed = true;
+		}
+	}
+
+	// save schedule setting if changed
+	if ($changed) {update_post_meta( $post_id, 'show_override_sched', $current_sched );}
 }
 add_action( 'save_post', 'radio_station_master_override_save_showpostdata' );
 
