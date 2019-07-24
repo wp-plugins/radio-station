@@ -154,8 +154,11 @@ function radio_station_master_schedule( $atts ) {
 		$output .= '<ul class="master-list">';
 
 		foreach ( $flip as $day => $hours ) {
+
+			// 2.2.2: use translate function for weekday string
+			$display_day = radio_station_translate_weekday( $day );
 			$output .= '<li class="master-list-day" id="list-header-'.strtolower($day).'">';
-			$output .= '<span class="master-list-day-name">'.__($day, 'radio-station').'</span>';
+			$output .= '<span class="master-list-day-name">'.$display_day.'</span>';
 			$output .= '<ul class="master-list-day-'.strtolower($day).'-list">';
 			foreach ($hours as $hour => $mins) {
 
@@ -414,7 +417,8 @@ function radio_station_master_schedule( $atts ) {
 		// output the headings in the correct order
 		$output .= '<tr class="master-program-day-row"> <th></th>';
 		foreach($days_of_the_week as $weekday => $info) {
-			$heading = substr( $heading, 0, 3 );
+			// 2.2.2: fix to translate incorrect variable (heading)
+			$heading = substr( $weekday, 0, 3 );
 			$heading = radio_station_translate_weekday( $heading, true );
 			$output .= '<th>'.$heading.'</th>';
 		}

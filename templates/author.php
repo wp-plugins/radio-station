@@ -18,7 +18,8 @@ get_header(); ?>
 					<h1 class="page-title author"><?php echo $curauth->display_name; ?></h1>
 				</header>
 
-				<div id="author-avatar"><?php echo get_avatar( $curauth->ID, 50 ); ?></div>
+				<?php $avatar_size = apply_filters( 'radio_station_dj_avatar_size', 50 );
+				<div id="author-avatar"><?php echo get_avatar( $curauth->ID, $avatar_size ); ?></div>
 				<div id="author-description">
 
 					<?php echo $curauth->description; ?>
@@ -64,7 +65,7 @@ get_header(); ?>
 					if ( get_the_author_meta( 'description' ) ) : ?>
 					<div id="author-info">
 						<div id="author-avatar">
-							<?php echo get_avatar( get_the_author_meta( 'user_email' ), 60 ); ?>
+							<?php echo get_avatar( get_the_author_meta( 'user_email' ), $avatar_size ); ?>
 						</div><!-- #author-avatar -->
 						<div id="author-description">
 							<h2><?php printf( __( 'About %s', 'radio-station' ), get_the_author() ); ?></h2>
