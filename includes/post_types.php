@@ -8,8 +8,11 @@
 
 // === Post Types ===
 // - Register Post Types
+// - Set CPTs to Classic Editor
 // - Add Show Thumbnail Support
+// === Taxonomies ===
 // - Add Genre Taxonomy
+// - Shift Genre Metabox
 // === Playlists ===
 // - Playlist Data Metabox
 // === Shows ===
@@ -32,7 +35,7 @@
 function radio_station_create_post_types() {
 
 	// $icon = WP_PLUGIN_URL.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__)) . 'images/playlist-menu-icon.png';
-	$icon = plugins_url( 'images/playlist-menu-icon.png', dirname(dirname(__FILE__)).'/radio-station.php' );
+	// $icon = plugins_url( 'images/playlist-menu-icon.png', dirname(dirname(__FILE__)).'/radio-station.php' );
 	register_post_type( 'playlist',
 		array(
 			'labels' => array(
@@ -47,21 +50,21 @@ function radio_station_create_post_types() {
 			'show_ui'			=> true,
 			'show_in_menu'		=> false, // now added to main menu
 			'description'		=> __('Post type for Playlist descriptions', 'radio-station'),
-			'menu_position'		=> 5,
-			'menu_icon'			=> $icon,
+			// 'menu_position'	=> 5,
+			// 'menu_icon'		=> $icon,
 			'public'			=> true,
 			'hierarchical'		=> false,
 			'supports'			=> array( 'title', 'editor', 'comments' ),
 			'can_export'		=> true,
 			'has_archive'		=> 'playlists-archive',
-			'rewrite'			=> array('slug' => 'playlists'),
+			'rewrite'			=> array( 'slug' => 'playlists' ),
 			'capability_type'	=> 'playlist',
 			'map_meta_cap'		=> true
 		)
 	);
 
 	// $icon = WP_PLUGIN_URL.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__)) . 'images/show-menu-icon.png';
-	$icon = plugins_url( 'images/show-menu-icon.png', dirname(dirname(__FILE__)).'/radio-station.php' );
+	// $icon = plugins_url( 'images/show-menu-icon.png', dirname(dirname(__FILE__)).'/radio-station.php' );
 	register_post_type( 'show',
 		array(
 			'labels' => array(
@@ -76,8 +79,8 @@ function radio_station_create_post_types() {
 			'show_ui'			=> true,
 			'show_in_menu'		=> false, // now added to main menu
 			'description'		=> __('Post type for Show descriptions', 'radio-station'),
-			'menu_position'		=> 5,
-			'menu_icon'			=> $icon,
+			// 'menu_position'	=> 5,
+			// 'menu_icon'		=> $icon,
 			'public'			=> true,
 			'taxonomies'		=> array( 'genres' ),
 			'hierarchical'		=> false,
@@ -89,7 +92,7 @@ function radio_station_create_post_types() {
 	);
 
 	// $icon = WP_PLUGIN_URL.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__)) . 'images/show-menu-icon.png';
-	$icon = plugins_url( 'images/show-menu-icon.png', dirname(dirname(__FILE__)).'/radio-station.php' );
+	// $icon = plugins_url( 'images/show-menu-icon.png', dirname(dirname(__FILE__)).'/radio-station.php' );
 	register_post_type( 'override',
 		array(
 				'labels' => array(
@@ -104,8 +107,8 @@ function radio_station_create_post_types() {
 				'show_ui'			=> true,
 				'show_in_menu'		=> false, // now added to main menu
 				'description' =>	__('Post type for Schedule Override', 'radio-station'),
-				'menu_position'		=> 5,
-				'menu_icon'			=> $icon,
+				// 'menu_position'	=> 5,
+				// 'menu_icon'		=> $icon,
 				'public'			=> true,
 				'hierarchical'		=> false,
 				'supports'			=> array( 'title', 'thumbnail' ),
@@ -118,22 +121,48 @@ function radio_station_create_post_types() {
 }
 add_action( 'init', 'radio_station_create_post_types' );
 
+// ---------------------------------------
+// Set Post Type Editing to Classic Editor
+// ---------------------------------------
+// 2.2.2: so metabox displays can have wide widths
+function radio_station_post_type_editor( $can_edit, $post_type ) {
+	$post_types = array( 'show', 'playlist', 'override' );
+	if ( in_array( $post_type, $post_types ) ) {return false;}
+	return $can_edit;
+}
+add_filter( 'gutenberg_can_edit_post_type', 'radio_station_post_type_editor', 20, 2 );
+add_filter( 'use_block_editor_for_post_type', 'radio_station_post_type_editor', 20, 2 );
+
 // --------------------------
 // Add Show Thumbnail Support
 // --------------------------
 // add featured image support to "show" post type
 // (this is probably no longer necessary as declared in register_post_type for show)
 function radio_station_add_featured_image_support() {
-    $supportedTypes = get_theme_support( 'post-thumbnails' );
+    $supported_types = get_theme_support( 'post-thumbnails' );
 
-    if ( $supportedTypes === false ) {
+    if ( $supported_types === false ) {
         add_theme_support( 'post-thumbnails', array( 'show' ) );
-    } elseif ( is_array( $supportedTypes ) ) {
-        $supportedTypes[0][] = 'show';
-        add_theme_support( 'post-thumbnails', $supportedTypes[0] );
+    } elseif ( is_array( $supported_types ) ) {
+        $supported_types[0][] = 'show';
+        add_theme_support( 'post-thumbnails', $supported_types[0] );
     }
 }
 add_action( 'init', 'radio_station_add_featured_image_support' );
+
+// ----------------------------
+// Metaboxes Above Content Area
+// ----------------------------
+function radio_station_top_meta_boxes() {
+    global $post;
+    do_meta_boxes( get_current_screen(), 'top', $post );
+}
+add_action( 'edit_form_after_title', 'radio_station_top_meta_boxes' );
+
+
+// ------------------
+// === Taxonomies ===
+// ------------------
 
 // -----------------------
 // Register Genre Taxonomy
@@ -175,7 +204,18 @@ function radio_station_myplaylist_create_show_taxonomy() {
 	);
 
 }
-add_action('init', 'radio_station_myplaylist_create_show_taxonomy');
+add_action( 'init', 'radio_station_myplaylist_create_show_taxonomy' );
+
+// ----------------------------
+// Shift Genre Metabox on Shows
+// ----------------------------
+function radio_station_genre_meta_box_order() {
+    global $wp_meta_boxes;
+    $genres = $wp_meta_boxes['show']['side']['core']['genresdiv'];
+    unset($wp_meta_boxes['show']['side']['core']['genresdiv']);
+    $wp_meta_boxes['show']['side']['high']['genresdiv'] = $genres;
+}
+add_action( 'add_meta_boxes_show', 'radio_station_genre_meta_box_order' );
 
 
 // -----------------
@@ -189,11 +229,14 @@ add_action('init', 'radio_station_myplaylist_create_show_taxonomy');
 // Add custom repeating meta field for the playlist edit form... Stores multiple associated values as a serialized string
 // Borrowed and adapted from http://wordpress.stackexchange.com/questions/19838/create-more-meta-boxes-as-needed/19852#19852
 function radio_station_myplaylist_add_custom_box() {
+	// 2.2.2: change context to show at top of edit screen
 	add_meta_box(
         'dynamic_sectionid',
 		__( 'Playlist Entries', 'radio-station' ),
         'radio_station_myplaylist_inner_custom_box',
-        'playlist'
+        'playlist',
+        'top', // shift to top
+        'high'
 	);
 }
 add_action( 'add_meta_boxes', 'radio_station_myplaylist_add_custom_box', 1 );
@@ -368,7 +411,7 @@ add_action( 'save_post', 'radio_station_myplaylist_save_postdata' );
 // Related Show Metabox
 // --------------------
 
-// --- Add custom meta box for show assigment on blog posts ---
+// --- Add custom meta box for show assignment on blog posts ---
 function radio_station_add_showblog_box() {
 
 	// make sure a show exists before adding metabox
@@ -432,7 +475,7 @@ function radio_station_inner_showblog_custom_box() {
    <?php
 }
 
-// --- When a playlist is saved, saves our custom data ---
+// --- When a post is saved, saves our custom data ---
 function radio_station_save_postdata( $post_id ) {
 
     // verify if this is an auto save routine.
@@ -471,12 +514,14 @@ add_action( 'save_post', 'radio_station_save_postdata' );
 
 // --- Add custom meta box for show assigment ---
 function radio_station_myplaylist_add_show_box() {
+	// 2.2.2: add high priority to shift above publish box
 	add_meta_box(
         'dynamicShow_sectionid',
 		__( 'Show', 'radio-station' ),
         'radio_station_myplaylist_inner_show_custom_box',
         'playlist',
-		'side'
+		'side',
+		'high'
 	);
 }
 add_action( 'add_meta_boxes', 'radio_station_myplaylist_add_show_box' );
@@ -565,11 +610,15 @@ function radio_station_myplaylist_inner_show_custom_box() {
 // ----------------------------
 // Adds a box to the side column of the show edit screens
 function radio_station_myplaylist_add_metainfo_box() {
+	// 2.2.2: change context to show at top of edit screen
 	add_meta_box(
         'dynamicShowMeta_sectionid',
 		__( 'Information', 'radio-station' ),
         'radio_station_myplaylist_inner_metainfo_custom_box',
-        'show');
+        'show',
+        'top', // shift to top
+        'high'
+	);
 }
 add_action( 'add_meta_boxes', 'radio_station_myplaylist_add_metainfo_box' );
 
@@ -611,12 +660,14 @@ function radio_station_myplaylist_inner_metainfo_custom_box() {
 
 // --- Adds a box to the side column of the show edit screens ---
 function radio_station_myplaylist_add_user_box() {
+	// 2.2.2: add high priority to show at top of edit sidebar
 	add_meta_box(
         'dynamicUser_sectionid',
 		__( 'DJs', 'radio-station' ),
         'radio_station_myplaylist_inner_user_custom_box',
         'show',
-		'side'
+		'side',
+		'high'
 	);
 }
 add_action( 'add_meta_boxes', 'radio_station_myplaylist_add_user_box' );
@@ -671,15 +722,20 @@ function radio_station_myplaylist_inner_user_custom_box() {
     	}
 	}
 
+	// 2.2.2: set DJ display name maybe with username
+	$display_name = $dj->display_name;
+	if ( $dj->display_name != $dj->user_login ) {$display_name .= '('.$dj->user_login.')';}
+
+	// 2.2.2: fix to make DJ multi-select input full metabox width
 	?>
     <div id="meta_inner">
 
-    <select name="show_user_list[]" multiple="multiple" style="height: 150px;">
+    <select name="show_user_list[]" multiple="multiple" style="height: 150px; width: 100%;">
     	<option value=""></option>
     <?php
     	foreach( $users as $dj ) {
     		if ( in_array( $dj->ID, $current ) ) {$selected = ' selected="selected"';} else {$selected = '';}
-    		echo '<option value="'.$dj->ID.'"'.$selected.'>'.$dj->display_name.'</option>';
+    		echo '<option value="'.$dj->ID.'"'.$selected.'>'.$display_name.'</option>';
     	}
 	?>
 	</select>
@@ -687,13 +743,16 @@ function radio_station_myplaylist_inner_user_custom_box() {
    <?php
 }
 
-// --- Adds a box to the side column of the show edit screens ---
+// --- Adds schedule box to show edit screens ---
 function radio_station_myplaylist_add_sched_box() {
+	// 2.2.2: change context to show at top of edit screen
 	add_meta_box(
         'dynamicSched_sectionid',
 		__( 'Schedules', 'radio-station' ),
         'radio_station_myplaylist_inner_sched_custom_box',
-        'show'
+        'show',
+        'top', // shift to top
+        'low'
 	);
 }
 add_action( 'add_meta_boxes', 'radio_station_myplaylist_add_sched_box' );
@@ -912,13 +971,16 @@ add_action( 'save_post', 'radio_station_myplaylist_save_showpostdata' );
 // Schedule Override Metabox
 // -------------------------
 
-// --- Adds a box to the side column of the show edit screens ---
+// --- Add schedule override box to override edit screens ---
 function radio_station_master_override_add_sched_box() {
+	// 2.2.2: add high priority to show at top of edit screen
 	add_meta_box(
 		'dynamicSchedOver_sectionid',
 		__( 'Override Schedule', 'radio-station' ),
 		'radio_station_master_override_inner_sched_custom_box',
-		'override'
+		'override',
+		'normal',
+		'high'
 	);
 }
 add_action( 'add_meta_boxes', 'radio_station_master_override_add_sched_box' );
