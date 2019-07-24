@@ -285,7 +285,8 @@ class DJ_Widget extends WP_Widget {
  		// --- enqueue widget stylesheet in footer ---
  		// (this means it will only load if widget is on page)
  		$dj_widget_css = get_stylesheet_directory().'/djonair.css';
- 		if ( !file_exists( $dj_widget_css ) ) {
+ 		// 2.2.2: fix to file check logic (file_exists not !file_exists)
+ 		if ( file_exists( $dj_widget_css ) ) {
  			$version = filemtime( $dj_widget_css );
  			$url = get_stylesheet_directory_uri().'/djonair.css';
  		} else {

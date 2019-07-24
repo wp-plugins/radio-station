@@ -1,19 +1,20 @@
 <?php
 /**
  * @package Radio Station
- * @version 2.1.1
+ * @version 2.2.2
  */
 /*
 Plugin Name: Radio Station
-Plugin URI: http://nlb-creations.com/2013/02/25/wordpress-plugin-radio-station/
-Description: Adds playlist and on-air programming functionality to your site.
-Author: Nikki Blight <nblight@nlb-creations.com>
-Version: 2.1.1
+Plugin URI: https://netmix.com/radio-station
+Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
+Author: Tony Zeoli <tonyzeoli@netmix.com>
+Version: 2.2.2
 Text Domain: radio-station
 Domain Path: /languages
-Author URI: http://www.nlb-creations.com
+Author URI: https://netmix.com/radio-station
+GitHub Plugin URI: netmix/radio-station
 
-Copyright 2013 Nikki Blight  (email : nblight@nlb-creations.com)
+Copyright 2019 Digital Strategy Works  (email : info@digitalstrategyworks.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 2, as
@@ -302,28 +303,92 @@ function radio_station_add_admin_menus() {
 				} elseif ( $item[2] == 'shows' ) {$submenu[$i][$j][2] = 'edit.php?post_type=show';}
 				elseif ( $item[2] == 'playlists' ) {$submenu[$i][$j][2] = 'edit.php?post_type=playlist';}
 				elseif ( $item[2] == 'add-playlist' ) {$submenu[$i][$j][2] = 'post-new.php?post_type=playlist';}
-				elseif ( $item[2] == 'genres' ) {$submenu[$i][$j][2] = 'edit-tags.php?taxonomy=genres&post_type=show';}
+				elseif ( $item[2] == 'genres' ) {$submenu[$i][$j][2] = 'edit-tags.php?taxonomy=genres';}
 				elseif ( $item[2] == 'schedule-overrides' ) {$submenu[$i][$j][2] = 'edit.php?post_type=override';}
 				elseif ( $item[2] == 'add-override' ) {$submenu[$i][$j][2] = 'post-new.php?post_type=override';}
 			}
 		}
 	}
-	// echo "<!-- Submenu: ".print_r($submenu,true)." -->";
 }
 add_action( 'admin_menu', 'radio_station_add_admin_menus' );
 
-// --- remove the Add Show link for DJs from the wp admin bar ---
-function station_radio_modify_admin_bar_menu($wp_admin_bar) {
-	// $user = wp_get_current_user();
-	// if ( in_array('dj', $user->roles ) ) {
-	if ( !current_user_can( 'publish_shows' ) ) {
-		$wp_admin_bar->remove_node( 'new-show' );
+// --- expand main menu fix for plugin submenu items ---
+// 2.2.2: added fix for genre taxonomy page and post type editing
+function radio_station_fix_genre_parent($parent_file = '') {
+	global $pagenow, $post;
+	$post_types = array( 'show', 'playlist', 'override' );
+	if ( ( $pagenow == 'edit-tags.php') && isset( $_GET['taxonomy'] ) && ( $_GET['taxonomy'] == 'genres' ) ) {
+		$parent_file = 'radio-station';
+	} elseif ( ( $pagenow == 'post.php' ) && ( in_array( $post->post_type, $post_types ) ) ) {
+		$parent_file = 'radio-station';
 	}
+	return $parent_file;
+}
+add_filter( 'parent_file', 'radio_station_fix_genre_parent', 11 );
+
+// --- genre taxonomy submenu item fix ---
+// 2.2.2: so genre submenu item link is set to current (bold)
+function radio_station_genre_submenu_fix() {
+	global $pagenow;
+	if ( ( $pagenow == 'edit-tags.php' ) && isset( $_GET['taxonomy'] ) && ( $_GET['taxonomy'] == 'genres' ) ) {
+	echo "<script>
+	jQuery('#toplevel_page_radio-station ul li').each(function() {
+		if (jQuery(this).find('a').attr('href') == 'edit-tags.php?taxonomy=genres') {
+			jQuery(this).addClass('current').find('a').addClass('current').attr('aria-current', 'page');
+		}
+	});</script>";
+	}
+}
+add_action( 'admin_footer', 'radio_station_genre_submenu_fix' );
+
+// --- remove the Add Show link for DJs from the wp admin bar ---
+// 2.2.2: re-add new post type items to admin bar
+// (as no longer automatically added by register_post_type)
+function station_radio_modify_admin_bar_menu( $wp_admin_bar ) {
+
+	// --- new show ---
+	if ( current_user_can( 'publish_shows' ) ) {
+
+		$args = array(
+			'id'		=> 'new-show',
+			'title'		=> __( 'Show', 'radio-station' ),
+			'parent'	=> 'new-content',
+			'href'		=> admin_url('post-new.php?post_type=show')
+		);
+	    $wp_admin_bar->add_node($args);
+	}
+
+	// --- new playlist ---
+	if ( current_user_can( 'publish_playlists' ) ) {
+		$args = array(
+			'id'		=> 'new-playlist',
+			'title'		=> __( 'Playlist', 'radio-station' ),
+			'parent'	=> 'new-content',
+			'href'		=> admin_url('post-new.php?post_type=playlist')
+		);
+		$wp_admin_bar->add_node($args);
+	}
+
+	// --- new schedule override ---
+	if ( current_user_can( 'publish_shows' ) ) {
+		$args = array(
+			'id'		=> 'new-override',
+			'title'		=> __( 'Override', 'radio-station' ),
+			'parent'	=> 'new-content',
+			'href'		=> admin_url('post-new.php?post_type=override')
+		);
+	    $wp_admin_bar->add_node($args);
+	}
+
 }
 add_action( 'admin_bar_menu', 'station_radio_modify_admin_bar_menu', 999 );
 
 // --- output help page ---
 function radio_station_plugin_help() {
+
+	// 2.2.2: include patreon button link
+	echo radio_station_patreon_blurb(false);
+
 	// include help template
 	include( dirname(__FILE__).'/templates/help.php' );
 }
@@ -414,5 +479,87 @@ function radio_station_admin_export() {
 	// display the export page
 	include( dirname(__FILE__).'/templates/admin-export.php' );
 
+}
+
+
+// --------------------
+// === Admin Notice ===
+// --------------------
+
+// --- plugin announcement notice ---
+// 2.2.2: added plugin announcement notice
+function radio_station_announcement_notice() {
+
+	// --- bug out if already dismissed ---
+	if ( get_option( 'radio_station_announcement_dismissed' ) ) {return;}
+
+	// --- bug out on certain plugin pages ---
+	$pages = array( 'radio-station', 'radio-station-help' );
+	if ( isset( $_REQUEST['page'] ) && ( in_array( $_REQUEST['page'], $pages ) ) ) {return;}
+
+	// --- display plugin announcement ---
+	echo '<div id="radio-station-announcement-notice" class="notice notice-info">';
+		echo radio_station_patreon_blurb();
+		echo '<iframe src="javascript:void(0);" name="radio-station-notice-iframe" style="display:none;"></iframe>';
+	echo '</div>';
+}
+add_action( 'admin_notices', 'radio_station_announcement_notice' );
+
+// --- dismiss plugin announcement notice ---
+// 2.2.2: AJAX for announcement notice dismissal
+function radio_station_announcement_dismiss() {
+	if ( current_user_can( 'manage_options' ) || current_user_can( 'update_plugins' ) ) {
+		update_option( 'radio_station_announcement_dismissed', true );
+		echo "<script>parent.document.getElementById('radio-station-announcement-notice').style.display = 'none';</script>";
+		exit;
+	}
+}
+add_action( 'wp_ajax_radio_station_announcement_dismiss', 'radio_station_announcement_dismiss' );
+
+// --- Patreon supporter blurb ---
+// 2.2.2: added simple patreon supporter blurb
+function radio_station_patreon_blurb( $dismissable = true ) {
+
+	$blurb = '<ul style="list-style:none;">';
+		$blurb .= '<li style="display:inline-block; vertical-align:middle;">';
+			$plugin_image = plugins_url( 'images/radio-station.png', __FILE__ );
+			$blurb .= '<img src="'.$plugin_image.'">';
+		$blurb .= '</li>';
+		$blurb .= '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">';
+			$blurb .= '<b style="font-size:17px;">'.__( 'Help support us to make improvements, modifications and introduce new features!', 'radio-station' ).'</b><br>';
+			$blurb .= __( 'With over a thousand radio station users thanks to the original plugin author Nikki Blight', 'radio-station' ).', <br>';
+			$blurb .= __( 'since June 2019', 'radio-station' ).', ';
+			$blurb .= '<b>'.__( 'Radio Station', 'radio-station' ).'</b> ';
+			$blurb .= __(' plugin development has been actively taken over by', 'radio-station' );
+			$blurb .= ' <a href="http://netmix.com" target="_blank">Netmix</a>.<br>';
+			$blurb .= __( 'We invite you to', 'radio-station');
+			$blurb .= ' <a href="https://patreon.com/radiostation" target="_blank">';
+				$blurb .= __('Become a Radio Station Patreon Supporter', 'radio-station');
+			$blurb .= '</a> '.__('to make it better for everyone', 'radio-station').'!';
+		$blurb .= '</li>';
+		$blurb .= '<li style="display:inline-block; vertical-align:middle; margin-left:40px;">';
+			$blurb .= radio_station_patreon_button();
+		$blurb .= '</li>';
+		if ($dismissable) {
+			$blurb .= '<li style="display:inline-block; vertical-align:top; margin-left:40px;">';
+				$dismiss_url = admin_url( 'admin-ajax.php?action=radio_station_announcement_dismiss' );
+				$blurb .= '<a href="'.$dismiss_url.'" target="radio-station-notice-iframe" style="text-decoration:none;">';
+				$blurb .= '<span class="dashicons dashicons-dismiss" title="'.__( 'Dismiss this Notice', 'radio-station' ).'"></span></a>';
+			$blurb .= '</li>';
+		}
+	$blurb .= '</ul>';
+	return $blurb;
+}
+
+// --- Patreon supporter button ---
+// 2.2.2: added simple patreon supporter image button
+function radio_station_patreon_button() {
+	$image_url = plugins_url( 'images/patreon-button.jpg', __FILE__ );
+	$button = '<a href="https://patreon.com/radiostation" target="_blank">';
+	$button .= '<img id="radio-station-patreon-button" src="'.$image_url.'" border="0">';
+	$button .= '</a>';
+	$button .= '<style>#radio-station-patreon-button {opacity:0.9;} '.PHP_EOL;
+	$button .= '#radio-station-patreon-button:hover {opacity:1;}</style>';
+	return $button;
 }
 
