@@ -1,29 +1,18 @@
 <?php
 /**
  * @package Radio Station
-<<<<<<< HEAD
- * @version 2.2.1
-=======
  * @version 2.2.2
->>>>>>> release/2.2.2
  */
 /*
 Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli <tonyzeoli@netmix.com>
-<<<<<<< HEAD
-Version: 2.2.1
-Text Domain: radio-station
-Domain Path: /languages
-Author URI: https://netmix.com/radio-station
-=======
 Version: 2.2.2
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
 GitHub Plugin URI: netmix/radio-station
->>>>>>> release/2.2.2
 
 Copyright 2019 Digital Strategy Works  (email : info@digitalstrategyworks.com)
 

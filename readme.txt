@@ -1,11 +1,6 @@
 === Radio Station ===
-<<<<<<< HEAD
-Contributors: tonyzeoli
-Donate link: https://www.patreon.com/radiostation
-=======
 Contributors: tonyzeoli, majick, nourma
 Donate link: https://netmix.co/donate
->>>>>>> release/2.2.2
 Tags: dj, music, playlist, radio, scheduling
 Requires at least: 3.3.1
 Tested up to: 5.2.2
@@ -243,10 +238,6 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
-<<<<<<< HEAD
-= 2.2.1 =
-
-=======
 = 2.2.2 =
 * shift main playlist and show metaboxes above editor
 * set plugin custom post types editor to Classic Editor
@@ -254,6 +245,8 @@ you send me your finished translation, I'd love to include it.
 * added dismissable development changeover admin notice
 * added simple Patreon supporter image button and blurb
 * added filter for DJ Avatar size on Author page template
+* fix to Schedule Override metabox value saving
+* fix to missing day of week headings in master schedule
 * fix to file_exists check for DJ on Air stylesheet path
 * fix to make DJ multi-select input full metabox width
 * fix to expand admin menu when on genre taxonomy page
@@ -262,7 +255,6 @@ you send me your finished translation, I'd love to include it.
 * added GitHub URI to plugin header for GitHub updater
 
 = 2.2.1 =
->>>>>>> release/2.2.2
 * Re-commit all missing files via SVN
 
 = 2.2.0 =
@@ -492,10 +484,6 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
-
-= 2.2.1 =
-
-* Re-commit all missing files via SVN
 
 = 2.2.0 =
 * WordPress coding standards refactoring for WP 5 (thanks to Tony Hayes @majick777)
