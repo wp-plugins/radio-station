@@ -1,9 +1,14 @@
 === Radio Station ===
+<<<<<<< HEAD
 Contributors: tonyzeoli
 Donate link: https://www.patreon.com/radiostation
+=======
+Contributors: tonyzeoli, majick, nourma
+Donate link: https://netmix.co/donate
+>>>>>>> release/2.2.2
 Tags: dj, music, playlist, radio, scheduling
 Requires at least: 3.3.1
-Tested up to: 4.9.10
+Tested up to: 5.2.2
 Stable tag: trunk
 
 Radio Station is a plugin to build and manage a Show Calendar in a radio station's WordPress website. It's functionality is based on Drupal 6's Station plugin.
@@ -238,8 +243,26 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+<<<<<<< HEAD
 = 2.2.1 =
 
+=======
+= 2.2.2 =
+* shift main playlist and show metaboxes above editor
+* set plugin custom post types editor to Classic Editor
+* add high priority to side metaboxes for plugin post types
+* added dismissable development changeover admin notice
+* added simple Patreon supporter image button and blurb
+* added filter for DJ Avatar size on Author page template
+* fix to file_exists check for DJ on Air stylesheet path
+* fix to make DJ multi-select input full metabox width
+* fix to expand admin menu when on genre taxonomy page
+* fix to expand admin menu when editing plugin post types
+* fix to genre submenu item link for current page
+* added GitHub URI to plugin header for GitHub updater
+
+= 2.2.1 =
+>>>>>>> release/2.2.2
 * Re-commit all missing files via SVN
 
 = 2.2.0 =
