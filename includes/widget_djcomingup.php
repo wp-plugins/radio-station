@@ -160,9 +160,9 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		 								$end_hour = substr($dj['sched']['end_hour'], 1);
 		 							}
 
-		 							echo ' <span class="on-air-dj-sched">'.$start_hour.':'.$dj['sched']['start_min'].' '.$dj['sched']['start_meridian'].'-'.$end_hour.':'.$dj['sched']['end_min'].' '.$dj['sched']['end_meridian'].'</span><br />';
+		 							echo ' <span class="on-air-dj-sched">'.$start_hour.':'.$dj['sched']['start_min'].' '.$dj['sched']['start_meridian'].' - '.$end_hour.':'.$dj['sched']['end_min'].' '.$dj['sched']['end_meridian'].'</span><br />';
 		 						} else {
-		 							echo ' <span class="on-air-dj-sched">'.$dj['sched']['start_hour'].':'.$dj['sched']['start_min'].' '.'-'.$dj['sched']['end_hour'].':'.$dj['sched']['end_min'].'</span><br />';
+		 							echo ' <span class="on-air-dj-sched">'.$dj['sched']['start_hour'].':'.$dj['sched']['start_min'].' - '.$dj['sched']['end_hour'].':'.$dj['sched']['end_min'].'</span><br />';
 		 						}
 		 					}
 		 					echo '</li>';
@@ -209,12 +209,13 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			 				if ( $show_sched ) {
 
 			 					$showtimes = explode( "|", $showtime );
-								$weekday = radio_station_translate_weekday( $showtimes[0] );
+			 					// 2.2.2: fix to weekday value to be translated
+								$weekday = radio_station_translate_weekday( date('l', $showtimes[0] ) );
 
 			 					if ( $time == 12 ) {
-			 						echo '<span class="on-air-dj-sched">'.$weekday.', '.date( 'g:i a', $showtimes[0] ).'-'.date( 'g:i a', $showtimes[1] ).'</span><br />';
+			 						echo '<span class="on-air-dj-sched">'.$weekday.', '.date( 'g:i a', $showtimes[0] ).' - '.date( 'g:i a', $showtimes[1] ).'</span><br />';
 			 					} else {
-			 						echo '<span class="on-air-dj-sched">'.$weekday.', '.date( 'H:i', $showtimes[0] ).'-'.date( 'H:i', $showtimes[1] ).'</span><br />';
+			 						echo '<span class="on-air-dj-sched">'.$weekday.', '.date( 'H:i', $showtimes[0] ).' - '.date( 'H:i', $showtimes[1] ).'</span><br />';
 			 					}
 
 
