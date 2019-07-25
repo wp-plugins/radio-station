@@ -1,4 +1,4 @@
-/* Table Style Gird */
+/* Table Style Grid */
 
 #master-program-schedule {
 	width: 100%;
@@ -22,6 +22,11 @@
 
 #master-program-schedule td div {
 	border-top: 1px solid #dddddd;
+}
+
+#master-program-schedule .master-program-hour div {
+	margin-top: -1em;
+	padding-bottom: 1em;
 }
 
 #master-program-schedule span.show-title,
