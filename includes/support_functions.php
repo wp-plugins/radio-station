@@ -18,17 +18,17 @@ function radio_station_current_schedule( $scheds = array() ) {
 		$start = strtotime( date( 'Y-m-d', $now ).$sched['start_hour'].':'.$sched['start_min'].' '.$sched['start_meridian'] );
 
 		if ( ( $sched['start_meridian'] == 'pm' ) && ( $sched['end_meridian'] == 'am') ) {
-			//check for shows that run overnight into the next morning
-			$end = strtotime(date('Y-m-d', ($now+86400)).$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian']);
+			// check for shows that run overnight into the next morning
+			$end = strtotime( date('Y-m-d', ($now + 86400) ).$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian']);
 		} else {
-			$end = strtotime(date('Y-m-d', $now).$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian']);
+			$end = strtotime( date('Y-m-d', $now ).$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian']);
 		}
 
 		// a show cannot end before it begins... if it does, it ends the following day.
 		if ( $end <= $start ) {$end = $end + 86400;}
 
 		// compare to the current timestamp
-		if ( $start <= $now && $end >= $now) {$current = $sched;}
+		if ( ( $start <= $now ) && ( $end >= $now ) ) {$current = $sched;}
 		else {continue;}
 	}
 
@@ -42,7 +42,7 @@ function radio_station_convert_time( $time = array() ) {
 
 	$now = strtotime( current_time( 'mysql' ) );
 	$curDate = date( 'Y-m-d', $now );
-	$tomDate = date( 'Y-m-d', ( $now + 86400) ); //get the date for tomorrow
+	$tomDate = date( 'Y-m-d', ( $now + 86400) ); // get the date for tomorrow
 
 	// convert to 24 hour time
 	$time = radio_station_convert_schedule_to_24hour( $time );
@@ -65,7 +65,7 @@ function radio_station_convert_time( $time = array() ) {
 	return $time;
 }
 
-// convert a shift to 24 hour time for display
+// --- convert a shift to 24 hour time for display ---
 function radio_station_convert_schedule_to_24hour( $sched = array() ) {
 
 	if ( empty( $sched ) ) {return false;}

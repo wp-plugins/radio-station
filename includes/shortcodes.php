@@ -254,27 +254,35 @@ function radio_station_shortcode_dj_on_air($atts) {
 				$dj_str .= '<span class="radio-clear"></span>';
 
 				if ( $show_sched ) {
+
 					$scheds = get_post_meta( $dj->ID, 'show_sched', true );
-					if ( !$show_all_sched ) { //if we only want the schedule that's relevant now to display...
+
+					// if we only want the schedule that's relevant now to display...
+					if ( !$show_all_sched ) {
+
 						$current_sched = radio_station_current_schedule( $scheds );
 
 						if ( $current_sched ) {
+							// 2.2.2: translate weekday for display
+							$display_day = radio_station_translate_weekday( $current_sched['day'] );
 							if ( $time == 12 ) {
-								$dj_str .= '<span class="on-air-dj-sched">'.__($current_sched['day'], 'radio-station').', '.$current_sched['start_hour'].':'.$current_sched['start_min'].' '.$current_sched['start_meridian'].'-'.$current_sched['end_hour'].':'.$current_sched['end_min'].' '.$current_sched['end_meridian'].'</span><br />';
+								$dj_str .= '<span class="on-air-dj-sched">'.$display_day.', '.$current_sched['start_hour'].':'.$current_sched['start_min'].' '.$current_sched['start_meridian'].' - '.$current_sched['end_hour'].':'.$current_sched['end_min'].' '.$current_sched['end_meridian'].'</span><br />';
 							} else {
 								$current_sched = radio_station_convert_schedule_to_24hour($current_sched);
-								$dj_str .= '<span class="on-air-dj-sched">'.__($current_sched['day'], 'radio-station').', '.$current_sched['start_hour'].':'.$current_sched['start_min'].' '.'-'.$current_sched['end_hour'].':'.$current_sched['end_min'].'</span><br />';
+								$dj_str .= '<span class="on-air-dj-sched">'.$display_day.', '.$current_sched['start_hour'].':'.$current_sched['start_min'].' - '.$current_sched['end_hour'].':'.$current_sched['end_min'].'</span><br />';
 							}
 						}
 
 					} else {
 
 						foreach ( $scheds as $sched ) {
+							// 2.2.2: translate weekday for display
+							$display_day = radio_station_translate_weekday( $sched['day'] );
 							if ( $time == 12 ) {
-								$dj_str .= '<span class="on-air-dj-sched">'.__($sched['day'], 'radio-station').', '.$sched['start_hour'].':'.$sched['start_min'].' '.$sched['start_meridian'].'-'.$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian'].'</span><br />';
+								$dj_str .= '<span class="on-air-dj-sched">'.$display_day.', '.$sched['start_hour'].':'.$sched['start_min'].' '.$sched['start_meridian'].' - '.$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian'].'</span><br />';
 							} else {
 								$sched = radio_station_convert_schedule_to_24hour( $sched );
-								$dj_str .= '<span class="on-air-dj-sched">'.__($sched['day'], 'radio-station').', '.$sched['start_hour'].':'.$sched['start_min'].' '.'-'.$sched['end_hour'].':'.$sched['end_min'].'</span><br />';
+								$dj_str .= '<span class="on-air-dj-sched">'.$display_day.', '.$sched['start_hour'].':'.$sched['start_min'].' - '.$sched['end_hour'].':'.$sched['end_min'].'</span><br />';
 							}
 						}
 					}
