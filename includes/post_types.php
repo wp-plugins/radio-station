@@ -278,14 +278,14 @@ function radio_station_myplaylist_inner_custom_box() {
               || isset( $track['playlist_entry_comments'] ) || isset( $track['playlist_entry_new'] )
               || isset( $track['playlist_entry_status'] ) ) {
 
-                echo '<tr>';
+                echo '<tr id="track-'.$c.'-rowa">';
                 echo '<td>'.$c.'</td>';
                 echo '<td><input type="text" name="playlist['.$c.'][playlist_entry_artist]" value="'.$track['playlist_entry_artist'].'" /></td>';
                 echo '<td><input type="text" name="playlist['.$c.'][playlist_entry_song]" value="'.$track['playlist_entry_song'].'" /></td>';
                 echo '<td><input type="text" name="playlist['.$c.'][playlist_entry_album]" value="'.$track['playlist_entry_album'].'" /></td>';
                 echo '<td><input type="text" name="playlist['.$c.'][playlist_entry_label]" value="'.$track['playlist_entry_label'].'" /></td>';
 
-				echo '</tr><tr>';
+				echo '</tr><tr id="track-'.$c.'-rowb">';
 
                 echo '<td colspan="3">'.__('Comments', 'radio-station').' ';
                 echo '<input type="text" name="playlist['.$c.'][playlist_entry_comments]" value="'.$track['playlist_entry_comments'].'" style="width:320px;"></td>';
@@ -306,7 +306,7 @@ function radio_station_myplaylist_inner_custom_box() {
 
                 echo '</select></td>';
 
-                echo '<td align="right"><span class="remove button-secondary" style="cursor: pointer;">'.__('Remove', 'radio-station').'</span></td>';
+                echo '<td align="right"><span id="track-'.$c.'" class="remove button-secondary" style="cursor: pointer;">'.__('Remove', 'radio-station').'</span></td>';
                 echo '</tr>';
                 $c++;
             }
@@ -321,28 +321,31 @@ function radio_station_myplaylist_inner_custom_box() {
     var shiftadda = jQuery.noConflict();
     shiftadda(document).ready(function() {
         var count = <?php echo $c; ?>;
-        shiftadda(".add").click(function() {
+        shiftadda('.add').click(function() {
 
-			output = '<tr><td>'+count+'</td>';
-			output += '<td><input type="text" name="playlist['+count+'][playlist_entry_artist]" value="" /></td>';
-			output += '<td><input type="text" name="playlist['+count+'][playlist_entry_song]" value="" /></td>';
-			output += '<td><input type="text" name="playlist['+count+'][playlist_entry_album]" value="" /></td>';
-			output += '<td><input type="text" name="playlist['+count+'][playlist_entry_label]" value="" /></td>';
-			output += '</tr><tr>';
-			output += '<td colspan="3"><?php echo __( 'Comments', 'radio-station' ); ?>: <input type="text" name="playlist['+count+'][playlist_entry_comments]" value="" style="width:320px;"></td>';
-			output += '<td><?php echo __( 'New', 'radio-station' ); ?>: <input type="checkbox" name="playlist['+count+'][playlist_entry_new]" />';
-			output += ' <?php echo __( 'Status', 'radio-station' ); ?>: <select name="playlist['+count+'][playlist_entry_status]">';
-			output += '<option value="queued"><?php _e( 'Queued', 'radio-station' ); ?></option>';
-			output += '<option value="played"><?php _e( 'Played', 'radio-station' ); ?></option>';
-			output += '</select></td>';
-			output += '<td align="right"><span class="remove button-secondary" style="cursor: pointer;"><?php _e( 'Remove', 'radio-station' ); ?></span></td></tr>';
+			output = '<tr id="track-'+count+'-rowa"><td>'+count+'</td>';
+				output += '<td><input type="text" name="playlist['+count+'][playlist_entry_artist]" value="" /></td>';
+				output += '<td><input type="text" name="playlist['+count+'][playlist_entry_song]" value="" /></td>';
+				output += '<td><input type="text" name="playlist['+count+'][playlist_entry_album]" value="" /></td>';
+				output += '<td><input type="text" name="playlist['+count+'][playlist_entry_label]" value="" /></td>';
+			output += '</tr><tr id="track-'+count+'-rowb">';
+				output += '<td colspan="3"><?php echo __( 'Comments', 'radio-station' ); ?>: <input type="text" name="playlist['+count+'][playlist_entry_comments]" value="" style="width:320px;"></td>';
+				output += '<td><?php echo __( 'New', 'radio-station' ); ?>: <input type="checkbox" name="playlist['+count+'][playlist_entry_new]" />';
+				output += ' <?php echo __( 'Status', 'radio-station' ); ?>: <select name="playlist['+count+'][playlist_entry_status]">';
+					output += '<option value="queued"><?php _e( 'Queued', 'radio-station' ); ?></option>';
+					output += '<option value="played"><?php _e( 'Played', 'radio-station' ); ?></option>';
+				output += '</select></td>';
+				output += '<td align="right"><span id="track-'+count+'" class="remove button-secondary" style="cursor: pointer;"><?php _e( 'Remove', 'radio-station' ); ?></span></td>';
+			output += '</tr>';
 
         	shiftadda('#here').append(output);
             count = count + 1;
             return false;
         });
-        shiftadda(".remove").live('click', function() {
-        	shiftadda(this).parent().parent().remove();
+        shiftadda('.remove').live('click', function() {
+        	rowid = shiftadda(this).attr('id');
+        	shiftadda('#'+rowid+'-rowa').remove();
+        	shiftadda('#'+rowid+'-rowb').remove();
         });
     });
     </script>
