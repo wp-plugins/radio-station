@@ -275,7 +275,7 @@ function radio_station_master_schedule( $atts ) {
 		}
 		$output .= '</div>';
 
-		foreach($master_list as $hour => $days) {
+		foreach ($master_list as $hour => $days) {
 
 			$output .= '<div class="master-schedule-'.$hour.' master-schedule-hour">';
 
@@ -430,7 +430,7 @@ function radio_station_master_schedule( $atts ) {
 		foreach ( $master_list as $hour => $days ) {
 
 			$output .= '<tr>';
-			$output .= '<th class="master-program-hour">';
+			$output .= '<th class="master-program-hour"><div>';
 
 			if ( $timeformat == 12 ) {
 				if ( $hour == 0 ) {$output .= '12am';}
@@ -442,7 +442,7 @@ function radio_station_master_schedule( $atts ) {
 				$output .= $hour.":00";
 			}
 
-			$output .= '</th>';
+			$output .= '</div></th>';
 
 			$curskip = $nextskip;
 			$nextskip = array();
