@@ -706,7 +706,7 @@ function radio_station_myplaylist_inner_user_custom_box() {
 	// check for roles that have the edit_shows capability enabled
 	$add_roles = array( 'dj' );
 	foreach ( $wp_roles->roles as $name => $role ) {
-		foreach($role['capabilities'] as $capname => $capstatus) {
+		foreach( $role['capabilities'] as $capname => $capstatus ) {
 			if ( ( $capname == 'edit_shows' ) && ( ( $capstatus == 1 ) || ( $capstatus == true ) ) ) {
 				$add_roles[] = $name;
 			}
@@ -718,9 +718,9 @@ function radio_station_myplaylist_inner_user_custom_box() {
 	$meta_query = array( 'relation' => 'OR' );
 	foreach ( $add_roles as $role ) {
 		$meta_query[] = array(
-			'key' => $wpdb->prefix.'capabilities',
-			'value' => $role,
-			'compare' => 'like'
+			'key'		=> $wpdb->prefix.'capabilities',
+			'value'		=> $role,
+			'compare'	=> 'like'
 		);
 	}
 
@@ -729,25 +729,21 @@ function radio_station_myplaylist_inner_user_custom_box() {
 		'meta_query' => $meta_query,
 		'orderby' => 'display_name',
 		'order' => 'ASC',
-		//'fields' => array('ID, display_name'),
+		//' fields' => array( 'ID, display_name' ),
 	);
 	$users = get_users( $args );
 
 	// get the DJs currently assigned to the show
-	$current = get_post_meta( $post->ID, 'show_user_list', true);
+	$current = get_post_meta( $post->ID, 'show_user_list', true );
 	if ( !$current ) {$current = array();}
 
 	// move any selected DJs to the top of the list
 	foreach ( $users as $i => $dj ) {
-    	if ( in_array($dj->ID, $current ) ) {
-    		unset( $users[$i] ); //unset first, or prepending will change the index numbers and cause you to delete the wrong item
-    		array_unshift( $users, $dj );  //prepend the user to the beginning of the array
+    	if ( in_array( $dj->ID, $current ) ) {
+    		unset( $users[$i] ); // unset first, or prepending will change the index numbers and cause you to delete the wrong item
+    		array_unshift( $users, $dj );  // prepend the user to the beginning of the array
     	}
 	}
-
-	// 2.2.2: set DJ display name maybe with username
-	$display_name = $dj->display_name;
-	if ( $dj->display_name != $dj->user_login ) {$display_name .= '('.$dj->user_login.')';}
 
 	// 2.2.2: fix to make DJ multi-select input full metabox width
 	?>
@@ -757,6 +753,9 @@ function radio_station_myplaylist_inner_user_custom_box() {
     	<option value=""></option>
     <?php
     	foreach( $users as $dj ) {
+    		// 2.2.2: set DJ display name maybe with username
+			$display_name = $dj->display_name;
+			if ( $dj->display_name != $dj->user_login ) {$display_name .= ' ('.$dj->user_login.')';}
     		if ( in_array( $dj->ID, $current ) ) {$selected = ' selected="selected"';} else {$selected = '';}
     		echo '<option value="'.$dj->ID.'"'.$selected.'>'.$display_name.'</option>';
     	}
