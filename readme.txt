@@ -246,8 +246,9 @@ you send me your finished translation, I'd love to include it.
 * added simple Patreon supporter image button and blurb
 * added filter for DJ Avatar size on Author page template
 * fix to Schedule Override metabox value saving
-* fix to Playlist track list overflowing metabox
-* fix to missing day of week headings in Master Schedule
+* fix to Playlist track list items overflowing metabox
+* fix to shift up time row on Master Schedule table view
+* fix to missing weekday headings in Master Schedule table
 * fix to weekday display for Upcoming DJ Widget
 * fix to user display labels on select DJ metabox
 * fix to file_exists check for DJ on Air stylesheet path
