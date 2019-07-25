@@ -275,7 +275,7 @@ function radio_station_master_schedule( $atts ) {
 		}
 		$output .= '</div>';
 
-		foreach($master_list as $hour => $days) {
+		foreach ($master_list as $hour => $days) {
 
 			$output .= '<div class="master-schedule-'.$hour.' master-schedule-hour">';
 
@@ -430,7 +430,7 @@ function radio_station_master_schedule( $atts ) {
 		foreach ( $master_list as $hour => $days ) {
 
 			$output .= '<tr>';
-			$output .= '<th class="master-program-hour">';
+			$output .= '<th class="master-program-hour"><div>';
 
 			if ( $timeformat == 12 ) {
 				if ( $hour == 0 ) {$output .= '12am';}
@@ -442,7 +442,7 @@ function radio_station_master_schedule( $atts ) {
 				$output .= $hour.":00";
 			}
 
-			$output .= '</th>';
+			$output .= '</div></th>';
 
 			$curskip = $nextskip;
 			$nextskip = array();
@@ -607,9 +607,8 @@ function radio_station_master_fetch_js_filter(){
 	$taxes = get_terms( 'genres', array('hide_empty' => true, 'orderby' => 'name', 'order' => 'ASC') );
 	foreach ( $taxes as $i => $tax ) {
 		$js .= '<a href="javascript:show_highlight(\''.sanitize_title_with_dashes($tax->name).'\')">'.$tax->name.'</a>';
-		if($i < count($taxes)) {
-			$js .= ' | ';
-		}
+		// 2.2.2: fix to not add pipe suffix for last genre
+		if ( $i != ( count($taxes) - 1 ) ) {$js .= ' | ';}
 	}
 
 	$js .= '</div>';

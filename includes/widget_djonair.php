@@ -134,8 +134,8 @@ class DJ_Widget extends WP_Widget {
  		$time = empty( $instance['time'] ) ? '' : $instance['time'];
  		$show_sched = $instance['show_sched'];
  		$show_playlist = $instance['show_playlist'];
- 		$show_all_sched = isset( $instance['show_all_sched'] ) ? $instance['show_all_sched'] : false; //keep the default settings for people updating from 1.6.2 or earlier
- 		$show_desc = isset( $instance['show_desc'] ) ? $instance['show_desc'] : false; //keep the default settings for people updating from 2.0.12 or earlier
+ 		$show_all_sched = isset( $instance['show_all_sched'] ) ? $instance['show_all_sched'] : false; // keep the default settings for people updating from 1.6.2 or earlier
+ 		$show_desc = isset( $instance['show_desc'] ) ? $instance['show_desc'] : false; // keep the default settings for people updating from 2.0.12 or earlier
 
  		// fetch the current DJs
 		$djs = radio_station_dj_get_current();
@@ -245,26 +245,33 @@ class DJ_Widget extends WP_Widget {
 
 							if ( $show_sched ) {
 
+								// if we only want the schedule that's relevant now to display...
 								if ( !$show_all_sched ) {
-								    // if we only want the schedule that's relevant now to display...
-									$current_sched = radio_station_current_schedule($scheds);
+
+									$current_sched = radio_station_current_schedule( $scheds );
 
 									if ( $current_sched ) {
+										// 2.2.2: translate weekday for display
+										$display_day = radio_station_translate_weekday( $current_sched['day'] );
 										if ( $time == 12 ) {
-											echo '<span class="on-air-dj-sched">'.__($current_sched['day'], 'radio-station').', '.$current_sched['start_hour'].':'.$current_sched['start_min'].' '.$current_sched['start_meridian'].'-'.$current_sched['end_hour'].':'.$current_sched['end_min'].' '.$current_sched['end_meridian'].'</span><br />';
+											echo '<span class="on-air-dj-sched">'.$display_day.', '.$current_sched['start_hour'].':'.$current_sched['start_min'].' '.$current_sched['start_meridian'].' - '.$current_sched['end_hour'].':'.$current_sched['end_min'].' '.$current_sched['end_meridian'].'</span><br />';
 										} else {
-											$current_sched = radio_station_convert_schedule_to_24hour($current_sched);
-											echo '<span class="on-air-dj-sched">'.__($current_sched['day'], 'radio-station').', '.$current_sched['start_hour'].':'.$current_sched['start_min'].' '.'-'.$current_sched['end_hour'].':'.$current_sched['end_min'].'</span><br />';
+											$current_sched = radio_station_convert_schedule_to_24hour( $current_sched );
+											echo '<span class="on-air-dj-sched">'.$display_day.', '.$current_sched['start_hour'].':'.$current_sched['start_min'].' - '.$current_sched['end_hour'].':'.$current_sched['end_min'].'</span><br />';
 										}
 									}
+
 								} else {
 
 									foreach ( $scheds as $sched ) {
+
+										// 2.2.2: translate weekday for display
+										$display_day = radio_station_translate_weekday( $sched['day'] );
 										if ( $time == 12 ) {
-											echo '<span class="on-air-dj-sched">'.__($sched['day'], 'radio-station').', '.$sched['start_hour'].':'.$sched['start_min'].' '.$sched['start_meridian'].'-'.$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian'].'</span><br />';
+											echo '<span class="on-air-dj-sched">'.$display_day.', '.$sched['start_hour'].':'.$sched['start_min'].' '.$sched['start_meridian'].' - '.$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian'].'</span><br />';
 										} else {
-											$sched = radio_station_convert_schedule_to_24hour($sched);
-											echo '<span class="on-air-dj-sched">'.__($sched['day'], 'radio-station').', '.$sched['start_hour'].':'.$sched['start_min'].' '.'-'.$sched['end_hour'].':'.$sched['end_min'].'</span><br />';
+											$sched = radio_station_convert_schedule_to_24hour( $sched );
+											echo '<span class="on-air-dj-sched">'.$display_day.', '.$sched['start_hour'].':'.$sched['start_min'].' - '.$sched['end_hour'].':'.$sched['end_min'].'</span><br />';
 										}
 									}
 								}

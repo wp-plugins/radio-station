@@ -188,7 +188,7 @@ function radio_station_set_roles() {
 		'delete_posts'				=> true
 	);
 	// $wp_roles->remove_role('dj'); // we need this here in case we ever update the capabilities list
-	// ? translate role name ?
+	// TODO: translate role name ?
 	$wp_roles->add_role( 'dj', 'DJ', $caps );
 
 	// grant all new capabilities to admin users
