@@ -18,7 +18,7 @@ get_header(); ?>
 					<h1 class="page-title author"><?php echo $curauth->display_name; ?></h1>
 				</header>
 
-				<?php $avatar_size = apply_filters( 'radio_station_dj_avatar_size', 50 );
+				<?php $avatar_size = apply_filters( 'radio_station_dj_avatar_size', 50 ); ?>
 				<div id="author-avatar"><?php echo get_avatar( $curauth->ID, $avatar_size ); ?></div>
 				<div id="author-description">
 
