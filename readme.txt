@@ -238,6 +238,13 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 2.2.3 =
+* added flush rewrite rules on plugin activation/deactivation
+* added show_admin_column and show_in_quick_edit for Genres
+* added show metadata and schedule value sanitization
+* fix to 00 minute validation for Schedule Override
+* convert span tags to div tags in Widgets to fix line breaks
+
 = 2.2.2 =
 * shift main playlist and show metaboxes above editor
 * set plugin custom post types editor to Classic Editor
