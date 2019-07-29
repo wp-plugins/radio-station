@@ -96,6 +96,19 @@ function radio_station_convert_schedule_to_24hour( $sched = array() ) {
 // --- fetch the current DJ(s) on-air --
 function radio_station_dj_get_current() {
 
+	// first check to see if there are any shift overrides
+	$check = radio_station_master_get_overrides(true);
+
+	if ( $check ) {
+		$shows = array(
+			'all'	=> $check,
+			'type'	=> 'override'
+		);
+
+		// at this point, we are done.  Return the info.
+		return $shows;
+	}
+
 	// load the info for the DJ
 	global $wpdb;
 
@@ -106,18 +119,6 @@ function radio_station_dj_get_current() {
 	$min = date( 'i', $now );
 	$curDay = date( 'l', $now );
 	$curDate = date( 'Y-m-d', $now );
-
-	// first check to see if there are any shift overrides
-	$check = radio_station_master_get_overrides(true);
-
-	if ( $check ) {
-		$shows = array();
-		$shows['all'] = $check;
-		$shows['type'] = 'override';
-
-		// at this point, we are done.  Return the info.
-		return $shows;
-	}
 
 	// then check to see if a show is scheduled
 	// $show_shifts = $wpdb->get_results("SELECT `meta`.`post_id`, `meta`.`meta_value` FROM ".$wpdb->prefix."postmeta AS `meta`

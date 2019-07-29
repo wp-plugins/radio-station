@@ -5,11 +5,11 @@
  */
 class DJ_Widget extends WP_Widget {
 
-	// use __contruct instead of DJ_Widget
+	// --- use __contruct instead of DJ_Widget ---
 	function __construct() {
 		$widget_ops = array( 'classname' => 'DJ_Widget', 'description' => __('The current on-air DJ.', 'radio-station') );
-		// $this->WP_Widget( 'DJ_Widget', __('Radio Station: Show/DJ On-Air', 'radio-station'), $widget_ops );
-		parent::__construct( 'DJ_Widget', __('Radio Station: Show/DJ On-Air', 'radio-station' ), $widget_ops );
+		$widget_display_name = __('(Radio Station) Show/DJ On-Air', 'radio-station' );
+		parent::__construct( 'DJ_Widget', $widget_display_name, $widget_ops );
 	}
 
 	// --- widget instance form ---
@@ -137,9 +137,11 @@ class DJ_Widget extends WP_Widget {
  		$show_all_sched = isset( $instance['show_all_sched'] ) ? $instance['show_all_sched'] : false; // keep the default settings for people updating from 1.6.2 or earlier
  		$show_desc = isset( $instance['show_desc'] ) ? $instance['show_desc'] : false; // keep the default settings for people updating from 2.0.12 or earlier
 
- 		// fetch the current DJs
+ 		// --- fetch the current DJs and playlist ---
 		$djs = radio_station_dj_get_current();
 		$playlist = radio_station_myplaylist_get_now_playing();
+
+		// 2.2.3: convert all span tags to div tags
 
 		?>
 		<div class="widget">
@@ -151,44 +153,46 @@ class DJ_Widget extends WP_Widget {
 			<ul class="on-air-list">
 				<?php
 
-				// find out which DJ/show is currently scheduled to be on-air and display them
+				// --- find out which DJ/show is currently scheduled to be on-air and display them ---
 				if ( $djs['type'] == 'override' ) {
-					//print_r($djs);
+
+					// print_r($djs);
 					echo '<li class="on-air-dj">';
 
-					if ( $djavatar ) {
-						if ( has_post_thumbnail($djs['all'][0]['post_id']) ) {
-							echo '<span class="on-air-dj-avatar">'.get_the_post_thumbnail( $djs['all'][0]['post_id'], 'thumbnail' ).'</span>';
-						}
-					}
-
-					echo $djs['all'][0]['title'];
-
-					// display the schedule override if requested
-					if ( $show_sched ) {
-
-						if ( $time == 12 ) {
-							$start_hour = $djs['all'][0]['sched']['start_hour'];
-							if ( substr( $djs['all'][0]['sched']['start_hour'], 0, 1 ) === '0' ) {
-								$start_hour = substr($djs['all'][0]['sched']['start_hour'], 1);
+						if ( $djavatar ) {
+							if ( has_post_thumbnail($djs['all'][0]['post_id']) ) {
+								echo '<div class="on-air-dj-avatar">'.get_the_post_thumbnail( $djs['all'][0]['post_id'], 'thumbnail' ).'</div>';
 							}
-
-							$end_hour = $djs['all'][0]['sched']['end_hour'];
-							if ( substr( $djs['all'][0]['sched']['end_hour'], 0, 1) === '0' ) {
-								$end_hour = substr($djs['all'][0]['sched']['end_hour'], 1);
-							}
-
-							echo ' <span class="on-air-dj-sched">'.$start_hour.':'.$djs['all'][0]['sched']['start_min'].' '.$djs['all'][0]['sched']['start_meridian'].'-'.$end_hour.':'.$djs['all'][0]['sched']['end_min'].' '.$djs['all'][0]['sched']['end_meridian'].'</span><br />';
-
-						} else {
-
-							$djs['all'][0]['sched'] = radio_station_convert_schedule_to_24hour($djs['all'][0]['sched']);
-							echo ' <span class="on-air-dj-sched">'.$djs['all'][0]['sched']['start_hour'].':'.$djs['all'][0]['sched']['start_min'].' '.'-'.$djs['all'][0]['sched']['end_hour'].':'.$djs['all'][0]['sched']['end_min'].'</span><br />';
-
 						}
 
-						echo '</li>';
-					}
+						// --- show title ---
+						echo '<div class="on-air-dj-title">'.$djs['all'][0]['title'].'</div>';
+
+						// --- display the schedule override if requested ---
+						if ( $show_sched ) {
+
+							if ( $time == 12 ) {
+								$start_hour = $djs['all'][0]['sched']['start_hour'];
+								if ( substr( $djs['all'][0]['sched']['start_hour'], 0, 1 ) === '0' ) {
+									$start_hour = substr($djs['all'][0]['sched']['start_hour'], 1);
+								}
+
+								$end_hour = $djs['all'][0]['sched']['end_hour'];
+								if ( substr( $djs['all'][0]['sched']['end_hour'], 0, 1) === '0' ) {
+									$end_hour = substr($djs['all'][0]['sched']['end_hour'], 1);
+								}
+
+								echo '<div class="on-air-dj-sched">'.$start_hour.':'.$djs['all'][0]['sched']['start_min'].' '.$djs['all'][0]['sched']['start_meridian'].' - '.$end_hour.':'.$djs['all'][0]['sched']['end_min'].' '.$djs['all'][0]['sched']['end_meridian'].'</div>';
+
+							} else {
+
+								$djs['all'][0]['sched'] = radio_station_convert_schedule_to_24hour($djs['all'][0]['sched']);
+								echo '<div class="on-air-dj-sched">'.$djs['all'][0]['sched']['start_hour'].':'.$djs['all'][0]['sched']['start_min'].' '.'-'.$djs['all'][0]['sched']['end_hour'].':'.$djs['all'][0]['sched']['end_min'].'</div>';
+
+							}
+						}
+
+					echo '</li>';
 
 				} else {
 
@@ -198,84 +202,92 @@ class DJ_Widget extends WP_Widget {
 							$scheds = get_post_meta( $dj->ID, 'show_sched', true );
 
 							echo '<li class="on-air-dj">';
-							if ( $djavatar ) {
-								echo '<span class="on-air-dj-avatar">'.get_the_post_thumbnail( $dj->ID, 'thumbnail' ).'</span>';
-							}
 
-							if ( $link ) {
-								echo '<a href="'.get_permalink( $dj->ID ).'">'.$dj->post_title.'</a>';
-							} else {
-								echo $dj->post_title;
-							}
-
-							if ( $display_djs ) {
-
-								$names = get_post_meta( $dj->ID, 'show_user_list', true );
-								$count = 0;
-
-								if ( $names ) {
-
-									echo '<div class="on-air-dj-names">'.__( 'With', 'radio-station' ).' ';
-									foreach( $names as $name ) {
-										$count ++;
-										$user_info = get_userdata($name);
-
-										echo $user_info->display_name;
-
-										if ( ( ( $count == 1 ) && ( count($names) == 2 ) )
-										  || ( ( count($names) > 2 ) && ( $count == ( count($names) - 1 ) ) ) ) {
-											echo ' and ';
-										} elseif ( ( $count < count($names) ) && ( count($names) > 2 ) ) {
-											echo ', ';
-										}
-									}
-									echo '</div>';
+								// --- show thumbnail ---
+								if ( $djavatar ) {
+									echo '<div class="on-air-dj-avatar">'.get_the_post_thumbnail( $dj->ID, 'thumbnail' ).'</div><br>';
 								}
-							}
 
-							if ( $show_desc ) {
-								$desc_string = radio_station_shorten_string( strip_tags( $dj->post_content ), 20 );
-								echo '<span class="on-air-show-desc">'.$desc_string.'</span>';
-							}
+								// --- show title ---
+								echo '<div class="on-air-dj-title">';
+									if ( $link ) {echo '<a href="'.get_permalink( $dj->ID ).'">'.$dj->post_title.'</a>';}
+									else {echo $dj->post_title;}
+								echo '</div>';
 
-							if ( $show_playlist ) {
-								echo '<span class="on-air-dj-playlist"><a href="'.$playlist['playlist_permalink'].'">'.__('View Playlist', 'radio-station').'</a></span>';
-							}
-							echo '<span class="radio-clear"></span>';
+								// --- DJ names ---
+								if ( $display_djs ) {
 
-							if ( $show_sched ) {
+									$names = get_post_meta( $dj->ID, 'show_user_list', true );
+									$count = 0;
 
-								// if we only want the schedule that's relevant now to display...
-								if ( !$show_all_sched ) {
+									if ( $names ) {
 
-									$current_sched = radio_station_current_schedule( $scheds );
+										echo '<div class="on-air-dj-names">'.__( 'With', 'radio-station' ).' ';
+										foreach( $names as $name ) {
+											$count ++;
+											$user_info = get_userdata($name);
 
-									if ( $current_sched ) {
-										// 2.2.2: translate weekday for display
-										$display_day = radio_station_translate_weekday( $current_sched['day'] );
-										if ( $time == 12 ) {
-											echo '<span class="on-air-dj-sched">'.$display_day.', '.$current_sched['start_hour'].':'.$current_sched['start_min'].' '.$current_sched['start_meridian'].' - '.$current_sched['end_hour'].':'.$current_sched['end_min'].' '.$current_sched['end_meridian'].'</span><br />';
-										} else {
-											$current_sched = radio_station_convert_schedule_to_24hour( $current_sched );
-											echo '<span class="on-air-dj-sched">'.$display_day.', '.$current_sched['start_hour'].':'.$current_sched['start_min'].' - '.$current_sched['end_hour'].':'.$current_sched['end_min'].'</span><br />';
+											echo $user_info->display_name;
+
+											if ( ( ( $count == 1 ) && ( count($names) == 2 ) )
+											  || ( ( count($names) > 2 ) && ( $count == ( count($names) - 1 ) ) ) ) {
+												echo ' and ';
+											} elseif ( ( $count < count($names) ) && ( count($names) > 2 ) ) {
+												echo ', ';
+											}
 										}
-									}
-
-								} else {
-
-									foreach ( $scheds as $sched ) {
-
-										// 2.2.2: translate weekday for display
-										$display_day = radio_station_translate_weekday( $sched['day'] );
-										if ( $time == 12 ) {
-											echo '<span class="on-air-dj-sched">'.$display_day.', '.$sched['start_hour'].':'.$sched['start_min'].' '.$sched['start_meridian'].' - '.$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian'].'</span><br />';
-										} else {
-											$sched = radio_station_convert_schedule_to_24hour( $sched );
-											echo '<span class="on-air-dj-sched">'.$display_day.', '.$sched['start_hour'].':'.$sched['start_min'].' - '.$sched['end_hour'].':'.$sched['end_min'].'</span><br />';
-										}
+										echo '</div>';
 									}
 								}
-							}
+
+								// --- show description ---
+								if ( $show_desc ) {
+									$desc_string = radio_station_shorten_string( strip_tags( $dj->post_content ), 20 );
+									echo '<div class="on-air-show-desc">'.$desc_string.'</div>';
+								}
+
+								// --- playlist link ---
+								if ( $show_playlist ) {
+									echo '<div class="on-air-dj-playlist"><a href="'.$playlist['playlist_permalink'].'">'.__('View Playlist', 'radio-station').'</a></div>';
+								}
+
+								echo '<span class="radio-clear"></span>';
+
+								// --- show schedule ---
+								if ( $show_sched ) {
+
+									// --- if we only want the schedule that's relevant now to display ---
+									if ( !$show_all_sched ) {
+
+										$current_sched = radio_station_current_schedule( $scheds );
+
+										if ( $current_sched ) {
+											// 2.2.2: translate weekday for display
+											$display_day = radio_station_translate_weekday( $current_sched['day'] );
+											if ( $time == 12 ) {
+												echo '<div class="on-air-dj-sched">'.$display_day.', '.$current_sched['start_hour'].':'.$current_sched['start_min'].' '.$current_sched['start_meridian'].' - '.$current_sched['end_hour'].':'.$current_sched['end_min'].' '.$current_sched['end_meridian'].'</div>';
+											} else {
+												$current_sched = radio_station_convert_schedule_to_24hour( $current_sched );
+												echo '<div class="on-air-dj-sched">'.$display_day.', '.$current_sched['start_hour'].':'.$current_sched['start_min'].' - '.$current_sched['end_hour'].':'.$current_sched['end_min'].'</div>';
+											}
+										}
+
+									} else {
+
+										foreach ( $scheds as $sched ) {
+
+											// 2.2.2: translate weekday for display
+											$display_day = radio_station_translate_weekday( $sched['day'] );
+											if ( $time == 12 ) {
+												echo '<div class="on-air-dj-sched">'.$display_day.', '.$sched['start_hour'].':'.$sched['start_min'].' '.$sched['start_meridian'].' - '.$sched['end_hour'].':'.$sched['end_min'].' '.$sched['end_meridian'].'</div>';
+											} else {
+												$sched = radio_station_convert_schedule_to_24hour( $sched );
+												echo '<div class="on-air-dj-sched">'.$display_day.', '.$sched['start_hour'].':'.$sched['start_min'].' - '.$sched['end_hour'].':'.$sched['end_min'].'</div>';
+											}
+										}
+									}
+								}
+
 							echo '</li>';
 
 						}
@@ -297,7 +309,8 @@ class DJ_Widget extends WP_Widget {
  			$version = filemtime( $dj_widget_css );
  			$url = get_stylesheet_directory_uri().'/djonair.css';
  		} else {
- 			$version = filemtime( dirname(__FILE__).'/css/djonair.css' );
+ 			// 2.2.3: fix to version path check also
+ 			$version = filemtime( dirname(dirname(__FILE__)).'/css/djonair.css' );
  			$url = plugins_url('css/djonair.css', dirname(dirname(__FILE__)).'/radio-station.php' );
 		}
 		wp_enqueue_style( 'dj-widget', $url, array(), $version, true );

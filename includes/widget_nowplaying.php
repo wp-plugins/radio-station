@@ -5,11 +5,11 @@
  */
 class Playlist_Widget extends WP_Widget {
 
-	// use __constuct instead of Playlist_Widget
+	// --- use __constuct instead of Playlist_Widget ---
 	function __construct() {
-		$widget_ops = array('classname' => 'Playlist_Widget', 'description' => __('Display the current song.', 'radio-station'));
-		// $this->WP_Widget('Playlist_Widget', __('Radio Station: Now Playing', 'radio-station'), $widget_ops);
-		parent::__construct('Playlist_Widget', __('Radio Station: Now Playing', 'radio-station' ), $widget_ops );
+		$widget_ops = array( 'classname' => 'Playlist_Widget', 'description' => __('Display the current song.', 'radio-station') );
+		$widget_display_name = __('(Radio Station) Now Playing', 'radio-station' );
+		parent::__construct('Playlist_Widget', $widget_display_name, $widget_ops );
 	}
 
 	// --- widget instance form ---
@@ -113,33 +113,36 @@ class Playlist_Widget extends WP_Widget {
 
 					echo '<div id="myplaylist-nowplaying"'.$class.'>';
 
-					if ( $song ) {
-						echo '<span class="myplaylist-song">'.$most_recent['playlist_entry_song'].'</span> ';
-					}
+						// 2.2.3: convert span tags to div tags
+						if ( $song ) {
+							echo '<div class="myplaylist-song">'.$most_recent['playlist_entry_song'].'</div> ';
+						}
 
-					if ( $artist ) {
-						echo '<span class="myplaylist-artist">'.$most_recent['playlist_entry_artist'].'</span> ';
-					}
+						if ( $artist ) {
+							echo '<div class="myplaylist-artist">'.$most_recent['playlist_entry_artist'].'</div> ';
+						}
 
-					if ( $album ) {
-						echo '<span class="myplaylist-album">'.$most_recent['playlist_entry_album'].'</span> ';
-					}
+						if ( $album ) {
+							echo '<div class="myplaylist-album">'.$most_recent['playlist_entry_album'].'</div> ';
+						}
 
-					if ( $label ) {
-						echo '<span class="myplaylist-label">'.$most_recent['playlist_entry_label'].'</span> ';
-					}
+						if ( $label ) {
+							echo '<div class="myplaylist-label">'.$most_recent['playlist_entry_label'].'</div> ';
+						}
 
-					if ( $comments ) {
-						echo '<span class="myplaylist-comments">'.$most_recent['playlist_entry_comments'].'</span> ';
-					}
+						if ( $comments ) {
+							echo '<div class="myplaylist-comments">'.$most_recent['playlist_entry_comments'].'</div> ';
+						}
 
-					echo '<span class="myplaylist-link">';
-					echo '<a href="'.$most_recent['playlist_permalink'].'">'.__('View Playlist', 'radio-station').'</a>';
-					echo '</span>';
+						echo '<div class="myplaylist-link">';
+							echo '<a href="'.$most_recent['playlist_permalink'].'">'.__('View Playlist', 'radio-station').'</a>';
+						echo '</div>';
+
 					echo '</div>';
 
 				} else {
-					echo 'No playlists available.';
+					// 2.2.3: added missing translation wrapper
+					echo '<div>'.__('No playlists available.','radio-station').'</div>';
 				}
 
 			?>
