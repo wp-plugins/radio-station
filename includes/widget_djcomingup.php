@@ -7,9 +7,9 @@ class DJ_Upcoming_Widget extends WP_Widget {
 
 	// use __construct instead of DJ_Upcoming_Widget
 	function __construct() {
-		$widget_ops = array('classname' => 'DJ_Upcoming_Widget', 'description' => __('The upcoming DJs/Shows.', 'radio-station'));
-		// $this->WP_Widget('DJ_Upcoming_Widget', __('Radio Station: Upcoming DJ On-Air', 'radio-station'), $widget_ops);
-		parent::__construct('DJ_Upcoming_Widget', __('Radio Station: Upcoming DJ On-Air', 'radio-station' ), $widget_ops );
+		$widget_ops = array( 'classname' => 'DJ_Upcoming_Widget', 'description' => __('The upcoming DJs/Shows.', 'radio-station') );
+		$widget_display_name = __( '(Radio Station) Upcoming DJ On-Air', 'radio-station' );
+		parent::__construct('DJ_Upcoming_Widget', $widget_display_name, $widget_ops );
 	}
 
 	// --- widget instance form ---
@@ -116,110 +116,121 @@ class DJ_Upcoming_Widget extends WP_Widget {
  		$time = empty( $instance['time'] ) ? '' : $instance['time'];
  		$show_sched = $instance['show_sched'];
 
- 		// find out which DJ(s) are coming up today
+ 		// --- find out which DJ(s) are coming up today ---
  		$djs = radio_station_dj_get_next($limit);
-
  		// print_r($djs);
+
+		// 2.2.3: convert all span tags to div tags
 
  		?>
 
  		<div class="widget">
  		<?php
+ 		// --- output widget title ---
  		if ( !empty( $title ) ) {echo $before_title.$title.$after_title;}
  		else {echo $before_title.$after_title;}
  		?>
  		<ul class="on-air-upcoming-list">
+
 			<?php
-		 		// echo the show/dj currently on-air
+		 		// --- echo the show/dj currently on-air ---
+
 		 		if ( isset($djs['all']) && ( count($djs['all']) > 0 ) ) {
 		 			//print_r($djs['all']);
 
 		 			foreach ( $djs['all'] as $showtime => $dj ) {
 
 		 				if ( is_array($dj) && $dj['type'] == 'override' ) {
+
 		 					echo '<li class="on-air-dj">';
 
-		 					if ( $djavatar ) {
-		 						if ( has_post_thumbnail($dj['post_id'] ) ) {
-		 							echo '<span class="on-air-dj-avatar">'.get_the_post_thumbnail( $dj['post_id'], 'thumbnail' ).'</span>';
-		 						}
-		 					}
+								// --- show thumbnail ---
+								if ( $djavatar ) {
+									if ( has_post_thumbnail($dj['post_id'] ) ) {
+										echo '<div class="on-air-dj-avatar">'.get_the_post_thumbnail( $dj['post_id'], 'thumbnail' ).'</div>';
+									}
+								}
 
-		 					echo $dj['title'];
+								// --- show title ---
+								echo '<div class="on-air-dj-title">'.$dj['title'].'</div>';
 
-		 					if ( $show_sched ) {
+								// --- show schedule ---
+								if ( $show_sched ) {
 
-		 						if ( $time == 12 ) {
-		 							$start_hour = $dj['sched']['start_hour'];
-		 							if ( substr($dj['sched']['start_hour'], 0, 1) === '0' ) {
-		 								$start_hour = substr($dj['sched']['start_hour'], 1);
-		 							}
+									if ( $time == 12 ) {
+										$start_hour = $dj['sched']['start_hour'];
+										if ( substr($dj['sched']['start_hour'], 0, 1) === '0' ) {
+											$start_hour = substr($dj['sched']['start_hour'], 1);
+										}
 
-		 							$end_hour = $dj['sched']['end_hour'];
-		 							if ( substr($dj['sched']['end_hour'], 0, 1) === '0' ) {
-		 								$end_hour = substr($dj['sched']['end_hour'], 1);
-		 							}
+										$end_hour = $dj['sched']['end_hour'];
+										if ( substr($dj['sched']['end_hour'], 0, 1) === '0' ) {
+											$end_hour = substr($dj['sched']['end_hour'], 1);
+										}
 
-		 							echo ' <span class="on-air-dj-sched">'.$start_hour.':'.$dj['sched']['start_min'].' '.$dj['sched']['start_meridian'].' - '.$end_hour.':'.$dj['sched']['end_min'].' '.$dj['sched']['end_meridian'].'</span><br />';
-		 						} else {
-		 							echo ' <span class="on-air-dj-sched">'.$dj['sched']['start_hour'].':'.$dj['sched']['start_min'].' - '.$dj['sched']['end_hour'].':'.$dj['sched']['end_min'].'</span><br />';
-		 						}
-		 					}
+										echo '<div class="on-air-dj-sched">'.$start_hour.':'.$dj['sched']['start_min'].' '.$dj['sched']['start_meridian'].' - '.$end_hour.':'.$dj['sched']['end_min'].' '.$dj['sched']['end_meridian'].'</div>';
+									} else {
+										echo '<div class="on-air-dj-sched">'.$dj['sched']['start_hour'].':'.$dj['sched']['start_min'].' - '.$dj['sched']['end_hour'].':'.$dj['sched']['end_min'].'</div>';
+									}
+								}
 		 					echo '</li>';
 
 		 				} else {
-		 					// print as normal
+
 			 				echo '<li class="on-air-dj">';
-			 				if ( $djavatar ) {
-			 					echo '<span class="on-air-dj-avatar">'.get_the_post_thumbnail( $dj->ID, 'thumbnail' ).'</span>';
-			 				}
 
-			 				if ( $link ) {
-			 					echo '<a href="'.get_permalink( $dj->ID ).'">'.$dj->post_title.'</a>';
-			 				} else {
-			 					echo $dj->post_title;
-			 				}
+								// --- show thumbnail ---
+								if ( $djavatar ) {
+									echo '<div class="on-air-dj-avatar">'.get_the_post_thumbnail( $dj->ID, 'thumbnail' ).'</div>';
+								}
 
-			 				if ( $display_djs ) {
+								// --- show title ---
+								echo '<div class="on-air-dj-title">';
+									if ( $link ) {echo '<a href="'.get_permalink( $dj->ID ).'">'.$dj->post_title.'</a>';}
+									else {echo $dj->post_title;}
+								echo '</div>';
 
-			 					$names = get_post_meta( $dj->ID, 'show_user_list', true );
-			 					$count = 0;
+								// --- DJ names ---
+								if ( $display_djs ) {
 
-			 					if($names) {
-			 						echo '<div class="on-air-dj-names">'.__( 'With', 'radio-station' ).' ';
-			 						foreach ( $names as $name ) {
-			 							$count++;
-			 							$user_info = get_userdata( $name );
+									$names = get_post_meta( $dj->ID, 'show_user_list', true );
+									$count = 0;
 
-			 							echo $user_info->display_name;
+									if($names) {
+										echo '<div class="on-air-dj-names">'.__( 'With', 'radio-station' ).' ';
+										foreach ( $names as $name ) {
+											$count++;
+											$user_info = get_userdata( $name );
 
-			 							if ( ( ( $count == 1 ) && ( count($names) == 2 ) )
-			 							  || ( ( count($names) > 2 ) && ( $count == ( count($names) - 1 ) ) ) ) {
-			 								echo ' and ';
-			 							} elseif ( ( $count < count($names) ) && ( count($names) > 2 ) ) {
-			 								echo ', ';
-			 							}
-			 						}
-			 						echo '</div>';
-			 					}
-			 				}
+											echo $user_info->display_name;
 
-			 				echo '<span class="radio-clear"></span>';
+											if ( ( ( $count == 1 ) && ( count($names) == 2 ) )
+											  || ( ( count($names) > 2 ) && ( $count == ( count($names) - 1 ) ) ) ) {
+												echo ' and ';
+											} elseif ( ( $count < count($names) ) && ( count($names) > 2 ) ) {
+												echo ', ';
+											}
+										}
+										echo '</div>';
+									}
+								}
 
-			 				if ( $show_sched ) {
+								echo '<span class="radio-clear"></span>';
 
-			 					$showtimes = explode( "|", $showtime );
-			 					// 2.2.2: fix to weekday value to be translated
-								$weekday = radio_station_translate_weekday( date('l', $showtimes[0] ) );
+								// --- show schedule ---
+								if ( $show_sched ) {
 
-			 					if ( $time == 12 ) {
-			 						echo '<span class="on-air-dj-sched">'.$weekday.', '.date( 'g:i a', $showtimes[0] ).' - '.date( 'g:i a', $showtimes[1] ).'</span><br />';
-			 					} else {
-			 						echo '<span class="on-air-dj-sched">'.$weekday.', '.date( 'H:i', $showtimes[0] ).' - '.date( 'H:i', $showtimes[1] ).'</span><br />';
-			 					}
+									$showtimes = explode( "|", $showtime );
+									// 2.2.2: fix to weekday value to be translated
+									$weekday = radio_station_translate_weekday( date('l', $showtimes[0] ) );
 
+									if ( $time == 12 ) {
+										echo '<div class="on-air-dj-sched">'.$weekday.', '.date( 'g:i a', $showtimes[0] ).' - '.date( 'g:i a', $showtimes[1] ).'</div>';
+									} else {
+										echo '<div class="on-air-dj-sched">'.$weekday.', '.date( 'H:i', $showtimes[0] ).' - '.date( 'H:i', $showtimes[1] ).'</div>';
+									}
 
-			 				}
+								}
 
 			 				echo '</li>';
 			 			}

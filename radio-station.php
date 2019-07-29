@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Radio Station
- * @version 2.2.2
+ * @version 2.2.3
  */
 /*
 Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli <tonyzeoli@netmix.com>
-Version: 2.2.2
+Version: 2.2.3
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -67,6 +67,14 @@ function radio_station_init() {
 }
 add_action( 'plugins_loaded', 'radio_station_init' );
 
+// --- flush rewrite rules on activate / deactivation ---
+// 2.2.3: added this for custom post types rewrite flushing
+register_activation_hook( __FILE__, 'radio_station_flush_rewrite_rules' );
+register_deactivation_hook( __FILE__, 'flush_rewrite_rules' );
+function radio_station_flush_rewrite_flag() {
+	add_option( 'radio_station_flush_rewrite_rules', true );
+}
+
 // --- enqueue necessary stylesheets ---
 function radio_station_load_styles() {
 
@@ -93,7 +101,7 @@ function radio_station_master_scripts() {
 	// wp_enqueue_style( 'jquery-style', $url, array(), '1.8.2' );
 	if (is_ssl()) {$protocol = 'https';} else {$protocol = 'http';}
 	$url = $protocol.'://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css';
-	wp_enqueue_style( 'jquery-ui-style', $url );
+	wp_enqueue_style( 'jquery-ui-style', $url, '1.8.2' );
 }
 add_action( 'wp_enqueue_scripts', 'radio_station_master_scripts' );
 add_action( 'admin_enqueue_scripts', 'radio_station_master_scripts' );
@@ -141,7 +149,7 @@ function radio_station_load_template( $single_template ) {
 
 	return $single_template;
 }
-add_filter( 'single_template', 'radio_station_load_template' ) ;
+add_filter( 'single_template', 'radio_station_load_template' );
 
 // --- load the theme file for the playlist archive pages ---
 function radio_station_load_custom_post_type_template( $archive_template ) {
@@ -156,7 +164,7 @@ function radio_station_load_custom_post_type_template( $archive_template ) {
 
 	return $archive_template;
 }
-add_filter( 'archive_template', 'radio_station_load_custom_post_type_template' ) ;
+add_filter( 'archive_template', 'radio_station_load_custom_post_type_template' );
 
 
 
