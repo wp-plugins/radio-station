@@ -16,11 +16,11 @@ We are grateful to Nikki Blight for her contribution to creating and developing 
 
 If you are a WordPress developer interested in contributing to this plugin, please follow plugin development on Github: <a href="https://github.com/netmix/radio-station">https://github.com/netmix/radio-station</a>.
 
-You may also submit feature requests here: <a href="https://github.com/netmix/radio-station/issues">https://github.com/netmix/radio-station/issues<a/>
+You may also submit bugs and feature requests here: <a href="https://github.com/netmix/radio-station/issues">https://github.com/netmix/radio-station/issues<a/>
 
-We are actively seeking radio station partners and donations to fund further development of the free, open source version of this plugin at: <a href="https://netmix.co/donate">https://netmix.co/donate</a>.
+We are actively seeking radio station partners and donations to fund further development of the free, open source version of this plugin at: <a href="https://www.patreon.com/radiostation">https://www.patreon.com/radiostation</a>.
 
-Please give 24-48 hours to answer support questions, which will be handled in the Wordpress Support Forums for this free version of the plugin here: <a href="https://wordpress.org/support/plugin/radio-station/">https://wordpress.org/support/plugin/radio-station/</a>
+For plugin support, please give 24-48 hours to answer support questions, which will be handled in the Wordpress Support Forums for this free version of the plugin here: <a href="https://wordpress.org/support/plugin/radio-station/">https://wordpress.org/support/plugin/radio-station/</a>
 
 == Installation ==
 
@@ -495,6 +495,13 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.2.3 =
+* added flush rewrite rules on plugin activation/deactivation
+* added show_admin_column and show_in_quick_edit for Genres
+* added show metadata and schedule value sanitization
+* fix to 00 minute validation for Schedule Override
+* convert span tags to div tags in Widgets to fix line breaks
 
 = 2.2.2 =
 * shift main playlist and show metaboxes above editor
