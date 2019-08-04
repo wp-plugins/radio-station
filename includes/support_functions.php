@@ -246,6 +246,7 @@ function radio_station_dj_get_next($limit = 1) {
 		// fix that to prevent errors in the foreach loop.
 		if ( !is_array( $shift->meta_value ) ) {$shift->meta_value = array();}
 
+		$encore_ids = array();
 		$days = array('Sunday' => 7, 'Monday' => 1, 'Tuesday' => 2, 'Wednesday' => 3, 'Thursday' => 4, 'Friday' => 5, 'Saturday' => 6);
 		foreach ( $shift->meta_value as $time ) {
 
@@ -267,6 +268,10 @@ function radio_station_dj_get_next($limit = 1) {
 			// if the shift occurs later than the current time, we want it
 			if ( $curShift >= $now ) {
 				$show_ids[$curShift.'|'.$endShift] = $shift->post_id;
+				// 2.2.4: set encore ID array to pass back
+				if ( isset( $time['encore'] ) && ( $time['encore'] == 'on' ) ) {
+					$encore_ids[$curShift.'|'.$endShift] = $shift->post_id;
+				}
 			}
 
 		}
@@ -320,6 +325,8 @@ function radio_station_dj_get_next($limit = 1) {
 		}
 	}
 	$shows['type'] = 'shows';
+	// 2.2.4: set encore IDs to pass back
+	$shows['encore'] = $encore_ids;
 
 	// return the information
 	return $shows;
