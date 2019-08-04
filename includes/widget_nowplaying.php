@@ -95,8 +95,9 @@ class Playlist_Widget extends WP_Widget {
 		$comments = $instance['comments'];
 
 
- 		// fetch the current song
+ 		// --- fetch the current song ---
 		$most_recent = radio_station_myplaylist_get_now_playing();
+		echo "<!-- MOST RECENT: ".print_r($most_recent,true)." -->";
 
 		?>
 		<div class="widget">
@@ -114,29 +115,32 @@ class Playlist_Widget extends WP_Widget {
 					echo '<div id="myplaylist-nowplaying"'.$class.'>';
 
 						// 2.2.3: convert span tags to div tags
-						if ( $song ) {
+						// 2.2.4: check value keys are set before outputting
+						if ( $song && isset( $most_recent['playlist_entry_song']) ) {
 							echo '<div class="myplaylist-song">'.$most_recent['playlist_entry_song'].'</div> ';
 						}
 
-						if ( $artist ) {
+						if ( $artist && isset( $most_recent['playlist_entry_artist'] ) ) {
 							echo '<div class="myplaylist-artist">'.$most_recent['playlist_entry_artist'].'</div> ';
 						}
 
-						if ( $album ) {
+						if ( $album && isset( $most_recent['playlist_entry_album'] ) ) {
 							echo '<div class="myplaylist-album">'.$most_recent['playlist_entry_album'].'</div> ';
 						}
 
-						if ( $label ) {
+						if ( $label && isset( $most_recent['playlist_entry_label'] ) ) {
 							echo '<div class="myplaylist-label">'.$most_recent['playlist_entry_label'].'</div> ';
 						}
 
-						if ( $comments ) {
+						if ( $comments && isset( $most_recent['playlist_entry_comments'] ) ) {
 							echo '<div class="myplaylist-comments">'.$most_recent['playlist_entry_comments'].'</div> ';
 						}
 
-						echo '<div class="myplaylist-link">';
-							echo '<a href="'.$most_recent['playlist_permalink'].'">'.__('View Playlist', 'radio-station').'</a>';
-						echo '</div>';
+						if ( isset( $most_recent['playlist_permalink'] ) ) {
+							echo '<div class="myplaylist-link">';
+								echo '<a href="'.$most_recent['playlist_permalink'].'">'.__('View Playlist', 'radio-station').'</a>';
+							echo '</div>';
+						}
 
 					echo '</div>';
 
@@ -150,6 +154,19 @@ class Playlist_Widget extends WP_Widget {
 
 		</div>
 		<?php
+
+ 		// --- enqueue widget stylesheet in footer ---
+ 		// (this means it will only load if widget is on page)
+ 		// 2.2.4: renamed djonair.css and load for all widgets
+ 		$dj_widget_css = get_stylesheet_directory().'/widgets.css';
+ 		if ( file_exists( $dj_widget_css ) ) {
+ 			$version = filemtime( $dj_widget_css );
+ 			$url = get_stylesheet_directory_uri().'/widgets.css';
+ 		} else {
+ 			$version = filemtime( dirname(dirname(__FILE__)).'/css/widgets.css' );
+ 			$url = plugins_url('css/widgets.css', dirname(dirname(__FILE__)).'/radio-station.php' );
+		}
+		wp_enqueue_style( 'dj-widget', $url, array(), $version, 'all' );
 
 		echo $after_widget;
 	}

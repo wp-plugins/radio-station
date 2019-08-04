@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Radio Station
- * @version 2.2.3
+ * @version 2.2.4
  */
 /*
 Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli <tonyzeoli@netmix.com>
-Version: 2.2.3
+Version: 2.2.4
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station

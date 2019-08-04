@@ -27,6 +27,11 @@ class DJ_Widget extends WP_Widget {
 		$show_all_sched = isset( $instance['show_all_sched'] ) ? $instance['show_all_sched'] : false;
 		$show_desc = isset( $instance['show_desc'] ) ? $instance['show_desc'] : false;
 
+		// 2.2.4: added title position, avatar width and DJ link options
+		$title_position = isset( $instance['title_position'] ) ? $instance['title_position'] : 'below';
+		$avatar_width = isset( $instance['avatar_width'] ) ? $instance['avatar_width'] : '';
+		$links_djs = isset( $instance['link_djs'] ) ? $instance['link_djs'] : '';
+
 		?>
 			<p>
 		  		<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title', 'radio-station'); ?>:
@@ -35,23 +40,58 @@ class DJ_Widget extends WP_Widget {
 		  	</p>
 
 		  	<p>
-		  		<label for="<?php echo $this->get_field_id('display_djs'); ?>">
-		  		<input id="<?php echo $this->get_field_id('display_djs'); ?>" name="<?php echo $this->get_field_name( 'display_djs' ); ?>" type="checkbox" <?php if ( $display_djs ) { echo 'checked="checked"'; } ?> />
-		  		<?php _e( 'Display names of the DJs on the show', 'radio-station' ); ?>
+		  		<label for="<?php echo $this->get_field_id('link'); ?>">
+		  		<input id="<?php echo $this->get_field_id('link'); ?>" name="<?php echo $this->get_field_name( 'link' ); ?>" type="checkbox" <?php if ( $link ) { echo 'checked="checked"'; } ?> />
+		  		<?php _e( 'Link the title to the Show page', 'radio-station' ); ?>
+		  		</label>
+		  	</p>
+
+		  	<p>
+		  		<label for="<?php echo $this->get_field_id( 'title_position' ); ?>">
+		  		<select id="<?php echo $this->get_field_id( 'title_position' ); ?>" name="<?php echo $this->get_field_name( 'title_position' ); ?>">
+		  			<?php
+		  			$positions = array(
+		  				'above'		=> __('Above', 'radio-station'),
+		  				'left'		=> __('Left', 'radio-station'),
+		  				'right'		=> __('Right', 'radio-station'),
+		  				'below'		=> __('Below', 'radio-station')
+		  			);
+		  			foreach ( $positions as $position => $label ) {
+		  				echo '<option value="'.$position.'"';
+		  				if ( $title_position == $position ) {echo 'selected="selected"';}
+		  				echo '>'.$label.'</option>';
+		  			} ?>
+		  		</select>
+		  		<?php _e( 'Show Title Position (relative to Avatar)', 'radio-station' ); ?>
 		  		</label>
 		  	</p>
 
 		  	<p>
 		  		<label for="<?php echo $this->get_field_id('djavatar'); ?>">
 		  		<input id="<?php echo $this->get_field_id('djavatar'); ?>" name="<?php echo $this->get_field_name( 'djavatar' ); ?>" type="checkbox" <?php if ( $djavatar ) { echo 'checked="checked"'; } ?> />
-		  		<?php _e( 'Show Avatars', 'radio-station' ); ?>
+		  		<?php _e( 'Display Show Avatar', 'radio-station' ); ?>
 		  		</label>
 		  	</p>
 
 		  	<p>
-		  		<label for="<?php echo $this->get_field_id('link'); ?>">
-		  		<input id="<?php echo $this->get_field_id('link'); ?>" name="<?php echo $this->get_field_name( 'link' ); ?>" type="checkbox" <?php if ( $link ) { echo 'checked="checked"'; } ?> />
-		  		<?php _e( "Link to the Show/DJ's profile", 'radio-station' ); ?>
+		  		<label for="<?php echo $this->get_field_id( 'avatar_width' ); ?>"><?php _e( 'Avatar Width', 'radio-station' ); ?>:
+		  		<input class="widefat" id="<?php echo $this->get_field_id( 'avatar_width' ); ?>" name="<?php echo $this->get_field_name( 'avatar_width' ); ?>" type="text" value="<?php echo esc_attr( $avatar_width ); ?>" />
+		  		</label>
+		  		<small><?php _e( 'Width of Show Avatar (in pixels, default full width)', 'radio-station' ); ?></small>
+		  	</p>
+
+
+		  	<p>
+		  		<label for="<?php echo $this->get_field_id('display_djs'); ?>">
+		  		<input id="<?php echo $this->get_field_id('display_djs'); ?>" name="<?php echo $this->get_field_name( 'display_djs' ); ?>" type="checkbox" <?php if ( $display_djs ) { echo 'checked="checked"'; } ?> />
+		  		<?php _e( 'Display names of the DJs on the Show', 'radio-station' ); ?>
+		  		</label>
+		  	</p>
+
+		  	<p>
+		  		<label for="<?php echo $this->get_field_id('link_djs'); ?>">
+		  		<input id="<?php echo $this->get_field_id('link_djs'); ?>" name="<?php echo $this->get_field_name('link_djs'); ?>" type="checkbox" <?php if ( $link_djs ) {echo 'checked="checked"';} ?> />
+		  		<?php _e( 'Link DJ names to author pages', 'radio-station' ); ?>
 		  		</label>
 		  	</p>
 
@@ -116,6 +156,12 @@ class DJ_Widget extends WP_Widget {
 		$instance['show_playlist'] = $new_instance['show_playlist'];
 		$instance['show_all_sched'] = $new_instance['show_all_sched'];
 		$instance['show_desc'] = $new_instance['show_desc'];
+
+		// 2.2.4: added title position and avatar width settings
+		$instance['title_position'] = $new_instance['title_position'];
+		$instance['avatar_width'] = $new_instance['avatar_width'];
+		$instance['link_djs'] = ( isset( $new_instance['link_djs'] ) ? 1 : 0 );
+
 		return $instance;
 
 	}
@@ -137,11 +183,21 @@ class DJ_Widget extends WP_Widget {
  		$show_all_sched = isset( $instance['show_all_sched'] ) ? $instance['show_all_sched'] : false; // keep the default settings for people updating from 1.6.2 or earlier
  		$show_desc = isset( $instance['show_desc'] ) ? $instance['show_desc'] : false; // keep the default settings for people updating from 2.0.12 or earlier
 
+		// 2.2.4: added title position, avatar width and DJ link settings
+		$position = empty( $instance['title_position'] ) ? 'bottom' : $instance['title_position'];
+		$width = empty( $instance['avatar_width'] ) ? '' : $instance['avatar_width'];
+		$link_djs = $instance['link_djs'];
+
  		// --- fetch the current DJs and playlist ---
 		$djs = radio_station_dj_get_current();
 		$playlist = radio_station_myplaylist_get_now_playing();
 
 		// 2.2.3: convert all span tags to div tags
+		// 2.2.4: maybe set float class and avatar width style
+		$floatclass = $widthstyle = '';
+		if ( $width != '' ) {$widthstyle = 'style="width:'.$width.'px;"';}
+		if ( $position == 'right' ) {$floatclass = ' float-left';}
+		elseif ( $position == 'left' ) {$floatclass = ' float-right';}
 
 		?>
 		<div class="widget">
@@ -156,17 +212,26 @@ class DJ_Widget extends WP_Widget {
 				// --- find out which DJ/show is currently scheduled to be on-air and display them ---
 				if ( $djs['type'] == 'override' ) {
 
-					// print_r($djs);
 					echo '<li class="on-air-dj">';
+
+						// --- show title *for above only) ---
+						if ( $position == 'above' ) {
+							echo '<div class="on-air-dj-title">'.$djs['all'][0]['title'].'</div>';
+						}
 
 						if ( $djavatar ) {
 							if ( has_post_thumbnail($djs['all'][0]['post_id']) ) {
-								echo '<div class="on-air-dj-avatar">'.get_the_post_thumbnail( $djs['all'][0]['post_id'], 'thumbnail' ).'</div>';
+								echo '<div class="on-air-dj-avatar'.$floatclass.'"'.$widthstyle.'>';
+								echo get_the_post_thumbnail( $djs['all'][0]['post_id'], 'thumbnail' ).'</div>';
 							}
 						}
 
 						// --- show title ---
-						echo '<div class="on-air-dj-title">'.$djs['all'][0]['title'].'</div>';
+						if ( $position != 'above' ) {
+							echo '<div class="on-air-dj-title">'.$djs['all'][0]['title'].'</div>';
+						}
+
+						echo '<span class="radio-clear"></span>';
 
 						// --- display the schedule override if requested ---
 						if ( $show_sched ) {
@@ -200,39 +265,61 @@ class DJ_Widget extends WP_Widget {
 						foreach( $djs['all'] as $dj ) {
 
 							$scheds = get_post_meta( $dj->ID, 'show_sched', true );
+							$current_sched = radio_station_current_schedule( $scheds );
 
 							echo '<li class="on-air-dj">';
 
-								// --- show thumbnail ---
+								// --- show title (for above only) ---
+								if ( $position == 'above' ) {
+									echo '<div class="on-air-dj-title">';
+										if ( $link ) {echo '<a href="'.get_permalink( $dj->ID ).'">'.$dj->post_title.'</a>';}
+										else {echo $dj->post_title;}
+									echo '</div>';
+								}
+
+								// --- show avatar ---
 								if ( $djavatar ) {
-									echo '<div class="on-air-dj-avatar">'.get_the_post_thumbnail( $dj->ID, 'thumbnail' ).'</div><br>';
+									echo '<div class="on-air-dj-avatar'.$floatclass.'"'.$widthstyle.'>';
+									echo get_the_post_thumbnail( $dj->ID, 'thumbnail' ).'</div>';
 								}
 
 								// --- show title ---
-								echo '<div class="on-air-dj-title">';
-									if ( $link ) {echo '<a href="'.get_permalink( $dj->ID ).'">'.$dj->post_title.'</a>';}
-									else {echo $dj->post_title;}
-								echo '</div>';
+								if ( $position != 'above' ) {
+									echo '<div class="on-air-dj-title">';
+										if ( $link ) {echo '<a href="'.get_permalink( $dj->ID ).'">'.$dj->post_title.'</a>';}
+										else {echo $dj->post_title;}
+									echo '</div>';
+								}
+
+								echo '<span class="radio-clear"></span>';
+
+								// --- encore presentation ---
+								// 2.2.4: added encore presentation display
+								if ( $current_sched['encore'] == 'on' ) {
+									echo '<div class="on-air-dj-encore">'.__('Encore Presentation','radio-station').'</div>';
+								}
 
 								// --- DJ names ---
 								if ( $display_djs ) {
 
-									$names = get_post_meta( $dj->ID, 'show_user_list', true );
+									$ids = get_post_meta( $dj->ID, 'show_user_list', true );
 									$count = 0;
 
-									if ( $names ) {
+									if ( $ids && is_array( $ids ) ) {
 
-										echo '<div class="on-air-dj-names">'.__( 'With', 'radio-station' ).' ';
-										foreach( $names as $name ) {
-											$count ++;
-											$user_info = get_userdata($name);
+										echo '<div class="on-air-dj-names">'.__( 'with', 'radio-station' ).' ';
+										foreach( $ids as $id ) {
+											$count++;
+											$user_info = get_userdata($id);
 
-											echo $user_info->display_name;
+											$dj_link = get_author_posts_url( $user_info->ID );
+											$dj_link = apply_filters( 'radio_station_dj_link', $dj_link, $user_info->ID );
+											echo '<a href="'.$dj_link.'">'.$user_info->display_name.'</a>';
 
-											if ( ( ( $count == 1 ) && ( count($names) == 2 ) )
-											  || ( ( count($names) > 2 ) && ( $count == ( count($names) - 1 ) ) ) ) {
-												echo ' and ';
-											} elseif ( ( $count < count($names) ) && ( count($names) > 2 ) ) {
+											if ( ( ( $count == 1 ) && ( count($ids) == 2 ) )
+											  || ( ( count($ids) > 2 ) && ( $count == ( count($ids) - 1 ) ) ) ) {
+												echo ' '.__( 'and', 'radio-station').' ';
+											} elseif ( ( $count < count($ids) ) && ( count($ids) > 2 ) ) {
 												echo ', ';
 											}
 										}
@@ -243,6 +330,7 @@ class DJ_Widget extends WP_Widget {
 								// --- show description ---
 								if ( $show_desc ) {
 									$desc_string = radio_station_shorten_string( strip_tags( $dj->post_content ), 20 );
+									$desc_string = apply_filters( 'radio_station_show_description', $desc_string, $dj->ID );
 									echo '<div class="on-air-show-desc">'.$desc_string.'</div>';
 								}
 
@@ -258,8 +346,6 @@ class DJ_Widget extends WP_Widget {
 
 									// --- if we only want the schedule that's relevant now to display ---
 									if ( !$show_all_sched ) {
-
-										$current_sched = radio_station_current_schedule( $scheds );
 
 										if ( $current_sched ) {
 											// 2.2.2: translate weekday for display
@@ -303,17 +389,19 @@ class DJ_Widget extends WP_Widget {
 
  		// --- enqueue widget stylesheet in footer ---
  		// (this means it will only load if widget is on page)
- 		$dj_widget_css = get_stylesheet_directory().'/djonair.css';
+ 		// 2.2.4: renamed djonair.css and load for all widgets
+ 		$dj_widget_css = get_stylesheet_directory().'/widgets.css';
  		// 2.2.2: fix to file check logic (file_exists not !file_exists)
  		if ( file_exists( $dj_widget_css ) ) {
  			$version = filemtime( $dj_widget_css );
- 			$url = get_stylesheet_directory_uri().'/djonair.css';
+ 			$url = get_stylesheet_directory_uri().'/widgets.css';
  		} else {
  			// 2.2.3: fix to version path check also
- 			$version = filemtime( dirname(dirname(__FILE__)).'/css/djonair.css' );
- 			$url = plugins_url('css/djonair.css', dirname(dirname(__FILE__)).'/radio-station.php' );
+ 			$version = filemtime( dirname(dirname(__FILE__)).'/css/widgets.css' );
+ 			$url = plugins_url('css/widgets.css', dirname(dirname(__FILE__)).'/radio-station.php' );
 		}
-		wp_enqueue_style( 'dj-widget', $url, array(), $version, true );
+		// 2.2.4: fix to media argument
+		wp_enqueue_style( 'dj-widget', $url, array(), $version, 'all' );
 
 		echo $after_widget;
 	}
