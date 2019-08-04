@@ -1096,6 +1096,10 @@ function radio_station_myplaylist_save_showpostdata( $post_id ) {
 			} elseif ( ($key == 'start_meridian') || ( $key == 'end_meridian' ) ) {
 				$valid = array( '', 'am', 'pm' );
 				if ( in_array( $value, $valid ) ) {$isvalid = true;}
+			} elseif ($key == 'encore') {
+				// 2.2.4: fix to missing encore sanitization saving
+				$valid = array( '', 'on');
+				if ( in_array( $value, $valid ) ) {$isvalid = true;}
 			}
 
 			// --- if valid add to new schedule ---

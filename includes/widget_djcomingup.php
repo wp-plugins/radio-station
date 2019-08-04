@@ -25,11 +25,57 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		$time = isset( $instance['time'] ) ? $instance['time']: 12;
 		$show_sched = isset( $instance['show_sched'] ) ? $instance['show_sched'] : false;
 
+		// 2.2.4: added title position, avatar width and DJ link options
+		$title_position = isset( $instance['title_position'] ) ? $instance['title_position'] : 'right';
+		$avatar_width = isset( $instance['avatar_width'] ) ? $instance['avatar_width'] : '75';
+		$link_djs = isset( $instance['link_djs'] ) ? $instance['link_djs'] : '';
+
 		?>
 			<p>
 		  		<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e( 'Title', 'radio-station' ); ?>
 		  		<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
 		  		</label>
+		  	</p>
+
+		  	<p>
+		  		<label for="<?php echo $this->get_field_id('link'); ?>">
+		  		<input id="<?php echo $this->get_field_id('link'); ?>" name="<?php echo $this->get_field_name('link'); ?>" type="checkbox" <?php if ( $link ) {echo 'checked="checked"';} ?> />
+		  		<?php _e( 'Link the title to the Show page', 'radio-station' ); ?>
+		  		</label>
+		  	</p>
+
+		  	<p>
+		  		<label for="<?php echo $this->get_field_id( 'title_position' ); ?>">
+		  		<select id="<?php echo $this->get_field_id( 'title_position' ); ?>" name="<?php echo $this->get_field_name( 'title_position' ); ?>">
+		  			<?php
+		  			$positions = array(
+		  				'above'		=> __('Above', 'radio-station'),
+		  				'left'		=> __('Left', 'radio-station'),
+		  				'right'		=> __('Right', 'radio-station'),
+		  				'below'		=> __('Below', 'radio-station')
+		  			);
+		  			foreach ( $positions as $position => $label ) {
+		  				echo '<option value="'.$position.'"';
+		  				if ( $title_position == $position ) {echo 'selected="selected"';}
+		  				echo '>'.$label.'</option>';
+		  			} ?>
+		  		</select>
+		  		<?php _e( 'Show Title Position (relative to Avatar)', 'radio-station' ); ?>
+		  		</label>
+		  	</p>
+
+		  	<p>
+		  		<label for="<?php echo $this->get_field_id( 'djavatar' ); ?>">
+		  		<input id="<?php echo $this->get_field_id( 'djavatar' ); ?>" name="<?php echo $this->get_field_name( 'djavatar' ); ?>" type="checkbox" <?php if ( $djavatar ) {echo 'checked="checked"';} ?> />
+		  		<?php _e( 'Display Show Avatars', 'radio-station' ); ?>
+		  		</label>
+		  	</p>
+
+		  	<p>
+		  		<label for="<?php echo $this->get_field_id( 'avatar_width' ); ?>"><?php _e( 'Avatar Width', 'radio-station' ); ?>:
+		  		<input class="widefat" id="<?php echo $this->get_field_id( 'avatar_width' ); ?>" name="<?php echo $this->get_field_name( 'avatar_width' ); ?>" type="text" value="<?php echo esc_attr( $avatar_width ); ?>" />
+		  		</label>
+		  		<small><?php _e( 'Width of Show Avatars (in pixels, default 75px)', 'radio-station' ); ?></small>
 		  	</p>
 
 		  	<p>
@@ -40,16 +86,9 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		  	</p>
 
 		  	<p>
-		  		<label for="<?php echo $this->get_field_id( 'djavatar' ); ?>">
-		  		<input id="<?php echo $this->get_field_id( 'djavatar' ); ?>" name="<?php echo $this->get_field_name( 'djavatar' ); ?>" type="checkbox" <?php if ( $djavatar ) {echo 'checked="checked"';} ?> />
-		  		<?php _e( 'Show Avatars', 'radio-station' ); ?>
-		  		</label>
-		  	</p>
-
-		  	<p>
-		  		<label for="<?php echo $this->get_field_id('link'); ?>">
-		  		<input id="<?php echo $this->get_field_id('link'); ?>" name="<?php echo $this->get_field_name('link'); ?>" type="checkbox" <?php if ( $link ) {echo 'checked="checked"';} ?> />
-		  		<?php _e( "Link to Show/DJ's user profile", 'radio-station' ); ?>
+		  		<label for="<?php echo $this->get_field_id('link_djs'); ?>">
+		  		<input id="<?php echo $this->get_field_id('link_djs'); ?>" name="<?php echo $this->get_field_name('link_djs'); ?>" type="checkbox" <?php if ( $link_djs ) {echo 'checked="checked"';} ?> />
+		  		<?php _e( 'Link DJ names to author pages', 'radio-station' ); ?>
 		  		</label>
 		  	</p>
 
@@ -98,6 +137,12 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		$instance['limit'] = $new_instance['limit'];
 		$instance['time'] = $new_instance['time'];
 		$instance['show_sched'] = $new_instance['show_sched'];
+
+		// 2.2.4: added title position, avatar width and DJ link settings
+		$instance['title_position'] = $new_instance['title_position'];
+		$instance['avatar_width'] = $new_instance['avatar_width'];
+		$instance['link_djs'] = ( isset( $new_instance['link_djs'] ) ? 1 : 0 );
+
 		return $instance;
 	}
 
@@ -116,11 +161,21 @@ class DJ_Upcoming_Widget extends WP_Widget {
  		$time = empty( $instance['time'] ) ? '' : $instance['time'];
  		$show_sched = $instance['show_sched'];
 
+		// 2.2.4: added title position, avatar width and DJ link settings
+		$position = empty( $instance['title_position'] ) ? 'right' : $instance['title_position'];
+		$width = empty( $instance['avatar_width'] ) ? '75' : $instance['avatar_width'];
+		$link_djs = $instance['link_djs'];
+
  		// --- find out which DJ(s) are coming up today ---
  		$djs = radio_station_dj_get_next($limit);
  		// print_r($djs);
 
 		// 2.2.3: convert all span tags to div tags
+		// 2.2.4: maybe set float class and avatar width style
+		$floatclass = $widthstyle = '';
+		if ( $width != '' ) {$widthstyle = 'style="width:'.$width.'px;"';}
+		if ( $position == 'right' ) {$floatclass = ' float-left';}
+		elseif ( $position == 'left' ) {$floatclass = ' float-right';}
 
  		?>
 
@@ -135,8 +190,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			<?php
 		 		// --- echo the show/dj currently on-air ---
 
-		 		if ( isset($djs['all']) && ( count($djs['all']) > 0 ) ) {
-		 			//print_r($djs['all']);
+		 		if ( isset($djs['all']) && ( count( $djs['all'] ) > 0 ) ) {
 
 		 			foreach ( $djs['all'] as $showtime => $dj ) {
 
@@ -144,15 +198,25 @@ class DJ_Upcoming_Widget extends WP_Widget {
 
 		 					echo '<li class="on-air-dj">';
 
-								// --- show thumbnail ---
+								// --- show title (for above only) ---
+								if ( $position == 'above' ) {
+									echo '<div class="on-air-dj-title">'.$dj['title'].'</div>';
+								}
+
+								// --- show avatar ---
 								if ( $djavatar ) {
 									if ( has_post_thumbnail($dj['post_id'] ) ) {
-										echo '<div class="on-air-dj-avatar">'.get_the_post_thumbnail( $dj['post_id'], 'thumbnail' ).'</div>';
+										echo '<div class="on-air-dj-avatar'.$floatclass.'"'.$widthstyle.'>';
+										echo get_the_post_thumbnail( $dj['post_id'], 'thumbnail' ).'</div>';
 									}
 								}
 
 								// --- show title ---
-								echo '<div class="on-air-dj-title">'.$dj['title'].'</div>';
+								if ( $position != 'above' ) {
+									echo '<div class="on-air-dj-title">'.$dj['title'].'</div>';
+								}
+
+								echo '<span class="radio-clear"></span>';
 
 								// --- show schedule ---
 								if ( $show_sched ) {
@@ -179,35 +243,58 @@ class DJ_Upcoming_Widget extends WP_Widget {
 
 			 				echo '<li class="on-air-dj">';
 
-								// --- show thumbnail ---
+								// --- show title (for above only) ---
+								if ( $position == 'above' ) {
+									echo '<div class="on-air-dj-title">';
+										if ( $link ) {echo '<a href="'.get_permalink( $dj->ID ).'">'.$dj->post_title.'</a>';}
+										else {echo $dj->post_title;}
+									echo '</div>';
+								}
+
+								// --- show avatar ---
 								if ( $djavatar ) {
-									echo '<div class="on-air-dj-avatar">'.get_the_post_thumbnail( $dj->ID, 'thumbnail' ).'</div>';
+									echo '<div class="on-air-dj-avatar'.$floatclass.'"'.$widthstyle.'>';
+									echo get_the_post_thumbnail( $dj->ID, 'thumbnail' ).'</div>';
 								}
 
 								// --- show title ---
-								echo '<div class="on-air-dj-title">';
-									if ( $link ) {echo '<a href="'.get_permalink( $dj->ID ).'">'.$dj->post_title.'</a>';}
-									else {echo $dj->post_title;}
-								echo '</div>';
+								if ( $position != 'above' ) {
+									echo '<div class="on-air-dj-title">';
+										if ( $link ) {echo '<a href="'.get_permalink( $dj->ID ).'">'.$dj->post_title.'</a>';}
+										else {echo $dj->post_title;}
+									echo '</div>';
+								}
+
+								echo '<span class="radio-clear"></span>';
+
+								// --- encore presentation ---
+								// 2.2.4: added encore presentation display
+								if ( array_key_exists( $showtime, $djs['encore'] ) ) {
+									echo '<div class="on-air-dj-encore">'.__('Encore Presentation','radio-station').'</div>';
+								}
 
 								// --- DJ names ---
 								if ( $display_djs ) {
 
-									$names = get_post_meta( $dj->ID, 'show_user_list', true );
+									$ids = get_post_meta( $dj->ID, 'show_user_list', true );
 									$count = 0;
 
-									if($names) {
-										echo '<div class="on-air-dj-names">'.__( 'With', 'radio-station' ).' ';
-										foreach ( $names as $name ) {
+									if ( $ids && is_array( $ids ) ) {
+										echo '<div class="on-air-dj-names">'.__( 'with', 'radio-station' ).' ';
+										foreach ( $ids as $id ) {
 											$count++;
-											$user_info = get_userdata( $name );
+											$user_info = get_userdata( $id );
 
-											echo $user_info->display_name;
+											if ( $link_djs ) {
+												$dj_link = get_author_posts_url( $user_info->ID );
+												$dj_link = apply_filters( 'radio_station_dj_link', $dj_link, $user_info->ID );
+												echo '<a href="'.$dj_link.'">'.$user_info->display_name.'</a>';
+											} else {echo $user_info->display_name;}
 
-											if ( ( ( $count == 1 ) && ( count($names) == 2 ) )
-											  || ( ( count($names) > 2 ) && ( $count == ( count($names) - 1 ) ) ) ) {
-												echo ' and ';
-											} elseif ( ( $count < count($names) ) && ( count($names) > 2 ) ) {
+											if ( ( ( $count == 1 ) && ( count($ids) == 2 ) )
+											  || ( ( count($ids) > 2 ) && ( $count == ( count($ids) - 1 ) ) ) ) {
+												echo ' '.__( 'and', 'radio-station' ).' ';
+											} elseif ( ( $count < count($ids) ) && ( count($ids) > 2 ) ) {
 												echo ', ';
 											}
 										}
@@ -244,6 +331,19 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			</ul>
 		</div>
 		<?php
+
+ 		// --- enqueue widget stylesheet in footer ---
+ 		// (this means it will only load if widget is on page)
+ 		// 2.2.4: renamed djonair.css and load for all widgets
+ 		$dj_widget_css = get_stylesheet_directory().'/widgets.css';
+ 		if ( file_exists( $dj_widget_css ) ) {
+ 			$version = filemtime( $dj_widget_css );
+ 			$url = get_stylesheet_directory_uri().'/widgets.css';
+ 		} else {
+ 			$version = filemtime( dirname(dirname(__FILE__)).'/css/widgets.css' );
+ 			$url = plugins_url('css/widgets.css', dirname(dirname(__FILE__)).'/radio-station.php' );
+		}
+		wp_enqueue_style( 'dj-widget', $url, array(), $version, 'all' );
 
 		echo $after_widget;
 	}
