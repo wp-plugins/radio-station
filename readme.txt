@@ -503,6 +503,13 @@ you send me your finished translation, I'd love to include it.
 
 == Upgrade Notice ==
 
+= 2.2.4 =
+* added title position and avatar width options to widgets
+* added missing DJ author links as new option to widgets
+* cleanup, improve and fix enqueued Widget CSS (on air/upcoming)
+* improved to show Encore Presentation in show widget displays
+* fix to Show shift Encore Presentation checkbox saving
+
 = 2.2.3 =
 * added flush rewrite rules on plugin activation/deactivation
 * added show_admin_column and show_in_quick_edit for Genres
