@@ -12,7 +12,7 @@ Radio Station is a plugin to build and manage a Show Calendar in a radio station
 
 Radio Station is a plugin to build and manage a Show Calendar in radio station's WordPress website. It's functionality is based on Drupal 6's Station plugin, reworked for use in Wordpress. The plugin includes the ability to associate users (as member role "DJ"") with the included custom post type of "Shows" (schedulable blocks of time that contain a Show description, and other meta information), and generate playlists associated with those shows. The plugin contains a widget to display the currently on-air DJ with a link to the DJ's Show page and current playlist.  A schedule of all Shows can also be generated and added to a page with a short code. Shows can be categorized and a category filter appears when the Calendar is added using a short code to a WordPress page or post.
 
-We are grateful to Nikki Blight for her contribution to creating and developing this plugin for as long as she could maintain the codebase. As of June 22, 2019, Radio Station will will managed by Tony Zeoli and developed by contributing committers to the project.
+We are grateful to Nikki Blight for her contribution to creating and developing this plugin for as long as she could maintain the codebase. As of June 22, 2019, Radio Station is managed by <a href="https://wordpress.org/ Tony Zeoli  and developed by contributing committers to the project.
 
 If you are a WordPress developer interested in contributing to this plugin, please follow plugin development on Github: <a href="https://github.com/netmix/radio-station">https://github.com/netmix/radio-station</a>.
 
