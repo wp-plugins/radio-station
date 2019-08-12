@@ -20,7 +20,7 @@ We are grateful to Nikki Blight for her contribution to creating and developing 
 
 If you are a WordPress developer wanting to contribute to Radio Station, please join the team and follow plugin development on Github: <a href="https://github.com/netmix/radio-station">https://github.com/netmix/radio-station</a>/.
 
-Submit bugs and feature requests here: <a href="https://github.com/netmix/radio-station/issues">https://github.com/netmix/radio-station/issues">https://github.com/netmix/radio-station/issues">https://github.com/netmix/radio-station/issues<a/>
+Submit bugs and feature requests here: <a href="https://github.com/netmix/radio-station/issues">https://github.com/netmix/radio-station/issues</a>
 
 We are actively seeking radio station partners and donations to fund further development of the free, open source version of this plugin at: <a href="https://www.patreon.com/radiostation">https://www.patreon.com/radiostation</a>.
 
