@@ -1,10 +1,12 @@
 === Radio Station ===
 Contributors: tonyzeoli, majick, nourma
 Donate link: https://netmix.co/donate
-Tags: dj, music, playlist, radio, scheduling
+Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
 Tested up to: 5.2.2
 Stable tag: trunk
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Radio Station is a plugin to build and manage a Show Calendar in a radio station or Internet broadcaster's WordPress website. Functionality is based on Drupal 6's Station plugin.
 
@@ -510,11 +512,7 @@ you send me your finished translation, I'd love to include it.
 == Upgrade Notice ==
 
 = 2.2.4 =
-* added title position and avatar width options to widgets
-* added missing DJ author links as new option to widgets
-* cleanup, improve and fix enqueued Widget CSS (on air/upcoming)
-* improved to show Encore Presentation in show widget displays
-* fix to Show shift Encore Presentation checkbox saving
+Adds title position and avatar width options to widgets; missing DJ author links as new option to widgets; cleanup, improve and fix enqueued Widget CSS (on air/upcoming); show Encore Presentation in show widget displays; fix to Show shift Encore Presentation checkbox saving
 
 = 2.2.3 =
 * added flush rewrite rules on plugin activation/deactivation
