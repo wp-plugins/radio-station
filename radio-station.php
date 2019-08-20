@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Radio Station
- * @version 2.2.5
+ * @version 2.2.6
  */
 /*
 Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli <tonyzeoli@netmix.com>
-Version: 2.2.5
+Version: 2.2.6
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -52,14 +52,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // === Setup ===
 // -------------
 
+define( 'RADIO_STATION_DIR', dirname( __FILE__ ) );
 // --- include necessary files ---
-require 'includes/post-types.php';
-require 'includes/master-schedule.php';
-require 'includes/shortcodes.php';
-require 'includes/class-dj-upcoming-widget.php';
-require 'includes/class-dj-widget.php';
-require 'includes/class-playlist-widget.php';
-require 'includes/support-functions.php';
+require RADIO_STATION_DIR . '/includes/post-types.php';
+require RADIO_STATION_DIR . '/includes/master-schedule.php';
+require RADIO_STATION_DIR . '/includes/shortcodes.php';
+require RADIO_STATION_DIR . '/includes/class-dj-upcoming-widget.php';
+require RADIO_STATION_DIR . '/includes/class-dj-widget.php';
+require RADIO_STATION_DIR . '/includes/class-playlist-widget.php';
+require RADIO_STATION_DIR . '/includes/support-functions.php';
 
 // --- load the text domain ---
 function radio_station_init() {
@@ -83,7 +84,7 @@ function radio_station_load_styles() {
 		$version = filemtime( $program_css );
 		$url     = get_stylesheet_directory_uri() . '/program-schedule.css';
 	} else {
-		$version = filemtime( dirname( __FILE__ ) . '/css/program-schedule.css' );
+		$version = filemtime( RADIO_STATION_DIR . '/css/program-schedule.css' );
 		$url     = plugins_url( 'css/program-schedule.css', __FILE__ );
 	}
 	wp_enqueue_style( 'program-schedule', $url, array(), $version );
@@ -97,7 +98,7 @@ add_action( 'wp_enqueue_scripts', 'radio_station_load_styles' );
 function radio_station_master_scripts() {
 	wp_enqueue_script( 'jquery' );
 	wp_enqueue_script( 'jquery-ui-datepicker' );
-	// $url = plugins_url( 'css/jquery-ui.css', dirname(__FILE__).'/radio-station.php' );
+	// $url = plugins_url( 'css/jquery-ui.css', RADIO_STATION_DIR.'/radio-station.php' );
 	// wp_enqueue_style( 'jquery-style', $url, array(), '1.8.2' );
 	if ( is_ssl() ) {
 		$protocol = 'https';
@@ -138,7 +139,7 @@ function radio_station_load_template( $single_template ) {
 		// first check to see if there's a template in the active theme's directory
 		$user_theme = get_stylesheet_directory() . '/single-playlist.php';
 		if ( ! file_exists( $user_theme ) ) {
-			$single_template = dirname( __FILE__ ) . '/templates/single-playlist.php';
+			$single_template = RADIO_STATION_DIR . '/templates/single-playlist.php';
 		}
 	}
 
@@ -146,7 +147,7 @@ function radio_station_load_template( $single_template ) {
 		// first check to see if there's a template in the active theme's directory
 		$user_theme = get_stylesheet_directory() . '/single-show.php';
 		if ( ! file_exists( $user_theme ) ) {
-			$single_template = dirname( __FILE__ ) . '/templates/single-show.php';
+			$single_template = RADIO_STATION_DIR . '/templates/single-show.php';
 		}
 	}
 
@@ -161,7 +162,7 @@ function radio_station_load_custom_post_type_template( $archive_template ) {
 	if ( is_post_type_archive( 'playlist' ) ) {
 		$playlist_archive_theme = get_stylesheet_directory() . '/archive-playlist.php';
 		if ( ! file_exists( $playlist_archive_theme ) ) {
-			$archive_template = dirname( __FILE__ ) . '/templates/archive-playlist.php';
+			$archive_template = RADIO_STATION_DIR . '/templates/archive-playlist.php';
 		}
 	}
 
@@ -421,7 +422,7 @@ function radio_station_plugin_help() {
 	echo radio_station_patreon_blurb( false );
 
 	// include help template
-	include dirname( __FILE__ ) . '/templates/help.php';
+	include RADIO_STATION_DIR . '/templates/help.php';
 }
 
 // --- output playlist export page ---
@@ -429,7 +430,7 @@ function radio_station_admin_export() {
 	global $wpdb;
 
 	// first, delete any old exports from the export directory
-	$dir = dirname( __FILE__ ) . '/export/';
+	$dir = RADIO_STATION_DIR . '/export/';
 	if ( is_dir( $dir ) ) {
 		$get_contents = opendir( $dir );
 		while ( $file = readdir( $get_contents ) ) {
@@ -453,12 +454,13 @@ function radio_station_admin_export() {
 
 		// fetch all records that were created between the start and end dates
 		$sql =
-			'SELECT `posts`.`ID`, `posts`.`post_date` FROM ' . $wpdb->prefix . "posts AS `posts`
-			WHERE `posts`.`post_type` = 'playlist'
-			AND `posts`.`post_status` = 'publish'
-			AND TO_DAYS(`posts`.`post_date`) >= TO_DAYS(%s)
-			AND TO_DAYS(`posts`.`post_date`) <= TO_DAYS(%s)
-			ORDER BY `posts`.`post_date` ASC;";
+		"SELECT posts.ID, posts.post_date 
+		FROM {$wpdb->posts} AS posts
+		WHERE posts.post_type = 'playlist' AND 
+			posts.post_status = 'publish' AND 
+			TO_DAYS(posts.post_date) >= TO_DAYS(%s) AND 
+			TO_DAYS(posts.post_date) <= TO_DAYS(%s)
+		ORDER BY posts.post_date ASC";
 		// prepare query before executing
 		$query     = $wpdb->prepare( $sql, array( $start, $end ) );
 		$playlists = $wpdb->get_results( $query );
@@ -500,7 +502,7 @@ function radio_station_admin_export() {
 		}
 
 		// save as file
-		$dir  = dirname( __FILE__ ) . '/export/';
+		$dir  = RADIO_STATION_DIR . '/export/';
 		$file = $date . '-export.txt';
 		if ( ! file_exists( $dir ) ) {
 			wp_mkdir_p( $dir );}
@@ -515,7 +517,7 @@ function radio_station_admin_export() {
 	}
 
 	// display the export page
-	include dirname( __FILE__ ) . '/templates/admin-export.php';
+	include RADIO_STATION_DIR . '/templates/admin-export.php';
 
 }
 

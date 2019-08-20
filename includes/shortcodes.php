@@ -78,14 +78,14 @@ function radio_station_shortcode_get_playlists_for_show( $atts ) {
 	}
 
 	$args = array(
-		'numberposts' => $atts['limit'],
-		'offset'      => 0,
-		'orderby'     => 'post_date',
-		'order'       => 'DESC',
-		'post_type'   => 'playlist',
-		'post_status' => 'publish',
-		'meta_key'    => 'playlist_show_id',
-		'meta_value'  => $atts['show'],
+		'posts_per_page' => $atts['limit'],
+		'offset'         => 0,
+		'orderby'        => 'post_date',
+		'order'          => 'DESC',
+		'post_type'      => 'playlist',
+		'post_status'    => 'publish',
+		'meta_key'       => 'playlist_show_id',
+		'meta_value'     => $atts['show'],
 	);
 
 	$query     = new WP_Query( $args );
@@ -127,27 +127,33 @@ function radio_station_shortcode_list_shows( $atts ) {
 
 	// grab the published shows
 	$args = array(
-		'numberposts' => -1,
-		'offset'      => 0,
-		'orderby'     => 'title',
-		'order'       => 'ASC',
-		'post_type'   => 'show',
-		'post_status' => 'publish',
-		'meta_query'  => array(
+		'posts_per_page' => 1000,
+		'offset'         => 0,
+		'orderby'        => 'title',
+		'order'          => 'ASC',
+		'post_type'      => 'show',
+		'post_status'    => 'publish',
+		'meta_query'     => array(
 			array(
 				'key'   => 'show_active',
 				'value' => 'on',
 			),
 		),
 	);
-
 	if ( ! empty( $atts['genre'] ) ) {
-		$args['genres'] = $atts['genre'];}
+		$args['tax_query'] = array(
+			array(
+				'taxonomy' => 'genres',
+				'field'    => 'slug',
+				'terms'    => $atts['genre'],
+			),
+		);
+	}
 
 	$query = new WP_Query( $args );
 
 	// if there are no shows saved, return nothing
-	if ( $query->found_posts <= 0 ) {
+	if ( ! $query->have_posts() ) {
 		return false;
 	}
 
@@ -155,13 +161,15 @@ function radio_station_shortcode_list_shows( $atts ) {
 
 	$output .= '<div id="station-show-list">';
 	$output .= '<ul>';
-	foreach ( $query->posts as $show ) {
+	while ( $query->have_posts() ) :
+		$query->the_post();
 		$output     .= '<li>';
-			$output .= '<a href="' . get_permalink( $show->ID ) . '">' . get_the_title( $show->ID ) . '</a>';
+			$output .= '<a href="' . get_permalink() . '">' . get_the_title() . '</a>';
 		$output     .= '</li>';
-	}
+	endwhile;
 	$output .= '</ul>';
 	$output .= '</div>';
+	wp_reset_postdata();
 	return $output;
 }
 add_shortcode( 'list-shows', 'radio_station_shortcode_list_shows' );

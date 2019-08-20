@@ -296,8 +296,7 @@ function radio_station_myplaylist_inner_custom_box() {
 
 	// --- get the saved meta as an arry ---
 	$entries = get_post_meta( $post->ID, 'playlist', false );
-	// print_r($entries);
-	$c = 1;
+	$c       = 1;
 
 	echo '<table id="here" class="widefat">';
 	echo '<tr>';
@@ -332,6 +331,7 @@ function radio_station_myplaylist_inner_custom_box() {
 				echo '<input type="text" name="playlist[' . esc_attr( $c ) . '][playlist_entry_comments]" value="' . esc_attr( $track['playlist_entry_comments'] ) . '" style="width:320px;"></td>';
 
 				echo '<td>' . esc_html__( 'New', 'radio-station' ) . ' ';
+				$track['playlist_entry_new'] = isset( $track['playlist_entry_new'] ) ? $track['playlist_entry_new'] : false;
 				echo '<input type="checkbox" name="playlist[' . esc_attr( $c ) . '][playlist_entry_new]" ' . checked( $track['playlist_entry_new'] ) . ' />';
 
 				echo ' ' . esc_html__( 'Status', 'radio-station' ) . ' ';
@@ -901,7 +901,6 @@ function radio_station_myplaylist_inner_sched_custom_box() {
 
 		// --- get the saved meta as an array ---
 		$shifts = get_post_meta( $post->ID, 'show_sched', false );
-		// print_r($shifts);
 
 		$c = 0;
 		if ( isset( $shifts[0] ) && is_array( $shifts[0] ) ) {
@@ -1046,7 +1045,7 @@ function radio_station_myplaylist_inner_sched_custom_box() {
 								>pm</option>
 							</select>
 						</li>
-
+						<?php $track['encore'] = isset( $track['encore'] ) ? $track['encore'] : false; ?>
 						<li style="display:inline-block; margin-left:20px;"><input type="checkbox" name="show_sched[<?php echo esc_attr( $c ); ?>][encore]" <?php checked( $track['encore'], 'on' ); ?> /> <?php esc_html_e( 'Encore Presentation', 'radio-station' ); ?></li>
 
 						<li style="display:inline-block; margin-left:20px;"><span class="remove button-secondary" style="cursor: pointer;"><?php esc_html_e( 'Remove', 'radio-station' ); ?></span></li>
