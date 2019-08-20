@@ -162,7 +162,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 	// --- output widget display ---
 	public function widget( $args, $instance ) {
 
-		echo wp_kses_post( $args['before_widget'] );
+		echo $args['before_widget'];
 		$title       = empty( $instance['title'] ) ? '' : apply_filters( 'widget_title', $instance['title'] );
 		$display_djs = $instance['display_djs'];
 		$djavatar    = $instance['djavatar'];
@@ -199,11 +199,11 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		<div class="widget">
 			<?php
 			// --- output widget title ---
-			echo wp_kses_post( $args['before_title'] );
+			echo $args['before_title'];
 			if ( ! empty( $title ) ) {
 				echo esc_html( $title );
 			}
-			echo wp_kses_post( $args['after_title'] );
+			echo $args['after_title'];
 			?>
 			<ul class="on-air-upcoming-list">
 
@@ -213,7 +213,6 @@ class DJ_Upcoming_Widget extends WP_Widget {
 				if ( isset( $djs['all'] ) && ( count( $djs['all'] ) > 0 ) ) {
 
 					foreach ( $djs['all'] as $showtime => $dj ) {
-
 						if ( is_array( $dj ) && isset( $dj['type'] ) && 'override' === $dj['type'] ) {
 							?>
 							<li class="on-air-dj">
@@ -441,7 +440,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		}
 		wp_enqueue_style( 'dj-widget', $url, array(), $version, 'all' );
 
-		echo wp_kses_post( $args['after_widget'] );
+		echo $args['after_widget'];
 	}
 }
 

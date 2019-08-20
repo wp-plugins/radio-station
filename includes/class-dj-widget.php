@@ -183,7 +183,7 @@ class DJ_Widget extends WP_Widget {
 	// --- widget output ---
 	public function widget( $args, $instance ) {
 
-		echo wp_kses_post( $args['before_title'] );
+		echo $args['before_widget'];
 		$title         = empty( $instance['title'] ) ? '' : apply_filters( 'widget_title', $instance['title'] );
 		$display_djs   = $instance['display_djs'];
 		$djavatar      = $instance['djavatar'];
@@ -222,11 +222,11 @@ class DJ_Widget extends WP_Widget {
 		?>
 		<div class="widget">
 			<?php
-			echo wp_kses_post( $args['before_title'] );
+			echo $args['before_title'];
 			if ( ! empty( $title ) ) {
 				echo esc_html( $title );
 			}
-			echo wp_kses_post( $args['after_title'] );
+			echo $args['after_title'];
 			?>
 
 			<ul class="on-air-list">
@@ -515,7 +515,7 @@ class DJ_Widget extends WP_Widget {
 		// 2.2.4: fix to media argument
 		wp_enqueue_style( 'dj-widget', $url, array(), $version, 'all' );
 
-		echo wp_kses_post( $args['after_widget'] );
+		echo $args['after_widget'];
 	}
 }
 

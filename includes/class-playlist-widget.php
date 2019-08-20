@@ -88,7 +88,7 @@ class Playlist_Widget extends WP_Widget {
 	// --- output widget display ---
 	public function widget( $args, $instance ) {
 
-		echo wp_kses_post( $args['before_widget'] );
+		echo $args['before_widget'];
 		$title    = empty( $instance['title'] ) ? '' : apply_filters( 'widget_title', $instance['title'] );
 		$artist   = $instance['artist'];
 		$song     = $instance['song'];
@@ -102,11 +102,11 @@ class Playlist_Widget extends WP_Widget {
 		?>
 		<div class="widget">
 			<?php
-			echo wp_kses_post( $args['before_title'] );
+			echo $args['before_title'];
 			if ( ! empty( $title ) ) {
 				echo esc_html( $title );
 			}
-			echo wp_kses_post( $args['after_title'] );
+			echo $args['after_title'];
 
 			if ( $most_recent ) {
 
@@ -197,7 +197,7 @@ class Playlist_Widget extends WP_Widget {
 		}
 		wp_enqueue_style( 'dj-widget', $url, array(), $version, 'all' );
 
-		echo wp_kses_post( $args['after_widget'] );
+		echo $args['after_widget'];
 	}
 }
 
