@@ -246,6 +246,18 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 2.2.6 =
+* Reorganize master-list shortcode into templates,
+* Add constant for plugin directory,
+* WP_Query instead of get_posts,
+* new posts_per_page and tax_query,
+* fixes for undefined indexes,
+* fixes for raw mysql queries,
+* typecasting to support strict comparisons.
+
+= 2.2.5 =
+* WordPress coding standards and best practices (thanks to Mike Garrett @mikengarrett)
+
 = 2.2.4 =
 * added title position and avatar width options to widgets
 * added missing DJ author links as new option to widgets
