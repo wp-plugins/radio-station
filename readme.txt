@@ -523,6 +523,18 @@ you send me your finished translation, I'd love to include it.
 
 == Upgrade Notice ==
 
+= 2.2.6 =
+* Reorganize master-list shortcode into templates,
+* Add constant for plugin directory,
+* WP_Query instead of get_posts,
+* new posts_per_page and tax_query,
+* fixes for undefined indexes,
+* fixes for raw mysql queries,
+* typecasting to support strict comparisons.
+
+= 2.2.5 =
+* WordPress coding standards and best practices (thanks to Mike Garrett @mikengarrett)
+
 = 2.2.4 =
 Adds title position and avatar width options to widgets; missing DJ author links as new option to widgets; cleanup, improve and fix enqueued Widget CSS (on air/upcoming); show Encore Presentation in show widget displays; fix to Show shift Encore Presentation checkbox saving
 
