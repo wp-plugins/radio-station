@@ -246,6 +246,9 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+= 2.2.7 =
+* Dutch translation added (Thank you to André Dortmont for the file!)
+
 = 2.2.6 =
 * Reorganize master-list shortcode into templates,
 * Add constant for plugin directory,
@@ -522,6 +525,9 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.2.7 =
+* Dutch translation added (Thank you to André Dortmont for the file!)
 
 = 2.2.6 =
 * Reorganize master-list shortcode into templates,
