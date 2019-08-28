@@ -246,6 +246,7 @@ you send me your finished translation, I'd love to include it.
 
 == Changelog ==
 
+<<<<<<< HEAD
 = 2.2.6 =
 * Reorganize master-list shortcode into templates,
 * Add constant for plugin directory,
@@ -254,6 +255,34 @@ you send me your finished translation, I'd love to include it.
 * fixes for undefined indexes,
 * fixes for raw mysql queries,
 * typecasting to support strict comparisons.
+=======
+= 2.2.7 =
+* Added Tabbed Display for Master Schedule Shortcode (via Tutorial)
+* Add Show list columns with active, shift, DJs and show image displays
+* Add Schedule Override list columns with date sorting and filtering
+* Add playlist track information labels to Now Playing Widget
+* Added meridiem (am/pm) translations via WP Locale class
+* Added star rating link to plugin announcement box
+* Added update subscription form to plugin Help page
+* Fix to checkbox value saving for On Air/Upcoming Widgets
+* Fix 12 hour show time display in Upcoming Widget
+* Fix PM 12 hour shot time display in On Air Widget
+* Fix to schedule override date picker value visibility
+* Fix to weekday and month translations to use WP Locale
+* Fix to checkbox value saving in Upcoming Widget
+* Split Plugin Admin Functions into separate file
+* Split Post Type Admin Functions into separate include
+* Revert anonymous function use in widget registrations
+
+= 2.2.6 =
+* Reorganize master-list shortcode into templates
+* Add constant for plugin directory
+* Use WP_Query instead of get_posts
+* New posts_per_page and tax_query
+* Fixes for undefined indexes
+* Fixes for raw mysql queries
+* Typecasting to support strict comparisons
+>>>>>>> release/2.2.7
 
 = 2.2.5 =
 * WordPress coding standards and best practices (thanks to Mike Garrett @mikengarrett)
