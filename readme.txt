@@ -239,11 +239,9 @@ Serbian (sr_RS)
 Spanish (es_ES)
 Catalan (ca)
 
-= Can you translate the plugin into my language? =
+= Can the plugin be translated into my language? =
 
-My foreign language skills are rather lacking.  I managed a Spanish translation, sheerly due to the fact that I still remember at least some of what 
-I learned in high school Spanish class.  But I've included the .pot file in the /languages directory.  If you want to give it a shot, be my guest.  If 
-you send me your finished translation, I'd love to include it.
+You may translate the plugin into another language. Please visit our WordPress Translate project page for this plugin for further instruction: <a target="_top" href="https://translate.wordpress.org/locale/en-gb/default/wp-plugins/radio-station/">https://translate.wordpress.org/locale/en-gb/default/wp-plugins/radio-station/</a> The radio-station.pot file is located in the /languages directory of the plugin. Please send the finished translation to info@netmix.com. We'd love to include it.
 
 == Changelog ==
 
