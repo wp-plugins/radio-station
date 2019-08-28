@@ -230,6 +230,7 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 Right now:
 
 Albanian (sq_AL)
+Dutch (nl_NL)
 French (fr_FR)
 German (de_DE)
 Italian (it_IT)
