@@ -230,6 +230,7 @@ little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  ht
 Right now:
 
 Albanian (sq_AL)
+Dutch (nl_NL)
 French (fr_FR)
 German (de_DE)
 Italian (it_IT)
@@ -238,25 +239,14 @@ Serbian (sr_RS)
 Spanish (es_ES)
 Catalan (ca)
 
-= Can you translate the plugin into my language? =
+= Can the plugin be translated into my language? =
 
-My foreign language skills are rather lacking.  I managed a Spanish translation, sheerly due to the fact that I still remember at least some of what 
-I learned in high school Spanish class.  But I've included the .pot file in the /languages directory.  If you want to give it a shot, be my guest.  If 
-you send me your finished translation, I'd love to include it.
+You may translate the plugin into another language. Please visit our WordPress Translate project page for this plugin for further instruction: <a target="_top" href="https://translate.wordpress.org/locale/en-gb/default/wp-plugins/radio-station/">https://translate.wordpress.org/locale/en-gb/default/wp-plugins/radio-station/</a> The radio-station.pot file is located in the /languages directory of the plugin. Please send the finished translation to info@netmix.com. We'd love to include it.
 
 == Changelog ==
 
-<<<<<<< HEAD
-= 2.2.6 =
-* Reorganize master-list shortcode into templates,
-* Add constant for plugin directory,
-* WP_Query instead of get_posts,
-* new posts_per_page and tax_query,
-* fixes for undefined indexes,
-* fixes for raw mysql queries,
-* typecasting to support strict comparisons.
-=======
 = 2.2.7 =
+* Dutch translation added (Thank you to André Dortmont for the file!)
 * Added Tabbed Display for Master Schedule Shortcode (via Tutorial)
 * Add Show list columns with active, shift, DJs and show image displays
 * Add Schedule Override list columns with date sorting and filtering
@@ -282,7 +272,6 @@ you send me your finished translation, I'd love to include it.
 * Fixes for undefined indexes
 * Fixes for raw mysql queries
 * Typecasting to support strict comparisons
->>>>>>> release/2.2.7
 
 = 2.2.5 =
 * WordPress coding standards and best practices (thanks to Mike Garrett @mikengarrett)
@@ -551,6 +540,21 @@ you send me your finished translation, I'd love to include it.
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.2.7 =
+* Dutch translation added (Thank you to André Dortmont for the file!)
+
+= 2.2.6 =
+* Reorganize master-list shortcode into templates,
+* Add constant for plugin directory,
+* WP_Query instead of get_posts,
+* new posts_per_page and tax_query,
+* fixes for undefined indexes,
+* fixes for raw mysql queries,
+* typecasting to support strict comparisons.
+
+= 2.2.5 =
+* WordPress coding standards and best practices (thanks to Mike Garrett @mikengarrett)
 
 = 2.2.4 =
 Adds title position and avatar width options to widgets; missing DJ author links as new option to widgets; cleanup, improve and fix enqueued Widget CSS (on air/upcoming); show Encore Presentation in show widget displays; fix to Show shift Encore Presentation checkbox saving
