@@ -35,16 +35,28 @@ class Playlist_Widget extends WP_Widget {
 			</p>
 
 			<p>
+<<<<<<< HEAD
 				<label for="<?php echo esc_attr( $this->get_field_id( 'artist' ) ); ?>">
 					<input id="<?php echo esc_attr( $this->get_field_id( 'artist' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'artist' ) ); ?>" type="checkbox" <?php checked( $artist ); ?>/>
 					<?php esc_html_e( 'Show Artist Name', 'radio-station' ); ?>
+=======
+				<label for="<?php echo esc_attr( $this->get_field_id( 'song' ) ); ?>">
+					<input id="<?php echo esc_attr( $this->get_field_id( 'song' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'song' ) ); ?>" type="checkbox" <?php checked( $song ); ?>/>
+					<?php esc_html_e( 'Show Song Title', 'radio-station' ); ?>
+>>>>>>> release/2.2.7
 				</label>
 			</p>
 
 			<p>
+<<<<<<< HEAD
 				<label for="<?php echo esc_attr( $this->get_field_id( 'song' ) ); ?>">
 					<input id="<?php echo esc_attr( $this->get_field_id( 'song' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'song' ) ); ?>" type="checkbox" <?php checked( $song ); ?>/>
 					<?php esc_html_e( 'Show Song Title', 'radio-station' ); ?>
+=======
+				<label for="<?php echo esc_attr( $this->get_field_id( 'artist' ) ); ?>">
+					<input id="<?php echo esc_attr( $this->get_field_id( 'artist' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'artist' ) ); ?>" type="checkbox" <?php checked( $artist ); ?>/>
+					<?php esc_html_e( 'Show Artist Name', 'radio-station' ); ?>
+>>>>>>> release/2.2.7
 				</label>
 			</p>
 
@@ -123,15 +135,27 @@ class Playlist_Widget extends WP_Widget {
 					if ( $song && isset( $most_recent['playlist_entry_song'] ) ) {
 						?>
 						<div class="myplaylist-song">
+<<<<<<< HEAD
 							<?php echo esc_html( $most_recent['playlist_entry_song'] ); ?>
+=======
+							<?php echo __( 'Song:','radio-station' ).' '.esc_html( $most_recent['playlist_entry_song'] ); ?>
+>>>>>>> release/2.2.7
 						</div>
 						<?php
 					}
 
+<<<<<<< HEAD
 					if ( $artist && isset( $most_recent['playlist_entry_artist'] ) ) {
 						?>
 						<div class="myplaylist-artist">
 							<?php echo esc_html( $most_recent['playlist_entry_artist'] ); ?>
+=======
+					// 2.2.7: add label prefixes to now playing data
+					if ( $artist && isset( $most_recent['playlist_entry_artist'] ) ) {
+						?>
+						<div class="myplaylist-artist">
+							<?php echo __( 'Song','radio-station' ).': '.esc_html( $most_recent['playlist_entry_artist'] ); ?>
+>>>>>>> release/2.2.7
 						</div>
 						<?php
 					}
@@ -139,7 +163,11 @@ class Playlist_Widget extends WP_Widget {
 					if ( $album && isset( $most_recent['playlist_entry_album'] ) ) {
 						?>
 						<div class="myplaylist-album">
+<<<<<<< HEAD
 							<?php echo esc_html( $most_recent['playlist_entry_album'] ); ?>
+=======
+							<?php echo __( 'Album','radio-station' ).': '.esc_html( $most_recent['playlist_entry_album'] ); ?>
+>>>>>>> release/2.2.7
 						</div>
 						<?php
 					}
@@ -147,7 +175,11 @@ class Playlist_Widget extends WP_Widget {
 					if ( $label && isset( $most_recent['playlist_entry_label'] ) ) {
 						?>
 						<div class="myplaylist-label">
+<<<<<<< HEAD
 							<?php echo esc_html( $most_recent['playlist_entry_label'] ); ?>
+=======
+							<?php echo __( 'Label','radio-station' ).': '.esc_html( $most_recent['playlist_entry_label'] ); ?>
+>>>>>>> release/2.2.7
 						</div>
 						<?php
 					}
@@ -155,7 +187,11 @@ class Playlist_Widget extends WP_Widget {
 					if ( $comments && isset( $most_recent['playlist_entry_comments'] ) ) {
 						?>
 						<div class="myplaylist-comments">
+<<<<<<< HEAD
 							<?php echo esc_html( $most_recent['playlist_entry_comments'] ); ?>
+=======
+							<?php echo __( 'Comments','radio-station' ).': '.esc_html( $most_recent['playlist_entry_comments'] ); ?>
+>>>>>>> release/2.2.7
 						</div>
 						<?php
 					}
@@ -192,8 +228,13 @@ class Playlist_Widget extends WP_Widget {
 			$version = filemtime( $dj_widget_css );
 			$url     = get_stylesheet_directory_uri() . '/widgets.css';
 		} else {
+<<<<<<< HEAD
 			$version = filemtime( dirname( dirname( __FILE__ ) ) . '/css/widgets.css' );
 			$url     = plugins_url( 'css/widgets.css', dirname( dirname( __FILE__ ) ) . '/radio-station.php' );
+=======
+			$version = filemtime( RADIO_STATION_DIR . '/css/widgets.css' );
+			$url     = plugins_url( 'css/widgets.css', RADIO_STATION_DIR . '/radio-station.php' );
+>>>>>>> release/2.2.7
 		}
 		wp_enqueue_style( 'dj-widget', $url, array(), $version, 'all' );
 
@@ -202,9 +243,17 @@ class Playlist_Widget extends WP_Widget {
 }
 
 // --- register the widget ---
+<<<<<<< HEAD
 add_action(
 	'widgets_init',
 	function() {
 		return register_widget( 'Playlist_Widget' );
 	}
 );
+=======
+// 2.2.7: revert anonymous function usage for backwards compatibility
+add_action( 'widgets_init', 'radio_station_register_nowplaying_widget' );
+function radio_station_register_nowplaying_widget() {
+	register_widget('Playlist_Widget');
+}
+>>>>>>> release/2.2.7

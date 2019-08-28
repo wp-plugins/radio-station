@@ -156,7 +156,11 @@ class DJ_Widget extends WP_Widget {
 		<?php
 	}
 
+<<<<<<< HEAD
 				// --- update widget instance values ---
+=======
+	// --- update widget instance values ---
+>>>>>>> release/2.2.7
 	public function update( $new_instance, $old_instance ) {
 
 		$instance                   = $old_instance;
@@ -166,10 +170,18 @@ class DJ_Widget extends WP_Widget {
 		$instance['link']           = ( isset( $new_instance['link'] ) ? 1 : 0 );
 		$instance['default']        = $new_instance['default'];
 		$instance['time']           = $new_instance['time'];
+<<<<<<< HEAD
 		$instance['show_sched']     = $new_instance['show_sched'];
 		$instance['show_playlist']  = $new_instance['show_playlist'];
 		$instance['show_all_sched'] = $new_instance['show_all_sched'];
 		$instance['show_desc']      = $new_instance['show_desc'];
+=======
+		// 2.2.7: fix checkbox value saving
+		$instance['show_sched']     = ( isset( $new_instance['show_sched'] ) ? 1 : 0 );
+		$instance['show_playlist']  = ( isset( $new_instance['show_playlist'] ) ? 1 : 0 );
+		$instance['show_all_sched'] = ( isset( $new_instance['show_all_sched'] ) ? 1 : 0 );
+		$instance['show_desc']      = ( isset( $new_instance['show_desc'] ) ? 1 : 0 );
+>>>>>>> release/2.2.7
 
 		// 2.2.4: added title position and avatar width settings
 		$instance['title_position'] = $new_instance['title_position'];
@@ -260,7 +272,11 @@ class DJ_Widget extends WP_Widget {
 						if ( 'above' !== $position ) {
 							?>
 							<div class="on-air-dj-title">
+<<<<<<< HEAD
 								<?php echo esc_html( $djs['all'][0]['title'] ); ?> 
+=======
+								<?php echo esc_html( $djs['all'][0]['title'] ); ?>
+>>>>>>> release/2.2.7
 							</div>
 							<?php
 						}
@@ -272,6 +288,7 @@ class DJ_Widget extends WP_Widget {
 						if ( $show_sched ) {
 
 							if ( 12 === (int) $time ) {
+<<<<<<< HEAD
 								$start_hour = $djs['all'][0]['sched']['start_hour'];
 								if ( substr( $djs['all'][0]['sched']['start_hour'], 0, 1 ) === '0' ) {
 									$start_hour = substr( $djs['all'][0]['sched']['start_hour'], 1 );
@@ -281,6 +298,21 @@ class DJ_Widget extends WP_Widget {
 								if ( substr( $djs['all'][0]['sched']['end_hour'], 0, 1 ) === '0' ) {
 									$end_hour = substr( $djs['all'][0]['sched']['end_hour'], 1 );
 								}
+=======
+
+								// 2.2.7: add fix to convert back from 24 hour time if past midday
+								$start_hour = $djs['all'][0]['sched']['start_hour'];
+								if ( substr( $start_hour, 0, 1 ) === '0' ) {
+									$start_hour = substr( $start_hour, 1 );
+								} elseif ( (int) $start_hour > 12 ) {$start_hour = $start_hour - 12;}
+
+								// 2.2.7: add fix to convert back from 24 hour time if past midday
+								$end_hour = $djs['all'][0]['sched']['end_hour'];
+								if ( substr( $end_hour, 0, 1 ) === '0' ) {
+									$end_hour = substr( $end_hour, 1 );
+								} elseif ( (int) $end_hour > 12 ) {$end_hour = $end_hour - 12;}
+
+>>>>>>> release/2.2.7
 								?>
 								<div class="on-air-dj-sched">
 									<?php echo esc_html( $start_hour . ':' . $djs['all'][0]['sched']['start_min'] . ' ' . $djs['all'][0]['sched']['start_meridian'] . ' - ' . $end_hour . ':' . $djs['all'][0]['sched']['end_min'] . ' ' . $djs['all'][0]['sched']['end_meridian'] ); ?>
@@ -389,7 +421,11 @@ class DJ_Widget extends WP_Widget {
 												if ( $link_djs ) {
 													?>
 													<a href="<?php echo esc_url( $dj_link ); ?>">
+<<<<<<< HEAD
 														<?php echo esc_html( $user_info->display_name ); ?> 
+=======
+														<?php echo esc_html( $user_info->display_name ); ?>
+>>>>>>> release/2.2.7
 													</a>
 													<?php
 												} else {
@@ -436,7 +472,11 @@ class DJ_Widget extends WP_Widget {
 								// --- show schedule ---
 								if ( $show_sched ) {
 
+<<<<<<< HEAD
 									// --- if we only want the schedule that's relevant now to display ---
+=======
+									// --- if we only want the schedule that is relevant now to display ---
+>>>>>>> release/2.2.7
 									if ( ! $show_all_sched ) {
 
 										if ( $current_sched ) {
@@ -466,7 +506,11 @@ class DJ_Widget extends WP_Widget {
 											if ( 12 === (int) $time ) {
 												?>
 												<div class="on-air-dj-sched">
+<<<<<<< HEAD
 													<?php echo esc_html( $display_day . ', ' . $sched['start_hour'] . ':' . $sched['start_min'] . ' ' . $sched['start_meridian'] . ' - ' . $sched['end_hour'] . ':' . $sched['end_min'] . ' ' . $sched['end_meridian'] ); ?> 
+=======
+													<?php echo esc_html( $display_day . ', ' . $sched['start_hour'] . ':' . $sched['start_min'] . ' ' . $sched['start_meridian'] . ' - ' . $sched['end_hour'] . ':' . $sched['end_min'] . ' ' . $sched['end_meridian'] ); ?>
+>>>>>>> release/2.2.7
 												</div>
 												<?php
 											} else {
@@ -509,8 +553,13 @@ class DJ_Widget extends WP_Widget {
 			$url     = get_stylesheet_directory_uri() . '/widgets.css';
 		} else {
 			// 2.2.3: fix to version path check also
+<<<<<<< HEAD
 			$version = filemtime( dirname( dirname( __FILE__ ) ) . '/css/widgets.css' );
 			$url     = plugins_url( 'css/widgets.css', dirname( dirname( __FILE__ ) ) . '/radio-station.php' );
+=======
+			$version = filemtime( RADIO_STATION_DIR . '/css/widgets.css' );
+			$url     = plugins_url( 'css/widgets.css', RADIO_STATION_DIR . '/radio-station.php' );
+>>>>>>> release/2.2.7
 		}
 		// 2.2.4: fix to media argument
 		wp_enqueue_style( 'dj-widget', $url, array(), $version, 'all' );
@@ -520,9 +569,17 @@ class DJ_Widget extends WP_Widget {
 }
 
 // --- register the widget ---
+<<<<<<< HEAD
 add_action(
 	'widgets_init',
 	function() {
 		return register_widget( 'DJ_Widget' );
 	}
 );
+=======
+// 2.2.7: revert anonymous function usage for backwards compatibility
+add_action( 'widgets_init', 'radio_station_register_dj_widget' );
+function radio_station_register_dj_widget() {
+	register_widget('DJ_Widget');
+}
+>>>>>>> release/2.2.7
