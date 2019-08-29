@@ -149,11 +149,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		$instance['default']     = $new_instance['default'];
 		$instance['limit']       = $new_instance['limit'];
 		$instance['time']        = $new_instance['time'];
-<<<<<<< HEAD
-		$instance['show_sched']  = $new_instance['show_sched'];
-=======
 		$instance['show_sched']  = ( isset( $new_instance['show_sched'] ) ? 1 : 0 );
->>>>>>> release/2.2.7
 
 		// 2.2.4: added title position, avatar width and DJ link settings
 		$instance['title_position'] = $new_instance['title_position'];
@@ -397,12 +393,8 @@ class DJ_Upcoming_Widget extends WP_Widget {
 									// 2.2.2: fix to weekday value to be translated
 									$weekday = radio_station_translate_weekday( date( 'l', $showtimes[0] ) );
 
-<<<<<<< HEAD
-									if ( 12 === $time ) {
-=======
 									// 2.2.7: fix to convert time to integer
 									if ( 12 === (int) $time ) {
->>>>>>> release/2.2.7
 										?>
 										<div class="on-air-dj-sched">
 											<?php echo esc_html( $weekday ); ?>, <?php echo esc_html( date( 'g:i a', $showtimes[0] ) ); ?> - <?php echo esc_html( date( 'g:i a', $showtimes[1] ) ); ?>
@@ -444,13 +436,8 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			$version = filemtime( $dj_widget_css );
 			$url     = get_stylesheet_directory_uri() . '/widgets.css';
 		} else {
-<<<<<<< HEAD
-			$version = filemtime( dirname( dirname( __FILE__ ) ) . '/css/widgets.css' );
-			$url     = plugins_url( 'css/widgets.css', dirname( dirname( __FILE__ ) ) . '/radio-station.php' );
-=======
 			$version = filemtime( RADIO_STATION_DIR . '/css/widgets.css' );
 			$url     = plugins_url( 'css/widgets.css', RADIO_STATION_DIR . '/radio-station.php' );
->>>>>>> release/2.2.7
 		}
 		wp_enqueue_style( 'dj-widget', $url, array(), $version, 'all' );
 
@@ -460,18 +447,8 @@ class DJ_Upcoming_Widget extends WP_Widget {
 
 
 // --- register the widget ---
-<<<<<<< HEAD
-add_action(
-	'widgets_init',
-	function() {
-		return register_widget( 'DJ_Upcoming_Widget' );
-	}
-);
-=======
 // 2.2.7: revert anonymous function usage for backwards compatibility
 add_action( 'widgets_init', 'radio_station_register_djcomingup_widget' );
 function radio_station_register_djcomingup_widget() {
 	register_widget('DJ_Upcoming_Widget');
 }
-
->>>>>>> release/2.2.7

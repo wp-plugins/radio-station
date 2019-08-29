@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?php
 /**
  * @package Radio Station
@@ -455,11 +454,11 @@ function radio_station_admin_export() {
 
 		// fetch all records that were created between the start and end dates
 		$sql =
-		"SELECT posts.ID, posts.post_date 
+		"SELECT posts.ID, posts.post_date
 		FROM {$wpdb->posts} AS posts
-		WHERE posts.post_type = 'playlist' AND 
-			posts.post_status = 'publish' AND 
-			TO_DAYS(posts.post_date) >= TO_DAYS(%s) AND 
+		WHERE posts.post_type = 'playlist' AND
+			posts.post_status = 'publish' AND
+			TO_DAYS(posts.post_date) >= TO_DAYS(%s) AND
 			TO_DAYS(posts.post_date) <= TO_DAYS(%s)
 		ORDER BY posts.post_date ASC";
 		// prepare query before executing
@@ -882,4 +881,3 @@ function radio_station_revoke_show_edit_cap( $allcaps, $cap = 'edit_shows', $arg
 }
 add_filter( 'user_has_cap', 'radio_station_revoke_show_edit_cap', 10, 3 );
 
->>>>>>> release/2.2.7
