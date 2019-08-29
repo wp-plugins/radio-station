@@ -17,10 +17,7 @@ function radio_station_master_schedule( $atts ) {
 			'list'              => 'table',
 			'show_image'        => 0,
 			'show_djs'          => 0,
-<<<<<<< HEAD
-=======
 			'show_genres'		=> 0,
->>>>>>> release/2.2.7
 			'divheight'         => 45,
 		),
 		$atts,
@@ -64,19 +61,6 @@ function radio_station_master_schedule( $atts ) {
 
 	// get the show schedules, excluding shows marked as inactive
 	$show_shifts = $wpdb->get_results(
-<<<<<<< HEAD
-		"SELECT meta.post_id, meta.meta_value 
-		FROM {$wpdb->postmeta} AS meta 
-		JOIN {$wpdb->postmeta} AS active 
-			ON meta.post_id = active.post_id 
-		JOIN {$wpdb->posts} as posts 
-			ON posts.ID = meta.post_id 
-		WHERE meta.meta_key = 'show_sched' AND 
-			posts.post_status = 'publish' AND 
-			( 
-				active.meta_key = 'show_active' AND 
-				active.meta_value = 'on' 
-=======
 		"SELECT meta.post_id, meta.meta_value
 		FROM {$wpdb->postmeta} AS meta
 		JOIN {$wpdb->postmeta} AS active
@@ -88,7 +72,6 @@ function radio_station_master_schedule( $atts ) {
 			(
 				active.meta_key = 'show_active' AND
 				active.meta_value = 'on'
->>>>>>> release/2.2.7
 			)"
 	);
 
@@ -145,20 +128,12 @@ function radio_station_master_schedule( $atts ) {
 				}
 
 				// if it ends after midnight, fix it
-<<<<<<< HEAD
-				if ( ( 'pm' === $time['time']['start_meridian'] && 'am' === $time['time']['end_meridian'] ) ||
-					//if it starts at night and ends in the morning, end hour is on the following day
-					( $time['time']['start_hour'] . $time['time']['start_min'] . $time['time']['start_meridian'] === $time['time']['end_hour'] . $time['time']['end_min'] . $time['time']['end_meridian'] ) ||
-					//if the start and end times are identical, assume the end time is the following day
-						( 'am' === $time['time']['start_meridian'] && $time['time']['start_hour'] > $time['time']['end_hour'] ) //if the start hour is in the morning, and greater than the end hour, assume end hour is the following day
-=======
 				// if it starts at night and ends in the morning, end hour is on the following day
 				if ( ( 'pm' === $time['time']['start_meridian'] && 'am' === $time['time']['end_meridian'] ) ||
 					// if the start and end times are identical, assume the end time is the following day
 					( $time['time']['start_hour'] . $time['time']['start_min'] . $time['time']['start_meridian'] === $time['time']['end_hour'] . $time['time']['end_min'] . $time['time']['end_meridian'] ) ||
 					// if the start hour is in the morning, and greater than the end hour, assume end hour is the following day
 						( 'am' === $time['time']['start_meridian'] && $time['time']['start_hour'] > $time['time']['end_hour'] )
->>>>>>> release/2.2.7
 					) {
 
 					if ( 12 === (int) $timeformat ) {
@@ -209,14 +184,6 @@ function radio_station_master_schedule( $atts ) {
 
 	$output = '';
 
-<<<<<<< HEAD
-	if ( 1 === (int) $atts['list'] || 'list' === $atts['list'] ) {
-		require RADIO_STATION_DIR . '/templates/master-list-list.php';
-	} elseif ( 'divs' === $atts['list'] ) {
-		require RADIO_STATION_DIR . '/templates/master-list-div.php';
-	} else {
-		require RADIO_STATION_DIR . '/templates/master-list-default.php';
-=======
 	// 2.2.7: added tabbed master schedule template
 	if ( 1 === (int) $atts['list'] || 'list' === $atts['list'] ) {
 		require( RADIO_STATION_DIR . '/templates/master-schedule-list.php' );
@@ -228,7 +195,6 @@ function radio_station_master_schedule( $atts ) {
 		add_action( 'wp_footer', 'radio_station_master_schedule_tabs_js' );
 	} else {
 		require( RADIO_STATION_DIR . '/templates/master-schedule-default.php' );
->>>>>>> release/2.2.7
 	}
 
 	return $output;
@@ -253,12 +219,8 @@ function radio_station_master_fetch_js_filter() {
 		$js .= '<a href="javascript:show_highlight(\'' . sanitize_title_with_dashes( $tax->name ) . '\')">' . $tax->name . '</a>';
 		// 2.2.2: fix to not add pipe suffix for last genre
 		if ( count( $taxes ) - 1 !== $i ) {
-<<<<<<< HEAD
-			$js .= ' | ';}
-=======
 			$js .= ' | ';
 		}
->>>>>>> release/2.2.7
 	}
 
 	$js .= '</div>';
@@ -272,8 +234,6 @@ function radio_station_master_fetch_js_filter() {
 
 	return $js;
 }
-<<<<<<< HEAD
-=======
 
 // --- javascript for tab switching ---
 // 2.2.7: added for tabbed display type
@@ -300,4 +260,3 @@ function radio_station_master_schedule_tabs_js() {
 		});
 	});</script>';
 }
->>>>>>> release/2.2.7

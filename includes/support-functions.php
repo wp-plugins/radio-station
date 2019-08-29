@@ -45,29 +45,16 @@ function radio_station_current_schedule( $scheds = array() ) {
 // --- convert shift times to 24-hour and timestamp formats for comparisons ---
 function radio_station_convert_time( $time = array() ) {
 
-<<<<<<< HEAD
-	if ( empty( $time ) ) {
-		return false;
-	}
-=======
 	if ( empty( $time ) ) {return false;}
->>>>>>> release/2.2.7
 
 	$now      = strtotime( current_time( 'mysql' ) );
 	$cur_date = date( 'Y-m-d', $now );
 	$tom_date = date( 'Y-m-d', ( $now + 86400 ) ); // get the date for tomorrow
 
-<<<<<<< HEAD
-	// convert to 24 hour time
-	$time = radio_station_convert_schedule_to_24hour( $time );
-
-	// get a timestamp for the schedule start and end
-=======
 	// --- convert to 24 hour time ---
 	$time = radio_station_convert_schedule_to_24hour( $time );
 
 	// --- get a timestamp for the schedule start and end ---
->>>>>>> release/2.2.7
 	$time['start_timestamp'] = strtotime( $cur_date . ' ' . $time['start_hour'] . ':' . $time['start_min'] );
 
 	if ( 'pm' === $time['start_meridian'] && 'am' === $time['end_meridian'] ) {
@@ -88,13 +75,7 @@ function radio_station_convert_time( $time = array() ) {
 // --- convert a shift to 24 hour time for display ---
 function radio_station_convert_schedule_to_24hour( $sched = array() ) {
 
-<<<<<<< HEAD
-	if ( empty( $sched ) ) {
-		return false;
-	}
-=======
 	if ( empty( $sched ) ) {return false;}
->>>>>>> release/2.2.7
 
 	if ( 'pm' === $sched['start_meridian'] && 12 !== (int) $sched['start_hour'] ) {
 		$sched['start_hour'] = $sched['start_hour'] + 12;
@@ -122,45 +103,13 @@ function radio_station_convert_schedule_to_24hour( $sched = array() ) {
 // --- fetch the current DJ(s) on-air --
 function radio_station_dj_get_current() {
 
-<<<<<<< HEAD
-	// first check to see if there are any shift overrides
-	$check = radio_station_master_get_overrides( true );
-
-=======
 	// --- first check to see if there are any shift overrides ---
 	$check = radio_station_master_get_overrides( true );
->>>>>>> release/2.2.7
 	if ( $check ) {
 		$shows = array(
 			'all'  => $check,
 			'type' => 'override',
 		);
-<<<<<<< HEAD
-
-		// at this point, we are done.  Return the info.
-		return $shows;
-	}
-
-	// load the info for the DJ
-	global $wpdb;
-
-	// get the current time
-	$now = strtotime( current_time( 'mysql' ) );
-
-	$cur_day = date( 'l', $now );
-
-	// we only want active shows
-	$show_shifts = $wpdb->get_results(
-		"SELECT meta.post_id, meta.meta_value FROM {$wpdb->postmeta} AS meta
-		JOIN {$wpdb->postmeta} AS metab 
-			ON meta.post_id = metab.post_id
-		JOIN {$wpdb->posts} as posts 
-			ON posts.ID = meta.post_id
-		WHERE meta.meta_key = 'show_sched' AND 
-			posts.post_status = 'publish' AND 
-			( 
-				metab.meta_key = 'show_active' AND 
-=======
 		return $shows;
 	}
 
@@ -181,7 +130,6 @@ function radio_station_dj_get_current() {
 			posts.post_status = 'publish' AND
 			(
 				metab.meta_key = 'show_active' AND
->>>>>>> release/2.2.7
 				metab.meta_value = 'on'
 			)"
 	);
@@ -237,10 +185,6 @@ function radio_station_dj_get_current() {
 // --- get the next DJ or DJs scheduled to be on air based on the current time ---
 function radio_station_dj_get_next( $limit = 1 ) {
 
-<<<<<<< HEAD
-	// load the info for the DJ
-=======
->>>>>>> release/2.2.7
 	global $wpdb;
 
 	// get the various times/dates we need
@@ -280,18 +224,6 @@ function radio_station_dj_get_next( $limit = 1 ) {
 
 	// Fetch all schedules... we only want active shows
 	$show_shifts = $wpdb->get_results(
-<<<<<<< HEAD
-		"SELECT meta.post_id, meta.meta_value 
-		FROM {$wpdb->postmeta} AS meta
-		JOIN {$wpdb->postmeta} AS metab 
-			ON meta.post_id = metab.post_id
-		JOIN {$wpdb->posts} as posts 
-			ON posts.ID = meta.post_id
-		WHERE meta.meta_key = 'show_sched' AND 
-			posts.post_status = 'publish' AND 
-			( 
-				metab.meta_key = 'show_active' AND 
-=======
 		"SELECT meta.post_id, meta.meta_value
 		FROM {$wpdb->postmeta} AS meta
 		JOIN {$wpdb->postmeta} AS metab
@@ -302,7 +234,6 @@ function radio_station_dj_get_next( $limit = 1 ) {
 			posts.post_status = 'publish' AND
 			(
 				metab.meta_key = 'show_active' AND
->>>>>>> release/2.2.7
 				metab.meta_value = 'on'
 			)"
 	);
@@ -466,15 +397,9 @@ function radio_station_myplaylist_get_posts_for_show( $show_id = null, $title = 
 
 	$fetch_posts = $wpdb->get_results(
 		$wpdb->prepare(
-<<<<<<< HEAD
-			"SELECT meta.post_id 
-			FROM {$wpdb->postmeta} AS meta
-			WHERE meta.meta_key = 'post_showblog_id' AND 
-=======
 			"SELECT meta.post_id
 			FROM {$wpdb->postmeta} AS meta
 			WHERE meta.meta_key = 'post_showblog_id' AND
->>>>>>> release/2.2.7
   			meta.meta_value = %d",
 			$show_id
 		)
@@ -490,15 +415,9 @@ function radio_station_myplaylist_get_posts_for_show( $show_id = null, $title = 
 
 		$blogposts = $wpdb->get_results(
 			$wpdb->prepare(
-<<<<<<< HEAD
-				"SELECT posts.ID, posts.post_title 
-				FROM {$wpdb->posts} AS posts
-				WHERE posts.ID IN(%s) AND 
-=======
 				"SELECT posts.ID, posts.post_title
 				FROM {$wpdb->posts} AS posts
 				WHERE posts.ID IN(%s) AND
->>>>>>> release/2.2.7
 					posts.post_status = 'publish'
 				ORDER BY posts.post_date DESC
 				LIMIT %d",
@@ -521,15 +440,9 @@ function radio_station_myplaylist_get_posts_for_show( $show_id = null, $title = 
 
 	// if the blog archive page has been created, add a link to the archive for this show
 	$page = $wpdb->get_results(
-<<<<<<< HEAD
-		"SELECT meta.post_id 
-		FROM {$wpdb->postmeta} AS meta
-		WHERE meta.meta_key = '_wp_page_template' AND 
-=======
 		"SELECT meta.post_id
 		FROM {$wpdb->postmeta} AS meta
 		WHERE meta.meta_key = '_wp_page_template' AND
->>>>>>> release/2.2.7
 			meta.meta_value = 'show-blog-archive-template.php'
 		LIMIT 1"
 	);
@@ -557,15 +470,9 @@ function radio_station_master_get_overrides( $currenthour = false ) {
 	$sql_date    = '%' . $sql_date . '%';
 	$show_shifts = $wpdb->get_results(
 		$wpdb->prepare(
-<<<<<<< HEAD
-			"SELECT meta.post_id 
-			FROM {$wpdb->postmeta} AS meta
-			WHERE meta_key = 'show_override_sched' AND 
-=======
 			"SELECT meta.post_id
 			FROM {$wpdb->postmeta} AS meta
 			WHERE meta_key = 'show_override_sched' AND
->>>>>>> release/2.2.7
 				meta_value LIKE %s",
 			$sql_date
 		)
@@ -629,17 +536,6 @@ function radio_station_shorten_string( $string, $limit ) {
 }
 
 // --- translate weekday ---
-<<<<<<< HEAD
-// translated individually as cannot translate a variable
-function radio_station_translate_weekday( $weekday, $short = false ) {
-	return __( $weekday, 'radio-station' );
-}
-
-// --- translate month ---
-function radio_station_translate_month( $month, $short = false ) {
-		return __( $month, 'radio-station' );
-}
-=======
 // important note: translated individually as cannot translate a variable
 // 2.2.7: use wp locale class to translate weekdays
 function radio_station_translate_weekday( $weekday, $short = false ) {
@@ -708,4 +604,3 @@ function radio_station_translate_meridiem( $meridiem ) {
 	global $wp_locale;
 	return $wp_locale->get_meridiem( $meridiem );
 }
->>>>>>> release/2.2.7
