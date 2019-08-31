@@ -132,7 +132,7 @@ class Playlist_Widget extends WP_Widget {
 					if ( $artist && isset( $most_recent['playlist_entry_artist'] ) ) {
 						?>
 						<div class="myplaylist-artist">
-							<?php echo __( 'Song','radio-station' ).': '.esc_html( $most_recent['playlist_entry_artist'] ); ?>
+							<?php echo __( 'Artist','radio-station' ).': '.esc_html( $most_recent['playlist_entry_artist'] ); ?>
 						</div>
 						<?php
 					}
