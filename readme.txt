@@ -28,7 +28,7 @@ We are actively seeking radio station partners and donations to fund further dev
 
 For plugin support, please give 24-48 hours to answer support questions, which will be handled in the Wordpress Support Forums for this free version of the plugin here: <a href="https://wordpress.org/support/plugin/radio-station/">https://wordpress.org/support/plugin/radio-station/</a>
 
-You can find a demo version of the plugin on our demo site here: <a href="https://netmix.co/radio-station-demo">https://netmix.co/radio-station-demo</a>
+You can find a demo version of the plugin on our demo site here: <a href="https://radiostationdemo.com">https://radiostationdemo.com</a>
 
 == Installation ==
 
