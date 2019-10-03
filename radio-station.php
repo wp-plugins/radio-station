@@ -261,7 +261,7 @@ function radio_station_revoke_show_edit_cap( $allcaps, $cap = 'edit_shows', $arg
 				}
 
 				// ---- revoke editing capability if not assigned to this show ---
-				if ( ! in_array( $user->ID, $djs, true ) ) {
+				if ( ! in_array( strval( $user->ID ), $djs, true ) ) {
 					$allcaps['edit_shows']           = false;
 					$allcaps['edit_published_shows'] = false;
 				}
@@ -271,4 +271,3 @@ function radio_station_revoke_show_edit_cap( $allcaps, $cap = 'edit_shows', $arg
 	return $allcaps;
 }
 add_filter( 'user_has_cap', 'radio_station_revoke_show_edit_cap', 10, 3 );
-
