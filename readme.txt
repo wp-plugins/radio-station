@@ -548,6 +548,11 @@ You may translate the plugin into another language. Please visit our WordPress T
 
 == Upgrade Notice ==
 
+= 2.2.8 =
+
+= 2.2.8 =
+* Fix to remove strict type checking from in_array (introduced 2.2.6) which fixes DJ can't edit Show issue; mismatched flush rewrite rules flag function name; undefined index warnings for new Schedule Overrides; not 404 author pages for DJs without blog posts; implode blog array for Show blog post listing (introduced 2.2.6) which affected display of blog posts on Show page.
+
 = 2.2.7 =
 * Dutch translation added (Thank you to André Dortmont for the file!)
 * Added Tabbed Display for Master Schedule Shortcode (via Tutorial)
