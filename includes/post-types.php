@@ -137,8 +137,10 @@ add_filter( 'gutenberg_can_edit_post_type', 'radio_station_post_type_editor', 20
 add_filter( 'use_block_editor_for_post_type', 'radio_station_post_type_editor', 20, 2 );
 function radio_station_post_type_editor( $can_edit, $post_type ) {
 	$post_types = array( 'show', 'playlist', 'override' );
-	if ( in_array( $post_type, $post_types, true ) ) {
-		return false;}
+	// 2.2.8: remove strict in_array checking
+	if ( in_array( $post_type, $post_types ) ) {
+		return false;
+	}
 	return $can_edit;
 }
 

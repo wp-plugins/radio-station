@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Radio Station
- * @version 2.2.7
+ * @version 2.2.8
  */
 /*
 Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli <tonyzeoli@netmix.com>
-Version: 2.2.7
+Version: 2.2.8
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -80,7 +80,8 @@ add_action( 'plugins_loaded', 'radio_station_init' );
 // -------------------
 // (on plugin activation / deactivation)
 // 2.2.3: added this for custom post types rewrite flushing
-register_activation_hook( __FILE__, 'radio_station_flush_rewrite_rules' );
+// 2.2.8: fix for mismatched flag function name
+register_activation_hook( __FILE__, 'radio_station_flush_rewrite_flag' );
 register_deactivation_hook( __FILE__, 'flush_rewrite_rules' );
 function radio_station_flush_rewrite_flag() {
 	add_option( 'radio_station_flush_rewrite_rules', true );
@@ -153,6 +154,25 @@ function radio_station_load_custom_post_type_template( $archive_template ) {
 }
 add_filter( 'archive_template', 'radio_station_load_custom_post_type_template' );
 
+// ----------------------
+// DJ Author Template Fix
+// ----------------------
+// 2.2.8: fix to not 404 author pages for DJs without blog posts
+// Ref: https://wordpress.org/plugins/show-authors-without-posts/
+function radio_station_fix_djs_without_posts( $template ) {
+	global $wp_query;
+	if ( ! is_author() && get_query_var( 'author' ) && ( 0 == $wp_query->posts->post ) ) {
+
+		// --- check if author has DJ (or administrator) role ---
+		$author = get_query_var( 'author_name' ) ? get_user_by( 'slug', get_query_var( 'author_name' ) ) : get_userdata( get_query_var( 'author' ) );
+		if ( in_array( 'dj', $author->roles ) || in_array( 'administrator', $author->roles ) ) {
+			return get_author_template();
+		}
+
+	}
+	return $template;
+}
+add_filter( '404_template', 'radio_station_fix_djs_without_posts' );
 
 
 // ------------------
@@ -243,7 +263,8 @@ function radio_station_revoke_show_edit_cap( $allcaps, $cap = 'edit_shows', $arg
 	// --- check if current user has any of these roles ---
 	$found = false;
 	foreach ( $add_roles as $role ) {
-		if ( in_array( $role, $user->roles, true ) ) {
+		// 2.2.8: remove strict in_array checking
+		if ( in_array( $role, $user->roles ) ) {
 			$found = true;
 		}
 	}
@@ -261,7 +282,8 @@ function radio_station_revoke_show_edit_cap( $allcaps, $cap = 'edit_shows', $arg
 				}
 
 				// ---- revoke editing capability if not assigned to this show ---
-				if ( ! in_array( strval( $user->ID ), $djs, true ) ) {
+				// 2.2.8: remove strict in_array checking
+				if ( ! in_array( $user->ID, $djs ) ) {
 					$allcaps['edit_shows']           = false;
 					$allcaps['edit_published_shows'] = false;
 				}
@@ -271,3 +293,4 @@ function radio_station_revoke_show_edit_cap( $allcaps, $cap = 'edit_shows', $arg
 	return $allcaps;
 }
 add_filter( 'user_has_cap', 'radio_station_revoke_show_edit_cap', 10, 3 );
+

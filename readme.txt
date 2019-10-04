@@ -245,6 +245,12 @@ You may translate the plugin into another language. Please visit our WordPress T
 
 == Changelog ==
 
+= 2.2.8 =
+* Fix to remove strict type checking from in_array (introduced 2.2.6)
+* Fix to mismatched flush rewrite rules flag function name
+* Fix to undefined index warnings for new Schedule Overrides
+* Fix to not 404 author pages for DJs without blog posts
+
 = 2.2.7 =
 * Dutch translation added (Thank you to André Dortmont for the file!)
 * Added Tabbed Display for Master Schedule Shortcode (via Tutorial)

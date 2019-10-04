@@ -13,7 +13,8 @@ get_header();
 		<section>
 			<div id="content" role="main">
 
-			<?php if ( in_array( 'dj', $curauth->roles, true ) ) : ?>
+			<?php // 2.2.8: remove strict in_array checking
+			if ( in_array( 'dj', $curauth->roles ) ) : ?>
 
 				<header class="page-header">
 					<h1 class="page-title author"><?php echo esc_html( $curauth->display_name ); ?></h1>
