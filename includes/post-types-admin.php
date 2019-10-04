@@ -205,8 +205,9 @@ function radio_station_myplaylist_inner_custom_box() {
 		<br /><br />
 		<?php
 		$can_publish = current_user_can( 'publish_playlists' );
-		//borrowed from wp-admin/includes/meta-boxes.php
-		if ( ! in_array( $post->post_status, array( 'publish', 'future', 'private' ), true ) || 0 === $post->ID ) {
+		// borrowed from wp-admin/includes/meta-boxes.php
+		// 2.2.8: remove strict in_array checking
+		if ( ! in_array( $post->post_status, array( 'publish', 'future', 'private' ) ) || ( 0 === $post->ID ) ) {
 			if ( $can_publish ) :
 				if ( ! empty( $post->post_date_gmt ) && time() < strtotime( $post->post_date_gmt . ' +0000' ) ) :
 					?>
@@ -553,7 +554,8 @@ function radio_station_myplaylist_inner_show_custom_box() {
 	$user = wp_get_current_user();
 
 	// --- allow administrators to do whatever they want ---
-	if ( ! in_array( 'administrator', $user->roles, true ) ) {
+	// 2.2.8: remove strict in_array checking
+	if ( ! in_array( 'administrator', $user->roles ) ) {
 
 		// --- get the user lists for all shows ---
 		$allowed_shows = array();
@@ -740,7 +742,8 @@ function radio_station_myplaylist_inner_user_custom_box() {
 
 	// --- move any selected DJs to the top of the list ---
 	foreach ( $users as $i => $dj ) {
-		if ( in_array( strval( $dj->ID ), $current, true ) ) {
+		// 2.2.8: remove strict in_array checking
+		if ( in_array( $dj->ID, $current ) ) {
 			unset( $users[ $i ] ); // unset first, or prepending will change the index numbers and cause you to delete the wrong item
 			array_unshift( $users, $dj );  // prepend the user to the beginning of the array
 		}
@@ -759,8 +762,9 @@ function radio_station_myplaylist_inner_user_custom_box() {
 		if ( $dj->display_name !== $dj->user_login ) {
 			$display_name .= ' (' . $dj->user_login . ')';
 		}
-		// 2.2.7: fix to remove unnecessay third argument
-		$checkcurrent = in_array( strval( $dj->ID ), $current );
+		// 2.2.7: fix to remove unnecessary third argument
+		// 2.2.8: removed unnecessary fix for non-strict check
+		$checkcurrent = in_array( $dj->ID, $current );
 		echo '<option value="' . esc_attr( $dj->ID ) . '" ' . selected( $checkcurrent ) . '>' . esc_html( $display_name ) . '</option>';
 	}
 	?>
@@ -1149,7 +1153,8 @@ function radio_station_save_show_data( $post_id ) {
 	$file   = wp_strip_all_tags( trim( $_POST['show_file'] ) );
 	$email  = sanitize_email( trim( $_POST['show_email'] ) );
 	$active = $_POST['show_active'];
-	if ( ! in_array( $active, array( '', 'on' ), true ) ) {
+	// 2.2.8: remove strict in_array checking
+	if ( ! in_array( $active, array( '', 'on' ) ) ) {
 		$active = '';
 	}
 	$link = filter_var( trim( $_POST['show_link'] ), FILTER_SANITIZE_URL );
@@ -1172,7 +1177,8 @@ function radio_station_save_show_data( $post_id ) {
 			// --- validate according to key ---
 			$isvalid = false;
 			if ( 'day' === $key ) {
-				if ( in_array( $value, $days, true ) ) {
+				// 2.2.8: remove strict in_array checking
+				if ( in_array( $value, $days ) ) {
 					$isvalid = true;
 				}
 			} elseif ( 'start_hour' === $key || 'end_hour' === $key ) {
@@ -1189,22 +1195,24 @@ function radio_station_save_show_data( $post_id ) {
 				}
 			} elseif ( 'start_meridian' === $key || 'end_meridian' === $key ) {
 				$valid = array( '', 'am', 'pm' );
-				if ( in_array( $value, $valid, true ) ) {
+				// 2.2.8: remove strict in_array checking
+				if ( in_array( $value, $valid ) ) {
 					$isvalid = true;
 				}
 			} elseif ( 'encore' === $key ) {
 				// 2.2.4: fix to missing encore sanitization saving
 				$valid = array( '', 'on' );
-				if ( in_array( $value, $valid, true ) ) {
+				// 2.2.8: remove strict in_array checking
+				if ( in_array( $value, $valid ) ) {
 					$isvalid = true;
 				}
 			}
 
 			// --- if valid add to new schedule ---
 			if ( $isvalid ) {
-				$new_scheds[ $i ][ $key ] = $value;
+				$new_scheds[$i][$key] = $value;
 			} else {
-				$new_scheds[ $i ][ $key ] = '';
+				$new_scheds[$i][$key] = '';
 			}
 		}
 	}
@@ -1558,7 +1566,8 @@ function radio_station_master_override_save_showpostdata( $post_id ) {
 			}
 		} elseif ( 'start_meridian' === $key || 'end_meridian' === $key ) {
 			$valid = array( '', 'am', 'pm' );
-			if ( in_array( $value, $valid, true ) ) {
+			// 2.2.8: remove strict in_array checking
+			if ( in_array( $value, $valid ) ) {
 				$isvalid = true;
 			}
 		}

@@ -133,12 +133,13 @@ add_action( 'admin_menu', 'radio_station_add_admin_menus' );
 // Fix to Expand Main Menu for Submenu Items
 // -----------------------------------------
 // 2.2.2: added fix for genre taxonomy page and post type editing
+// 2.2.8: remove strict in_array checking
 function radio_station_fix_genre_parent( $parent_file = '' ) {
 	global $pagenow, $post;
 	$post_types = array( 'show', 'playlist', 'override' );
 	if ( ( 'edit-tags.php' === $pagenow ) && isset( $_GET['taxonomy'] ) && 'genres' === $_GET['taxonomy'] ) {
 		$parent_file = 'radio-station';
-	} elseif ( 'post.php' === $pagenow && in_array( $post->post_type, $post_types, true ) ) {
+	} elseif ( 'post.php' === $pagenow && in_array( $post->post_type, $post_types ) ) {
 		$parent_file = 'radio-station';
 	}
 	return $parent_file;
@@ -337,7 +338,8 @@ function radio_station_announcement_notice() {
 
 	// --- bug out on certain plugin pages ---
 	$pages = array( 'radio-station', 'radio-station-help' );
-	if ( isset( $_REQUEST['page'] ) && in_array( $_REQUEST['page'], $pages, true ) ) {
+	// 2.2.8: remove strict in_array checking
+	if ( isset( $_REQUEST['page'] ) && in_array( $_REQUEST['page'], $pages ) ) {
 		return;
 	}
 
