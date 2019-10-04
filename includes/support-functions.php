@@ -45,7 +45,9 @@ function radio_station_current_schedule( $scheds = array() ) {
 // --- convert shift times to 24-hour and timestamp formats for comparisons ---
 function radio_station_convert_time( $time = array() ) {
 
-	if ( empty( $time ) ) {return false;}
+	if ( empty( $time ) ) {
+		return false;
+	}
 
 	$now      = strtotime( current_time( 'mysql' ) );
 	$cur_date = date( 'Y-m-d', $now );
@@ -75,7 +77,9 @@ function radio_station_convert_time( $time = array() ) {
 // --- convert a shift to 24 hour time for display ---
 function radio_station_convert_schedule_to_24hour( $sched = array() ) {
 
-	if ( empty( $sched ) ) {return false;}
+	if ( empty( $sched ) ) {
+		return false;
+	}
 
 	if ( 'pm' === $sched['start_meridian'] && 12 !== (int) $sched['start_hour'] ) {
 		$sched['start_hour'] = $sched['start_hour'] + 12;
@@ -116,7 +120,7 @@ function radio_station_dj_get_current() {
 	global $wpdb;
 
 	// --- get the current time and day ---
-	$now = strtotime( current_time( 'mysql' ) );
+	$now     = strtotime( current_time( 'mysql' ) );
 	$cur_day = date( 'l', $now );
 
 	// --- query for active shows only ---
@@ -541,22 +545,38 @@ function radio_station_shorten_string( $string, $limit ) {
 function radio_station_translate_weekday( $weekday, $short = false ) {
 	global $wp_locale;
 	if ( $short ) {
-		if ( $weekday == 'Sun' ) {$weekday = $wp_locale->get_weekday_abbrev( 0 );}
-		elseif ( $weekday == 'Mon' ) {$weekday = $wp_locale->get_weekday_abbrev( 1 );}
-		elseif ( $weekday == 'Tue' ) {$weekday = $wp_locale->get_weekday_abbrev( 2 );}
-		elseif ( $weekday == 'Wed' ) {$weekday = $wp_locale->get_weekday_abbrev( 3 );}
-		elseif ( $weekday == 'Thu' ) {$weekday = $wp_locale->get_weekday_abbrev( 4 );}
-		elseif ( $weekday == 'Fri' ) {$weekday = $wp_locale->get_weekday_abbrev( 5 );}
-		elseif ( $weekday == 'Sat' ) {$weekday = $wp_locale->get_weekday_abbrev( 6 );}
+		if ( 'Sun' === $weekday ) {
+			$weekday = $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( 0 ) );
+		} elseif ( 'Mon' === $weekday ) {
+			$weekday = $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( 1 ) );
+		} elseif ( 'Tue' === $weekday ) {
+			$weekday = $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( 2 ) );
+		} elseif ( 'Wed' === $weekday ) {
+			$weekday = $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( 3 ) );
+		} elseif ( 'Thu' === $weekday ) {
+			$weekday = $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( 4 ) );
+		} elseif ( 'Fri' === $weekday ) {
+			$weekday = $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( 5 ) );
+		} elseif ( 'Sat' === $weekday ) {
+			$weekday = $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( 6 ) );
+		}
 	} else {
 		// 2.2.7: fix to typo for Tuesday
-		if ( $weekday == 'Sunday' ) {$weekday = $wp_locale->get_weekday( 0 );}
-		elseif ( $weekday == 'Monday' ) {$weekday = $wp_locale->get_weekday( 1 );}
-		elseif ( $weekday == 'Tuesday' ) {$weekday = $wp_locale->get_weekday( 2 );}
-		elseif ( $weekday == 'Wednesday' ) {$weekday = $wp_locale->get_weekday( 3 );}
-		elseif ( $weekday == 'Thurday' ) {$weekday = $wp_locale->get_weekday( 4 );}
-		elseif ( $weekday == 'Friday' ) {$weekday = $wp_locale->get_weekday( 5 );}
-		elseif ( $weekday == 'Saturday' ) {$weekday = $wp_locale->get_weekday( 6 );}
+		if ( 'Sunday' === $weekday ) {
+			$weekday = $wp_locale->get_weekday( 0 );
+		} elseif ( 'Monday' === $weekday ) {
+			$weekday = $wp_locale->get_weekday( 1 );
+		} elseif ( 'Tuesday' === $weekday ) {
+			$weekday = $wp_locale->get_weekday( 2 );
+		} elseif ( 'Wednesday' === $weekday ) {
+			$weekday = $wp_locale->get_weekday( 3 );
+		} elseif ( 'Thurday' === $weekday ) {
+			$weekday = $wp_locale->get_weekday( 4 );
+		} elseif ( 'Friday' === $weekday ) {
+			$weekday = $wp_locale->get_weekday( 5 );
+		} elseif ( 'Saturday' === $weekday ) {
+			$weekday = $wp_locale->get_weekday( 6 );
+		}
 	}
 	return $weekday;
 }
@@ -567,31 +587,57 @@ function radio_station_translate_weekday( $weekday, $short = false ) {
 function radio_station_translate_month( $month, $short = false ) {
 	global $wp_locale;
 	if ( $short ) {
-		if ( $month == 'Jan' ) {$month = $wp_locale->get_month_abbrev( 1 );}
-		elseif ( $month == 'Feb' ) {$month = $wp_locale->get_month_abbrev( 2 );}
-		elseif ( $month == 'Mar' ) {$month = $wp_locale->get_month_abbrev( 3 );}
-		elseif ( $month == 'Apr' ) {$month = $wp_locale->get_month_abbrev( 4 );}
-		elseif ( $month == 'May' ) {$month = $wp_locale->get_month_abbrev( 5 );}
-		elseif ( $month == 'Jun' ) {$month = $wp_locale->get_month_abbrev( 6 );}
-		elseif ( $month == 'Jul' ) {$month = $wp_locale->get_month_abbrev( 7 );}
-		elseif ( $month == 'Aug' ) {$month = $wp_locale->get_month_abbrev( 8 );}
-		elseif ( $month == 'Sep' ) {$month = $wp_locale->get_month_abbrev( 9 );}
-		elseif ( $month == 'Oct' ) {$month = $wp_locale->get_month_abbrev( 10 );}
-		elseif ( $month == 'Nov' ) {$month = $wp_locale->get_month_abbrev( 11 );}
-		elseif ( $month == 'Dec' ) {$month = $wp_locale->get_month_abbrev( 12 );}
+		if ( 'Jan' === $month ) {
+			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 1 ) );
+		} elseif ( 'Feb' === $month ) {
+			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 2 ) );
+		} elseif ( 'Mar' === $month ) {
+				$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 3 ) );
+		} elseif ( 'Apr' === $month ) {
+			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 4 ) );
+		} elseif ( 'May' === $month ) {
+				$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 5 ) );
+		} elseif ( 'Jun' === $month ) {
+			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 6 ) );
+		} elseif ( 'Jul' === $month ) {
+				$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 7 ) );
+		} elseif ( 'Aug' === $month ) {
+			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 8 ) );
+		} elseif ( 'Sep' === $month ) {
+				$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 9 ) );
+		} elseif ( 'Oct' === $month ) {
+			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 10 ) );
+		} elseif ( 'Nov' === $month ) {
+				$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 11 ) );
+		} elseif ( 'Dec' === $month ) {
+			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 12 ) );
+		}
 	} else {
-		if ( $month == 'January' ) {$month = $wp_locale->get_month( 1 );}
-		elseif ( $month == 'February' ) {$month = $wp_locale->get_month( 2 );}
-		elseif ( $month == 'March' ) {$month = $wp_locale->get_month( 3 );}
-		elseif ( $month == 'April' ) {$month = $wp_locale->get_month( 4 );}
-		elseif ( $month == 'May' ) {$month = $wp_locale->get_month( 5 );}
-		elseif ( $month == 'June' ) {$month = $wp_locale->get_month( 6 );}
-		elseif ( $month == 'July' ) {$month = $wp_locale->get_month( 7 );}
-		elseif ( $month == 'August' ) {$month = $wp_locale->get_month( 8 );}
-		elseif ( $month == 'September' ) {$month = $wp_locale->get_month( 9 );}
-		elseif ( $month == 'October' ) {$month = $wp_locale->get_month( 10 );}
-		elseif ( $month == 'November' ) {$month = $wp_locale->get_month( 11 );}
-		elseif ( $month == 'December' ) {$month = $wp_locale->get_month( 12 );}
+		if ( 'January' === $month ) {
+			$month = $wp_locale->get_month( 1 );
+		} elseif ( 'February' === $month ) {
+			$month = $wp_locale->get_month( 2 );
+		} elseif ( 'March' === $month ) {
+				$month = $wp_locale->get_month( 3 );
+		} elseif ( 'April' === $month ) {
+			$month = $wp_locale->get_month( 4 );
+		} elseif ( 'May' === $month ) {
+				$month = $wp_locale->get_month( 5 );
+		} elseif ( 'June' === $month ) {
+			$month = $wp_locale->get_month( 6 );
+		} elseif ( 'July' === $month ) {
+				$month = $wp_locale->get_month( 7 );
+		} elseif ( 'August' === $month ) {
+			$month = $wp_locale->get_month( 8 );
+		} elseif ( 'September' === $month ) {
+				$month = $wp_locale->get_month( 9 );
+		} elseif ( 'October' === $month ) {
+			$month = $wp_locale->get_month( 10 );
+		} elseif ( 'November' === $month ) {
+				$month = $wp_locale->get_month( 11 );
+		} elseif ( 'December' === $month ) {
+			$month = $wp_locale->get_month( 12 );
+		}
 	}
 	return $month;
 }
