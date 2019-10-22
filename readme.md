@@ -1,4 +1,4 @@
-=== Radio Station ===
+# Radio Station
 Contributors: tonyzeoli, majick, nourma
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
@@ -10,7 +10,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Radio Station is a plugin to build and manage a Show Calendar in a radio station or Internet broadcaster's WordPress website. Functionality is based on Drupal 6's Station plugin.
 
-== Description ==
+## Description
 
 Radio Station is a plugin to build and manage a Show Calendar in a radio station or Internet broadcaster's WordPress website. It's functionality is based on Drupal 6's Station plugin, reworked for use in Wordpress.
 
@@ -18,31 +18,23 @@ The plugin includes the ability to associate users (as member role "DJ") with th
 
 The plugin contains a widget to display the currently on-air DJ with a link to the DJ's Show page and current playlist.  A schedule of all Shows can also be generated and added to a page with a short code. Shows can be categorized and a category filter appears when the Calendar is added using a short code to a WordPress page or post.
 
-Posts can be assigned to Shows by creating a Post and using the meta-box to assign it to a specific Show. They will appear below the Show Description and Playlist on a Show page. Please use this function as your archive for each show, so that each Show archive has it's own URL and can be crawled for SEO purposes. Use your favorite SEO plugin to manage SEO on Show pages and Posts. We prefer [All in One SEO Pack] (https://wordpress.org/plugins/all-in-one-seo-pack/).
+Posts can be assigned to Shows by creating a Post and using the meta-box to assign it to a specific Show. They will appear below the Show Description and Playlist on a Show page. Please use this function as your archive for each show, so that each Show archive has it's own URL and can be crawled for SEO purposes. Use your favorite SEO plugin to manage SEO on Show pages and Posts. We prefer [All in One SEO Pack](https://wordpress.org/plugins/all-in-one-seo-pack/).
 
-We are grateful to Nikki Blight for her contribution to creating and developing this plugin for as long as she could maintain the codebase. As of June 22, 2019, Radio Station is managed by <a href="https://profiles.wordpress.org/tonyzeoli/">Tony Zeoli</a>  and developed by contributing committers to the project.
+We are grateful to Nikki Blight for her contribution to creating and developing this plugin for as long as she could maintain the codebase. As of June 22, 2019, Radio Station is managed by [Tony Zeoli](https://profiles.wordpress.org/tonyzeoli/) and developed by contributing committers to the project.
 
-We are actively seeking radio station partners and donations to fund further development of the free, open source version of this plugin at: <a href="https://www.patreon.com/radiostation">https://www.patreon.com/radiostation</a>.
+We are actively seeking radio station partners and donations to fund further development of the free, open source version of this plugin at: [https://www.patreon.com/radiostation](https://www.patreon.com/radiostation).
 
-You can find a demo version of the plugin on our demo site here: <a href="https://radiostationdemo.com">https://radiostationdemo.com</a>
+You can find a demo version of the plugin on our demo site here: [https://radiostationdemo.com](https://radiostationdemo.com).
 
-== Plugin Support ==
+## Plugin Support
 
-For plugin support, please give 24-48 hours to answer support questions, which will be handled in the Wordpress Support Forums for this free version of the plugin here: <a href="https://wordpress.org/support/plugin/radio-station/">https://wordpress.org/support/plugin/radio-station/</a>
+For plugin support, please give 24-48 hours to answer support questions, which will be handled in the Wordpress Support Forums for this free version of the plugin here: [https://wordpress.org/support/plugin/radio-station](https://wordpress.org/support/plugin/radio-station/).
 
-== Development ==
+## Development
 
-<<<<<<< HEAD
-If you are a WordPress developer wanting to contribute to Radio Station, please join the team and follow plugin development on Github: <a href="https://github.com/netmix/radio-station">https://github.com/netmix/radio-station</a>/.
-
-Submit bugs and feature requests here: <a href="https://github.com/netmix/radio-station/issues">https://github.com/netmix/radio-station/issues</a>
-
-== Installation ==
-=======
 You can find a demo version of the plugin on our demo site [here](https://radiostationdemo.com).
 
 ## Installation
->>>>>>> a35950f... Fixed headings & lists for README.md #1
 
 1. Upload plugin .zip file to the `/wp-content/plugins/` directory and unzip.
 2. Activate the plugin through the 'Plugins' menu in WordPress
@@ -50,7 +42,7 @@ You can find a demo version of the plugin on our demo site [here](https://radios
 4. Create shows and set up shifts.
 5. Add playlists to your shows.
 
-== Frequently Asked Questions ==
+## Frequently Asked Questions
 
 ### I've scheduled all my shows, but they're not showing up on the programming grid! 
 
