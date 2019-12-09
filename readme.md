@@ -1,3 +1,4 @@
+
 # Radio Station
 Contributors: tonyzeoli, majick, nourma
 Donate link: https://netmix.co/donate
@@ -42,6 +43,7 @@ You can find a demo version of the plugin on our demo site [here](https://radios
 4. Create shows and set up shifts.
 5. Add playlists to your shows.
 
+
 ## Frequently Asked Questions
 
 ### I've scheduled all my shows, but they're not showing up on the programming grid! 
@@ -76,11 +78,13 @@ If you have a one-off event that you need to show up in the On-Air or Coming Up 
 in the Dashboard menu.  This will allow you to set aside a block of time on a specific date, and will display the title you give it in the widgets.  Please note that 
 this will only override the widgets and their corresponding shortcodes.  If you are using the weekly master schedule shortcode on a page, its output will not be altered.
 
+
 ### How do I get the last song played to show up? 
 
 You'll find a widget for just that purpose under the Widgets tab.  You can also use the shortcode `[now-playing]` in your page/post, or use `do_shortcode('[now-playing]');` in your template files.
 
 The following attributes are available for the shortcode:
+
 * 'title' => The title you would like to appear over the now playing block
 * 'artist' => Display artist name.  Valid values are 0 for hide, 1 for show.  Default is 1.
 * 'song' => Display song name.  Valid values are 0 for hide, 1 for show.  Default is 1.
@@ -97,6 +101,7 @@ You'll find a widget for just that purpose under the Widgets tab.  You can also 
 `do_shortcode('[dj-widget]');` in your template files.
 
 The following attributes are available for the shortcode:
+
 * 'title' => The title you would like to appear over the on-air block 
 * 'display_djs' => Display the names of the DJs on the show.  Valid values are 0 for hide names, 1 for show names.  Default is 0.
 * 'show_avatar' => Display a show's thumbnail.  Valid values are 0 for hide avatar, 1 for show avatar.  Default is 0.
@@ -107,7 +112,8 @@ The following attributes are available for the shortcode:
 * 'show_playlist' => Display a link to the show's current playlist.  Valid values are 0 for hide link, 1 for show link.  Default is 1.
 * 'show_all_sched' => Displays all schedules for a show if it airs on multiple days.  Valid values are 0 for current schedule, 1 for all schedules.  Default is 0.
 * 'show_desc' => Displays the first 20 words of the show's description. Valid values are 0 for hide descripion, 1 for show description.  Default is 0.
-* 
+ 
+
 Example:
 `[dj-widget title="Now On-Air" display_djs="1" show_avatar="1" show_link="1" default_name="RadioBot" time="12" show_sched="1" show_playlist="1"]`
 
@@ -143,9 +149,6 @@ Same deal.  Grab the radio-station/templates/archive-playlist.php file, copy it 
 
 ### And the program schedule, too? 
 
-Because of the complexity of outputting the data, you can't directly alter the template, but you can copy the radio-station/templates/program-schedule.css file
-into your theme directory and change the CSS rules for the page.
-
 ### What if I want to style the DJ on air sidebar widget? 
 
 Copy the radio-station/templates/djonair.css file to your theme directory.
@@ -155,6 +158,7 @@ Copy the radio-station/templates/djonair.css file to your theme directory.
 First, grab the radio-station/templates/playlist-archive-template.php file, and copy it to your active theme directory.  Then, create a Page in wordpress
 to hold the playlist archive.  Under Page Attributes, set the template to Playlist Archive.  Please note: If you don't copy the template file to your theme first, 
 the option to select it will not appear.
+
 
 ### Can show pages link to an archive of related blog posts? 
 
@@ -330,6 +334,7 @@ Adds title position and avatar width options to widgets; missing DJ author links
 * New Feature - Added ability to give schedule overrides a featured image
 * New Feature - Added built-in help page
 
+
 ## 2.1
 * General code cleanup, 4.1 compatibility testing, and changes for better efficiency.
 * Bug fix - Fixed issue with early morning shows spanning entire column in the programming grid shortcode
@@ -447,8 +452,6 @@ Adds title position and avatar width options to widgets; missing DJ author links
 * Fixed some other areas of the code that were generating PHP notices in WordPress 3.6
 * Added CSS classes to master program schedule output so CSS rules can be applied to specific shows
 * Added new attribute to the list-shows shortcode to allow only specified genres to be displayed
-
-## 1.4.5
 * Fixed master-schedule shortcode bug that was preventing display of 12 hour time
 
 ## 1.4.4
@@ -523,6 +526,7 @@ Adds title position and avatar width options to widgets; missing DJ author links
 * Fixed a bug in the master schedule shortcode that messed up the table for shows that are more than two hours in duration
 * Fixed a bug in the master schedule shortcode to accomodate shows that run from late night into the following morning.
 * Added new field to associate blog posts with shows
+
 
 ## 1.0
 * Initial release  
