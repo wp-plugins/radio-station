@@ -1,7 +1,6 @@
-
 # Radio Station
-Contributors: tonyzeoli, majick, nourma
-Donate link: https://netmix.co/donate
+Contributors: tonyzeoli, majick
+Donate link: https://www.patreon.com/radiostation
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
 Tested up to: 5.2.2
@@ -21,7 +20,7 @@ The plugin contains a widget to display the currently on-air DJ with a link to t
 
 Posts can be assigned to Shows by creating a Post and using the meta-box to assign it to a specific Show. They will appear below the Show Description and Playlist on a Show page. Please use this function as your archive for each show, so that each Show archive has it's own URL and can be crawled for SEO purposes. Use your favorite SEO plugin to manage SEO on Show pages and Posts. We prefer [All in One SEO Pack](https://wordpress.org/plugins/all-in-one-seo-pack/).
 
-We are grateful to Nikki Blight for her contribution to creating and developing this plugin for as long as she could maintain the codebase. As of June 22, 2019, Radio Station is managed by [Tony Zeoli](https://profiles.wordpress.org/tonyzeoli/) and developed by contributing committers to the project.
+We are grateful to [Nikki Blight] (https://profiles.wordpress.org/kionae/) for her contribution to creating and developing this plugin for as long as she could maintain the codebase. As of June 22, 2019, Radio Station is managed by [Tony Zeoli](https://profiles.wordpress.org/tonyzeoli/) and developed by contributing committers to the project overseen by Lead Developer, [Tony Hayes] (https://profiles.wordpress.org/majick/)
 
 We are actively seeking radio station partners and donations to fund further development of the free, open source version of this plugin at: [https://www.patreon.com/radiostation](https://www.patreon.com/radiostation).
 
