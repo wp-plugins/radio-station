@@ -1430,7 +1430,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// 1.0.9: fix to check if PNG file exists
 			$icon_url = false;
 			if ( file_exists( $this->args['dir'] . '/images/' . $args['slug'] . '.gif' ) ) {
-				$icon_url = plugins_url( 'images/' . $args['slug'] . '.gif', $args['file'] );
+				$icon_url = admin_page_tab_plugins_url( 'images/' . $args['slug'] . '.gif', $args['file'] );
 			} elseif ( file_exists( $this->args['dir'] . '/images/' . $args['slug'] . '.png' ) ) {
 				$icon_url = plugins_url( 'images/' . $args['slug'] . '.png', $args['file'] );
 			}
@@ -1777,7 +1777,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 							// --- section top ---
 							ob_start();
-							do_action( $namespace . '_admin_page_section_' . $section );
+							do_action( $namespace . '_admin_page_section_' . $section . '_top');
 							$output = ob_get_clean();
 							if ( $output ) {
 								echo "<tr class='setting-section-bottom'><td colspan='5'>";
@@ -1802,7 +1802,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 							// --- section bottom hook ---
 							ob_start();
-							do_action( $namespace . '_admin_page_section_' . $section );
+							do_action( $namespace . '_admin_page_section_' . $section . '_bottom' );
 							$output = ob_get_clean();
 							if ( $output ) {
 								echo "<tr class='setting-section-bottom'><td colspan='5'>";
