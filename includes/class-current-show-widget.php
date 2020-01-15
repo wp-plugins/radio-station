@@ -24,7 +24,7 @@ class DJ_Widget extends WP_Widget {
 		$title = $instance['title'];
 		$display_djs = isset( $instance['show_desc'] ) ? $instance['display_djs'] : false;
 		$djavatar = isset( $instance['djavatar'] ) ? $instance['djavatar'] : false;
-		$default = isset( $instance['default'] ) ? $instance['default'] : '';
+		$default = isset( $instance['default'] ) ? $instance['default'] : __( 'No Show scheduled for this time.', 'radio-station' );
 		$link = isset( $instance['link'] ) ? $instance['link'] : false;
 		$time = isset( $instance['time'] ) ? $instance['time'] : 12;
 		$show_sched = isset( $instance['show_sched'] ) ? $instance['show_sched'] : false;
@@ -134,7 +134,7 @@ class DJ_Widget extends WP_Widget {
 				' . esc_html( __( 'No Show Display Text', 'radio-station' ) ) . ':
 				<input class="widefat" id="' . esc_attr( $this->get_field_id( 'default' ) ) . '" name="' . esc_attr( $this->get_field_name( 'default' ) ) . '" type="text" value="' . esc_attr( $default ) . '" />
 			</label>
-			<small>' . esc_html( __( 'If no Show is scheduled for the current time, display this text.', 'radio-station' ) ) . '</small>
+			<small>' . esc_html( __( 'Text to display if no Show is scheduled for the current time.', 'radio-station' ) ) . '</small>
 		</p>
 
 		<p>
@@ -204,7 +204,7 @@ class DJ_Widget extends WP_Widget {
 			'display_djs'    => $display_djs,
 			'show_avatar'    => $djavatar,
 			'show_link'      => $link,
-			// 'default_name'	=> '',
+			'default_name'   => $default,
 			'time'           => $time,
 			'show_sched'     => $show_sched,
 			'show_playlist'  => $show_playlist,
