@@ -1240,7 +1240,7 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 				$output .= $title; // already escaped
 			}
 
-			echo '<span class="radio-clear"></span>';
+			$output .= '<span class="radio-clear"></span>';
 
 			// --- encore presentation ---
 			// 2.2.4: added encore presentation display
@@ -1470,7 +1470,7 @@ function radio_station_now_playing_shortcode( $atts ) {
 				$output .= '</div>';
 			}
 
-			echo '</div>';
+			$output .= '</div>';
 		}
 
 		// --- playlist permalink ---
