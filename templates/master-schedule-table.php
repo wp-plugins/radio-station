@@ -8,7 +8,7 @@ $weekdays = radio_station_get_schedule_weekdays();
 $schedule = radio_station_get_current_schedule();
 $hours = radio_station_get_hours();
 $now = strtotime( current_time( 'mysql' ) );
-$today =  strtolower( date( 'j', $now ) );
+$today =  strtolower( date( 'l', $now ) );
 $am = str_replace( ' ', '', radio_station_translate_meridiem( 'am' ) );
 $pm = str_replace( ' ', '', radio_station_translate_meridiem( 'pm' ) );
 
@@ -24,13 +24,24 @@ $output .= '<table id="master-program-schedule" cellspacing="0" cellpadding="0" 
 // --- weekday table headings row ---
 $output .= '<tr class="master-program-day-row">';
 $output .= '<th></th>';
-foreach ( $weekdays as $weekday ) {
+foreach ( $weekdays as $i => $weekday ) {
 	$heading = substr( $weekday, 0, 3 );
 	$heading = radio_station_translate_weekday( $heading, true );
-	$classes = array( 'master-program-day', strtolower( $weekday ) );
-	if ( strtolower( $weekday ) == $today ) {$classes[] = 'current-day';}
+	$classes = array( 'master-program-day', 'day-' . $i, strtolower( $weekday ) );
+	if ( strtolower( $weekday ) == $today ) {
+		$classes[] = 'current-day';
+		$classes[] = 'selected-day';
+	}
 	$class = implode( ' ', $classes );
-	$output .= '<th class="' . esc_attr( $class ) . '">' . esc_html( $heading ) . '</th>';
+	$output .= '<th class="' . esc_attr( $class ) . '">';
+	$output .= '<div class="shift-left-arrow">';
+	$output .= '<a href="javascript:void(0);" onclick="radio_shift_day(\'left\');" title="' . esc_attr( __( 'Previous Day', 'radio-station' ) ) . '"><</a>';
+	$output .= '</div>';
+	$output .= ' <div class="day-heading">' . esc_html( $heading ) . '</div> ';
+	$output .= '<div class="shift-right-arrow">';
+	$output .= '<a href="javacript:void(0);" onclick="radio_shift_day(\'right\');" title="' . esc_attr( __( 'Next Day', 'radio-station' ) ) . '">></a>';
+	$output .= '</div>';
+	$output .= '</th>';
 }
 $output .= '</tr>';
 
@@ -61,7 +72,7 @@ foreach ( $hours as $hour ) {
 	$output .= '</div>';
 	$output .= '</th>';
 
-	foreach ( $weekdays as $weekday ) {
+	foreach ( $weekdays as $i => $weekday ) {
 
 		// --- clear the cell ---
 		if ( isset( $cell ) ) {
@@ -324,7 +335,7 @@ foreach ( $hours as $hour ) {
 		}
 
 		// --- add cell to hour row - weekday column ---
-		$cellclasses = array( 'show-info', $weekday );
+		$cellclasses = array( 'show-info', 'day-' . $i, strtolower( $weekday ) );
 		if ( $cellcontinued ) {
 			$cellclasses[] = 'continued';
 		}

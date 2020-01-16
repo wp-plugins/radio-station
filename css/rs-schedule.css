@@ -52,6 +52,30 @@
 	padding-top: 0;
 }
 
+#master-program-schedule th .day-heading {
+	display: inline-block;
+}
+
+#master-program-schedule th a {
+	text-decoration: none;
+}
+
+#master-program-schedule th .shift-left-arrow {
+	float: left;
+}
+
+#master-program-schedule th .shift-right-arrow {
+	float: right;
+}
+
+#master-program-schedule th .shift-left-arrow, #master-program-schedule th .shift-right-arrow {
+	display: none;
+}
+
+#master-program-schedule th.first-column .shift-left-arrow, #master-program-schedule th.last-column .shift-right-arrow {
+	display: inline-block;
+}
+
 #master-program-schedule td {
 	vertical-align: top;
 	font-size: 12px;
