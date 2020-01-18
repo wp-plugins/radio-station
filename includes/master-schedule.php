@@ -9,8 +9,6 @@
 add_shortcode( 'master-schedule', 'radio_station_master_schedule' );
 function radio_station_master_schedule( $atts ) {
 
-	global $wpdb;
-
 	// --- make list attribute backward compatible ---
 	// 2.3.0: convert old list attribute to view
 	if ( !isset( $atts['view'] ) && isset( $atts['list'] ) ) {
@@ -20,6 +18,7 @@ function radio_station_master_schedule( $atts ) {
 		$atts['view'] = $atts['list'];
 	}
 
+	// --- merge shortcode attributes with defaults ---
 	// 2.3.0: added show_hosts (alias of show_djs)
 	// 2.3.0: added show_file attribute (default off)
 	// 2.3.0: added show_encore attribute (default on)
@@ -45,6 +44,10 @@ function radio_station_master_schedule( $atts ) {
 		'show_file'         => 0,
 		'show_encore'       => 1,
 	);
+	// 2.3.0: display avatar by default for tabbed view
+	if ( 'tabs' == $atts['view'] ) {
+		$defaults['show_image'] = 1;
+	}
 	$atts = shortcode_atts( $defaults, $atts, 'master-schedule' );
 
 	// --- enqueue schedule stylesheet ---
@@ -73,20 +76,24 @@ function radio_station_master_schedule( $atts ) {
 	// 2.3.0: moved out from templates to apply to all views
 	$output .= '<div id="master-schedule-controls-wrapper">';
 
-	$output .= '<div id="master-schedule-clock-wrapper">';
 	if ( $atts['clock'] ) {
+		// --- display radio clock ---
+		$output .= '<div id="master-schedule-clock-wrapper">';
 		$output .= $clock;
+		$output .= '</div>';
 	} else {
 		// --- display radio timezone ---
+		$output .= '<div id="master-schedule-timezone-wrapper">';
 		$output .= radio_station_timezone_shortcode();
+		$output .= '</div>';
 	}
-	$output .= '</div>';
 
-	$output .= '<div id="master-schedule-selector-wrapper">';
 	if ( $atts['selector'] ) {
+		// --- display genre selector ---
+		$output .= '<div id="master-schedule-selector-wrapper">';
 		$output .= $selector;
+		$output .= '</div><br>';
 	}
-	$output .= '</div>';
 
 	$output .= '</div><br>';
 
@@ -121,7 +128,10 @@ function radio_station_master_schedule( $atts ) {
 	// ----------------------
 	// Legacy Master Schedule
 	// ----------------------
-	// 2.3.0: remove usused default DJ name option
+
+	global $wpdb;
+
+	// 2.3.0: remove unused default DJ name option
 	// $default_dj = get_option( 'dj_default_name' );
 
 	// --- check to see what day of the week we need to start on ---
@@ -306,20 +316,20 @@ function radio_station_master_schedule_selector() {
 
 	// --- genre highlighter script ---
 	// 2.3.0: improved to highlight / unhighlight multiple genres
+	// 2.3.0: improved to work with table, tabs or list view
 	$js = "var highlighted_genres = new Array();
 	function show_highlight(genre) {
 		if (jQuery('#genre-highlight-'+genre).hasClass('highlighted')) {
 			jQuery('#genre-highlight-'+genre).removeClass('highlighted');
 
-			jQuery('.master-show-entry').each(function() {
-				jQuery(this).removeClass('highlighted');
-			});
+			jQuery('.master-show-entry').each(function() {jQuery(this).removeClass('highlighted');});
+			jQuery('.master-schedule-tabs-show').each(function() {jQuery(this).removeClass('highlighted');});
+			jQuery('.master-list-day-item').each(function() {jQuery(this).removeClass('highlighted');});
 
 			j = 0; new_genre_highlights = new Array();
 			for (i = 0; i < highlighted_genres.length; i++) {
-				console.log(i+':'+highlighted_genres[i]);
 				if (highlighted_genres[i] != genre) {
-					jQuery('.'+genre).addClass('highlighted');
+					jQuery('.'+highlighted_genres[i]).addClass('highlighted');
 					new_genre_highlights[j] = highlighted_genres[i]; j++;
 				}
 			}
@@ -331,7 +341,7 @@ function radio_station_master_schedule_selector() {
 			jQuery('.'+genre).each(function () {
 				jQuery(this).addClass('highlighted');
 			});
-		}	
+		}
 	}";
 
 	// --- enqueue script ---

@@ -25,14 +25,22 @@ $output .= '<table id="master-program-schedule" cellspacing="0" cellpadding="0" 
 $output .= '<tr class="master-program-day-row">';
 $output .= '<th></th>';
 foreach ( $weekdays as $i => $weekday ) {
+
+	// --- set column heading ---
 	$heading = substr( $weekday, 0, 3 );
 	$heading = radio_station_translate_weekday( $heading, true );
+
+	// --- set heading classes ---
+	// 2.3.0: add day and check for highlighting
 	$classes = array( 'master-program-day', 'day-' . $i, strtolower( $weekday ) );
 	if ( strtolower( $weekday ) == $today ) {
 		$classes[] = 'current-day';
 		$classes[] = 'selected-day';
 	}
 	$class = implode( ' ', $classes );
+
+	// --- output table column heading ---
+	// 2.3.0: added left/right arrow responsive controls
 	$output .= '<th class="' . esc_attr( $class ) . '">';
 	$output .= '<div class="shift-left-arrow">';
 	$output .= '<a href="javascript:void(0);" onclick="radio_shift_day(\'left\');" title="' . esc_attr( __( 'Previous Day', 'radio-station' ) ) . '"><</a>';
@@ -63,8 +71,18 @@ foreach ( $hours as $hour ) {
 		$data_format = "H a";
 	}
 
+	// --- set heading classes ---
+	// 2.3.0: check current hour for highlighting
+	$classes = array( 'master-program-hour' );
+	$hour_start = strtotime( $today . ' ' . $hour );
+	$hour_end = $hour_start + ( 60 * 60 );
+	if ( ( $now > $hour_start ) && ( $now < $hour_end ) ) {
+		$classes[] = 'current-hour';
+	}
+	$class= implode( ' ', $classes );
+
 	// --- hour heading ---
-	$output .= '<th class="master-program-hour">';
+	$output .= '<th class="' . esc_attr( $class ) . '">';
 	$output .= '<div>';
 	$output .= esc_html( $hour );
 	$output .= '<br>';
@@ -174,6 +192,13 @@ foreach ( $hours as $hour ) {
 
 					$show = $shift['show'];
 
+					// --- set filtered show link ---
+					// 2.3.0: filter show link via show ID and context
+					$show_link = false;
+					if ( $atts['show_link'] ) {
+						$show_link = apply_filters( 'radio_station_schedule_show_link', $show['url'], $show['id'], 'table' );
+					}
+
 					// --- set the show div classes ---
 					$divclasses = array( 'master-show-entry', 'show-id-' . $show['id'], $show['slug'] );
 					if ( $nowplaying ) {
@@ -216,24 +241,21 @@ foreach ( $hours as $hour ) {
 							$show_avatar = apply_filters( 'radio_station_schedule_show_avatar', $show_avatar, $show['id'], 'table' );
 							if ( $show_avatar ) {
 								$cell .= '<span class="show-image">';
-								$cell .= $show_avatar;
+								if ( $show_link ) {
+									$cell .= '<a href="' . esc_url( $show_link ) . '">' . $show_avatar . '</a>';
+								} else {
+									$cell .= $show_avatar;
+								}
 								$cell .= '</span>';
 							}
 						}
 
 						// --- show title ---
 						$cell .= '<span class="show-title">';
-						$show_link = false;
-						if ( $atts['show_link'] ) {
-							// 2.3.0: filter show link via show ID and context
-							$show_link = apply_filters( 'radio_station_schedule_show_link', $show['url'], $show['id'], 'table' );
-						}
 						if ( $show_link ) {
-							$cell .= '<a href="' . $show_link . '">';
-						}
-						$cell .= $show['name'];
-						if ( $show_link ) {
-							$cell .= '</a>';
+							$cell .= '<a href="' . esc_url( $show_link ) . '">' . esc_html( $show['name'] ) . '</a>';
+						} else {
+							$cell .= esc_html( $show['name'] );
 						}
 						$cell .= '</span>';
 

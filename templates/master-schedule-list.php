@@ -15,7 +15,7 @@ $pm = str_replace( ' ', '', radio_station_translate_meridiem( 'pm' ) );
 $avatar_size = apply_filters( 'radio_station_schedule_show_avatar_size', 'thumbnail', 'tabs' );
 
 // --- start list schedule output ---
-$output .= '<ul class="master-list">';
+$output .= '<ul id="master-list" class="master-list">';
 
 $tcount = 0;
 // 2.3.0: loop weekdays instead of legacy master list
@@ -41,7 +41,23 @@ foreach ( $weekdays as $day ) {
 
 			$show = $shift['show'];
 
-			$output .= '<li class="master-list-day-item">';
+			// 2.3.0: filter show link by show and context
+			$show_link = false;
+			if ( $atts['show_link'] ) {
+				$show_link = apply_filters( 'radio_station_schedule_show_link', $show['url'], $show['id'], 'list' );
+			}
+
+			// 2.3.0: add genre classes for highlighting
+			$classes = array( 'master-list-day-item' );
+			$terms = wp_get_post_terms( $show['id'], RADIO_STATION_GENRES_SLUG, array() );
+			if ( $terms && ( count( $terms ) > 0 ) ) {
+				foreach ( $terms as $term ) {
+					$classes[] = strtolower( $term->slug );
+				}
+			}
+			$class = implode( ' ', $classes );
+
+			$output .= '<li class="' . esc_attr( $class ) . '">';
 
 			// --- show avatar ---
 			if ( $atts['show_image'] ) {
@@ -50,20 +66,20 @@ foreach ( $weekdays as $day ) {
 				$show_avatar = apply_filters( 'radio_station_schedule_show_avatar', $show_avatar, $show['id'], 'list' );
 				if ( $show_avatar ) {
 					$output .= '<div class="show-image">';
-					$output .= $show_avatar;
+					if ( $show_link ) {
+						$output .= '<a href="' . esc_url( $show_link ) . '">' . $show_avatar . '</a>';
+					} else {
+						$output .= $show_avatar;
+					}
 					$output .= '</div>';
 				}
 			}
 
 			// --- show title ---
-			$show_title = get_the_title( $show['id'] );
-			if ( $atts['show_link'] ) {
-				// 2.3.0: filter show link by show and context
-				$show_link = get_permalink( $show['id'] );
-				$show_link = apply_filters( 'radio_station_schedule_show_link', $show_link, $show['id'], 'list' );
-				if ( $show_link ) {
-					$show_title = '<a href="' . esc_url( $show_link ) . '">' . $show_title . '</a>';
-				}
+			if ( $show_link ) {
+				$show_title = '<a href="' . esc_url( $show_link ) . '">' . esc_html( $show['name'] ) . '</a>';
+			} else {
+				$show_title = esc_html( $show['name'] );
 			}
 			$output .= '<span class="show-title">';
 			$output .= $show_title;

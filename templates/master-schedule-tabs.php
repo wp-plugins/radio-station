@@ -26,7 +26,7 @@ foreach ( $weekdays as $day ) {
 	// 2.2.2: use translate function for weekday string
 	$display_day = radio_station_translate_weekday( $day );
 	$output .= '<li class="master-schedule-tabs-day" id="master-schedule-tabs-header-' . strtolower( $day ) . '">';
-	$output .= '<div class="master-schedule-tabs-day-name">' . $display_day . '</div>';
+	$output .= '<div class="master-schedule-tabs-day-name">' . esc_html( $display_day ) . '</div>';
 	$output .= '</li>';
 
 	// 2.2.7: separate headings from panels for tab view
@@ -50,18 +50,39 @@ foreach ( $weekdays as $day ) {
 
 			$show = $shift['show'];
 
-			$panels .= '<li class="master-schedule-tabs-show">';
+			if ( $atts['show_link'] ) {
+				$show_link = apply_filters( 'radio_station_schedule_show_link', $show['url'], $show['id'], 'tabs' );
+			}
+
+			// 2.3.0: add genre classes for highlighting
+			$classes = array( 'master-schedule-tabs-show' );
+			$terms = wp_get_post_terms( $show['id'], RADIO_STATION_GENRES_SLUG, array() );
+			if ( $terms && ( count( $terms ) > 0 ) ) {
+				foreach ( $terms as $term ) {
+					$classes[] = strtolower( $term->slug );
+				}
+			}
+			$class = implode( ' ' , $classes );
+
+			$panels .= '<li class="' . esc_attr( $class ) . '">';
 
 			// --- Show Image ---
 			// (defaults to display on)
-			if ( ( 'false' !== $atts['show_image'] ) && ( 0 !== $atts['show_image'] ) ) {
+			if ( $atts['show_image'] ) {
 				// 2.3.0: filter show avatar by show and context
+				// 2.3.0: maybe link avatar to show
 				$show_avatar = radio_station_get_show_avatar( $show['id'], $avatar_size );
 				$show_avatar = apply_filters( 'radio_station_schedule_show_avatar', $show_avatar, $show['id'], 'tabs' );
 				if ( $show_avatar ) {
 					$panels .= '<div class="show-image">';
-					$panels .= $show_avatar;
+					if ( $show_link ) {
+						$panels .= '<a href="' . esc_url( $show_link ) . '">' . $show_avatar . '</a>';
+					} else {
+						$panels .= $show_avatar;
+					}
 					$panels .= '</div>';
+				} else {
+					$panels .= '<div class="show-image"></div>';
 				}
 			}
 
@@ -69,14 +90,10 @@ foreach ( $weekdays as $day ) {
 			$panels .= '<div class="show-info">';
 
 			// --- show title ---
-			$show_title = get_the_title( $show['id'] );
-			if ( $atts['show_link'] ) {
-				// 2.3.0: filter show link by show and context
-				$show_link = get_permalink( $show['id'] );
-				$show_link = apply_filters( 'radio_station_schedule_show_link', $show_link, $show['id'], 'list' );
-				if ( $show_link ) {
-					$show_title = '<a href="' . esc_url( $show_link ) . '">' . $show_title . '</a>';
-				}
+			if ( $show_link ) {
+				$show_title = '<a href="' . esc_url( $show_link ) . '">' . esc_html( $show['name'] ) . '</a>';
+			} else {
+				$show_title = esc_html( $show['name'] );
 			}
 			$panels .= '<span class="show-title">';
 			$panels .= $show_title;
@@ -183,13 +200,10 @@ foreach ( $weekdays as $day ) {
 				}
 			}
 
-			$panels .= '</div>';
-
 			// --- Show Genres list ---
 			// (defaults to display on)
 			if ( 'false' !== $atts['show_genres'] ) {
 				$panels .= '<div class="show-genres">';
-				$terms = wp_get_post_terms( $show['id'], RADIO_STATION_GENRES_SLUG, array() );
 				$genres = array();
 				if ( count( $terms ) > 0 ) {
 					foreach ( $terms as $term ) {
@@ -200,6 +214,8 @@ foreach ( $weekdays as $day ) {
 				}
 				$panels .= '</div>';
 			}
+
+			$panels .= '</div>';
 
 			$panels .= '</li>';
 		}

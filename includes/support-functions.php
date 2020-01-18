@@ -1343,8 +1343,7 @@ function radio_station_get_show_avatar_url( $show_id, $size = 'thumbnail' ) {
 	}
 
 	// --- filter and return ---
-	$avatar_url = apply_filters( 'radio_stattion_show_avatar_url', $avatar_url, $show_id );
-
+	$avatar_url = apply_filters( 'radio_station_show_avatar_url', $avatar_url, $show_id );
 	return $avatar_url;
 }
 
@@ -1363,8 +1362,8 @@ function radio_station_get_show_avatar( $show_id, $size = 'thumbnail', $attr = a
 		$avatar = wp_get_attachment_image( $avatar_id, $size, false, $attr );
 	}
 
+	// --- filter and return ---
 	$avatar = apply_filters( 'radio_station_show_avatar', $avatar, $show_id );
-
 	return $avatar;
 }
 

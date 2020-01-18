@@ -911,14 +911,18 @@ function radio_station_current_show_shortcode( $atts ) {
 
 		$output .= '<li class="current-show on-air-dj">';
 
+		$show_link = false;
+		if ( $atts['show_link'] ) {
+			$show_link = get_permalink( $show['id'] );
+			$show_link = apply_filters( 'radio_station_current_show_link', $show_link, $show['id'], $atts );
+		}
+
 		// --- set show title output ---
 		$title = '<div class="on-air-dj-title">';
-		if ( $atts['show_link'] ) {
-			$title .= '<a href="' . esc_url( get_permalink( $show['id'] ) ) . '">';
-		}
-		$title .= esc_html( $show['name'] );
-		if ( $atts['show_link'] ) {
-			$title .= '</a>';
+		if ( $show_link ) {
+			$title .= '<a href="' . esc_url( $show_link ) . '">' . esc_html( $show['name'] ) . '</a>';
+		} else {
+			$title .= esc_html( $show['name'] );
 		}
 		$title .= '</div>';
 
@@ -931,10 +935,17 @@ function radio_station_current_show_shortcode( $atts ) {
 		if ( $atts['show_avatar'] ) {
 
 			// 2.3.0: get show avatar (with thumbnail fallback)
+			// 2.3.0: filter show avatar via display context
+			// 2.3.0: maybe add link from avatar to show
 			$show_avatar = radio_station_get_show_avatar( $show['id'] );
+			$show_avatar = apply_filters( 'radio_station_current_show_avatar', $show_avatar, $show['id'], $atts );
 			if ( $show_avatar ) {
 				$output .= '<div class="current-show-avatar on-air-dj-avatar' . esc_attr( $floatclass ) . '" ' . $widthstyle . '>';
-				$output .= $show_avatar;
+				if ( $show_link ) {
+					$output .= '<a href="' . esc_url( $show_link ) . '">' . $show_avatar . '</a>';
+				} else {
+					$output .= $show_avatar;
+				}
 				$output .= '</div>';
 			}
 		}
@@ -943,8 +954,6 @@ function radio_station_current_show_shortcode( $atts ) {
 		if ( 'above' != $atts['title_position'] ) {
 			$output .= $title; // already escaped
 		}
-
-		$output .= '<span class="radio-clear"></span>';
 
 		// --- encore presentation ---
 		// 2.3.0: added encore presentation display
@@ -1002,6 +1011,8 @@ function radio_station_current_show_shortcode( $atts ) {
 				$output .= '</div>';
 			}
 		}
+
+		$output .= '<span class="radio-clear"></span>';
 
 		// --- show description ---
 		// 2.3.0: convert span to div tags for consistency
@@ -1203,16 +1214,20 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 			$show = $shift['show'];
 
+			$show_link = false;
+			if ( $atts['show_link'] ) {
+				$show_link = get_permalink( $show['id'] );
+				$show_link = apply_filters( 'radio_station_upcoming_show_link', $show_link, $show['id'], $atts );
+			}
+
 			$output .= '<li class="upcoming-show on-air-dj">';
 
 			// --- set show title output ---
 			$title = '<div class="upcoming-show-title on-air-dj-title">';
-			if ( $atts['show_link'] ) {
-				$title .= '<a href="' . esc_url( get_permalink( $show['id'] ) ) . '">';
-			}
-			$title .= esc_html( $show['name'] );
-			if ( $atts['show_link'] ) {
-				$title .= '</a>';
+			if ( $show_link ) {
+				$title .= '<a href="' . esc_url( $show_link ) . '">' . esc_html( $show['name'] ) . '</a>';
+			} else {
+				$title .= esc_html( $show['name'] );
 			}
 			$title .= '</div>';
 
@@ -1226,10 +1241,19 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 			if ( $atts['show_avatar'] ) {
 
 				// 2.3.0: get show avatar (with thumbnail fallback)
+				// 2.3.0: filter show avatar by context
+				// 2.3.0: maybe link avatar to show
 				$show_avatar = radio_station_get_show_avatar( $show['id'] );
+				$show_avatar = apply_filters( 'radio_station_upcoming_show_avatar', $show_avatar, $show['id'], $atts );
 				if ( $show_avatar ) {
 					$output .= '<div class="upcoming-show-avatar on-air-dj-avatar' . esc_attr( $float_class ) . '" ' . $width_style . '>';
+					if ( $atts['show_link'] ) {
+						$output .= '<a href="' . esc_url( $show_link ) . '">';
+					}
 					$output .= $show_avatar;
+					if ( $atts['show_link'] ) {
+						$output .= '</a>';
+					}
 					$output .= '</div>';
 				}
 			}
