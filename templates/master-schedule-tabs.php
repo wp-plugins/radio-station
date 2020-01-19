@@ -113,8 +113,12 @@ foreach ( $weekdays as $day ) {
 
 					foreach ( $show['hosts'] as $host ) {
 						$count ++;
-						$user_info = get_userdata( $host );
-						$hosts .= $user_info->display_name;
+						// 2.3.0: added link_hosts attribute check
+						if ( $atts['link_hosts'] && !empty( $host['url'] ) ) {
+							$hosts .= '<a href="' . esc_url( $host['url'] ) . '">' . esc_html( $host['name'] ) . '</a>';
+						} else {
+							$hosts .= esc_html( $host['name'] );
+						}
 
 						if ( ( ( 1 === $count ) && ( 2 === $host_count ) )
 						     || ( ( $host_count > 2 ) && ( ( $host_count - 1 ) === $count ) ) ) {
@@ -127,7 +131,7 @@ foreach ( $weekdays as $day ) {
 
 				$hosts = apply_filters( 'radio_station_schedule_show_hosts', $hosts, $show['id'], 'tabs' );
 				if ( $hosts ) {
-					$panels .= '<div class="show-dj-names">';
+					$panels .= '<div class="show-dj-names show-host-names">';
 					$panels .= $hosts; // phpcs:ignore WordPress.Security.OutputNotEscaped
 					$panels .= '</div>';
 				}
@@ -202,7 +206,7 @@ foreach ( $weekdays as $day ) {
 
 			// --- Show Genres list ---
 			// (defaults to display on)
-			if ( 'false' !== $atts['show_genres'] ) {
+			if ( $atts['show_genres'] ) {
 				$panels .= '<div class="show-genres">';
 				$genres = array();
 				if ( count( $terms ) > 0 ) {

@@ -93,11 +93,18 @@ foreach ( $weekdays as $day ) {
 
 					$count = 0;
 					$host_count = count( $show['hosts'] );
-					$hosts .= '<span class="show-dj-names-leader"> ' . esc_html( __( 'with', 'radio-station' ) ) . ' </span>';
+					$hosts .= '<span class="show-dj-names-leader">';
+                    $hosts .= esc_html( __( 'with', 'radio-station' ) );
+                    $host .= ' </span>';
+
 					foreach ( $show['hosts'] as $host ) {
 						$count ++;
-						$user_info = get_userdata( $host );
-						$hosts .= $user_info->display_name;
+						// 2.3.0: added link_hosts attribute check
+						if ( $atts['link_hosts'] && !empty( $host['url'] ) ) {
+							$hosts .= '<a href="' . esc_url( $host['url'] ) . '">' . esc_html( $host['name'] ) . '</a>';
+						} else {
+							$hosts .= esc_html( $host['name'] );
+						}
 
 						if ( ( ( 1 === $count ) && ( 2 === $host_count ) )
 						     || ( ( $host_count > 2 ) && ( ( $count === $host_count - 1 ) ) ) ) {
@@ -110,7 +117,7 @@ foreach ( $weekdays as $day ) {
 
 				$hosts = apply_filters( 'radio_station_schedule_show_hosts', $hosts, $show['id'], 'tabs' );
 				if ( $hosts ) {
-					$output .= '<div class="show-dj-names">';
+					$output .= '<div class="show-dj-names show-host-names">';
 					$output .= $hosts;
 					$output .= '</div>';
 				}
@@ -163,9 +170,9 @@ foreach ( $weekdays as $day ) {
 				}
 				$show_encore = apply_filters( 'radio_station_schedule_show_encore', $show_encore, $show['id'], 'list' );
 				if ( 'on' == $show_encore ) {
-					$output .= '<span class="show-encore">';
+					$output .= '<div class="show-encore">';
 					$output .= esc_html( __( 'encore airing', 'radio-station' ) );
-					$output .= '</span>';
+					$output .= '</div>';
 				}
 			}
 
@@ -175,12 +182,28 @@ foreach ( $weekdays as $day ) {
 				$show_file = get_post_meta( $show['id'], 'show_file', true );
 				$show_file = apply_filters( 'radio_station_schedule_show_link', $show_file, $show['id'], 'list' );
 				if ( $show_file && !empty( $show_file ) ) {
-					$output .= '<span class="show-file">';
+					$output .= '<div class="show-file">';
 					$output .= '<a href="' . esc_url( $show_file ) . '">';
 					$output .= esc_html( __( 'Audio File', 'radio-station' ) );
 					$output .= '</a>';
-					$output .= '</span>';
+					$output .= '</div>';
 				}
+			}
+
+			// --- show genres ---
+			// (defaults to on)
+			// 2.3.0: add genres to list view
+			if ( $atts['show_genres'] ) {
+				$output .= '<div class="show-genres">';
+				$genres = array();
+				if ( count( $terms ) > 0 ) {
+					foreach ( $terms as $term ) {
+						$genres[] = '<a href="' . esc_url( get_term_link( $term ) ) . '">' . esc_html( $term->name ) . '</a>';
+					}
+					$genre_display = implode( ', ', $genres );
+					$output .= esc_html( __( 'Genres', 'radio-station' ) ) . ': ' . $genre_display;
+				}
+				$output .= '</div>';
 			}
 
 			$output .= '</li>';

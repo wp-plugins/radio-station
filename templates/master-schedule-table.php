@@ -260,7 +260,7 @@ foreach ( $hours as $hour ) {
 						$cell .= '</span>';
 
 						// --- show DJs / hosts ---
-						if ( $atts['show_djs'] || $atts['show_hosts'] ) {
+						if ( $atts['show_hosts'] ) {
 
 							$hosts = '';
 							if ( $show['hosts'] && is_array( $show['hosts'] ) && ( count( $show['hosts'] ) > 0 ) ) {
@@ -273,8 +273,12 @@ foreach ( $hours as $hour ) {
 								$hostcount = count( $show['hosts'] );
 								foreach ( $show['hosts'] as $host ) {
 									$count ++;
-									$user_info = get_userdata( $host );
-									$hosts .= $user_info->display_name;
+									// 2.3.0: added link_hosts attribute check
+									if ( $atts['link_hosts'] && !empty( $host['url'] ) ) {
+										$hosts .= '<a href="' . esc_url( $host['url'] ) . '">' . esc_html( $host['name'] ) . '</a>';
+									} else {
+										$hosts .= esc_html( $host['name'] );
+									}
 
 									if ( ( ( 1 === $count ) && ( 2 === $hostcount ) )
 									     || ( ( $hostcount > 2 ) && ( ( $hostcount - 1 ) === $count ) ) ) {

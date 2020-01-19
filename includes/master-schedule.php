@@ -16,6 +16,12 @@ function radio_station_master_schedule( $atts ) {
 			$atts['list'] = 'list';
 		}
 		$atts['view'] = $atts['list'];
+		unset( $atts['list'] );
+	}
+	// 2.3.0: convert show_djs attribute to show_hosts
+	if ( !isset( $atts['show_hosts'] ) && isset( $atts['show_djs'] ) ) {
+		$atts['show_hosts'] = $atts['show_djs'];
+		unset( $atts['show_djs'] );
 	}
 
 	// --- merge shortcode attributes with defaults ---
@@ -24,6 +30,7 @@ function radio_station_master_schedule( $atts ) {
 	// 2.3.0: added show_encore attribute (default on)
 	// 2.3.0: added display clock attribute (default on)
 	// 2.3.0: added display selector attribute (default on)
+	// 2.3.0: added link_hosts attribute (default off)
 	// 2.3.0: set default time format according to plugin setting
 	// 2.3.0: set default table display to new table formatting
 	$time_format = (int) radio_station_get_setting( 'clock_time_format' );
@@ -32,22 +39,30 @@ function radio_station_master_schedule( $atts ) {
 		'show_link'         => 1,
 		'display_show_time' => 1,
 		'view'              => 'table',
-		// 'list'           => 0,
 		'divheight'         => 45,
-		'show_djs'          => 0,
-		// new display options
+		// 'list'           => 0, // converted above / deprecated
+		// 'show_djs'       => 0, // converted above / deprecated
+
+		// --- new display options ---
 		'selector'          => 1,
 		'clock'             => 1,
 		'show_image'        => 0,
 		'show_hosts'        => 0,
+		'link_hosts'        => 0,
 		'show_genres'       => 0,
 		'show_file'         => 0,
 		'show_encore'       => 1,
 	);
-	// 2.3.0: display avatar by default for tabbed view
+	// 2.3.0: change some defaults for tabbed and list view
 	if ( 'tabs' == $atts['view'] ) {
 		$defaults['show_image'] = 1;
+		$defaults['show_hosts'] = 1;
+		$defaults['show_genres'] = 1;
+	} elseif ( 'list' == $atts['view'] ) {
+		$defaults['show_genres'] = 1;
 	}
+
+	// --- merge attributes with defaults ---
 	$atts = shortcode_atts( $defaults, $atts, 'master-schedule' );
 
 	// --- enqueue schedule stylesheet ---

@@ -596,8 +596,10 @@ function radio_station_get_show_data_meta( $show, $single = false ) {
 				$user = get_user_by( 'ID', $host );
 				$radio_station_data['user-' . $host] = $user;
 			}
-			$hosts[]['name'] = $user->display_name;
-			$hosts[]['url'] = radio_station_get_host_url( $host );
+			$hosts[] = array(
+				'name'  => $user->display_name,
+				'url'   => radio_station_get_host_url( $host ),
+			);
 		}
 	}
 	if ( is_array( $show_producers ) && ( count( $show_producers ) > 0 ) ) {
@@ -608,8 +610,10 @@ function radio_station_get_show_data_meta( $show, $single = false ) {
 				$user = get_user_by( 'ID', $producer );
 				$radio_station_data['user-' . $producer] = $user;
 			}
-			$producers[]['name'] = $user->display_name;
-			$producers[]['url'] = radio_station_get_producer_url( $producer );
+			$producers[] = array(
+				'name'  => $user->display_name,
+				'url'   => radio_station_get_producer_url( $producer ),
+			);
 		}
 	}
 

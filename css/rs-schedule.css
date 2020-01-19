@@ -172,6 +172,10 @@
 	display: block;
 }
 
+#master-program-schedule .show-host-names {
+	font-size: 12px;
+}
+
 #master-program-schedule span.show-time {
 	font-size: 10px;
 }
@@ -282,8 +286,9 @@
 	text-align: center;
 }
 
-#master-schedule-tab-panels .master-schedule-tabs-show .show-encore,
 #master-schedule-tab-panels .master-schedule-tabs-show .show-time,
+#master-schedule-tab-panels .master-schedule-tabs-show .show-host-names,
+#master-schedule-tab-panels .master-schedule-tabs-show .show-encore,
 #master-schedule-tab-panels .master-schedule-tabs-show .show-genres {
 	font-size: 15px;
 }

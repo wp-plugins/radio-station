@@ -89,11 +89,19 @@ define( 'RADIO_STATION_API_DOCS_URL', 'https://netmix.com/radio-station/docs/api
 define( 'RADIO_STATION_LANGUAGES_SLUG', 'rs-languages' );
 define( 'RADIO_STATION_HOST_SLUG', 'rs-host' );
 define( 'RADIO_STATION_PRODUCER_SLUG', 'rs-producer' );
-// TODO: prefix existing slugs and update user data
-define( 'RADIO_STATION_GENRES_SLUG', 'genres' ); // will become rs-genres
-define( 'RADIO_STATION_SHOW_SLUG', 'show' ); // will become rs-show
-define( 'RADIO_STATION_PLAYLIST_SLUG', 'playlist' ); // will become rs-playlist
-define( 'RADIO_STATION_OVERRIDE_SLUG', 'override' ); // will become rs-override
+
+// TODO: prefix pre-existing slugs and update post/taxonomy data
+// if ( get_option( 'radio_show_cpts_prefixed' ) ) {
+//  define( 'RADIO_STATION_GENRES_SLUG', 'rs-genres' );
+//	define( 'RADIO_STATION_SHOW_SLUG', 'rs-show' );
+//	define( 'RADIO_STATION_PLAYLIST_SLUG', 'rs-playlist' );
+//	define( 'RADIO_STATION_OVERRIDE_SLUG', 'rs-override' );
+// } else {
+	define( 'RADIO_STATION_GENRES_SLUG', 'genres' );
+	define( 'RADIO_STATION_SHOW_SLUG', 'show' );
+	define( 'RADIO_STATION_PLAYLIST_SLUG', 'playlist' );
+	define( 'RADIO_STATION_OVERRIDE_SLUG', 'override' );
+// }
 
 // --- set debug mode constant ---
 // 2.3.0: added debug mode constant
@@ -149,16 +157,6 @@ $options = array(
 		'section' => 'broadcast',
 	),
 
-	'radio_language'    => array(
-		'type'    => 'select',
-		'options' => $languages,
-		'label'   => __( 'Main Broadcast Language', 'radio-station' ),
-		'default' => '',
-		'helper'  => __( 'Select the main language used on your Radio Station.', 'radio-station' ),
-		'tab'     => 'general',
-		'section' => 'broadcast',
-	),
-
 	// [Pro] Alternative Stream URL ?
 	// 'streaming_alt' => array(
 	//						'type'		=> 'text',
@@ -169,6 +167,16 @@ $options = array(
 	//						'section'	=> 'broadcast',
 	//						'pro'		=> true,
 	// ),
+
+	'radio_language'    => array(
+		'type'    => 'select',
+		'options' => $languages,
+		'label'   => __( 'Main Broadcast Language', 'radio-station' ),
+		'default' => '',
+		'helper'  => __( 'Select the main language used on your Radio Station.', 'radio-station' ),
+		'tab'     => 'general',
+		'section' => 'broadcast',
+	),
 
 	// --- Times ---
 	'timezone_location' => array(
@@ -702,7 +710,7 @@ function radio_station_check_version() {
 	} elseif ( version_compare( $version, $stored_version, '>' ) ) {
 
 		// --- updates from before to after x.x.x ---
-		// (example code template if neede for future release updates)
+		// (example code template if needed for future release updates)
 		// if ( ( version_compare( $version, 'x.x.x', '>=' ) )
 		//   && ( version_compare( $stored_version, 'x.x.x', '<' ) ) ) {
 		//		// eg. trigger a single thing to do
