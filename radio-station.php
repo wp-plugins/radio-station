@@ -1622,7 +1622,6 @@ function radio_station_set_roles() {
 	// --- add the Show Editor role ---
 	// 2.3.0: added Show Editor role
 	$wp_roles->add_role( 'show-editor', __( 'Show Editor', 'radio-station' ), $caps );
-	// }
 
 	// --- check plugin setting for authors ---
 	if ( radio_station_get_setting( 'add_author_capabilities' ) == 'yes' ) {
@@ -1713,7 +1712,7 @@ function radio_station_set_roles() {
 	}
 
 	// --- grant all plugin capabilities to admin users ---
-	$admin_caps = $wp_roles->roles['editor']['capabilities'];
+	$admin_caps = $wp_roles->roles['administrator']['capabilities'];
 	foreach ( $edit_caps as $cap ) {
 		if ( !array_key_exists( $cap, $admin_caps ) || ( !$admin_caps[$cap] ) ) {
 			$wp_roles->add_cap( 'administrator', $cap, true );
