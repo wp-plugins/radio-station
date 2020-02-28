@@ -44,7 +44,7 @@ class Playlist_Widget extends WP_Widget {
 
 		<p>
 			<label for="' . esc_attr( $this->get_field_id( 'song' ) ) . '">
-			<input id="' . esc_attr( $this->get_field_id( 'song' ) ) . '" name="' . esc_attr( $this->get_field_name( 'song' ) ) . ' type="checkbox" ' . checked( $song, true, false ) . '/>
+			<input id="' . esc_attr( $this->get_field_id( 'song' ) ) . '" name="' . esc_attr( $this->get_field_name( 'song' ) ) . '" type="checkbox" ' . checked( $song, true, false ) . '/>
 				' . esc_html( __( 'Show Song Title', 'radio-station' ) ) . '
 			</label>
 		</p>
