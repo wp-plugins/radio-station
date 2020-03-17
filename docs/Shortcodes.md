@@ -12,7 +12,15 @@ Shortcode Output Examples can be seen on the [Radio Station Demo Site](http://ra
 
 ### Master Schedule Shortcode
 
-Use the shortcode `[master-schedule]` on any page. This will generate a full-page schedule in one of five Views: Table, Tabbed, List, Divs and Legacy, with Table being the default. Note that Divs and Legacy do not honour Schedule Overrides and should be considered Deprecated but have been kept for backwards compatibility.
+Use the shortcode `[master-schedule]` on any page. This will generate a full-page schedule in one of five Views: 
+
+* Table (default) - responsive program grid in table form
+* Tabbed - responsive styled list view with day selection tabs
+* List - unstyled plain list view for custom development use
+* Divs - (display issues) legacy unstyled div based view 
+* Legacy - (deprecated) legacy table grid view 
+
+Note that Divs and Legacy do not honour Schedule Overrides, but have been kept for backwards compatibility. The legacy Divs view has display issues but may be rewritten in future.
 
 The following attributes are available for the shortcode:
 

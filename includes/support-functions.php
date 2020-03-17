@@ -423,13 +423,14 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 				if ( $inrange ) {
 				
 					$thisdate = date( 'Y-m-d', $date_time );
+					$thisday = date( 'l', $date_time );
 					$start = $data['start_hour'] . ':' . $data['start_min'] . ' ' . $data['start_meridian'];
 					$end = $data['end_hour'] . ':' . $data['end_min'] . ' ' . $data['end_meridian'];
 					$override_start_time = strtotime( $thisdate . ' ' . $start );
 					$override_end_time = strtotime( $thisdate . ' ' . $end );
-					if ( $override_end_time < $override_start_time ) {
-						$override_end_time = $override_end_time + 86400;
-					}
+					// if ( $override_end_time < $override_start_time ) {
+					//	$override_end_time = $override_end_time + ( 24 * 60 * 60 );
+					// }
 
 					if ( $override_start_time < $override_end_time ) {
 
@@ -438,8 +439,8 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 							'override' => $override['ID'],
 							'name'     => $override['post_title'],
 							'slug'     => $override['post_name'],
-							'date'     => $date,
-							'day'      => $day,
+							'date'     => $thisdate,
+							'day'      => $thisday,
 							'start'    => $start,
 							'end'      => $end,
 							'url'      => get_permalink( $override['ID'] ),
@@ -454,8 +455,8 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 							'override' => $override['ID'],
 							'name'     => $override['post_title'],
 							'slug'     => $override['post_name'],
-							'date'     => $date,
-							'day'      => $day,
+							'date'     => $thisdate,
+							'day'      => $thisday,
 							'start'    => $start,
 							'end'      => '11:59 pm',
 							'url'      => get_permalink( $override['ID'] ),
@@ -463,8 +464,8 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 						);
 						$override_list[$date][] = $override_data;
 
-						$nextday = date( 'l', $date_time + ( 24 * 60 * 60 ) );
 						$nextdate = date( 'Y-m-d', $date_time + ( 24 * 60 * 60 ) );
+						$nextday = date( 'l', $date_time + ( 24 * 60 * 60 ) );
 						$override_data = array(
 							'override' => $override['ID'],
 							'name'     => $override['post_title'],
@@ -476,7 +477,7 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 							'url'      => get_permalink( $override['ID'] ),
 							'split'    => true,
 						);
-						$override_list[$date][] = $override_data;
+						$override_list[$nextdate][] = $override_data;
 					}
 				}
 			}
@@ -1033,7 +1034,7 @@ function radio_station_get_current_schedule() {
 			$next_shows = radio_station_get_next_shows( 1, $show_shifts );
 			if ( count( $next_shows ) > 0 ) {
 				$next_show = $next_shows[0];
-				$shift_end_time = strtotime( $weekdates[$day] . ' ' . $next_show['end'] );
+				$shift_end_time = strtotime( $weekdates[$next_show['day']] . ' ' . $next_show['end'] );
 				$next_expires = $shift_end_time - $now - 1;
 				set_transient( 'radio_station_next_show', $next_show, $next_expires );
 			}
@@ -1480,7 +1481,7 @@ function radio_station_check_shifts( $all_shifts ) {
 
 						// --- conflict debug output ---
 						if ( RADIO_STATION_DEBUG ) {
-							$debug = "This Date: " . $thisday . " - Next Date: " . $nextday . " - Prev Date: " . $prevday . PHP_EOL;
+							$debug = "This Date: " . $thisdate . " - Next Date: " . $nextdate . " - Prev Date: " . $prevdate . PHP_EOL;
 							$debug .= "(Conflicting Start Time: " . date( "m-d l H:i", $start_time ) . " (" . $start_time . ")" . PHP_EOL;
 							$debug .= "Overlaps previous End Time: " . date( "m-d l H:i", $prev_end_time ) . " (" . $prev_end_time . ")" . PHP_EOL;
 							$debug .= "Shift: " . print_r( $shift, true );
@@ -2047,10 +2048,13 @@ function radio_station_get_producer_url( $producer_id ) {
 // ---------------
 // 2.3.0: added to get Upgrade to Pro link
 function radio_station_get_upgrade_url() {
+
 	// TODO: test Freemius upgrade to Pro URL
 	// ...maybe it is -addons instead of -pricing ???
-	$upgrade_url = add_query_arg( 'page', 'radio-station-pricing', admin_url( 'admin.php' ) );
+	// $upgrade_url = add_query_arg( 'page', 'radio-station-pricing', admin_url( 'admin.php' ) );
 
+	$upgrade_url = RADIO_STATION_PRO_URL;
+	
 	return $upgrade_url;
 }
 
