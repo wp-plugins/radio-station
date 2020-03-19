@@ -57,6 +57,8 @@
 	width: 12%;
 	text-align: center;
 	vertical-align: top;
+	min-width: 100%;
+	padding: 0.5em 0;
 }
 
 #master-program-schedule .master-program-day.current-day {

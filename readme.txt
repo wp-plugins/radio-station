@@ -522,7 +522,7 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 = 2.3.0 =
 * Major Update including many new features, enhancements and fixes!
-* https://netmix.com/blog/2-3-0-release-announcement/
+* https://netmix.com/radio-station-2-3-0-release/
 * Revamped Templates, Master Schedule Views, Shortcodes and Widgets
 * Added Admin Options, REST API Routes and Shift Conflict Checking
 * Added Show Producers, Language Taxonomy, Timezones and Countdowns

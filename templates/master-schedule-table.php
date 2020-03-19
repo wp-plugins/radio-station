@@ -65,7 +65,7 @@ foreach ( $weekdays as $i => $weekday ) {
 
 		// --- output table column heading ---
 		// 2.3.0: added left/right arrow responsive controls
-		$arrows = array( 'right' => '#9658;', 'left' => '#9668;' );
+		$arrows = array( 'right' => '&#9658;', 'left' => '&#9668;' );
 		$arrows = apply_filters( 'radio_station_schedule_arrows', $arrows, 'table' );
 		$output .= '<th class="' . esc_attr( $class ) . '">';
 		$output .= '<div class="shift-left-arrow">';

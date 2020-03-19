@@ -57,8 +57,8 @@ foreach ( $weekdays as $i => $weekday ) {
 		$display_day = radio_station_translate_weekday( $weekday );
 
 		// 2.3.0: added left/right arrow responsive controls
-		// $arrows = array( 'right' => '#9658;', 'left' => '#9668;' );
-		// $arrows = apply_filters( 'radio_station_schedule_arrows', $arrows, 'tabs' );
+		$arrows = array( 'right' => '&#9658;', 'left' => '&#9668;' );
+		$arrows = apply_filters( 'radio_station_schedule_arrows', $arrows, 'tabs' );
 		$output .= '<li id="master-schedule-tabs-header-' . strtolower( $weekday ) . '" class="' . esc_attr( $class ) . '">';
 		$output .= '<div class="shift-left-arrow">';
 		$output .= '<a href="javacript:void(0);" onclick="radio_shift_tab(\'left\');" title="' . esc_attr( __( 'Previous Day', 'radio-station' ) ) . '">' . $arrows['left'] . '</a>';
