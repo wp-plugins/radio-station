@@ -160,14 +160,14 @@ function radio_station_add_admin_menus() {
 	// add_submenu_page( 'radio-station', $rs . ' ' . __( 'Producers', 'radio-station' ), __( 'Producers', 'radio-station' ), 'edit_producers', 'producers' );
 	// add_submenu_page( 'radio-station', $rs . ' ' . __( 'Export Playlists', 'radio-station' ), __( 'Export Playlists', 'radio-station' ), $settingscap, 'playlist-export', 'radio_station_playlist_export_page' );
 
+	// --- import / export feature ---
 	if ( file_exists( RADIO_STATION_DIR . '/includes/import-export.php' ) ) {
 		add_submenu_page( 'radio-station', 	$rs . ' ' . __( 'Import/Export Show Data', 'radio-station' ), __( 'Import/Export', 'radio-station' ), 'manage_options', 'import-export-shows', 'radio_station_import_export_show_page' );
 	}
-
-	add_submenu_page( 'radio-station', $rs . ' ' . __( 'Settings', 'radio-station' ), __( 'Settings', 'radio-station' ), $settingscap, 'radio-station', 'radio_station_settings_page' );
 	
-	// TODO: redo help page with new docs
-	add_submenu_page( 'radio-station', $rs . ' ' . __( 'Help', 'radio-station' ), __( 'Help', 'radio-station' ), 'publish_playlists', 'radio-station-help', 'radio_station_plugin_help_page' );
+	add_submenu_page( 'radio-station', $rs . ' ' . __( 'Settings', 'radio-station' ), __( 'Settings', 'radio-station' ), $settingscap, 'radio-station', 'radio_station_settings_page' );	
+	// 2.3.0: rename Help page to Documentation
+	add_submenu_page( 'radio-station', $rs . ' ' . __( 'Documentation', 'radio-station' ), __( 'Help', 'radio-station' ), 'publish_playlists', 'radio-station-docs', 'radio_station_plugin_docs_page' );
 	
 	do_action( 'radio_station_admin_submenu_bottom' );
 
@@ -319,9 +319,9 @@ function radio_station_import_export_show_page() {
 }
 
 // ------------------------
-// Display Plugin Help Page
+// Display Plugin Docs Page
 // ------------------------
-function radio_station_plugin_help_page() {
+function radio_station_plugin_docs_page() {
 
 	// --- show MailChimp signup form ---
 	echo "<p>&nbsp;</p>";
@@ -1014,7 +1014,7 @@ function radio_station_announcement_notice() {
 
 	// --- bug out on certain plugin pages ---
 	// 2.2.8: remove strict in_array checking
-	$pages = array( 'radio-station', 'radio-station-help' );
+	$pages = array( 'radio-station', 'radio-station-docs' );
 	if ( isset( $_REQUEST['page'] ) && in_array( $_REQUEST['page'], $pages ) ) {
 		return;
 	}

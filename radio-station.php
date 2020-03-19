@@ -2119,8 +2119,11 @@ function radio_station_debug( $data, $echo = true, $file = false ) {
 
 	// --- maybe output debug info ---
 	if ( $echo ) {
+		// 2.3.0: added span wrap for hidden display
+		echo '<span style="display:none;">';
 		// phpcs:ignore WordPress.Security.OutputNotEscaped
 		echo $data;
+		echo '</span>' . PHP_EOL;
 	}
 
 	// --- check for logging constant ---

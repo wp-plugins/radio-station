@@ -399,10 +399,10 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 					$data_format2 = 'g:i a';
 				}
 			
-				echo '<span class="rs-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $data_format ) . '">';
+				echo '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $data_format ) . '">';
 				echo esc_html( $display_day ) . ', ' . $start . '</span>';
 				echo '<span class="rs-sep"> - </span>';
-				echo '<span class="rs-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $data_format2 ) . '">' . $end . '</span>';
+				echo '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $data_format2 ) . '">' . $end . '</span>';
 				echo "</div>";
 			}
 
@@ -707,7 +707,10 @@ function radio_station_genre_archive_list( $atts ) {
 				$list .= '</div>';
 
 				// --- show excerpt ---
-				// n/a
+				// TODO: show description
+				// if ( $atts['show_desc' ] ) {
+				//
+				// } 
 
 				$list .= '</li>';
 			}
@@ -1344,10 +1347,10 @@ function radio_station_current_show_shortcode( $atts ) {
 					$class = implode( ' ', $classes );
 									
 					$current_shift_display = '<div class="' . esc_attr( $class ) . '">';
-					$current_shift_display .= '<span class="rs-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $data_format ) . '">';
+					$current_shift_display .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $data_format ) . '">';
 					$current_shift_display .= esc_html( $display_day ) . ', ' . $start . '</span>';
 					$current_shift_display .= '<span class="rs-sep"> - </span>';
-					$current_shift_display .= '<span class="rs-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $data_format2 ) . '">' . $end . '</span>';
+					$current_shift_display .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $data_format2 ) . '">' . $end . '</span>';
 					$current_shift_display .= '</div>';
 				}
 				$class = implode( ' ', $classes );
@@ -1357,10 +1360,10 @@ function radio_station_current_show_shortcode( $atts ) {
 				if ( in_array( 'current-shift', $classes ) ) {
 					$shift_display .= '<ul class="current-shift-list"><li class="current-shift-list-item">';
 				}
-				$shift_display .= '<span class="rs-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $data_format ) . '">';
+				$shift_display .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $data_format ) . '">';
 				$shift_display .= esc_html( $display_day ) . ', ' . $start . '</span>';
 				$shift_display .= '<span class="rs-sep"> - </span>';
-				$shift_display .= '<span class="rs-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $data_format2 ) . '">' . $end . '</span>';
+				$shift_display .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $data_format2 ) . '">' . $end . '</span>';
 				if ( in_array( 'current-shift', $classes ) ) {
 					$shift_display .= '</li></ul>';
 				}
@@ -1749,10 +1752,10 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 				}
 
 				$shift_display .= '<div class="' . esc_attr( $class ) . '">';
-				$shift_display .= '<span class="rs-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $data_format ) . '">';
+				$shift_display .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $data_format ) . '">';
 				$shift_display .= esc_html( $display_day ) . ', ' . $start . '</span>';
 				$shift_display .= '<span class="rs-sep"> - </span>';
-				$shift_display .= '<span class="rs-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $data_format2 ) . '">' . $end . '</span>';
+				$shift_display .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $data_format2 ) . '">' . $end . '</span>';
 				$shift_display .= '</div>';
 
 				$shift_display .= '</div>';

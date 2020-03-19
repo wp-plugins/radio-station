@@ -976,15 +976,15 @@ function radio_station_get_current_schedule() {
 					// --- get this shift start and end times ---
 					$shift_start = $weekdates[$day] . ' ' . $shift['start'];
 					$shift_end = $weekdates[$day] . ' ' . $shift['end'];
+					if ( isset( $shift['split'] ) && $shift['split'] ) {
+						$nextdate = date( 'Y-m-d', strtotime( $weekdates[$day] ) );
+						$shift_end = $nextdate . ' ' . $shift['real_end'];
+					}
 					$shift_start_time = strtotime( $shift_start );
 					$shift_end_time = strtotime( $shift_end );
-
-					// --- debug point ---
-					if ( RADIO_STATION_DEBUG ) {
-						$debug = 'Now: ' . date( 'm-d H:i:s', $now ) . ' (' . $now . '])' . PHP_EOL;
-						$debug .= 'Shift Start: ' . $shift_start . ' (' . $shift_start_time . ')' . PHP_EOL;
-						$debug .= 'Shift End: ' . $shift_end . ' (' . $shift_end_time . ')' . PHP_EOL . PHP_EOL;
-						radio_station_debug( $debug );
+					// adjust for shifts ending at midnight
+					if ( $shift_start_time > $shift_end_time ) {
+						$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 					}
 
 					// --- check if this is the currently scheduled show ---
@@ -998,12 +998,27 @@ function radio_station_get_current_schedule() {
 						set_transient( 'radio_station_current_show', $current_show, $expires );
 					}
 
+					// --- debug point ---
+					if ( RADIO_STATION_DEBUG ) {
+						$debug = 'Now: ' . date( 'm-d H:i:s', $now ) . ' (' . $now . '])' . PHP_EOL;
+						$debug .= 'Shift Start: ' . $shift_start . ' (' . $shift_start_time . ')' . PHP_EOL;
+						$debug .= 'Shift End: ' . $shift_end . ' (' . $shift_end_time . ')' . PHP_EOL . PHP_EOL;
+						if ( isset ( $current_show ) ) {
+							$debug .= '[Current Shift] ' . print_r( $current_show, true ) . PHP_EOL;
+							$debug .= 'Transient Expires in ' . $expires . PHP_EOL;
+						}
+						$debug .= PHP_EOL;
+						if ( $now >= $shift_start_time ) {$debug .= "!A!";}
+						if ( $now < $shift_end_time ) {$debug .= "!B!";}
+						radio_station_debug( $debug );
+					}
+
 				} elseif ( isset( $current_show['split'] ) && $current_show['split'] ) {
 
-					// --- recombine split current shift ---
-					$current_show['end'] = $shift['end'];
+					// --- skip second part of split shift for current shift ---
 					unset( $current_show['split'] );
-					set_transient( 'radio_station_current_show', $current_show, $expires );
+					// $current_show['end'] = $shift['end'];
+					// set_transient( 'radio_station_current_show', $current_show, $expires );
 
 				} elseif ( !isset( $next_show ) ) {
 
