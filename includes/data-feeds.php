@@ -170,13 +170,13 @@ function radio_station_get_broadcast_data() {
 
 	// --- get broadcast info ---
 	$current_show = radio_station_get_current_show();
-	print_r( $current_show );
+	// print_r( $current_show );
 	$current_show = radio_station_convert_show_shift( $current_show );
-	print_r( $current_show );
+	// print_r( $current_show );
 	$next_show = radio_station_get_next_show();
-	print_r( $next_show );
+	// print_r( $next_show );
 	$next_show = radio_station_convert_show_shift( $next_show );
-	print_r( $nextt_show );
+	// print_r( $next_show );
 
 	// TODO: maybe get now playing playlist ?
 	// $current_playlist = radio_station_current_playlist();
@@ -305,15 +305,16 @@ function radio_station_get_languages_data( $language = false ) {
 		// --- get all assigned language terms ---
 		$args = array( 'taxonomy' => RADIO_STATION_LANGUAGES_SLUG, 'hide_empty' => true );
 		$terms = get_terms( $args );
+
 		if ( count( $terms ) > 0 ) {
 			$all_langs = radio_station_get_languages();
 			foreach ( $terms as $term ) {
 				$languages_data[$term->slug] = array(
-					'id'          => $term->id,
+					'id'          => $term->term_id,
 					'slug'        => $term->slug,
 					'name'        => $term->name,
 					'description' => $term->description,
-					'url'         => get_term_link( $term->id, RADIO_STATION_LANGUAGES_SLUG ),
+					'url'         => get_term_link( $term->term_id, RADIO_STATION_LANGUAGES_SLUG ),
 				);
 			}
 		}

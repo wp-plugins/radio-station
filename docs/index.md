@@ -15,6 +15,7 @@
 | [Data](./Data.md) | Post Types, Taxonomies and Data Filters |
 | [API](./API.md) | Data API via REST and Feed Endpoints
 | [Roadmap](./Roadmap.md) | Feature Roadmap for Free and Pro Versions |
+| [Changelog](../CHANGELOG.md) | Log of Changes for each Release |
 
 
 ### Quickstart Guide

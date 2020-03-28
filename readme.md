@@ -84,10 +84,12 @@ Love Radio Station and ready for more? As the free version develops, we have als
 
 1. Upload plugin .zip file to the `/wp-content/plugins/` directory and unzip.
 2. Activate the plugin through the 'Plugins' menu in the WordPress Admin
-3. Give any users who need access to the plugin the role of "Host", "Producer" or "Show Editor". Only these roles have administrative access to the plugin's records.
-4. Create Shows, add Shifts to them, and assign Images, Genres, Languages, Hosts and/or Producers.
-5. Add Playlists to your Shows or assign posts to Shows as needed.
-6. See the QuickStart Guide above for more detailed instructions of what else is available.
+3. Alternatively search for Radio Station via the WordPress admin Add New plugin interface and install and activate it there.
+4. Give any users who need access to the plugin the role of "Host", "Producer" or "Show Editor". Assigning These roles gives publish and edit access to the plugin's records.
+5. Create Shows, add Shifts to them, and assign Images, Genres, Languages, Hosts and/or Producers.
+6. Add Playlists to your Shows or assign posts to Shows as needed.
+7. Go to your admin Appearance -> Widgets page to add and configure Current and Upcoming Show Widgets, and any other desired plugin widgets.
+8. See the QuickStart Guide above for more detailed instructions of what else is available.
 
 
 ## Frequently Asked Questions

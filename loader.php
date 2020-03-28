@@ -2383,6 +2383,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			$styles[] = '#wrapbox {margin-right: 20px;}';
 
 			// --- settings tab styles ---
+			// 1.1.0: added max-width:100% to select input
 			$styles[] = '.settings-tab-button {display:inline-block; font-size:15px; padding:7px 14px; margin-right:20px; border-radius:7px;}';
 			$styles[] = '.settings-tab-button.active {font-weight:bold; background-color:#0073aa; color:#FFF; border:1px solid #FFF;}';
 			$styles[] = '.settings-tab-button.inactive {font-weight:bold; background-color:#F5F5F5; color:#0073aa; border:1px solid #000;}';
@@ -2404,7 +2405,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			$styles[] = '.settings-input input.setting-numeric {display:inline-block; width:50%; text-align:center;}';
 			$styles[] = '.settings-input input.setting-button {display:inline-block; padding:0px 5px;}';
 			$styles[] = '.settings-input input.setting-textarea {width:100%;}';
-			$styles[] = '.settings-input select.setting-select {min-width:100px;}';
+			$styles[] = '.settings-input select.setting-select {min-width:100px; max-width:100%;}';
 
 			// --- toggle input styles ---
 			// Ref: https://www.w3schools.com/howto/howto_css_switch.asp

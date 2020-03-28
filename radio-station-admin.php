@@ -334,6 +334,7 @@ function radio_station_plugin_docs_page() {
 	include_once RADIO_STATION_DIR . '/reader.php';
 
 	$docs = scandir( RADIO_STATION_DIR . '/docs/' );
+	$docs[] = 'CHANGELOG.md';
 	foreach ( $docs as $doc ) {
 		if ( !in_array( $doc, array( '.', '..' ) ) ) {
 			$id = str_replace( '.md', '', $doc );
@@ -389,7 +390,11 @@ function radio_station_plugin_docs_page() {
 function radio_station_parse_doc( $id ) {
 
 	// --- get docs page contents ---
-	$path = RADIO_STATION_DIR . '/docs/' . $id . '.md';
+	if ( 'CHANGELOG' == $id ) {
+		$path = RADIO_STATION_DIR . '/CHANGELOG.md';
+	} else {
+		$path = RADIO_STATION_DIR . '/docs/' . $id . '.md';
+	}
 	$contents = file_get_contents( $path );
 	
 	// --- strip top level heading to prevent duplicate title ---
