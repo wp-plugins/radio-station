@@ -33,4 +33,4 @@ Upcoming Release Version: 2.3.0
 
 [comment]: # (Show and Override Feeds)
 
-[Go Pro Link](https://netmix.com/radio-station-pro/)
+Interested in "going pro"? [Find out more about Radio Station Pro](https://netmix.com/radio-station-pro/).

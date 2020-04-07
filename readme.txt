@@ -12,13 +12,13 @@ Radio Station let's you build and manage a Show Schedule for a radio station or 
 
 == Description ==
 
-Radio Station is a plugin to build and manage a Show Schedule for a radio station or internet broadcaster's WordPress website. It's functionality is based on Drupal 6's Station plugin, reworked for use in Wordpress.
+Radio Station by NetMix is a plugin to build and manage a Show Schedule for a radio station or internet broadcaster's WordPress website, including podcasters. It's functionality was originally based on Drupal 6's Station plugin, reworked for use in Wordpress and then extended.
 
-The main included custom post type is "Shows", schedulable blocks of time that contain a Show description, a Show shifts repeater field, assignable images and other meta information. You can also create Playlists associated with those shows, or assign standard blog posts to relate to a Show. It also supports adding Schedule Overrides for specific dates and times. The plugin has the ability to associate users (given a DJ role of "Host") to Shows, so they can be displayed for that Show and to give them edit access.
+The plugin adds a new "Show" post type, schedulable blocks of time that contain a Show description, a Show shifts repeater field, assignable images and other meta information. You can also create Playlists associated with those shows, or assign standard blog posts to relate to a Show. It also supports adding Schedule Overrides for specific dates and times, and adds the ability to associate users (given a role of "Host" or "Producer") to Shows, so they can be displayed for that Show and to give them edit access.
 
 A schedule of all Shows can be generated and added to a page with a shortcode (or simple page selection in the Plugin Settings) which has a number of Layout and display options. Shows can be categorized into Genres and a Genre highlighting filter appears on the embedded Schedule view. Each Show has it's own dedicated page to display all the Show details in a responsive layout.
 
-The plugin contains a widget to display the on-air Currentr Show linked to the Show page, with various widget display options, and further widgets for displaying Upcoming Shows and current Playlist tracks. Shortcodes are available for these widgets, as well as for displaying archive lists of any of the plugin's custom post types.
+The plugin contains a widget to display the on-air Current Show linked to the Show page, with various widget display options, and further widgets for displaying Upcoming Shows and current Playlist tracks. Shortcodes are available for these widgets, as well as for displaying archive lists of any of the plugin's custom post types.
 
 As there is a lot you can do with Radio Station, we've made an effort to provide complete [Radio Station Plugin Documentation](https://netmix.com/radio-station/docs/). You can also find a Quickstart Guide there, as well as in the section below. You can see some example displays from the plugin via the Screenshots section, and full live examples are available on the [Radio Station Plugin Demo Site](https://radiostationdemo.com).
 
@@ -173,10 +173,14 @@ Right now:
 You may translate the plugin into another language. Please visit our [WordPress Translate project page](https://translate.wordpress.org/locale/en-gb/default/wp-plugins/radio-station/) for this plugin for further instruction. The `radio-station.pot` file is located in the `/languages` directory of the plugin. Please send the finished translation to `info@netmix.com`. We'd love to include it.
 
 == Screenshots ==
-1. Weekly Schedule View
-2. Show Page Layout
-3. Admin Settings Panel
-4. Show Conflict Display
+1. Table Schedule View
+2. Tabbed Schedule View
+3. Show Page Layout
+4. Playlist Page Layout
+5. Current Show Widget
+6. Show Archive List Shortcode
+7. Admin Settings Panel
+8. Show Conflict Display
 
 == Changelog ==
 
