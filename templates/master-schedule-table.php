@@ -235,13 +235,12 @@ foreach ( $hours as $hour ) {
 					}
 
 					if ( isset( $_GET['shiftdebug'] ) && ( '1' == $_GET['shiftdebug'] ) ) {
-						$test .= 'Now: ' . $now . '(' . date( 'Y-m-d l H:i', $now ) . ') -- Today: ' . $today . '<br>';
+						$test .= 'Now: ' . $now . ' (' . date( 'Y-m-d l H:i', $now ) . ') -- Today: ' . $today . '<br>';
 						$test .= 'Day: ' . $weekday . ' - Hour: ' . $hour . ' - Next Hour: ' . $nexthour . '<br>';
-						// $test .= 'Hour Start' . $hour_start . '(' . date( 'l H:i', $hour_start ) . ')';
-						// $test .= 'Next Hour Start' . $next_hour_start . '(' . date( 'l H:i', $next_hour_start ) . ')';
-						// $test .= 'Hour End' . $hour_end . '(' . date( 'l H:i', $hour_end ) . ')<br>';
-						$test .= 'Shift Start: ' . $shift_start . '(' . date( 'Y-m-d l H:i', $shift_start ) . ')' . '<br>';
-						$test .= 'Shift End: ' . $shift_end . '(' . date( 'Y-m-d l H:i', $shift_end ) . ')' . '<br>';
+						$test .= 'Hour Start' . $hour_start . ' (' . date( 'l H:i', $hour_start ) . ')<br>';
+						$test .= 'Hour End' . $hour_end . ' (' . date( 'l H:i', $hour_end ) . ')<br>';
+						$test .= 'Shift Start: ' . $shift_start . ' (' . date( 'Y-m-d l H:i', $shift_start ) . ')' . '<br>';
+						$test .= 'Shift End: ' . $shift_end . ' (' . date( 'Y-m-d l H:i', $shift_end ) . ')' . '<br>';
 						$test .= 'Display: ' . ( $display ? 'yes' : 'no' ) . ' - ';
 						$test .= 'New Shift: ' . ( $newshift ? 'yes' : 'no' ) . ' - ';
 						$test .= 'Now Playing: ' . ( $nowplaying ? 'yes' : 'no' ) . ' - ';
