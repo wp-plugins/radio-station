@@ -88,9 +88,12 @@ $output .= '</tr>';
 $tcount = 0;
 foreach ( $hours as $hour ) {
 
+	// 2.3.1: fix to set translated hour for display only
 	$raw_hour = $hour;
-	$nexthour = radio_station_convert_hour( ( $hour + 1 ), $atts['time'] );
-	$hour = radio_station_convert_hour( $hour, $atts['time'] );
+	$hour_display = radio_station_convert_hour( $hour, $atts['time'] );
+	if ( 1 == strlen( $hour ) ) {
+		$hour = '0' . $hour;
+	}
 
 	// --- start hour row ---
 	$output .= '<tr class="master-program-hour-row hour-row-' . esc_attr( $raw_hour ) . '">';
@@ -104,8 +107,9 @@ foreach ( $hours as $hour ) {
 
 	// --- set heading classes ---
 	// 2.3.0: check current hour for highlighting
+	// 2.3.1: fix to use untranslated hour (12 hr format bug)
 	$classes = array( 'master-program-hour' );
-	$hour_start = strtotime( $date . ' ' . $hour );
+	$hour_start = strtotime( $date . ' ' . $hour . ':00' );
 	$hour_end = $hour_start + ( 60 * 60 );
 	if ( ( $now > $hour_start ) && ( $now < $hour_end ) ) {
 		$classes[] = 'current-hour';
@@ -124,7 +128,7 @@ foreach ( $hours as $hour ) {
 	}
 	
 	$output .= '<div class="master-program-server-hour rs-time" data="' . esc_attr( $raw_hour ) . '" data-format="' . esc_attr( $data_format ) . '">';
-	$output .= esc_html( $hour );
+	$output .= esc_html( $hour_display );
 	$output .= '<br>';
 	$output .= '<div class="master-program-user-hour rs-time" data="' . esc_attr( $raw_hour ) . '" data-format="' . esc_attr( $data_format ) . '"></div>';
 	$output .= '</div>';
@@ -164,7 +168,8 @@ foreach ( $hours as $hour ) {
 			$nextdate = $weekdates[$nextday];		
 
 			// --- get hour and next hour start and end times ---
-			$hour_start = strtotime( $weekdate . ' ' . $hour );
+			// 2.3.1: fix to use untranslated hour (12 hr format bug)
+			$hour_start = strtotime( $weekdate . ' ' . $hour . ':00' );
 			$hour_end = $next_hour_start = $hour_start + ( 60 * 60 );
 			$next_hour_end = $hour_end + ( 60 * 60 );
 
@@ -236,7 +241,7 @@ foreach ( $hours as $hour ) {
 
 					if ( isset( $_GET['shiftdebug'] ) && ( '1' == $_GET['shiftdebug'] ) ) {
 						$test .= 'Now: ' . $now . ' (' . date( 'Y-m-d l H:i', $now ) . ') -- Today: ' . $today . '<br>';
-						$test .= 'Day: ' . $weekday . ' - Hour: ' . $hour . ' - Next Hour: ' . $nexthour . '<br>';
+						$test .= 'Day: ' . $weekday . ' - Raw Hour: ' . $raw_hour . ' - Hour: ' . $hour . ' - Hour Display: ' . $hour_display . '<br>';
 						$test .= 'Hour Start' . $hour_start . ' (' . date( 'l H:i', $hour_start ) . ')<br>';
 						$test .= 'Hour End' . $hour_end . ' (' . date( 'l H:i', $hour_end ) . ')<br>';
 						$test .= 'Shift Start: ' . $shift_start . ' (' . date( 'Y-m-d l H:i', $shift_start ) . ')' . '<br>';
