@@ -402,9 +402,10 @@ foreach ( $hours as $hour ) {
 							}
 
 							// --- encore airing ---
+							// 2.3.1: added isset check for encore switch
 							$show_encore = false;
-							if ( $atts['show_encore'] ) {
-								$$show_encore = $shift['encore'];
+							if ( $atts['show_encore'] && isset( $shift['encore'] ) ) {
+								$show_encore = $shift['encore'];
 							}
 							$show_encore = apply_filters( 'radio_station_schedule_show_encore', $shift['encore'], $show['id'], 'table' );
 							if ( 'on' == $show_encore ) {

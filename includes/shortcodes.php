@@ -373,7 +373,9 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 			// --- display Override date(s) ---
 			if ( ( RADIO_STATION_OVERRIDE_SLUG == $type ) && ( $atts['show_dates'] ) ) {
 				$datetime = get_post_meta( $archive_post->ID, 'show_override_sched', true );
-				echo "<div class='override-archive-date'>";
+				
+				// 2.3.1: fix to append not echo override date to archive list
+				$list .= "<div class='override-archive-date'>";
 
 				// --- convert date info ---
 				$day = date( 'l', strtotime( $datetime['date'] ) );
@@ -399,11 +401,12 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 					$data_format2 = 'g:i a';
 				}
 			
-				echo '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $data_format ) . '">';
-				echo esc_html( $display_day ) . ', ' . $start . '</span>';
-				echo '<span class="rs-sep"> - </span>';
-				echo '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $data_format2 ) . '">' . $end . '</span>';
-				echo "</div>";
+				// 2.3.1: fix to append not echo override date to archive list
+				$list .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $data_format ) . '">';
+				$list .= esc_html( $display_day ) . ', ' . $start . '</span>';
+				$list .= '<span class="rs-sep"> - </span>';
+				$list .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $data_format2 ) . '">' . $end . '</span>';
+				$list .= "</div>";
 			}
 
 			// TODO: display Show shifts ?
@@ -428,6 +431,18 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 			// 	$tracks = get_post_meta( $archive_post->ID, 'playlist', true );
 			//	$track_count = count( $tracks );
 			// }
+			
+			// TODO: display episode / host / producer meta ?
+			// if ( defined( 'RADIO_STATION_PRO_EPISODE_SLUG' && ( RADIO_STATION_PRO_EPISODE_SLUG == $type ) {
+			//	$list .= apply_filters( 'radio_station_episode_archive_meta', '' );		
+			// }			
+			// if ( defined( 'RADIO_STATION_PRO_HOST_SLUG' && ( RADIO_STATION_PRO_EPISODE_SLUG == $type ) {
+			//	$list .= apply_filters( 'radio_station_host_archive_meta', '' );		
+			// }
+			// if ( defined( 'RADIO_STATION_PRO_PRODUCER_SLUG' && ( RADIO_STATION_PRO_EPISODE_SLUG == $type ) {
+			//	$list .= apply_filters( 'radio_station_producer_archive_meta', '' );		
+			// }
+			
 
 			// --- description ---
 			if ( 'none' == $atts['description'] ) {
@@ -1377,7 +1392,7 @@ function radio_station_current_show_shortcode( $atts ) {
 		}
 
 		// --- output current shift display ---
-		if ( $atts['show_sched'] ) {
+		if ( $atts['show_sched'] && isset( $current_shift_display ) ) {
 			$output .= $current_shift_display;
 		}
 
