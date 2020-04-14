@@ -184,6 +184,12 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 == Changelog ==
 
+= 2.3.1 =
+* fix to schedule table view - 12 hour format with translations
+* fix to schedule table view hour column width style
+* fix to javascript table/tab arrows to prevent default click
+* fix to undefined index warning when saving show with no shifts
+
 = 2.3.0 =
 * Include: Plugin Loader (1.1.0) with plugin options and settings
 * Include: Freemius SDK (2.3.0) and Freemius integration

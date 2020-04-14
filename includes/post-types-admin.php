@@ -66,7 +66,21 @@
 add_action( 'edit_form_after_title', 'radio_station_top_meta_boxes' );
 function radio_station_top_meta_boxes() {
 	global $post;
-	do_meta_boxes( get_current_screen(), 'rs-top', $post );
+	$current_screen = get_current_screen();
+	
+	if ( RADIO_STATION_DEBUG ) {
+		echo "<!-- DOING TOP METABOXES -->";
+		echo "<!-- Current Screen: " . print_r( $current_screen, true ) . " -->";
+		$hidden_metaboxes = get_hidden_meta_boxes( $current_screen );
+		echo "<!-- Hidden Metaboxes: ". print_r( $hidden_metaboxes, true ) . " -->";
+	}
+	
+	// --- top metabox output ---
+	do_meta_boxes( $current_screen, 'rs-top', $post );
+	
+	if ( RADIO_STATION_DEBUG ) {
+		echo "<!-- DONE TOP METABOXES -->";
+	}
 }
 
 // ---------------------------------
@@ -2119,8 +2133,11 @@ function radio_station_show_save_data( $post_id ) {
 	if ( isset( $_POST['show_shifts_nonce'] ) && wp_verify_nonce( $_POST['show_shifts_nonce'], 'radio-station' ) ) {
 
 		// --- loop posted show shift times ---
-		$new_shifts = array();
-		$shifts = $_POST['show_sched'];
+		// 2.3.1: added check if any shifts are set (fix undefined index warning)
+		$shifts = $new_shifts = array();
+		if ( isset( $_POST['show_sched'] ) ) {
+			$shifts = $_POST['show_sched'];
+		}
 		$prev_shifts = radio_station_get_show_schedule( $post_id );
 		$days = array( '', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday' );
 		if ( $shifts && is_array( $shifts ) && ( count( $shifts ) > 0 ) ) {

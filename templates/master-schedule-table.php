@@ -65,18 +65,19 @@ foreach ( $weekdays as $i => $weekday ) {
 
 		// --- output table column heading ---
 		// 2.3.0: added left/right arrow responsive controls
+		// 2.3.1: added (negative) return to arrow onclick functions
 		$arrows = array( 'right' => '&#9658;', 'left' => '&#9668;' );
 		$arrows = apply_filters( 'radio_station_schedule_arrows', $arrows, 'table' );
 		$output .= '<th class="' . esc_attr( $class ) . '">';
 		$output .= '<div class="shift-left-arrow">';
-		$output .= '<a href="javascript:void(0);" onclick="radio_shift_day(\'left\');" title="' . esc_attr( __( 'Previous Day', 'radio-station' ) ) . '">' . $arrows['left'] . '</a>';
+		$output .= '<a href="javascript:void(0);" onclick="return radio_shift_day(\'left\');" title="' . esc_attr( __( 'Previous Day', 'radio-station' ) ) . '">' . $arrows['left'] . '</a>';
 		$output .= '</div>';
 		$output .= '<div class="headings">';
 		$output .= '<div class="day-heading">' . esc_html( $heading ) . '</div>';
 		$output .= '<div class="date-subheading">' . esc_html( $subheading ) . '</div>';
 		$output .= '</div>';
 		$output .= '<div class="shift-right-arrow">';
-		$output .= '<a href="javacript:void(0);" onclick="radio_shift_day(\'right\');" title="' . esc_attr( __( 'Next Day', 'radio-station' ) ) . '">' . $arrows['right'] . '</a>';
+		$output .= '<a href="javacript:void(0);" onclick="return radio_shift_day(\'right\');" title="' . esc_attr( __( 'Next Day', 'radio-station' ) ) . '">' . $arrows['right'] . '</a>';
 		$output .= '</div>';
 		$output .= '</th>';
 		
