@@ -921,7 +921,7 @@ function radio_station_get_current_schedule() {
 										}
 
 
-										if ( RADIO_DEBUG && ( $day == $debugday ) ) {
+										if ( RADIO_STATION_DEBUG && ( $day == $debugday ) ) {
 											echo $shift['start'] . ': ' . $start_time . ' - ' . $shift['end'] . ': ' . $end_time . PHP_EOL;
 											echo $override['start'] . ': ' . $override_start_time . ' - ' . $override['end'] . ': ' . $override_end_time . PHP_EOL;
 										}
