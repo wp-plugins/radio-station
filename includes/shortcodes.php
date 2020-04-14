@@ -1145,10 +1145,13 @@ function radio_station_current_show_shortcode( $atts ) {
 		// --- default output if no current shift ---
 		$output .= '<li class="current-show on-air-dj default-dj">';
 		if ( !empty( $atts['default_name'] ) ) {
-			$output .= esc_html( $atts['default_name'] );
+			$no_current_show = esc_html( $atts['default_name'] );
 		} else {
-			$output .= esc_html( __( 'No Show currently scheduled.', 'radio-station') );
+			$no_current_show = esc_html( __( 'No Show currently scheduled.', 'radio-station') );
 		}
+		// 2.3.1: add filter for no current shows text
+		$no_current_show = apply_filters( 'radio_station_no_current_show_text', $no_current_show, $atts );
+		$output .= $no_current_show;
 		$output .= '</li>';
 
 	} else {
@@ -1567,10 +1570,13 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 		$output .= '<li class="upcoming-show-none on-air-dj default-dj">';
 		if ( ! empty( $atts['default_name'] ) ) {
-			$output .= esc_html( $atts['default_name'] );
+			$no_upcoming_shows = esc_html( $atts['default_name'] );
 		} else {
-			$output .= esc_html( __( 'No Upcoming Shows Scheduled.', 'radio-station' ) );
+			$no_upcoming_shows = esc_html( __( 'No Upcoming Shows Scheduled.', 'radio-station' ) );
 		}
+		// 2.3.1: add filter for no current shows text
+		$no_upcoming_shows = apply_filters( 'radio_station_no_upcoming_shows_text', $no_upcoming_shows, $atts );
+		$output .= $no_upcoming_shows;
 		$output .= '</li>';
 
 	} else {
@@ -1986,8 +1992,11 @@ function radio_station_current_playlist_shortcode( $atts ) {
 	} else {
 		// 2.2.3: added missing translation wrapper
 		// 2.3.0: added no playlist class
+		// 2.3.1: add filter for no playlist text
 		$output .= '<div class="show-playlist-noplaylist myplaylist-noplaylist>';
-		$output .= esc_html( __( 'No Playlist available.', 'radio-station' ) );
+		$no_current_playlist = esc_html( __( 'No Current Playlist available.', 'radio-station' ) );
+		$no_current_playlist = apply_filters( 'radio_station_no_current_playlist_text', $no_current_playlist, $atts );
+		$output .= $no_current_playlist;
 		$output .= '</div>';
 	}
 
