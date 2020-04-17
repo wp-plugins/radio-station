@@ -7,6 +7,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### 2.3.1
+* Update: Plugin Loader (1.1.1) with Freemius first path fix
+* Fixed: conditions for Schedule Override time calculations
+* Fixed: schedule table view - 12 hour format with translations
+* Fixed: schedule table view hour column width style
+* Fixed: javascript table/tab arrows to prevent default click
+* Fixed: undefined index warning when saving show with no shifts
+* Fixed: append not echo override date to shortcode archive list
+
 ### 2.3.0
 * Include: Plugin Loader (1.1.0) with plugin options and settings
 * Include: Freemius SDK (2.3.0) and Freemius integration
