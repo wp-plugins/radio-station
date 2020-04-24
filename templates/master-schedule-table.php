@@ -199,23 +199,16 @@ foreach ( $hours as $hour ) {
 						if ( !isset( $cell ) ) {
 							$cellcontinued = true;
 						}
-						$display = true;
-						$showcontinued = true;
+						$display = $showcontinued = true;
 						$cellshifts ++;
-					} elseif ( $shift_start == $hour_start ) {
+					} elseif ( ( $shift_start == $hour_start ) 
+						|| ( ( $shift_start > $hour_start ) && ( $shift_start < $next_hour_start ) ) ) {
 						// start display of shift
 						$started = $shift['started'] = true;
 						$schedule[$weekday][$shift['start']] = $shift;
-						$display = true;
+						$display = $newshift = true;
+						// 2.3.1: reset showcontinued flag
 						$showcontinued = false;
-						$cellshifts ++;
-					} elseif ( ( $shift_start > $hour_start )
-							   && ( $shift_start < $next_hour_start ) ) {
-						// start display of shift
-						$started = $shift['started'] = true;
-						$schedule[$weekday][$shift['start']] = $shift;
-						$display = true;
-						$newshift = true;
 						$cellshifts ++;
 					}
 
@@ -243,8 +236,8 @@ foreach ( $hours as $hour ) {
 					if ( isset( $_GET['shiftdebug'] ) && ( '1' == $_GET['shiftdebug'] ) ) {
 						$test .= 'Now: ' . $now . ' (' . date( 'Y-m-d l H:i', $now ) . ') -- Today: ' . $today . '<br>';
 						$test .= 'Day: ' . $weekday . ' - Raw Hour: ' . $raw_hour . ' - Hour: ' . $hour . ' - Hour Display: ' . $hour_display . '<br>';
-						$test .= 'Hour Start' . $hour_start . ' (' . date( 'l H:i', $hour_start ) . ')<br>';
-						$test .= 'Hour End' . $hour_end . ' (' . date( 'l H:i', $hour_end ) . ')<br>';
+						$test .= 'Hour Start: ' . $hour_start . ' (' . date( 'l H:i', $hour_start ) . ')<br>';
+						$test .= 'Hour End: ' . $hour_end . ' (' . date( 'l H:i', $hour_end ) . ')<br>';
 						$test .= 'Shift Start: ' . $shift_start . ' (' . date( 'Y-m-d l H:i', $shift_start ) . ')' . '<br>';
 						$test .= 'Shift End: ' . $shift_end . ' (' . date( 'Y-m-d l H:i', $shift_end ) . ')' . '<br>';
 						$test .= 'Display: ' . ( $display ? 'yes' : 'no' ) . ' - ';
@@ -454,6 +447,11 @@ foreach ( $hours as $hour ) {
 
 						}
 						$cell .= '</div>';
+
+						// 2.3.1: fix to ensure reset showcontinued flag in cell
+						if ( isset( $shift['finished'] ) && $shift['finished'] ) {
+							$showcontinued = false;
+						}
 					}
 
 				}

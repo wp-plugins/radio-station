@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed: undefined index warning when saving show with no shifts
 * Fixed: append not echo override date to shortcode archive list
 * Fixed: compatibility with multiple the_content calls (Yoast)
+* Fixed: reset to showcontinued flag in Schedule (table view)
 
 ### 2.3.0
 * Include: Plugin Loader (1.1.0) with plugin options and settings
