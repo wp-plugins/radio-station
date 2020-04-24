@@ -192,6 +192,7 @@ You may translate the plugin into another language. Please visit our [WordPress 
 * Fixed: javascript table/tab arrows to prevent default click
 * Fixed: undefined index warning when saving show with no shifts
 * Fixed: append not echo override date to shortcode archive list
+* Fixed: compatibility with multiple the_content calls (Yoast)
 
 = 2.3.0 =
 * Include: Plugin Loader (1.1.0) with plugin options and settings

@@ -2,7 +2,7 @@
 
 /**
  * @package Radio Station
- * @version 2.3.0
+ * @version 2.3.1
  */
 /*
 
@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.2.9
+Version: 2.3.1
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -79,6 +79,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // -----------------------
 // Define Plugin Constants
 // -----------------------
+// 2.3.1: added constant for Netmix Directory
 define( 'RADIO_STATION_FILE', __FILE__ );
 define( 'RADIO_STATION_DIR', dirname( __FILE__ ) );
 define( 'RADIO_STATION_BASENAME', plugin_basename( __FILE__ ) );
@@ -86,6 +87,7 @@ define( 'RADIO_STATION_HOME_URL', 'https://netmix.com/radio-station/' );
 define( 'RADIO_STATION_DOCS_URL', 'https://netmix.com/radio-station/docs/' );
 define( 'RADIO_STATION_API_DOCS_URL', 'https://netmix.com/radio-station/docs/api/' );
 define( 'RADIO_STATION_PRO_URL', 'https://netmix.com/radio-station-pro/' );
+define( 'RADIO_STATION_NETMIX_DIR', 'https://netmix.com/' );
 
 // ------------------------
 // Define Plugin Data Slugs
@@ -233,6 +235,18 @@ $options = array(
 		'tab'     => 'general',
 		'section' => 'feeds',
 	),
+
+	// --- Ping Netmix Directory ---
+	// note: must be disabled by default for WordPress.org compliance
+	// 'ping_netmix_directory' => array(
+	//	'type'    => 'checkbox',
+	//	'label'   => __( 'Ping Netmix Directory', 'radio-station' ),
+	//	'default' => '',
+	//	'value'   => 'yes',
+	//	'helper'  => __( 'If you have a Netmix Directory listing, enable this to ping the directory whenever you update your schedule.', 'radio-station' ),
+	//	'tab'     => 'general',
+	//  'section' => 'feeds',
+	// ),
 
 	// --- Show Shift Feeds ---
 	'show_shift_feeds' => array(
@@ -1098,8 +1112,14 @@ function radio_station_get_template( $type, $template, $paths = false ) {
 // Automatic Pages Content Filter
 // ------------------------------
 // 2.3.0: standalone filter for automatic page content
+// 2.3.1: re-add filter so the_content can be processed multuple times
 add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
 function radio_station_automatic_pages_content( $content ) {
+
+	// global $radio_station_data;
+	// if ( isset( $radio_station_data['doing_excerpt'] ) && $radio_station_data['doing_excerpt'] ) {
+	//	return $content;
+	// }
 
 	// --- for automatic output on selected master schedule page ---
 	$schedule_page = radio_station_get_setting( 'schedule_page' );
@@ -1118,7 +1138,10 @@ function radio_station_automatic_pages_content( $content ) {
 				}
 				$shortcode = '[master-schedule' . $atts_string . ']';
 				remove_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				return do_shortcode( $shortcode );
+				$content = do_shortcode( $shortcode );
+				// 2.3.1: re-add filter so the_content may be processed multuple times
+				add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
+				return $content;
 			}
 		}
 	}
@@ -1142,7 +1165,10 @@ function radio_station_automatic_pages_content( $content ) {
 				}
 				$shortcode = '[shows-archive' . $atts_string . ']';
 				remove_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				return do_shortcode( $shortcode );
+				$content = do_shortcode( $shortcode );
+				// 2.3.1: re-add filter so the_content may be processed multuple times
+				add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
+				return $content;
 			}
 		}
 	}
@@ -1166,7 +1192,10 @@ function radio_station_automatic_pages_content( $content ) {
 				}
 				$shortcode = '[overrides-archive' . $atts_string . ']';
 				remove_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				return do_shortcode( $shortcode );
+				$content = do_shortcode( $shortcode );
+				// 2.3.1: re-add filter so the_content may be processed multuple times
+				add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
+				return $content;
 			}
 		}
 	}
@@ -1190,7 +1219,10 @@ function radio_station_automatic_pages_content( $content ) {
 				}
 				$shortcode = '[playlists-archive' . $atts_string . ']';
 				remove_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				return do_shortcode( $shortcode );
+				$content = do_shortcode( $shortcode );
+				// 2.3.1: re-add filter so the_content may be processed multuple times
+				add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
+				return $content;
 			}
 		}
 	}
@@ -1214,7 +1246,10 @@ function radio_station_automatic_pages_content( $content ) {
 				}
 				$shortcode = '[genres-archive' . $atts_string. ']';
 				remove_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				return do_shortcode( $shortcode );
+				$content = do_shortcode( $shortcode );
+				// 2.3.1: re-add filter so the_content may be processed multuple times
+				add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
+				return $content;
 			}
 		}
 	}
@@ -1284,7 +1319,10 @@ function radio_station_single_content_template( $content, $post_type ) {
 add_filter( 'the_content', 'radio_station_show_content_template', 11 );
 function radio_station_show_content_template( $content ) {
 	remove_filter( 'the_content', 'radio_station_show_content_template', 11 );
-	return radio_station_single_content_template( $content, RADIO_STATION_SHOW_SLUG );
+	$output = radio_station_single_content_template( $content, RADIO_STATION_SHOW_SLUG );
+	// 2.3.1: re-add filter so the_content can be processed multuple times
+	add_filter( 'the_content', 'radio_station_show_content_template', 11 );
+	return $output;
 }
 
 // --------------------------------
@@ -1294,7 +1332,10 @@ function radio_station_show_content_template( $content ) {
 add_filter( 'the_content', 'radio_station_playlist_content_template', 11 );
 function radio_station_playlist_content_template( $content ) {
 	remove_filter( 'the_content', 'radio_station_playlist_content_template', 11 );
-	return radio_station_single_content_template( $content, RADIO_STATION_PLAYLIST_SLUG );
+	$output = radio_station_single_content_template( $content, RADIO_STATION_PLAYLIST_SLUG );
+	// 2.3.1: re-add filter so the_content can be processed multuple times
+	add_filter( 'the_content', 'radio_station_playlist_content_template', 11 );
+	return $output;
 }
 
 // --------------------------------
@@ -1304,7 +1345,10 @@ function radio_station_playlist_content_template( $content ) {
 add_filter( 'the_content', 'radio_station_override_content_template', 11 );
 function radio_station_override_content_template( $content ) {
 	remove_filter( 'the_content', 'radio_station_override_content_template', 11 );
-	return radio_station_single_content_template( $content, RADIO_STATION_OVERRIDE_SLUG );
+	$output = radio_station_single_content_template( $content, RADIO_STATION_OVERRIDE_SLUG );
+	// 2.3.1: re-add filter so the_content can be processed multuple times
+	add_filter( 'the_content', 'radio_station_override_content_template', 11 );
+	return $output;
 }
 
 // ---------------------------------
