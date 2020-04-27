@@ -194,6 +194,7 @@ You may translate the plugin into another language. Please visit our [WordPress 
 * Fixed: append not echo override date to shortcode archive list
 * Fixed: compatibility with multiple the_content calls (Yoast)
 * Fixed: reset to showcontinued flag in Schedule (table view)
+* Added: show avatar and featured image URLs to Data API output
 
 = 2.3.0 =
 * Include: Plugin Loader (1.1.0) with plugin options and settings

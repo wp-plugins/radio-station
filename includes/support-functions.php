@@ -45,6 +45,8 @@
 // - Get Producer Profile URL
 // - Get Upgrade URL
 // - Patreon Supporter Button
+// - Patreon Button Styles
+// - Send Directory Ping
 // === Time Conversions
 // - Get Timezones Options
 // - Get Timezone Code
@@ -459,6 +461,7 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 							'day'      => $thisday,
 							'start'    => $start,
 							'end'      => '11:59 pm',
+							'real_end' => $end,
 							'url'      => get_permalink( $override['ID'] ),
 							'split'    => true,
 						);
@@ -472,6 +475,7 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 							'slug'     => $override['post_name'],
 							'date'     => $nextdate,
 							'day'      => $nextday,
+							'real_start' => $start,
 							'start'    => '00:00 am',
 							'end'      => $end,
 							'url'      => get_permalink( $override['ID'] ),
@@ -697,7 +701,21 @@ function radio_station_get_show_data_meta( $show, $single = false ) {
 		}
 	}
 
+	// --- get avatar and thumbnail URL ---
+	// 2.3.1: added show avatar and image URLs
+	$avatar_url = radio_station_get_show_avatar_url( $show->ID );
+	if ( !$avatar_url ) {
+		$avatar_url = '';
+	}
+	$thumbnail_url = '';
+	$thumbnail_id = get_post_meta( $show->ID, '_thumbnail_id', true );
+	if ( $thumbnail_id ) {
+		$thumbnail = wp_get_attachment_image_src( $thumbnail_id, 'thumbnail' );
+		$thumbnail_url = $thumbnail[0];
+	}
+	
 	// --- create array and return ---
+	// 2.3.1: added show avatar and image URLs
 	$show_data = array(
 		'id'        => $show->ID,
 		'name'      => $show->post_title,
@@ -712,6 +730,8 @@ function radio_station_get_show_data_meta( $show, $single = false ) {
 		'genres'    => $genre_list,
 		'languages' => $language_list,
 		'schedule'  => $show_shifts,
+		'avatar_url' => $avatar_url,
+		'image_url'  => $thumbnail_url,
 	);
 
 	// --- data route / feed for show ---
@@ -801,16 +821,32 @@ function radio_station_get_override_data_meta( $override ) {
 		}
 	}
 
+	// --- get avatar and thumbnail URL ---
+	// 2.3.1: added show avatar and image URLs
+	$avatar_url = radio_station_get_show_avatar_url( $override->ID );
+	if ( !$avatar_url ) {
+		$avatar_url = '';
+	}
+	$thumbnail_url = '';
+	$thumbnail_id = get_post_meta( $override->ID, '_thumbnail_id', true );
+	if ( $thumbnail_id ) {
+		$thumbnail = wp_get_attachment_image_src( $thumbnail_id, 'thumbnail' );
+		$thumbnail_url = $thumbnail[0];
+	}
+			
 	// --- create array and return ---
+	// 2.3.1: added show avatar and image URLs
 	$override_data = array(
-		'id'        => $override->ID,
-		'name'      => $override->post_title,
-		'slug'      => $override->post_name,
-		'url'       => get_permalink( $override->ID ),
-		'genres'    => $genre_list,
-		'languages' => $language_list,
-		'hosts'     => $hosts,
-		'producers' => $producers,
+		'id'         => $override->ID,
+		'name'       => $override->post_title,
+		'slug'       => $override->post_name,
+		'url'        => get_permalink( $override->ID ),
+		'genres'     => $genre_list,
+		'languages'  => $language_list,
+		'hosts'      => $hosts,
+		'producers'  => $producers,
+		'avatar_url' => $avatar_url,
+		'image_url'  => $thumbnail_url,
 	);
 
 	// --- filter and return ---
@@ -2215,6 +2251,26 @@ function radio_station_patreon_button_styles() {
 	// 2.2.7: added button hover opacity
 	echo '<style>#radio-station-patreon-button {opacity:0.9;}
 	#radio-station-patreon-button:hover {opacity:1 !important;}</style>';
+}
+
+
+// -------------------
+// Send Directory Ping
+// -------------------
+// 2.3.1: added directory ping function prototype
+function radio_station_send_directory_ping() {
+	$do_ping = radio_station_get_setting( 'ping_netmix_directory' );
+	if ( 'yes' != $do_ping ) {return;}
+	
+	// --- set the URL to ping ---
+	$site_url = site_url();
+	$url = add_query_arg( 'ping', 'directory', RADIO_STATION_NETMIX_DIR );
+	$url = add_query_arg( 'station-url', url_encode( $site_url ), $url );
+	$url = add_query_arg( 'timestamp', time(), $url );
+	
+	// --- send the ping ---
+	$args = array( 'timeout' => 3 );
+	wp_remote_get( $url, $args );
 }
 
 
