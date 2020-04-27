@@ -2277,6 +2277,10 @@ function radio_station_show_save_data( $post_id ) {
 		delete_transient( 'radio_station_next_show' );
 		do_action( 'radio_station_clear_data', 'show', $post_id );
 		do_action( 'radio_station_clear_data', 'show_meta', $post_id );
+		
+		// --- maybe send directory ping ---
+		// 2.3.1: added directory update ping option
+		radio_station_send_directory_ping();
 	}
 	
 	if ( RADIO_STATION_DEBUG ) {
@@ -2734,6 +2738,10 @@ function radio_station_master_override_save_showpostdata( $post_id ) {
 		delete_transient( 'radio_station_current_schedule' );
 		delete_transient( 'radio_station_current_show' );
 		delete_transient( 'radio_station_next_show' );
+		
+		// --- maybe send directory ping ---
+		// 2.3.1: added directory update ping option
+		radio_station_send_directory_ping();
 	}
 }
 

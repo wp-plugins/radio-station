@@ -237,16 +237,16 @@ $options = array(
 	),
 
 	// --- Ping Netmix Directory ---
-	// note: must be disabled by default for WordPress.org compliance
-	// 'ping_netmix_directory' => array(
-	//	'type'    => 'checkbox',
-	//	'label'   => __( 'Ping Netmix Directory', 'radio-station' ),
-	//	'default' => '',
-	//	'value'   => 'yes',
-	//	'helper'  => __( 'If you have a Netmix Directory listing, enable this to ping the directory whenever you update your schedule.', 'radio-station' ),
-	//	'tab'     => 'general',
-	//  'section' => 'feeds',
-	// ),
+	// note: disabled by default for WordPress.org repository compliance
+	'ping_netmix_directory' => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Ping Netmix Directory', 'radio-station' ),
+		'default' => '',
+		'value'   => 'yes',
+		'helper'  => __( 'If you have a Netmix Directory listing, enable this to ping the directory whenever you update your schedule.', 'radio-station' ),
+		'tab'     => 'general',
+		'section' => 'feeds',
+	),
 
 	// --- Show Shift Feeds ---
 	'show_shift_feeds' => array(
