@@ -398,7 +398,11 @@ function radio_station_get_now_playing() {
 		return $playlist;
 	}
 	$show_id = $current_show['show']['id'];
-	$shifts = $current_show['shifts'];
+	
+	// TODO: match current playlist to show shift ?
+	if ( isset( $current_show['shifts'] ) ) {
+		$shifts = $current_show['shifts'];
+	}
 	$playlist = array();
 
 	// --- grab the most recent playlist for the current show ---

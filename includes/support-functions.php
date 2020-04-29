@@ -2837,9 +2837,13 @@ function radio_station_trim_excerpt( $content, $length = false, $more = false, $
 	$content = str_replace( ']]>', ']]&gt;', $content );
 
 	if ( !$length ) {
-		$length = (int) apply_filters( 'radio_station_excerpt_length', 35 );
+		$length = 35;
+		// $length = apply_filters( 'radio_station_excerpt_length', $length );
+		$length = (int) apply_filters( 'radio_station_excerpt_length', $length );
 	}
 	if ( !$more ) {
+		$more = ' [&hellip;]';
+		// $more = apply_filters( 'excerpt_more', $more);
 		$more = apply_filters( 'radio_station_excerpt_more', ' [&hellip;]' );
 	}
 	// 2.3.0: added link wrapper
@@ -2848,7 +2852,8 @@ function radio_station_trim_excerpt( $content, $length = false, $more = false, $
 	}
 	$excerpt = wp_trim_words( $content, $length, $more );
 
-	return apply_filters( 'radio_station_trim_excerpt', $excerpt, $raw_content, $length, $more, $permalink );
+	$excerpt = apply_filters( 'radio_station_trim_excerpt', $excerpt, $raw_content, $length, $more, $permalink );
+	return $excerpt;
 }
 
 // ---------------

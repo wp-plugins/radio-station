@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed: reset to showcontinued flag in Schedule (table view)
 * Added: show avatar and featured image URLs to Data API output
 * Added: option to ping Netmix directory on show updates
+* Added: filters for widget section display order
 
 ### 2.3.0
 * Include: Plugin Loader (1.1.0) with plugin options and settings

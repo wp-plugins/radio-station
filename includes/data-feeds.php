@@ -845,8 +845,11 @@ function radio_station_add_feeds() {
 	add_rewrite_rule( $feedrule, 'index.php?feed=$matches[1]', 'top' );
 
 	// --- check if feeds are registered ---
+	// 2.3.1: add check for empty rewrite rules
 	$rewrite_rules = get_option( 'rewrite_rules' );
-	if ( !array_key_exists( $baserule, $rewrite_rules )
+	// note this should provide an array not a string
+	if ( !$rewrite_rules || !is_array( $rewrite_rules )
+	  || !array_key_exists( $baserule, $rewrite_rules )
 	  || !array_key_exists( $feedrule, $rewrite_rules ) ) {
 		flush_rewrite_rules( false );
 	}

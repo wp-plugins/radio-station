@@ -1222,7 +1222,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				}
 
 				// --- set Freemius settings from plugin settings ---
-				$first_path = add_query_arg( 'page', $args['slug'], admin_url( 'admin.php' ) );
+				// 1.1.1: remove admin_url wrapper on Freemius first-path value
+				$first_path = add_query_arg( 'page', $args['slug'], 'admin.php' );
 				$first_path = add_query_arg( 'welcome', 'true', $first_path );
 				$settings = array(
 					'type'             => $args['type'],
@@ -2677,6 +2678,9 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // =========
 // CHANGELOG
 // =========
+
+// == 1.1.1 ==
+// - remove admin_url wrapper on Freemius first-path value
 
 // == 1.1.0 ==
 // - fix to saving multicheck as single array of values
