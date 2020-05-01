@@ -179,11 +179,15 @@ if ( ( $avatar_id || $thumbnail_id ) || ( count( $show_icons ) > 0 ) || ( $show_
 		}
 
 		// --- Show Patreon Button ---
+		$show_patreon_button = '';
 		if ( $show_patreon ) {
-			$blocks['show_images'] .= '<div class="show-patreon">';
-			$blocks['show_images'] .= radio_station_patreon_button( $show_patreon, $patreon_title );
-			$blocks['show_images'] .= '</div>';
+			$show_patreon_button .= '<div class="show-patreon">';
+			$show_patreon_button .= radio_station_patreon_button( $show_patreon, $patreon_title );
+			$show_patreon_button .= '</div>';
 		}
+		// 2.3.1: added filter for patreon button
+		$show_patreon_button = apply_filters( 'radio_station_show_patreon_button', $show_patreon_button, $post_id );
+		$blocks['show_images'] .= $show_patreon_button;
 
 		// --- Show Player ---
 		// 2.3.0: embed latest broadcast audio player

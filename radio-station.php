@@ -1832,6 +1832,8 @@ function radio_station_show_playlist_query( $query ) {
 // ----------------------------
 if ( is_multisite() ) {
 	add_action( 'init', 'radio_station_set_roles', 10, 0 );
+	// 2.3.1: added possible fix for roles not being set on multisite
+	add_action( 'admin_init', 'radio_station_set_roles', 10, 0 );
 } else {
 	add_action( 'admin_init', 'radio_station_set_roles', 10, 0 );
 }
@@ -2057,6 +2059,13 @@ add_filter( 'user_has_cap', 'radio_station_revoke_show_edit_cap', 10, 3 );
 function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args ) {
 
 	global $post, $wp_roles;
+
+	// --- check if super admin ---
+	// 2.3.1: fix to not revoke edit caps from super admin
+	// (not implemented, causing connection reset error)
+	// if ( function_exists( 'is_super_admin' ) && is_super_admin() ) {
+	//	return $allcaps;
+	// }
 
 	// --- get the current user ---
 	$user = wp_get_current_user();

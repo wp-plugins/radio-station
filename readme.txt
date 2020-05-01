@@ -3,7 +3,7 @@ Contributors: tonyzeoli, majick, nourma
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
-Tested up to: 5.4.0
+Tested up to: 5.4.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -539,6 +539,12 @@ You may translate the plugin into another language. Please visit our [WordPress 
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.3.1 =
+* Bugfix Update and Announcing New Netmix Station Directory!
+* https://netmix.com/announcing-new-netmix-directory/
+* Including minor fixes to major update release
+* Option to ping Netmix Directory on show updates
 
 = 2.3.0 =
 * Major Update including many new features, enhancements and fixes!
