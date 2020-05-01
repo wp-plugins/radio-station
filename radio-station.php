@@ -248,8 +248,31 @@ $options = array(
 		'section' => 'feeds',
 	),
 
+	// --- Clear Transients ---
+	'clear_transients' => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Clear Transients', 'radio-station' ),
+		'default' => '',
+		'value'   => 'yes',
+		'helper'  => __( 'Clear Schedule transients with every pageload. Less efficient but more reliable.', 'radio-station' ),
+		'tab'     => 'general',
+		'section' => 'feeds',
+	),
+
+	// --- Transient Caching ---
+	'transient_caching' => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Show Transients', 'radio-station' ),
+		'default' => 'yes',
+		'value'   => 'yes',
+		'helper'  => __( 'Use Show Transient Data to improve Schedule calculation performance.', 'radio-station' ),
+		'tab'     => 'general',
+		'section' => 'feeds',
+		'pro'     => true,
+	),
+
 	// --- Show Shift Feeds ---
-	'show_shift_feeds' => array(
+	/* 'show_shift_feeds' => array(
 		'type'    => 'checkbox',
 		'label'   => __( 'Show Shift Feeds', 'radio-station' ),
 		'default' => 'yes',
@@ -258,19 +281,7 @@ $options = array(
 		'tab'     => 'general',
 		'section' => 'feeds',
 		'pro'     => true,
-	),
-
-	// --- Transient Caching ---
-	'transient_caching' => array(
-		'type'    => 'checkbox',
-		'label'   => __( 'Transient Caching', 'radio-station' ),
-		'default' => 'yes',
-		'value'   => 'yes',
-		'helper'  => __( 'Use Transient Caching to improve Schedule calculation performance.', 'radio-station' ),
-		'tab'     => 'general',
-		'section' => 'feeds',
-		'pro'     => true,
-	),
+	), */
 
 	// === Master Schedule Page ===
 
@@ -2158,10 +2169,15 @@ if ( !defined( 'RADIO_STATION_DEBUG' ) ) {
 // maybe Clear Transient Data
 // --------------------------
 // 2.3.0: clear show transients if debugging
-if ( RADIO_STATION_DEBUG ) {
-	delete_transient( 'radio_station_current_schedule' );
-	delete_transient( 'radio_station_current_show' );
-	delete_transient( 'radio_station_next_show' );
+// 2.3.1: added action to init hook
+// 2.3.1: check clear show transients option
+add_action( 'init', 'radio_station_clear_transients' );
+function radio_station_clear_transients() {
+	if ( RADIO_STATION_DEBUG || ( 'yes' == radio_station_get_setting( 'clear_transients' ) ) ) {
+		delete_transient( 'radio_station_current_schedule' );
+		delete_transient( 'radio_station_current_show' );
+		delete_transient( 'radio_station_next_show' );
+	}
 }
 
 // ------------------------

@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed: append not echo override date to shortcode archive list
 * Fixed: compatibility with multiple the_content calls (Yoast)
 * Fixed: reset to showcontinued flag in Schedule (table view)
+* Added: option to clear transients on every pageload
 * Added: show avatar and featured image URLs to Data API output
 * Added: option to ping Netmix directory on show updates
 * Added: filters for widget section display order

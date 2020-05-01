@@ -1091,6 +1091,7 @@ function radio_station_listing_offer_content( $dismissable = true ) {
 	// --- accept / decline offer button links ---
 	$blurb .= '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">';
 	$blurb .= '<center>';
+	$onclick = '';
 	if ( $dismissable ) {
 		$onclick = ' onclick="radio_display_dismiss_link();"';
 	}

@@ -196,6 +196,7 @@ You may translate the plugin into another language. Please visit our [WordPress 
 * Fixed: reset to showcontinued flag in Schedule (table view)
 * Added: show avatar and featured image URLs to Data API output
 * Added: option to ping Netmix directory on show updates
+* Added: option to clear transients on every pageload
 * Added: filters for widget section display order
 
 = 2.3.0 =
