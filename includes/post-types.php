@@ -53,6 +53,7 @@ function radio_station_create_post_types() {
 		'show_ui'           => true,
 		'show_in_menu'      => false, // now added to main menu
 		'show_in_admin_bar' => false, // this is done manually
+		'show_in_rest'      => true,
 		'description'       => __( 'Post type for Show descriptions', 'radio-station' ),
 		'public'            => true,
 		'taxonomies'        => array( RADIO_STATION_GENRES_SLUG, RADIO_STATION_LANGUAGES_SLUG ),
@@ -94,6 +95,7 @@ function radio_station_create_post_types() {
 		'show_ui'           => true,
 		'show_in_menu'      => false, // now added to main menu
 		'show_in_admin_bar' => false, // this is done manually
+		'show_in_rest'      => true,
 		'description'       => __( 'Post type for Playlist descriptions', 'radio-station' ),
 		'public'            => true,
 		'hierarchical'      => false,
@@ -132,6 +134,7 @@ function radio_station_create_post_types() {
 		'show_ui'           => true,
 		'show_in_menu'      => false, // now added to main menu
 		'show_in_admin_bar' => false, // this is done manually
+		'show_in_rest'      => true,
 		'description'       => __( 'Post type for Schedule Override', 'radio-station' ),
 		'public'            => true,
 		// 2.3.0: added taxonomies to overrides
@@ -175,6 +178,7 @@ function radio_station_create_post_types() {
 		'show_in_menu'        => false,
 		'show_in_admin_bar'   => false,
 		'show_in_nav_menus'   => false,
+		'show_in_rest'        => true,
 		'description'         => __( 'Post type for DJ / Host Profiles', 'radio-station' ),
 		'exclude_from_search' => false,
 		'public'              => true,
@@ -215,6 +219,7 @@ function radio_station_create_post_types() {
 		'show_in_menu'        => false,
 		'show_in_admin_bar'   => false,
 		'show_in_nav_menus'   => false,
+		'show_in_rest'        => true,
 		'description'         => __( 'Post type for Producer Profiles', 'radio-station' ),
 		'exclude_from_search' => false,
 		'public'              => true,

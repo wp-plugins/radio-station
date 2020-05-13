@@ -451,6 +451,7 @@ function radio_station_master_schedule_table_js() {
 			else {jQuery('.master-program-day.day-'+i).removeClass('selected-day');}
 		}
 		radio_table_responsive();
+		return false;
 	}";
 
 	// --- enqueue script inline ---
@@ -567,6 +568,7 @@ function radio_station_master_schedule_tabs_js() {
 			else {jQuery('.master-schedule-tabs-day.day-'+i).removeClass('selected-day');}
 		}
 		radio_tabs_responsive();
+		return false;
 	}";
 
 	// --- enqueue script inline ---

@@ -65,18 +65,19 @@ foreach ( $weekdays as $i => $weekday ) {
 
 		// --- output table column heading ---
 		// 2.3.0: added left/right arrow responsive controls
+		// 2.3.1: added (negative) return to arrow onclick functions
 		$arrows = array( 'right' => '&#9658;', 'left' => '&#9668;' );
 		$arrows = apply_filters( 'radio_station_schedule_arrows', $arrows, 'table' );
 		$output .= '<th class="' . esc_attr( $class ) . '">';
 		$output .= '<div class="shift-left-arrow">';
-		$output .= '<a href="javascript:void(0);" onclick="radio_shift_day(\'left\');" title="' . esc_attr( __( 'Previous Day', 'radio-station' ) ) . '">' . $arrows['left'] . '</a>';
+		$output .= '<a href="javascript:void(0);" onclick="return radio_shift_day(\'left\');" title="' . esc_attr( __( 'Previous Day', 'radio-station' ) ) . '">' . $arrows['left'] . '</a>';
 		$output .= '</div>';
 		$output .= '<div class="headings">';
 		$output .= '<div class="day-heading">' . esc_html( $heading ) . '</div>';
 		$output .= '<div class="date-subheading">' . esc_html( $subheading ) . '</div>';
 		$output .= '</div>';
 		$output .= '<div class="shift-right-arrow">';
-		$output .= '<a href="javacript:void(0);" onclick="radio_shift_day(\'right\');" title="' . esc_attr( __( 'Next Day', 'radio-station' ) ) . '">' . $arrows['right'] . '</a>';
+		$output .= '<a href="javacript:void(0);" onclick="return radio_shift_day(\'right\');" title="' . esc_attr( __( 'Next Day', 'radio-station' ) ) . '">' . $arrows['right'] . '</a>';
 		$output .= '</div>';
 		$output .= '</th>';
 		
@@ -88,9 +89,12 @@ $output .= '</tr>';
 $tcount = 0;
 foreach ( $hours as $hour ) {
 
+	// 2.3.1: fix to set translated hour for display only
 	$raw_hour = $hour;
-	$nexthour = radio_station_convert_hour( ( $hour + 1 ), $atts['time'] );
-	$hour = radio_station_convert_hour( $hour, $atts['time'] );
+	$hour_display = radio_station_convert_hour( $hour, $atts['time'] );
+	if ( 1 == strlen( $hour ) ) {
+		$hour = '0' . $hour;
+	}
 
 	// --- start hour row ---
 	$output .= '<tr class="master-program-hour-row hour-row-' . esc_attr( $raw_hour ) . '">';
@@ -104,8 +108,9 @@ foreach ( $hours as $hour ) {
 
 	// --- set heading classes ---
 	// 2.3.0: check current hour for highlighting
+	// 2.3.1: fix to use untranslated hour (12 hr format bug)
 	$classes = array( 'master-program-hour' );
-	$hour_start = strtotime( $date . ' ' . $hour );
+	$hour_start = strtotime( $date . ' ' . $hour . ':00' );
 	$hour_end = $hour_start + ( 60 * 60 );
 	if ( ( $now > $hour_start ) && ( $now < $hour_end ) ) {
 		$classes[] = 'current-hour';
@@ -124,7 +129,7 @@ foreach ( $hours as $hour ) {
 	}
 	
 	$output .= '<div class="master-program-server-hour rs-time" data="' . esc_attr( $raw_hour ) . '" data-format="' . esc_attr( $data_format ) . '">';
-	$output .= esc_html( $hour );
+	$output .= esc_html( $hour_display );
 	$output .= '<br>';
 	$output .= '<div class="master-program-user-hour rs-time" data="' . esc_attr( $raw_hour ) . '" data-format="' . esc_attr( $data_format ) . '"></div>';
 	$output .= '</div>';
@@ -164,7 +169,8 @@ foreach ( $hours as $hour ) {
 			$nextdate = $weekdates[$nextday];		
 
 			// --- get hour and next hour start and end times ---
-			$hour_start = strtotime( $weekdate . ' ' . $hour );
+			// 2.3.1: fix to use untranslated hour (12 hr format bug)
+			$hour_start = strtotime( $weekdate . ' ' . $hour . ':00' );
 			$hour_end = $next_hour_start = $hour_start + ( 60 * 60 );
 			$next_hour_end = $hour_end + ( 60 * 60 );
 
@@ -193,23 +199,16 @@ foreach ( $hours as $hour ) {
 						if ( !isset( $cell ) ) {
 							$cellcontinued = true;
 						}
-						$display = true;
-						$showcontinued = true;
+						$display = $showcontinued = true;
 						$cellshifts ++;
-					} elseif ( $shift_start == $hour_start ) {
+					} elseif ( ( $shift_start == $hour_start ) 
+						|| ( ( $shift_start > $hour_start ) && ( $shift_start < $next_hour_start ) ) ) {
 						// start display of shift
 						$started = $shift['started'] = true;
 						$schedule[$weekday][$shift['start']] = $shift;
-						$display = true;
+						$display = $newshift = true;
+						// 2.3.1: reset showcontinued flag
 						$showcontinued = false;
-						$cellshifts ++;
-					} elseif ( ( $shift_start > $hour_start )
-							   && ( $shift_start < $next_hour_start ) ) {
-						// start display of shift
-						$started = $shift['started'] = true;
-						$schedule[$weekday][$shift['start']] = $shift;
-						$display = true;
-						$newshift = true;
 						$cellshifts ++;
 					}
 
@@ -236,9 +235,9 @@ foreach ( $hours as $hour ) {
 
 					if ( isset( $_GET['shiftdebug'] ) && ( '1' == $_GET['shiftdebug'] ) ) {
 						$test .= 'Now: ' . $now . ' (' . date( 'Y-m-d l H:i', $now ) . ') -- Today: ' . $today . '<br>';
-						$test .= 'Day: ' . $weekday . ' - Hour: ' . $hour . ' - Next Hour: ' . $nexthour . '<br>';
-						$test .= 'Hour Start' . $hour_start . ' (' . date( 'l H:i', $hour_start ) . ')<br>';
-						$test .= 'Hour End' . $hour_end . ' (' . date( 'l H:i', $hour_end ) . ')<br>';
+						$test .= 'Day: ' . $weekday . ' - Raw Hour: ' . $raw_hour . ' - Hour: ' . $hour . ' - Hour Display: ' . $hour_display . '<br>';
+						$test .= 'Hour Start: ' . $hour_start . ' (' . date( 'l H:i', $hour_start ) . ')<br>';
+						$test .= 'Hour End: ' . $hour_end . ' (' . date( 'l H:i', $hour_end ) . ')<br>';
 						$test .= 'Shift Start: ' . $shift_start . ' (' . date( 'Y-m-d l H:i', $shift_start ) . ')' . '<br>';
 						$test .= 'Shift End: ' . $shift_end . ' (' . date( 'Y-m-d l H:i', $shift_end ) . ')' . '<br>';
 						$test .= 'Display: ' . ( $display ? 'yes' : 'no' ) . ' - ';
@@ -396,9 +395,10 @@ foreach ( $hours as $hour ) {
 							}
 
 							// --- encore airing ---
+							// 2.3.1: added isset check for encore switch
 							$show_encore = false;
-							if ( $atts['show_encore'] ) {
-								$$show_encore = $shift['encore'];
+							if ( $atts['show_encore'] && isset( $shift['encore'] ) ) {
+								$show_encore = $shift['encore'];
 							}
 							$show_encore = apply_filters( 'radio_station_schedule_show_encore', $shift['encore'], $show['id'], 'table' );
 							if ( 'on' == $show_encore ) {
@@ -447,6 +447,11 @@ foreach ( $hours as $hour ) {
 
 						}
 						$cell .= '</div>';
+
+						// 2.3.1: fix to ensure reset showcontinued flag in cell
+						if ( isset( $shift['finished'] ) && $shift['finished'] ) {
+							$showcontinued = false;
+						}
 					}
 
 				}

@@ -54,11 +54,14 @@
 }
 
 #master-program-schedule th {
-	width: 12%;
+	width: auto;
 	text-align: center;
 	vertical-align: top;
-	min-width: 100%;
 	padding: 0.5em 0;
+}
+
+#master-program-schedule th.master-program-hour {
+	min-width: 80px;
 }
 
 #master-program-schedule .master-program-day.current-day {

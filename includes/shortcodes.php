@@ -373,7 +373,9 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 			// --- display Override date(s) ---
 			if ( ( RADIO_STATION_OVERRIDE_SLUG == $type ) && ( $atts['show_dates'] ) ) {
 				$datetime = get_post_meta( $archive_post->ID, 'show_override_sched', true );
-				echo "<div class='override-archive-date'>";
+				
+				// 2.3.1: fix to append not echo override date to archive list
+				$list .= "<div class='override-archive-date'>";
 
 				// --- convert date info ---
 				$day = date( 'l', strtotime( $datetime['date'] ) );
@@ -399,11 +401,12 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 					$data_format2 = 'g:i a';
 				}
 			
-				echo '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $data_format ) . '">';
-				echo esc_html( $display_day ) . ', ' . $start . '</span>';
-				echo '<span class="rs-sep"> - </span>';
-				echo '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $data_format2 ) . '">' . $end . '</span>';
-				echo "</div>";
+				// 2.3.1: fix to append not echo override date to archive list
+				$list .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $data_format ) . '">';
+				$list .= esc_html( $display_day ) . ', ' . $start . '</span>';
+				$list .= '<span class="rs-sep"> - </span>';
+				$list .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $data_format2 ) . '">' . $end . '</span>';
+				$list .= "</div>";
 			}
 
 			// TODO: display Show shifts ?
@@ -428,6 +431,18 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 			// 	$tracks = get_post_meta( $archive_post->ID, 'playlist', true );
 			//	$track_count = count( $tracks );
 			// }
+			
+			// TODO: display episode / host / producer meta ?
+			// if ( defined( 'RADIO_STATION_PRO_EPISODE_SLUG' && ( RADIO_STATION_PRO_EPISODE_SLUG == $type ) {
+			//	$list .= apply_filters( 'radio_station_episode_archive_meta', '' );		
+			// }			
+			// if ( defined( 'RADIO_STATION_PRO_HOST_SLUG' && ( RADIO_STATION_PRO_EPISODE_SLUG == $type ) {
+			//	$list .= apply_filters( 'radio_station_host_archive_meta', '' );		
+			// }
+			// if ( defined( 'RADIO_STATION_PRO_PRODUCER_SLUG' && ( RADIO_STATION_PRO_EPISODE_SLUG == $type ) {
+			//	$list .= apply_filters( 'radio_station_producer_archive_meta', '' );		
+			// }
+			
 
 			// --- description ---
 			if ( 'none' == $atts['description'] ) {
@@ -1145,140 +1160,35 @@ function radio_station_current_show_shortcode( $atts ) {
 		// --- default output if no current shift ---
 		$output .= '<li class="current-show on-air-dj default-dj">';
 		if ( !empty( $atts['default_name'] ) ) {
-			$output .= esc_html( $atts['default_name'] );
+			$no_current_show = esc_html( $atts['default_name'] );
 		} else {
-			$output .= esc_html( __( 'No Show currently scheduled.', 'radio-station') );
+			$no_current_show = esc_html( __( 'No Show currently scheduled.', 'radio-station') );
 		}
+		// 2.3.1: add filter for no current shows text
+		$no_current_show = apply_filters( 'radio_station_no_current_show_text', $no_current_show, $atts );
+		$output .= $no_current_show;
 		$output .= '</li>';
 
 	} else {
+
+		// --- set html output ---
+		// 2.3.1: store all HTML to allow section re-ordering
+		$html = array( 'title' => '' );
 
 		// --- set current show data ---
 		$show = $current_shift['show'];
 
 		$output .= '<li class="current-show on-air-dj">';
 
+		// --- get show link ---
 		$show_link = false;
 		if ( $atts['show_link'] ) {
 			$show_link = get_permalink( $show['id'] );
 			$show_link = apply_filters( 'radio_station_current_show_link', $show_link, $show['id'], $atts );
 		}
 
-		// --- set show title output ---
-		$title = '<div class="current-show-title on-air-dj-title">';
-		if ( $show_link ) {
-			$title .= '<a href="' . esc_url( $show_link ) . '">' . esc_html( $show['name'] ) . '</a>';
-		} else {
-			$title .= esc_html( $show['name'] );
-		}
-		$title .= '</div>';
-
-		// --- show title (above only) ---
-		if ( 'above' == $atts['title_position'] ) {
-			$output .= $title; // already escaped
-		}
-
-		// --- show avatar ---
-		if ( $atts['show_avatar'] ) {
-
-			// 2.3.0: get show avatar (with thumbnail fallback)
-			// 2.3.0: filter show avatar via display context
-			// 2.3.0: maybe add link from avatar to show
-			$show_avatar = radio_station_get_show_avatar( $show['id'] );
-			$show_avatar = apply_filters( 'radio_station_current_show_avatar', $show_avatar, $show['id'], $atts );
-			if ( $show_avatar ) {
-				$output .= '<div class="current-show-avatar on-air-dj-avatar' . esc_attr( $floatclass ) . '" ' . $widthstyle . '>';
-				if ( $show_link ) {
-					$output .= '<a href="' . esc_url( $show_link ) . '">' . $show_avatar . '</a>';
-				} else {
-					$output .= $show_avatar;
-				}
-				$output .= '</div>';
-			}
-		}
-
-		// --- show title (all other positions) ---
-		if ( 'above' != $atts['title_position'] ) {
-			$output .= $title; // already escaped
-		}
-
-		// --- encore presentation ---
-		// 2.3.0: added encore presentation display
-		if ( isset( $show['encore'] ) && ( $show['encore'] ) ) {
-			$output .= '<div class="current-show-encore on-air-dj-encore">';
-			$output .= esc_html( __( 'Encore Presentation', 'radio-station' ) );
-			$output .= '</div>';
-		}
-
-		// --- show DJs / hosts ---
-		if ( $atts['display_hosts'] ) {
-
-			$hosts = get_post_meta( $show['id'], 'show_user_list', true );
-
-			if ( $hosts && is_array( $hosts ) && ( count( $hosts ) > 0 ) ) {
-
-				$output .= '<div class="current-show-hosts on-air-dj-names">';
-
-				$output .= esc_html( __( 'with', 'radio-station' ) ) . ' ';
-
-				$count = 0;
-				$host_count = count( $hosts );
-				foreach ( $hosts as $host ) {
-
-					$count ++;
-
-					// 2.3.0: maybe get stored user data
-					// $user = get_userdata( $host );
-					if ( isset( $radio_station_data['user-' . $host] ) ) {
-						$user = $radio_station_data['user-' . $host];
-					} else {
-						$user = get_user_by( 'ID', $host );
-						$radio_station_data['user-' . $host] = $user;
-					}
-
-					if ( $atts['link_hosts'] ) {
-						// 2.3.0: use new get host URL function
-						$host_link = radio_station_get_host_url( $host );
-						$host_link = apply_filters( 'radio_station_dj_link', $host_link, $host );
-
-						$output .= '<a href="' . esc_url( $host_link ) . '">';
-						$output .= esc_html( $user->display_name );
-						$output .= '</a>';
-					} else {
-						$output .= esc_html( $user->display_name );
-					}
-
-					if ( ( ( 1 == $count ) && ( 2 == $host_count ) )
-					     || ( ( $host_count > 2 ) && ( ( $host_count - 1 ) == $count ) ) ) {
-						$output .= ' ' . esc_html( __( 'and', 'radio-station' ) ) . ' ';
-					} elseif ( ( $count < $host_count ) && ( $host_count > 2 ) ) {
-						$output .= ', ';
-					}
-				}
-				$output .= '</div>';
-			}
-		}
-
-		// --- current show playlist ---
-		// 2.3.0: convert span to div tags for consistency
-		if ( $atts['show_playlist'] ) {
-			// 2.3.0: use new function to get current playlist
-			$playlist  = radio_station_get_now_playing();
-			if ( RADIO_STATION_DEBUG ) {
-				$output .= '<span style="display:none;">' . print_r( $playlist, true ) . '</span>';
-			}
-			if ( $playlist && isset( $playlist['playlist_url'] ) ) {
-				$output .= '<div class="current-show-playlist on-air-dj-playlist">';
-				$output .= '<a href="' . esc_url( $playlist['playlist_url'] ) . '">';
-				$output .= esc_html( __( 'View Playlist', 'radio-station' ) );
-				$output .= '</a>';
-				$output .= '</div>';
-			}
-		}
-
-		$output .= '<span class="radio-clear"></span>';
-
 		// --- check show schedule ---
+		// 2.3.1: check early for later display
 		if ( $atts['show_sched'] || $atts['show_all_sched'] ) {
 
 			$shift_display = '<div class="current-show-schedule on-air-dj-schedule">';
@@ -1372,15 +1282,135 @@ function radio_station_current_show_shortcode( $atts ) {
 
 			$shift_display .= '</div>';
 		}
+		
+		// --- set show title output ---
+		$title = '<div class="current-show-title on-air-dj-title">';
+		if ( $show_link ) {
+			$title .= '<a href="' . esc_url( $show_link ) . '">' . esc_html( $show['name'] ) . '</a>';
+		} else {
+			$title .= esc_html( $show['name'] );
+		}
+		$title .= '</div>';
+		$html['title'] = $title;
+
+		// --- show title (above only) ---
+		// if ( 'above' == $atts['title_position'] ) {
+		//	$html['title'] .= $title; // already escaped
+		//	$output .= $html['title'];
+		// }
+
+		// --- show avatar ---
+		if ( $atts['show_avatar'] ) {
+
+			// 2.3.0: get show avatar (with thumbnail fallback)
+			// 2.3.0: filter show avatar via display context
+			// 2.3.0: maybe add link from avatar to show
+			$show_avatar = radio_station_get_show_avatar( $show['id'] );
+			$show_avatar = apply_filters( 'radio_station_current_show_avatar', $show_avatar, $show['id'], $atts );
+			if ( $show_avatar ) {
+				$html['avatar'] .= '<div class="current-show-avatar on-air-dj-avatar' . esc_attr( $floatclass ) . '" ' . $widthstyle . '>';
+				if ( $show_link ) {
+					$html['avatar'] .= '<a href="' . esc_url( $show_link ) . '">' . $show_avatar . '</a>';
+				} else {
+					$html['avatar'] .= $show_avatar;
+				}
+				$html['avatar'] .= '</div>';
+			}
+		}
+
+		// --- show title (all other positions) ---
+		// if ( 'above' != $atts['title_position'] ) {
+		//	$html['title'] .= $title; // already escaped
+		//	$output .= $html['title'];
+		// }
+
+		// --- show DJs / hosts ---
+		if ( $atts['display_hosts'] ) {
+
+			$hosts = get_post_meta( $show['id'], 'show_user_list', true );
+
+			if ( $hosts && is_array( $hosts ) && ( count( $hosts ) > 0 ) ) {
+
+				$html['hosts'] = '<div class="current-show-hosts on-air-dj-names">';
+
+				$html['hosts'] .= esc_html( __( 'with', 'radio-station' ) ) . ' ';
+
+				$count = 0;
+				$host_count = count( $hosts );
+				foreach ( $hosts as $host ) {
+
+					$count ++;
+
+					// 2.3.0: maybe get stored user data
+					// $user = get_userdata( $host );
+					if ( isset( $radio_station_data['user-' . $host] ) ) {
+						$user = $radio_station_data['user-' . $host];
+					} else {
+						$user = get_user_by( 'ID', $host );
+						$radio_station_data['user-' . $host] = $user;
+					}
+
+					if ( $atts['link_hosts'] ) {
+						// 2.3.0: use new get host URL function
+						$host_link = radio_station_get_host_url( $host );
+						$host_link = apply_filters( 'radio_station_dj_link', $host_link, $host );
+
+						$html['hosts'] .= '<a href="' . esc_url( $host_link ) . '">';
+						$html['hosts'] .= esc_html( $user->display_name );
+						$html['hosts'] .= '</a>';
+					} else {
+						$html['hosts'] .= esc_html( $user->display_name );
+					}
+
+					if ( ( ( 1 == $count ) && ( 2 == $host_count ) )
+					     || ( ( $host_count > 2 ) && ( ( $host_count - 1 ) == $count ) ) ) {
+						$html['hosts'] .= ' ' . esc_html( __( 'and', 'radio-station' ) ) . ' ';
+					} elseif ( ( $count < $host_count ) && ( $host_count > 2 ) ) {
+						$html['hosts'] .= ', ';
+					}
+				}
+				$html['hosts'] .= '</div>';
+				// $output .= $html['hosts'];
+			}
+		}
 
 		// --- output current shift display ---
-		if ( $atts['show_sched'] ) {
-			$output .= $current_shift_display;
+		if ( $atts['show_sched'] && isset( $current_shift_display ) ) {
+			$html['shift'] = $current_shift_display;
+			// $output .= $html['shift'];
+		}
+
+		// --- encore presentation ---
+		// 2.3.0: added encore presentation display
+		if ( isset( $show['encore'] ) && ( $show['encore'] ) ) {
+			$html['encore'] = '<div class="current-show-encore on-air-dj-encore">';
+			$html['encore'] .= esc_html( __( 'Encore Presentation', 'radio-station' ) );
+			$html['encore'] .= '</div>';
+			// $output .= $html['encore'];
+		}
+
+		$html['clear'] = '<span class="radio-clear"></span>';
+
+		// --- current show playlist ---
+		// 2.3.0: convert span to div tags for consistency
+		if ( $atts['show_playlist'] ) {
+			// 2.3.0: use new function to get current playlist
+			$playlist  = radio_station_get_now_playing();
+			if ( RADIO_STATION_DEBUG ) {
+				$output .= '<span style="display:none;">' . print_r( $playlist, true ) . '</span>';
+			}
+			if ( $playlist && isset( $playlist['playlist_url'] ) ) {
+				$html['playlist'] = '<div class="current-show-playlist on-air-dj-playlist">';
+				$html['playlist'] .= '<a href="' . esc_url( $playlist['playlist_url'] ) . '">';
+				$html['playlist'] .= esc_html( __( 'View Playlist', 'radio-station' ) );
+				$html['playlist'] .= '</a>';
+				$html['playlist'] .= '</div>';
+			}
 		}
 
 		// --- countdown timer display ---
 		if ( isset( $current_shift_end ) && $atts['countdown'] ) {
-			$output .= '<div class="current-show-countdown rs-countdown"></div>';
+			$html['countdown'] = '<div class="current-show-countdown rs-countdown"></div>';
 			do_action( 'radio_station_countdown_enqueue' );
 		}
 
@@ -1394,10 +1424,12 @@ function radio_station_current_show_shortcode( $atts ) {
 
 			// --- get show excerpt ---
 			if ( !empty( $show_post->post_excerpt ) ) {
-				$excerpt = $show_post->post_excerpt;
+				$excerpt = "<!-- Post Excerpt -->";
+				$excerpt .= $show_post->post_excerpt;
 				$excerpt .= ' <a href="' . esc_url( $permalink ) . '">' . $more . '</a>';
 			} else {
-				$excerpt = radio_station_trim_excerpt( $show_post->post_content, $length, $more, $permalink );
+				$excerpt = "<!-- Trimmed Excerpt -->";
+				$excerpt .= radio_station_trim_excerpt( $show_post->post_content, $length, $more, $permalink );
 			}
 
 			// --- filter excerpt by context ---
@@ -1409,16 +1441,30 @@ function radio_station_current_show_shortcode( $atts ) {
 			}
 
 			// --- output excerpt ---
-			$output .= '<div class="current-show-desc on-air-show-desc">';
-			$output .= $excerpt;
-			$output .= '</div>';
+			$html['description'] = '<div class="current-show-desc on-air-show-desc">';
+			$html['description'] .= $excerpt;
+			$html['description'] .= '</div>';
 		}
 
-		$output .= '<span class="radio-clear"></span>';
+		// $html['clear'] = '<span class="radio-clear"></span>';
 
 		// --- output full show schedule ---
 		if ( $atts['show_all_sched'] ) {
-			$output .= $shift_display;
+			$html['schedule'] = $shift_display;
+		}
+
+		// --- filter display section order ---
+		// 2.3.1: added filter for section order display
+		if ( 'above' == $atts['title_position'] ) {
+			$order = array( 'title', 'avatar', 'hosts', 'shift', 'encore', 'clear', 'playlist', 'countdown', 'description', 'clear', 'schedule' );
+		} else {
+			$order = array( 'avatar', 'title', 'hosts', 'shift', 'encore', 'clear', 'playlist', 'countdown', 'description', 'clear', 'schedule' );
+		}
+		$order = apply_filters( 'radio_station_current_show_section_order', $order, $atts );
+		foreach ( $order as $section ) {
+			if ( isset( $html[$section] ) ) {
+				$output .= $html[$section];
+			}
 		}
 
 		$output .= '</li>';
@@ -1567,10 +1613,13 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 		$output .= '<li class="upcoming-show-none on-air-dj default-dj">';
 		if ( ! empty( $atts['default_name'] ) ) {
-			$output .= esc_html( $atts['default_name'] );
+			$no_upcoming_shows = esc_html( $atts['default_name'] );
 		} else {
-			$output .= esc_html( __( 'No Upcoming Shows Scheduled.', 'radio-station' ) );
+			$no_upcoming_shows = esc_html( __( 'No Upcoming Shows Scheduled.', 'radio-station' ) );
 		}
+		// 2.3.1: add filter for no current shows text
+		$no_upcoming_shows = apply_filters( 'radio_station_no_upcoming_shows_text', $no_upcoming_shows, $atts );
+		$output .= $no_upcoming_shows;
 		$output .= '</li>';
 
 	} else {
@@ -1578,8 +1627,14 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 		// --- loop upcoming shows ---
 		foreach ( $shows as $i => $shift ) {
 
+			// --- reset output ---
+			// 2.3.1: store all HTML to allow section re-ordering
+			$html = array( 'title' => '' );
+
+			// --- get show data ---
 			$show = $shift['show'];
 
+			// --- set show link ---
 			$show_link = false;
 			if ( $atts['show_link'] ) {
 				$show_link = get_permalink( $show['id'] );
@@ -1588,109 +1643,8 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 			$output .= '<li class="upcoming-show on-air-dj">';
 
-			// --- set show title output ---
-			$title = '<div class="upcoming-show-title on-air-dj-title">';
-			if ( $show_link ) {
-				$title .= '<a href="' . esc_url( $show_link ) . '">' . esc_html( $show['name'] ) . '</a>';
-			} else {
-				$title .= esc_html( $show['name'] );
-			}
-			$title .= '</div>';
-
-			// --- show title (above position only) ---
-			// (for above position only)
-			if ( 'above' == $atts['title_position'] ) {
-				$output .= $title; // already escaped
-			}
-
-			// --- show avatar ---
-			if ( $atts['show_avatar'] ) {
-
-				// 2.3.0: get show avatar (with thumbnail fallback)
-				// 2.3.0: filter show avatar by context
-				// 2.3.0: maybe link avatar to show
-				$show_avatar = radio_station_get_show_avatar( $show['id'] );
-				$show_avatar = apply_filters( 'radio_station_upcoming_show_avatar', $show_avatar, $show['id'], $atts );
-				if ( $show_avatar ) {
-					$output .= '<div class="upcoming-show-avatar on-air-dj-avatar' . esc_attr( $float_class ) . '" ' . $width_style . '>';
-					if ( $atts['show_link'] ) {
-						$output .= '<a href="' . esc_url( $show_link ) . '">';
-					}
-					$output .= $show_avatar;
-					if ( $atts['show_link'] ) {
-						$output .= '</a>';
-					}
-					$output .= '</div>';
-				}
-			}
-
-			// --- show title (all other positions) ---
-			// (for all positions except above)
-			if ( 'above' != $atts['title_position'] ) {
-				$output .= $title; // already escaped
-			}
-
-			// $output .= '<span class="radio-clear"></span>';
-
-			// --- encore presentation ---
-			// 2.2.4: added encore presentation display
-			if ( isset( $show['encore'] ) && ( 'on' == $show['encore'] ) ) {
-				$output .= '<div class="upcoming-show-encore on-air-dj-encore">';
-				$output .= esc_html( __( 'Encore Presentation', 'radio-station' ) );
-				$output .= '</div>';
-			}
-
-			// --- DJ / Host names ---
-			if ( $atts['display_hosts'] ) {
-
-				$hosts = get_post_meta( $show['id'], 'show_user_list', true );
-				if ( isset( $hosts ) && is_array( $hosts ) && ( count( $hosts ) > 0 ) ) {
-
-					$output .= '<div class="upcoming-show-hosts on-air-dj-names">';
-
-					$output .= esc_html( __( 'with', 'radio-station' ) ) . ' ';
-
-					$count = 0;
-					$host_count = count( $hosts );
-					foreach ( $hosts as $host ) {
-
-						$count ++;
-
-						// 2.3.0: maybe get stored user data
-						// $user = get_userdata( $host );
-						if ( isset( $radio_station_data['user-' . $host] ) ) {
-							$user = $radio_station_data['user-' . $host];
-						} else {
-							$user = get_user_by( 'ID', $host );
-							$radio_station_data['user-' . $host] = $user;
-						}
-
-						if ( $atts['link_hosts'] ) {
-							// 2.3.0: use new get host URL function
-							$host_link = radio_station_get_host_url( $host );
-							$host_link = apply_filters( 'radio_station_dj_link', $host_link, $host );
-
-							$output .= '<a href="' . esc_url( $host_link ) . '">';
-							$output .= esc_html( $user->display_name );
-							$output .= '</a>';
-						} else {
-							$output .= esc_html( $user->display_name );
-						}
-
-						if ( ( ( 1 == $count ) && ( 2 == $host_count ) )
-						     || ( ( $host_count > 2 ) && ( $count == ( $host_count - 1 ) ) ) ) {
-							$output .= ' ' . esc_html( __( 'and', 'radio-station' ) ) . ' ';
-						} elseif ( ( $count < $host_count ) && ( $host_count > 2 ) ) {
-							$output .= ', ';
-						}
-					}
-					$output .= '</div>';
-				}
-			}
-
-			$output .= '<span class="radio-clear"></span>';
-
 			// --- check show schedule ---
+			// 2.3.1: check earlier for later display
 			if ( $atts['show_sched'] || $atts['countdown'] || $atts['dynamic'] ) {
 
 				$shift_display = '<div class="upcoming-show-schedule on-air-dj-schedule">';
@@ -1761,14 +1715,131 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 				$shift_display .= '</div>';
 			}
 
+			// --- set show title output ---
+			$title = '<div class="upcoming-show-title on-air-dj-title">';
+			if ( $show_link ) {
+				$title .= '<a href="' . esc_url( $show_link ) . '">' . esc_html( $show['name'] ) . '</a>';
+			} else {
+				$title .= esc_html( $show['name'] );
+			}
+			$title .= '</div>';
+			$html['title'] = $title;
+
+			// --- show title (above position only) ---
+			// (for above position only)
+			// if ( 'above' == $atts['title_position'] ) {
+			//	$output .= $title; // already escaped
+			// }
+
+			// --- show avatar ---
+			if ( $atts['show_avatar'] ) {
+
+				// 2.3.0: get show avatar (with thumbnail fallback)
+				// 2.3.0: filter show avatar by context
+				// 2.3.0: maybe link avatar to show
+				$show_avatar = radio_station_get_show_avatar( $show['id'] );
+				$show_avatar = apply_filters( 'radio_station_upcoming_show_avatar', $show_avatar, $show['id'], $atts );
+				if ( $show_avatar ) {
+					$html['avatar'] = '<div class="upcoming-show-avatar on-air-dj-avatar' . esc_attr( $float_class ) . '" ' . $width_style . '>';
+					if ( $atts['show_link'] ) {
+						$html['avatar'] .= '<a href="' . esc_url( $show_link ) . '">';
+					}
+					$html['avatar'] .= $show_avatar;
+					if ( $atts['show_link'] ) {
+						$html['avatar'] .= '</a>';
+					}
+					$html['avatar'] .= '</div>';
+				}
+			}
+
+			// --- show title (all other positions) ---
+			// (for all positions except above)
+			// if ( 'above' != $atts['title_position'] ) {
+			// 	$output .= $title; // already escaped
+			// }
+
+			// $output .= '<span class="radio-clear"></span>';
+
+			// --- DJ / Host names ---
+			if ( $atts['display_hosts'] ) {
+
+				$hosts = get_post_meta( $show['id'], 'show_user_list', true );
+				if ( isset( $hosts ) && is_array( $hosts ) && ( count( $hosts ) > 0 ) ) {
+
+					$html['hosts'] = '<div class="upcoming-show-hosts on-air-dj-names">';
+
+					$html['hosts'] .= esc_html( __( 'with', 'radio-station' ) ) . ' ';
+
+					$count = 0;
+					$host_count = count( $hosts );
+					foreach ( $hosts as $host ) {
+
+						$count ++;
+
+						// 2.3.0: maybe get stored user data
+						// $user = get_userdata( $host );
+						if ( isset( $radio_station_data['user-' . $host] ) ) {
+							$user = $radio_station_data['user-' . $host];
+						} else {
+							$user = get_user_by( 'ID', $host );
+							$radio_station_data['user-' . $host] = $user;
+						}
+
+						if ( $atts['link_hosts'] ) {
+							// 2.3.0: use new get host URL function
+							$host_link = radio_station_get_host_url( $host );
+							$host_link = apply_filters( 'radio_station_dj_link', $host_link, $host );
+
+							$html['hosts'] .= '<a href="' . esc_url( $host_link ) . '">';
+							$html['hosts'] .= esc_html( $user->display_name );
+							$html['hosts'] .= '</a>';
+						} else {
+							$html['hosts'] .= esc_html( $user->display_name );
+						}
+
+						if ( ( ( 1 == $count ) && ( 2 == $host_count ) )
+						     || ( ( $host_count > 2 ) && ( $count == ( $host_count - 1 ) ) ) ) {
+							$html['hosts'] .= ' ' . esc_html( __( 'and', 'radio-station' ) ) . ' ';
+						} elseif ( ( $count < $host_count ) && ( $host_count > 2 ) ) {
+							$html['hosts'] .= ', ';
+						}
+					}
+					$html['hosts'] .= '</div>';
+				}
+			}
+
+			// --- encore presentation ---
+			// 2.2.4: added encore presentation display
+			if ( isset( $show['encore'] ) && ( 'on' == $show['encore'] ) ) {
+				$html['encore'] = '<div class="upcoming-show-encore on-air-dj-encore">';
+				$html['encore'] .= esc_html( __( 'Encore Presentation', 'radio-station' ) );
+				$html['encore'] .= '</div>';
+			}
+
+			$html['clear'] = '<span class="radio-clear"></span>';
+
 			// --- countdown timer display ---
 			if ( ( 0 == $i ) && isset( $next_start_time ) && $atts['countdown'] ) {
-				$output .= '<div class="upcoming-show-countdown rs-countdown"></div>';				
+				$html['countdown'] = '<div class="upcoming-show-countdown rs-countdown"></div>';				
 			}
 
 			// --- output show schedule ---
 			if ( $atts['show_sched'] ) {
-				$output .= $shift_display;
+				$html['shift'] = $shift_display;
+			}
+
+			// --- filter display section order ---
+			// 2.3.1: added filter for section order display
+			if ( 'above' == $atts['title_position'] ) {
+				$order = array( 'title', 'avatar', 'hosts', 'shift', 'clear', 'countdown', 'encore' );
+			} else {
+				$order = array( 'avatar', 'title', 'hosts', 'shift', 'clear', 'countdown', 'encore' );
+			}
+			$order = apply_filters( 'radio_station_upcoming_shows_section_order', $order, $atts );
+			foreach ( $order as $section ) {
+				if ( isset( $html[$section] ) ) {
+					$output .= $html[$section];
+				}
 			}
 
 			$output .= '</li>';
@@ -1878,116 +1949,134 @@ function radio_station_current_playlist_shortcode( $atts ) {
 
 		// --- loop playlist tracks ---
 		// 2.3.0: loop all instead of just latest
-		foreach ( $playlist['tracks'] as $track ) {
+		// 2.3.1: added check for playlist tracks
+		if ( isset( $playlist['tracks'] ) && is_array( $playlist['tracks'] ) && ( count( $playlist['tracks'] ) > 0 ) ) {
+			foreach ( $playlist['tracks'] as $track ) {
 
-			$class = '';
-			if ( isset( $track['playlist_entry_new'] ) && ( 'on' === $track['playlist_entry_new'] ) ) {
-				$class .= ' new';
+				$class = '';
+				if ( isset( $track['playlist_entry_new'] ) && ( 'on' === $track['playlist_entry_new'] ) ) {
+					$class .= ' new';
+				}
+				// 2.3.0: added check for latest track since looping
+				if ( $track == $playlist['latest'] ) {
+					$class .= ' latest';
+				} else {
+					$class .= ' played';
+				}
+
+				$html['tracks'] = '<div class="show-playlist-track myplaylist-track' . esc_attr( $class ) . '">';
+
+				// 2.2.3: convert span tags to div tags
+				// 2.2.4: check value keys are set before outputting
+				if ( $atts['song'] && isset( $track['playlist_entry_song'] ) ) {
+					$html['tracks'] .= '<div class="show-playlist-song myplaylist-song">';
+					$html['tracks'] .= esc_html( __( 'Song', 'radio-station' ) );
+					$html['tracks'] .= ': ' . esc_html( $track['playlist_entry_song'] );
+					$html['tracks'] .= '</div>';
+				}
+
+				// 2.2.7: add label prefixes to now playing data
+				if ( $atts['artist'] && isset( $track['playlist_entry_artist'] ) ) {
+					$html['tracks'] .= '<div class="show-playlist-artist myplaylist-artist">';
+					$html['tracks'] .= esc_html( __( 'Artist', 'radio-station' ) );
+					$html['tracks'] .= ': ' . esc_html( $track['playlist_entry_artist'] );
+					$html['tracks'] .= '</div>';
+				}
+
+				if ( $atts['album'] && !empty( $track['playlist_entry_album'] ) ) {
+					$html['tracks'] .= '<div class="show-playlist-album myplaylist-album">';
+					$html['tracks'] .= esc_html( __( 'Album', 'radio-station' ) );
+					$html['tracks'] .= ': ' . esc_html( $track['playlist_entry_album'] );
+					$html['tracks'] .= '</div>';
+				}
+
+				if ( $atts['label'] && !empty( $track['playlist_entry_label'] ) ) {
+					$html['tracks'] .= '<div class="show-playlist-label myplaylist-label">';
+					$html['tracks'] .= esc_html( __( 'Label', 'radio-station' ) );
+					$html['tracks'] .= ': ' . esc_html( $track['playlist_entry_label'] );
+					$html['tracks'] .= '</div>';
+				}
+
+				if ( $atts['comments'] && !empty( $track['playlist_entry_comments'] ) ) {
+					$html['tracks'] .= '<div class="show-playlist-comments myplaylist-comments">';
+					$html['tracks'] .= esc_html( __( 'Comments', 'radio-station' ) );
+					$html['tracks'] .= ': ' . esc_html( $track['playlist_entry_comments'] );
+					$html['tracks'] .= '</div>';
+				}
+
+				$html['tracks'] .= '</div>';
 			}
-			// 2.3.0: added check for latest track since looping
-			if ( $track == $playlist['latest'] ) {
-				$class .= ' latest';
-			} else {
-				$class .= ' played';
-			}
-
-			$output .= '<div class="show-playlist-track myplaylist-track' . esc_attr( $class ) . '">';
-
-			// 2.2.3: convert span tags to div tags
-			// 2.2.4: check value keys are set before outputting
-			if ( $atts['song'] && isset( $track['playlist_entry_song'] ) ) {
-				$output .= '<div class="show-playlist-song myplaylist-song">';
-				$output .= esc_html( __( 'Song', 'radio-station' ) );
-				$output .= ': ' . esc_html( $track['playlist_entry_song'] );
-				$output .= '</div>';
-			}
-
-			// 2.2.7: add label prefixes to now playing data
-			if ( $atts['artist'] && isset( $track['playlist_entry_artist'] ) ) {
-				$output .= '<div class="show-playlist-artist myplaylist-artist">';
-				$output .= esc_html( __( 'Artist', 'radio-station' ) );
-				$output .= ': ' . esc_html( $track['playlist_entry_artist'] );
-				$output .= '</div>';
-			}
-
-			if ( $atts['album'] && !empty( $track['playlist_entry_album'] ) ) {
-				$output .= '<div class="show-playlist-album myplaylist-album">';
-				$output .= esc_html( __( 'Album', 'radio-station' ) );
-				$output .= ': ' . esc_html( $track['playlist_entry_album'] );
-				$output .= '</div>';
-			}
-
-			if ( $atts['label'] && !empty( $track['playlist_entry_label'] ) ) {
-				$output .= '<div class="show-playlist-label myplaylist-label">';
-				$output .= esc_html( __( 'Label', 'radio-station' ) );
-				$output .= ': ' . esc_html( $track['playlist_entry_label'] );
-				$output .= '</div>';
-			}
-
-			if ( $atts['comments'] && !empty( $track['playlist_entry_comments'] ) ) {
-				$output .= '<div class="show-playlist-comments myplaylist-comments">';
-				$output .= esc_html( __( 'Comments', 'radio-station' ) );
-				$output .= ': ' . esc_html( $track['playlist_entry_comments'] );
-				$output .= '</div>';
-			}
-
-			$output .= '</div>';
 		}
 
 		// --- playlist permalink ---
 		if ( isset( $playlist['playlist_permalink'] ) ) {
-			$output .= '<div class="show-playlist-link myplaylist-link">';
-			$output .= '<a href="' . esc_url( $playlist['playlist_permalink'] ) . '">';
-			$output .= esc_html( __( 'View Playlist', 'radio-station' ) );
-			$output .= '</a>';
-			$output .= '</div>';
+			$html['link'] = '<div class="show-playlist-link myplaylist-link">';
+			$html['link'] .= '<a href="' . esc_url( $playlist['playlist_permalink'] ) . '">';
+			$html['link'] .= esc_html( __( 'View Playlist', 'radio-station' ) );
+			$html['link'] .= '</a>';
+			$html['link'] .= '</div>';
 		}
 
 		// --- countdown timer ---
 		// 2.3.0: added for countdown changeovers
 		if ( $atts['countdown'] || $atts['dynamic'] ) {
 
-			foreach ( $playlist['shifts'] as $shift ) {
+			// 2.3.1: added check for playlist shifts value
+			if ( isset( $playlist['shifts'] ) && is_array( $playlist['shifts'] ) && ( count( $playlist['shifts'] ) > 0 ) ) {
+				foreach ( $playlist['shifts'] as $shift ) {
 
-				// --- convert shift info ---
-				$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
-				$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
-				$shift_start_time = strtotime( $start );
-				$shift_end_time = strtotime( $end );
-				if ( $start > $end ) {
-					$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
-				}
-
-				// --- check currently playing show time ---
-				$now = strtotime( current_time( 'mysql' ) );
-				if ( ( $now > $shift_start_time ) && ( $now < $shift_end_time ) ) {
-
-					// --- hidden input for playlist end time ---
-					$output .= '<input type="hidden" class="current-playlist-end" value="' . esc_attr( $shift_end_time ) . '">';
-
-					// --- for countdown timer display ---
-					if ( $atts['countdown'] ) {
-						$output .= '<div class="show-playlist-countdown rs-countdown"></div>';
-						do_action( 'radio_station_countdown_enqueue' );
+					// --- convert shift info ---
+					$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
+					$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
+					$shift_start_time = strtotime( $start );
+					$shift_end_time = strtotime( $end );
+					if ( $start > $end ) {
+						$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 					}
 
-					// --- for dynamic reloading ---
-					if ( $atts['dynamic'] ) {
-						$dynamic = apply_filters( 'radio_station_countdown_dynamic', false, 'current_playlist', $atts, $shift_end_time );
-						if ( $dynamic ) {
-							$output .= $dynamic;
+					// --- check currently playing show time ---
+					$now = strtotime( current_time( 'mysql' ) );
+					if ( ( $now > $shift_start_time ) && ( $now < $shift_end_time ) ) {
+
+						// --- hidden input for playlist end time ---
+						$html['countdown'] = '<input type="hidden" class="current-playlist-end" value="' . esc_attr( $shift_end_time ) . '">';
+
+						// --- for countdown timer display ---
+						if ( $atts['countdown'] ) {
+							$html['countdown'] .= '<div class="show-playlist-countdown rs-countdown"></div>';
+							do_action( 'radio_station_countdown_enqueue' );
+						}
+
+						// --- for dynamic reloading ---
+						if ( $atts['dynamic'] ) {
+							$dynamic = apply_filters( 'radio_station_countdown_dynamic', false, 'current_playlist', $atts, $shift_end_time );
+							if ( $dynamic ) {
+								$html['countdown'] .= $dynamic;
+							}
 						}
 					}
-
 				}
+			}
+		}
+
+		// --- filter display section order ---
+		// 2.3.1: added filter for section order display
+		$order = array( 'tracks', 'link', 'countdown' );
+		$order = apply_filters( 'radio_station_current_playlist_section_order', $order, $atts );
+		foreach ( $order as $section ) {
+			if ( isset( $html[$section] ) ) {
+				$output .= $html[$section];
 			}
 		}
 
 	} else {
 		// 2.2.3: added missing translation wrapper
 		// 2.3.0: added no playlist class
+		// 2.3.1: add filter for no playlist text
 		$output .= '<div class="show-playlist-noplaylist myplaylist-noplaylist>';
-		$output .= esc_html( __( 'No Playlist available.', 'radio-station' ) );
+		$no_current_playlist = esc_html( __( 'No Current Playlist available.', 'radio-station' ) );
+		$no_current_playlist = apply_filters( 'radio_station_no_current_playlist_text', $no_current_playlist, $atts );
+		$output .= $no_current_playlist;
 		$output .= '</div>';
 	}
 
