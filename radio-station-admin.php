@@ -281,6 +281,14 @@ function radio_station_taxonomy_submenu_fix() {
 // 2.3.0: added section for upcoming (Pro) role editor feature
 add_action( 'radio_station_admin_page_section_permissions_bottom', 'radio_station_role_editor' );
 function radio_station_role_editor() {
+
+	// 2.3.2: add filter role editor message
+	$display = apply_filters( 'radio_station_role_editor_message', true );
+	if ( !$display ) {
+		return;
+	}
+
+	// --- role assignment message ---
 	echo "<h3>" . esc_html( __( 'Role Assignments', 'radio-station' ) ) . "</h3>";
 	echo esc_html( __( 'You can assign a Radio Station role to users through the WordPress User editor.', 'radio-station' ) );
 

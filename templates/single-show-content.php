@@ -37,7 +37,16 @@ $patreon_title = __( 'Become a Supporter for', 'radio-station' ) . ' ' . $show_t
 // $show_rss = get_post_meta( $post_id, 'show_rss', true );
 $show_rss = false; // TEMP
 
+// 2.3.2: added show download disabled check
+$show_download = true;
+$download = get_post_meta( $post_id, 'show_download', true );
+if ( 'on' == $download ) {
+	// --- on = disabled ---
+	$show_download = false;
+}
+
 // --- filter all show meta data ---
+// 2.3.2: added show download filter
 $show_title = apply_filters( 'radio_station_show_title', $show_title, $post_id );
 $header_id = apply_filters( 'radio_station_show_header', $header_id, $post_id );
 $avatar_id = apply_filters( 'radio_station_show_avatar', $avatar_id, $post_id );
@@ -49,6 +58,7 @@ $producers = apply_filters( 'radio_station_show_producers', $producers, $post_id
 $active = apply_filters( 'radio_station_show_active', $active, $post_id );
 $shifts = apply_filters( 'radio_station_show_shifts', $shifts, $post_id );
 $show_file = apply_filters( 'radio_station_show_file', $show_file, $post_id );
+$show_download = apply_filters( 'radio_station_show_download', $show_download, $post_id );
 $show_link = apply_filters( 'radio_station_show_link', $show_link, $post_id );
 $show_email = apply_filters( 'radio_station_show_email', $show_email, $post_id );
 $show_patreon = apply_filters( 'radio_station_show_patreon', $show_patreon, $post_id );
@@ -192,6 +202,7 @@ if ( ( $avatar_id || $thumbnail_id ) || ( count( $show_icons ) > 0 ) || ( $show_
 		// --- Show Player ---
 		// 2.3.0: embed latest broadcast audio player
 		if ( $show_file ) {
+		
 			$blocks['show_images'] .= '<div class="show-player">';
 			$shortcode = '[audio src="' . $show_file . '" preload="metadata"]';
 			$player_embed = do_shortcode( $shortcode );
@@ -200,12 +211,16 @@ if ( ( $avatar_id || $thumbnail_id ) || ( count( $show_icons ) > 0 ) || ( $show_
 			$blocks['show_images'] .= '</div>';
 
 			// --- Download Audio Icon ---
-			$title = __( 'Download Latest Broadcast', 'radio-station' );
-			$blocks['show_images'] .= '<div class="show-download">';
-			$blocks['show_images'] .= '<a href="' . esc_url( $show_file ) . '" title="' . esc_attr( $title ) . '">';
-			$blocks['show_images'] .= '<span style="color:#7DBB00;" class="dashicons dashicons-download"></span>';
-			$blocks['show_images'] .= '</a>';
-			$blocks['show_images'] .= '</div>';
+			// 2.3.2: check show download switch
+			if ( $show_download ) {
+				$title = __( 'Download Latest Broadcast', 'radio-station' );
+				$blocks['show_images'] .= '<div class="show-download">';
+				$blocks['show_images'] .= '<a href="' . esc_url( $show_file ) . '" title="' . esc_attr( $title ) . '">';
+				$blocks['show_images'] .= '<span style="color:#7DBB00;" class="dashicons dashicons-download"></span>';
+				$blocks['show_images'] .= '</a>';
+				$blocks['show_images'] .= '</div>';
+			}
+			
 			$blocks['show_images'] .= '</div>';
 		}
 

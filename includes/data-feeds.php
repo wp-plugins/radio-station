@@ -168,11 +168,13 @@ function radio_station_add_station_data( $data ) {
 // ------------------
 function radio_station_get_broadcast_data() {
 
-	// --- get broadcast info ---
+	// --- get current show ---
 	$current_show = radio_station_get_current_show();
 	// print_r( $current_show );
 	$current_show = radio_station_convert_show_shift( $current_show );
 	// print_r( $current_show );
+	
+	// --- get next show ---
 	$next_show = radio_station_get_next_show();
 	// print_r( $next_show );
 	$next_show = radio_station_convert_show_shift( $next_show );
@@ -181,7 +183,7 @@ function radio_station_get_broadcast_data() {
 	// TODO: maybe get now playing playlist ?
 	// $current_playlist = radio_station_current_playlist();
 
-	// --- return current and next show info ---
+	// --- return broadcast info ---
 	$broadcast = array(
 		'current_show' => $current_show,
 		'next_show'    => $next_show,

@@ -68,19 +68,23 @@ function radio_station_master_schedule( $atts ) {
 		'show_file'         => 0,
 	);
 	// 2.3.0: change some defaults for tabbed and list view
+	// 2.3.2: check for comma separated view list
 	if ( isset( $atts['view'] ) ) {
-		if ( 'tabs' == $atts['view'] ) {
+		// 2.3.2: view value to lowercase to be case insensitive
+		$atts['view'] = strtolower( $atts['view'] );
+		$views = explode( ',', $atts['view'] );
+		if ( ( 'tabs' == $atts['view'] ) || in_array( 'tabs', $views ) ) {
 			$defaults['show_image'] = 1;
 			$defaults['show_hosts'] = 1;
 			$defaults['show_genres'] = 1;
-		} elseif ( 'list' == $atts['view'] ) {
+		} elseif ( ( 'list' == $atts['view'] ) || in_array( 'list', $views ) ) {
 			$defaults['show_genres'] = 1;
 		}
 	}
 
 	// --- merge attributes with defaults ---
 	$atts = shortcode_atts( $defaults, $atts, 'master-schedule' );
-
+		
 	// --- enqueue schedule stylesheet ---
 	// 2.3.0: use abstracted method for enqueueing widget styles
 	radio_station_enqueue_style( 'schedule' );
@@ -107,26 +111,51 @@ function radio_station_master_schedule( $atts ) {
 	// 2.3.0: moved out from templates to apply to all views
 	$output .= '<div id="master-schedule-controls-wrapper">';
 
-	if ( $atts['clock'] ) {
-		// --- display radio clock ---
-		$output .= '<div id="master-schedule-clock-wrapper">';
-		$output .= $clock;
-		$output .= '</div>';
-	} else {
-		// --- display radio timezone ---
-		$output .= '<div id="master-schedule-timezone-wrapper">';
-		$output .= radio_station_timezone_shortcode();
-		$output .= '</div>';
-	}
+		$controls = array();
+		if ( $atts['clock'] ) {
+			// --- display radio clock ---
+			$controls['clock'] = '<div id="master-schedule-clock-wrapper">';
+			$controls['clock'] .= $clock;
+			$controls['clock'] .= '</div>';
+		} else {
+			// --- display radio timezone ---
+			$controls['timezone'] = '<div id="master-schedule-timezone-wrapper">';
+			$controls['timezone'] .= radio_station_timezone_shortcode();
+			$controls['timezone'] .= '</div>';
+		}
 
-	if ( $atts['selector'] ) {
-		// --- display genre selector ---
-		$output .= '<div id="master-schedule-selector-wrapper">';
-		$output .= $selector;
-		$output .= '</div><br>';
-	}
+		if ( $atts['selector'] ) {
+			// --- display genre selector ---
+			$controls['selector'] = '<div id="master-schedule-selector-wrapper">';
+			$controls['selector'] .= $selector;
+			$controls['selector'] .= '</div>';
+		}
 
-	$output .= '</div><br>';
+		// 2.3.1: add filters for control order
+		$control_order = array( 'clock', 'timezone', 'selector' );
+		$control_order = apply_filters( 'radio_station_schedule_control_order', $control_order, $atts );
+		
+		// 2.3.1: add filters for controls
+		$controls = apply_filters( 'radio_station_schedule_controls', $controls, $atts );
+		// print_r( $controls );
+		
+		if ( is_array( $control_order ) && ( count( $control_order ) > 0 ) ) {
+			foreach ( $control_order as $control ) {
+				if ( isset( $controls[$control] ) && ( '' != $control ) ) {
+					$output .= $controls[$control];
+				}
+			}
+		}
+	
+	$output .= '<br></div><br>';
+
+	// --- schedule display override ---
+	// 2.3.1: add full schedule override filter
+	$override = apply_filters( 'radio_station_schedule_override', '', $atts );
+	if ( ( '' != $override ) && strstr( $override, '<!-- OVERRIDE -->' ) ) {
+		$override = str_replace( '<!-- OVERRIDE -->', '', $override );
+		return $output . $override;
+	}
 
 	// -------------------------
 	// New Master Schedule Views

@@ -422,7 +422,7 @@ function radio_station_playlist_metabox() {
 				echo '<div>' . esc_html( __( 'New', 'radio-station' ) ) . ':</div>';
 				$track['playlist_entry_new'] = isset( $track['playlist_entry_new'] ) ? $track['playlist_entry_new'] : false;
 				echo '<div><input type="checkbox" style="display:inline-block;" name="playlist[' . esc_attr( $c ) . '][playlist_entry_new]" ' . checked( $track['playlist_entry_new'] ) . '></div>';
-				echo '<div>' . esc_html( __( 'Status', 'radio-station' ) ) . ':</div>';
+				echo '<div style="margin-left:5px;">' . esc_html( __( 'Status', 'radio-station' ) ) . ':</div>';
 				echo '<div><select name="playlist[' . esc_attr( $c ) . '][playlist_entry_status]">';
 				echo '<option value="queued" ' . selected( $track['playlist_entry_status'], 'queued', false ) . '>' . esc_html__( 'Queued', 'radio-station' ) . '</option>';
 				echo '<option value="played" ' . selected( $track['playlist_entry_status'], 'played', false ) . '>' . esc_html__( 'Played', 'radio-station' ) . '</option>';
@@ -437,15 +437,19 @@ function radio_station_playlist_metabox() {
 	echo '</table>';
 	
 	// 2.3.0: added track meta style fix
-	echo '<style>.track-meta div {display:inline-block; margin-right:3px;}</style>';
+	// 2.3.2: added track meta select font size fix
+	echo '<style>.track-meta div {display:inline-block; margin-right:3px;}
+	.track-meta select {font-size: 12px;}</style>';
 
+	// 2.3.2: change from button-primary to button-secondary
     echo '<center>';
-    echo '<a class="add-track button-primary" style="cursor: pointer; margin-top: 10px;">' . esc_html( __( 'Add Track', 'radio-station' ) ) . '</a>';
+    echo '<a class="add-track button-secondary" style="cursor: pointer; margin-top: 10px;">' . esc_html( __( 'Add Track', 'radio-station' ) ) . '</a>';
     echo '</center>';
     
     echo '<div style="clear: both;"></div>';
 
 	// 2.3.0: set javascript as string to enqueue
+	// 2.3.2: added missing track-meta cell class to script
 	$js = "
 		jQuery(document).ready(function() {
 			var count = " . esc_js( $c ) . ";
@@ -458,9 +462,9 @@ function radio_station_playlist_metabox() {
 					output += '<td><input type=\"text\" name=\"playlist['+count+'][playlist_entry_label]\" value=\"\" style=\"width:150px;\"></td>';
 				output += '</tr><tr id=\"track-'+count+'-rowb\">';
 					output += '<td colspan=\"3\">" . esc_js( __( 'Comments', 'radio-station' ) ) . ": <input type=\"text\" name=\"playlist['+count+'][playlist_entry_comments]\" value=\"\" style=\"width:300px;\"></td>';
-					output += '<td><div>" . esc_js( __( 'New', 'radio-station' ) ) . ":</div>';
+					output += '<td class=\"track-meta\"><div>" . esc_js( __( 'New', 'radio-station' ) ) . ":</div>';
 					output += '<div><input type=\"checkbox\" name=\"playlist['+count+'][playlist_entry_new]\"></div>';
-					output += '<div>" . esc_js( __( 'Status', 'radio-station' ) ) . ":</div>';
+					output += '<div style=\"margin-left:5px;\">" . esc_js( __( 'Status', 'radio-station' ) ) . ":</div>';
 					output += '<div><select name=\"playlist['+count+'][playlist_entry_status]\">';
 						output += '<option value=\"queued\">" . esc_js( __( 'Queued', 'radio-station' ) ) . "</option>';
 						output += '<option value=\"played\">" . esc_js( __( 'Played', 'radio-station' ) ) . "</option>';
@@ -486,6 +490,7 @@ function radio_station_playlist_metabox() {
 
 	echo '</div>';
 
+	// TODO: maybe just trigger click of publish button ?
     echo '<div id="publishing-action-bottom">';
         echo '<br/><br/>';
 
@@ -954,7 +959,9 @@ function radio_station_show_info_metabox() {
 	wp_nonce_field( 'radio-station', 'show_meta_nonce' );
 
 	// --- get show meta ---
+	// 2.3.2: added show download disable switch
 	$file = get_post_meta( $post->ID, 'show_file', true );
+	$download = get_post_meta( $post->ID, 'show_download', true );
 	$email = get_post_meta( $post->ID, 'show_email', true );
 	$active = get_post_meta( $post->ID, 'show_active', true );
 	$link = get_post_meta( $post->ID, 'show_link', true );
@@ -962,23 +969,28 @@ function radio_station_show_info_metabox() {
 
 	// added max-width to prevent metabox overflows
 	// 2.3.0: removed new lines between labels and fields and changed widths
+	// 2.3.2: increase label width to 120px for disable download field label
 	echo '<div id="meta_inner">';
 
-		echo '<p><div style="width:100px; display:inline-block;"><label>' . esc_html( __( 'Active', 'radio-station' ) ) . '?</label></div> 
+		echo '<p><div style="width:120px; display:inline-block;"><label>' . esc_html( __( 'Active', 'radio-station' ) ) . '?</label></div> 
 		<input type="checkbox" name="show_active" ' . checked( $active, 'on', false ) . '> 
 		<em>' . esc_html( __( 'Check this box if show is currently active (Show will not appear on programming schedule if unchecked.)', 'radio-station' ) ) . '</em></p>';
 
-		echo '<p><div style="width:100px; display:inline-block;"><label>' . esc_html( __( 'Website Link', 'radio-station' ) ) . ':</label></div> 
+		echo '<p><div style="width:120px; display:inline-block;"><label>' . esc_html( __( 'Website Link', 'radio-station' ) ) . ':</label></div> 
 		<input type="text" name="show_link" size="100" style="max-width:80%;" value="' . esc_url( $link ) . '" /></p>';
 
-		echo '<p><div style="width:100px; display:inline-block;"><label>' . esc_html( __( 'DJ / Host Email', 'radio-station' ) ) . ':</label></div> 
+		echo '<p><div style="width:120px; display:inline-block;"><label>' . esc_html( __( 'DJ / Host Email', 'radio-station' ) ) . ':</label></div> 
 		<input type="text" name="show_email" size="100" style="max-width:80%;" value="' . esc_attr( $email ) . '" /></p>';
 
-		echo '<p><div style="width:100px; display:inline-block;"><label>' . esc_html( __( 'Latest Audio File', 'radio-station' ) ) . ':</label></div> 
+		echo '<p><div style="width:120px; display:inline-block;"><label>' . esc_html( __( 'Latest Audio File', 'radio-station' ) ) . ':</label></div> 
 		<input type="text" name="show_file" size="100" style="max-width:80%;" value="' . esc_attr( $file ) . '" /></p>';
 
+		// 2.3.2: added show download disable field
+		echo '<p><div style="width:120px; display:inline-block;"><label>' . esc_html( __( 'Disable Download', 'radio-station' ) ) . '?</label></div> 
+		<input type="checkbox" name="show_download" ' . checked( $download, 'on', false ) . '></p>';
+
 		// 2.3.0: added patreon page field
-		echo '<p><div style="width:100px; display:inline-block;"><label>' . esc_html( __( 'Patreon Page ID', 'radio-station' ) ) . ':</label></div>';
+		echo '<p><div style="width:120px; display:inline-block;"><label>' . esc_html( __( 'Patreon Page ID', 'radio-station' ) ) . ':</label></div>';
 		echo ' https://patreon.com/<input type="text" name="show_patreon" size="80" style="max-width:50%;" value="' . esc_attr( $patreon_id ) . '" /></p>';
 
 	echo '</div>';
@@ -1497,8 +1509,10 @@ function radio_station_show_shifts_metabox() {
 	echo '<span id="here"></span>';
 	
 	// 2.3.0: center add shift button
+	// 2.3.2: fix centering by removing span wrapper
+	// 2.3.2: change from button-primary to button-secondary
 	echo '<center>';
-    echo '<span style="text-align: center;"><a class="add-shift button-primary" style="cursor: pointer; display:block; width: 150px; padding: 8px; text-align: center; line-height: 1em;">' . esc_html( __( 'Add Shift', 'radio-station' ) ) . '</a></span>';
+    echo '<a class="add-shift button-secondary" style="cursor: pointer; display:block; width: 150px; padding: 8px; text-align: center; line-height: 1em;">' . esc_html( __( 'Add Shift', 'radio-station' ) ) . '</a>';
     echo '</center>';
 
 	// 2.3.0: added confirmation to remove shift button
@@ -1657,7 +1671,8 @@ function radio_station_show_shifts_metabox() {
 	wp_add_inline_script( 'radio-station-admin', $js );
 
 	// --- shift display styles ---
-	echo '<style>
+	// 2.3.2: added dashed border to new shift
+	echo '<style>#here .show-shift {border 2px dashed green;}
 	.show-shift {
 		list-style: none;
 		margin-bottom: 10px;
@@ -2075,24 +2090,33 @@ function radio_station_show_save_data( $post_id ) {
 		if ( !in_array( $active, array( '', 'on' ) ) ) {
 			$active = '';
 		}
+		// 2.3.2: added download disable switch
+		$download = $_POST['show_download'];
+		if ( !in_array( $active, array( '', 'on' ) ) ) {
+			$download = '';
+		}
 		$link = filter_var( trim( $_POST['show_link'] ), FILTER_SANITIZE_URL );
 		$patreon_id = sanitize_title( $_POST['show_patreon'] );
 
 		// --- get existing values and check if changed ---
 		// 2.3.0: added check against previous values
+		// 2.3.2: added download disable switch
 		$prev_file = get_post_meta( $post_id, 'show_file', true );
+		$prev_download = get_post_meta( $post_id, 'show_download', true );
 		$prev_email = get_post_meta( $post_id, 'show_email', true );
 		$prev_active = get_post_meta( $post_id, 'show_active', true );
 		$prev_link = get_post_meta( $post_id, 'show_link', true );
 		$prev_patreon_id = get_post_meta( $post_id, 'show_patreon', true );
 		if ( ( $prev_file != $file ) || ( $prev_email != $email )
 		     || ( $prev_active != $active ) || ( $prev_link != $link )
-		     || ( $prev_patreon_id != $patreon_id ) ) {
+		     || ( $prev_download != $download ) || ( $prev_patreon_id != $patreon_id ) ) {
 			$show_meta_changed = true;
 		}
 
 		// --- update the show metadata ---
+		// 2.3.2: added download disable switch
 		update_post_meta( $post_id, 'show_file', $file );
+		update_post_meta( $post_id, 'show_download', $download );
 		update_post_meta( $post_id, 'show_email', $email );
 		update_post_meta( $post_id, 'show_active', $active );
 		update_post_meta( $post_id, 'show_link', $link );

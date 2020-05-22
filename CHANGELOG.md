@@ -7,6 +7,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### 2.3.2
+* Update: Plugin Loader (1.1.2) with settings link fix
+* Fixed: added check for empty role capabilities
+* Fixed: added settings submenu redirection fix
+
 ### 2.3.1
 * Update: Plugin Loader (1.1.1) with Freemius first path fix
 * Fixed: conditions for Schedule Override time calculations

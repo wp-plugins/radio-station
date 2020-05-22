@@ -1057,11 +1057,19 @@ function radio_station_current_show_shortcode( $atts ) {
 
 	global $radio_station_data;
 
+	// --- set widget instance ID ---
+	// 2.3.2: added for AJAX loading
+	if ( !isset( $radio_station_data['current_show_instance'] ) ) {
+		$radio_station_data['current_show_instance'] = 0;
+	}
+	$radio_station_data['current_show_instance']++;
+
 	$output = '';
 
 	// --- get shortcode attributes ---
 	// 2.3.0: set default default_name text
 	// 2.3.0: set default time format to plugin setting
+	// 2.3.2: added AJAX load attribute
 	$time_format = radio_station_get_setting( 'clock_time_format' );
 	$defaults = array(
 		// --- legacy options ---
@@ -1081,6 +1089,7 @@ function radio_station_current_show_shortcode( $atts ) {
 		'title_position' => 'right',
 		'link_hosts'     => 0,
 		'countdown'      => 0,
+		'ajax'           => 0,
 		'dynamic'        => 0,
 		'widget'         => 0,
 		'id'             => '',
@@ -1096,6 +1105,38 @@ function radio_station_current_show_shortcode( $atts ) {
 	}
 	// 2.3.0: renamed shortcode identifier to current-show
 	$atts = shortcode_atts( $defaults, $atts, 'current-show' );
+
+	// 2.3.2: enqueue countdown script earlier
+	if ( $atts['countdown'] ) {
+		do_action( 'radio_station_countdown_enqueue' );
+	}
+
+	// --- maybe do AJAX load ---
+	// 2.3.2 added widget AJAX loading
+	$atts['ajax'] = apply_filters( 'radio_station_widgets_ajax_override', $atts['ajax'], 'current-show', $atts['widget'] );
+	if ( $atts['ajax'] && ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) ) {
+	
+		// --- AJAX load via iframe ---
+		$ajax_url = admin_url( 'admin-ajax.php' );
+		$instance = $radio_station_data['current_show_instance'];
+		$html = '<div id="rs-current-show-' . esc_attr( $instance ) . '"></div>';
+		$html .= '<iframe id="rs-current-show-' . esc_attr( $instance ) . '-loader" src="javascript:void(0);" style="display:none;"></iframe>';
+		$html .= "<script>timestamp = Math.floor( (new Date()).getTime() / 1000 );
+			url = '" . esc_url( $ajax_url ) . "?action=radio_station_current_show';
+			url += '&instance=" . esc_attr( $instance ) . "&timestamp='+timestamp;";
+			$html .= "url += '";
+			foreach ( $atts as $key => $value ) {
+				$html .= "&" . esc_attr( $key ) . "=" . esc_attr( $value );
+			}			
+			$html .= "'; ";
+		$html .= "document.getElementById('rs-current-show-" . esc_attr( $instance ) ."-loader').src = url;";
+		$html .= "</script>";
+
+		// --- enqueue shortcode styles ---
+		radio_station_enqueue_style( 'shortcodes' );
+	
+		return $html;
+	}
 
 	// 2.3.0: maybe set float class and avatar width style
 	$widthstyle = $floatclass = '';
@@ -1411,7 +1452,6 @@ function radio_station_current_show_shortcode( $atts ) {
 		// --- countdown timer display ---
 		if ( isset( $current_shift_end ) && $atts['countdown'] ) {
 			$html['countdown'] = '<div class="current-show-countdown rs-countdown"></div>';
-			do_action( 'radio_station_countdown_enqueue' );
 		}
 
 		// --- show description ---
@@ -1429,6 +1469,8 @@ function radio_station_current_show_shortcode( $atts ) {
 				$excerpt .= ' <a href="' . esc_url( $permalink ) . '">' . $more . '</a>';
 			} else {
 				$excerpt = "<!-- Trimmed Excerpt -->";
+				$excerpt .= "<!-- Post ID: " . $show_post->ID . " -->";
+				$excerpt .= "<!-- Post Content: " . $show_post->post_content . " -->";
 				$excerpt .= radio_station_trim_excerpt( $show_post->post_content, $length, $more, $permalink );
 			}
 
@@ -1510,6 +1552,45 @@ function radio_station_current_show_shortcode( $atts ) {
 }
 
 // ------------------------
+// AJAX Current Show Loader
+// ------------------------
+// 2.3.2: added AJAX current show loader
+add_action( 'wp_ajax_radio_station_current_show', 'radio_station_current_show' );
+add_action( 'wp_ajax_nopriv_radio_station_current_show', 'radio_station_current_show' );
+function radio_station_current_show() {
+
+	// --- sanitize shortcode attributes ---
+	$atts = radio_station_sanitize_shortcode_values( 'current-show' );
+
+	// --- output widget contents ---
+	echo '<div id="widget-contents">';
+	echo radio_station_current_show_shortcode( $atts );
+	echo '</div>';
+
+	$js = '';
+	if ( isset( $atts['instance'] ) ) {
+
+		// --- send to parent window ---
+		$js .= "widget = document.getElementById('widget-contents').innerHTML;" . PHP_EOL;
+		$js .= "parent.document.getElementById('rs-current-show-" . esc_js( $atts['instance'] ) . "').innerHTML = widget;" . PHP_EOL;
+	
+		// --- restart countdowns ---
+		$js .= "parent.radio_countdown();" . PHP_EOL;
+		
+	}
+
+	// --- filter load script ---
+	$js = apply_filters( 'radio_station_current_show_load_script', $js, $atts );
+
+	// --- output javascript
+	if ( '' != $js ) {
+		echo "<script>" . $js . "</script>";
+	}
+	
+	exit;
+}
+
+// ------------------------
 // Upcoming Shows Shortcode
 // ------------------------
 // [upcoming-shows] / [dj-coming-up-widget]
@@ -1522,9 +1603,17 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 	global $radio_station_data;
 
+	// --- set widget instance ID ---
+	// 2.3.2: added for AJAX loading
+	if ( !isset( $radio_station_data['upcoming_shows_instance'] ) ) {
+		$radio_station_data['upcoming_shows_instance'] = 0;
+	}
+	$radio_station_data['upcoming_shows_instance']++;
+
 	$output = '';
 
 	// 2.3.0: set default time format to plugin setting
+	// 2.3.2: added AJAX load attribute
 	$time_format = radio_station_get_setting( 'clock_time_format' );
 	$defaults = array(
 		// --- legacy options ---
@@ -1543,6 +1632,7 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 		'avatar_width'      => '',
 		'title_position'    => 'right',
 		'countdown'         => 0,
+		'ajax'              => 0,
 		'dynamic'           => 0,
 		'widget'            => 0,
 		'id'                => '',
@@ -1558,6 +1648,38 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 	}
 	// 2.3.0: renamed shortcode identifier to upcoming-shows
 	$atts = shortcode_atts( $defaults, $atts, 'upcoming-shows' );
+
+	// 2.3.2: enqueue countdown script earlier
+	if ( $atts['countdown'] ) {
+		do_action( 'radio_station_countdown_enqueue' );
+	}
+
+	// --- maybe do AJAX load ---
+	// 2.3.2 added widget AJAX loading
+	$atts['ajax'] = apply_filters( 'radio_station_widgets_ajax_override', $atts['ajax'], 'upcoming-shows', $atts['widget'] );
+	if ( $atts['ajax'] && ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) ) {
+	
+		// --- AJAX load via iframe ---
+		$ajax_url = admin_url( 'admin-ajax.php' );
+		$instance = $radio_station_data['upcoming_shows_instance'];
+		$html = '<div id="rs-upcoming-shows-' . esc_attr( $instance ) . '"></div>';
+		$html .= '<iframe id="rs-upcoming-shows-' . esc_attr( $instance ) . '-loader" src="javascript:void(0);" style="display:none;"></iframe>';
+		$html .= "<script>timestamp = Math.floor( (new Date()).getTime() / 1000 );
+			url = '" . esc_url( $ajax_url ) . "?action=radio_station_upcoming_shows';
+			url += '&instance=" . esc_attr( $instance ) . "&timestamp='+timestamp;";
+			$html .= "url += '";
+			foreach ( $atts as $key => $value ) {
+				$html .= "&" . esc_attr( $key ) . "=" . esc_attr( $value );
+			}			
+			$html .= "'; ";
+		$html .= "document.getElementById('rs-upcoming-shows-" . esc_attr( $instance ) ."-loader').src = url;";
+		$html .= "</script>";
+
+		// --- enqueue shortcode styles ---
+		radio_station_enqueue_style( 'shortcodes' );
+	
+		return $html;
+	}
 
 	// 2.2.4: maybe set float class and avatar width style
 	// 2.3.0: moved here from upcoming widget class
@@ -1854,9 +1976,6 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 	// 2.3.0: added for countdowns
 	if ( isset( $next_start_time ) && ( $atts['countdown'] || $atts['dynamic'] ) ) {
 
-		// --- enqueue countdown javascript ---
-		do_action( 'radio_station_countdown_enqueue' );
-
 		// --- hidden input for next start time ---
 		$output .= '<input type="hidden" class="upcoming-show-times" value="' . esc_attr( $next_start_time ) . '-' . esc_attr( $next_end_time ) . '">';
 		if ( RADIO_STATION_DEBUG ) {
@@ -1888,6 +2007,45 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 	return $output;
 }
 
+// --------------------------
+// AJAX Upcoming Shows Loader
+// --------------------------
+// 2.3.2: added AJAX upcoming shows loader
+add_action( 'wp_ajax_radio_station_upcoming_shows', 'radio_station_upcoming_shows' );
+add_action( 'wp_ajax_nopriv_radio_station_upcoming_shows', 'radio_station_upcoming_shows' );
+function radio_station_upcoming_shows() {
+
+	// --- sanitize shortcode attributes ---
+	$atts = radio_station_sanitize_shortcode_values( 'upcoming-shows' );
+	
+	// --- output widget contents ---
+	echo '<div id="widget-contents">';
+	echo radio_station_upcoming_shows_shortcode( $atts );
+	echo '</div>';
+
+	$js = '';
+	if ( isset( $atts['instance'] ) ) {
+
+		// --- send to parent window ---
+		$js .= "widget = document.getElementById('widget-contents').innerHTML;" . PHP_EOL;
+		$js .= "parent.document.getElementById('rs-upcoming-shows-" . esc_js( $atts['instance'] ) . "').innerHTML = widget;" . PHP_EOL;
+	
+		// --- restart countdowns ---
+		$js .= "parent.radio_countdown();" . PHP_EOL;
+
+	}
+
+	// --- filter load script ---
+	$js = apply_filters( 'radio_station_upcoming_shows_load_script', $js, $atts );
+
+	// --- output javascript
+	if ( '' != $js ) {
+		echo "<script>" . $js . "</script>";
+	}
+	
+	exit;
+}
+
 // ---------------------
 // Now Playing Shortcode
 // ---------------------
@@ -1899,9 +2057,17 @@ function radio_station_current_playlist_shortcode( $atts ) {
 
 	global $radio_station_data;
 
+	// --- set widget instance ID ---
+	// 2.3.2: added for AJAX loading
+	if ( !isset( $radio_station_data['current_playlist_instance'] ) ) {
+		$radio_station_data['current_playlist_instance'] = 0;
+	}
+	$radio_station_data['current_playlist_instance']++;
+
 	$output = '';
 
 	// --- get shortcode attributes ---
+	// 2.3.2: added AJAX load attribute
 	$defaults = array(
 		// --- legacy options ---
 		'title'     => '',
@@ -1911,6 +2077,7 @@ function radio_station_current_playlist_shortcode( $atts ) {
 		'label'     => 0,
 		'comments'  => 0,
 		// --- new options ---
+		'ajax'      => 0,
 		'countdown' => 0,
 		'dynamic'   => 0,
 		'widget'    => 0,
@@ -1918,6 +2085,38 @@ function radio_station_current_playlist_shortcode( $atts ) {
 	);
 	// 2.3.0: renamed shortcode identifier to current-playlist
 	$atts = shortcode_atts( $defaults, $atts, 'current-playlist' );
+
+	// 2.3.2: enqueue countdown script earlier
+	if ( $atts['countdown'] ) {
+		do_action( 'radio_station_countdown_enqueue' );
+	}
+
+	// --- maybe do AJAX load ---
+	// 2.3.2 added widget AJAX loading
+	$atts['ajax'] = apply_filters( 'radio_station_widgets_ajax_override', $atts['ajax'], 'current-playlist', $atts['widget'] );
+	if ( $atts['ajax'] && ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) ) {
+	
+		// --- AJAX load via iframe ---
+		$ajax_url = admin_url( 'admin-ajax.php' );
+		$instance = $radio_station_data['current_playlist_instance'];
+		$html = '<div id="rs-current-playlist-' . esc_attr( $instance ) . '"></div>';
+		$html .= '<iframe id="rs-current-playlist-' . esc_attr( $instance ) . '-loader" src="javascript:void(0);" style="display:none;"></iframe>';
+		$html .= "<script>timestamp = Math.floor( (new Date()).getTime() / 1000 );
+			url = '" . esc_url( $ajax_url ) . "?action=radio_station_current_playlist';
+			url += '&instance=" . esc_attr( $instance ) . "&timestamp='+timestamp;";
+			$html .= "url += '";
+			foreach ( $atts as $key => $value ) {
+				$html .= "&" . esc_attr( $key ) . "=" . esc_attr( $value );
+			}			
+			$html .= "'; ";
+		$html .= "document.getElementById('rs-current-playlist-" . esc_attr( $instance ) ."-loader').src = url;";
+		$html .= "</script>";
+
+		// --- enqueue shortcode styles ---
+		radio_station_enqueue_style( 'shortcodes' );
+	
+		return $html;
+	}
 
 	// --- fetch the current playlist ---
 	$playlist = radio_station_get_now_playing();
@@ -2044,7 +2243,6 @@ function radio_station_current_playlist_shortcode( $atts ) {
 						// --- for countdown timer display ---
 						if ( $atts['countdown'] ) {
 							$html['countdown'] .= '<div class="show-playlist-countdown rs-countdown"></div>';
-							do_action( 'radio_station_countdown_enqueue' );
 						}
 
 						// --- for dynamic reloading ---
@@ -2090,6 +2288,46 @@ function radio_station_current_playlist_shortcode( $atts ) {
 	
 	return $output;
 }
+
+// ----------------------------
+// AJAX Current Playlist Loader
+// ----------------------------
+// 2.3.2: added AJAX current playlist loader
+add_action( 'wp_ajax_radio_station_current_playlist', 'radio_station_current_playlist' );
+add_action( 'wp_ajax_nopriv_radio_station_current_playlist', 'radio_station_current_playlist' );
+function radio_station_current_playlist() {
+
+	// --- sanitize shortcode attributes ---
+	$atts = radio_station_sanitize_shortcode_values( 'current-playlist' );
+	
+	// --- output widget contents ---
+	echo '<div id="widget-contents">';
+	echo radio_station_current_playlist_shortcode( $atts );
+	echo '</div>';
+	
+	$js = '';
+	if ( isset( $atts['instance'] ) ) {
+
+		// --- send to parent window ---
+		$js .= "widget = document.getElementById('widget-contents').innerHTML;" . PHP_EOL;
+		$js .= "parent.document.getElementById('rs-current-playlist-" . esc_js( $atts['instance'] ) . "').innerHTML = widget;" . PHP_EOL;
+	
+		// --- restart countdowns ---
+		$js .= "parent.radio_countdown();" . PHP_EOL;
+
+	}
+
+	// --- filter load script ---
+	$js = apply_filters( 'radio_station_current_playlist_load_script', $js, $atts );
+
+	// --- output javascript
+	if ( '' != $js ) {
+		echo "<script>" . $js . "</script>";
+	}
+	
+	exit;
+}
+
 
 // ----------------
 // Countdown Script

@@ -61,5 +61,6 @@ There are filters throughout the plugin that allow you to override data values a
 
 You can add your own custom filters via a Code Snippets plugin (which has the advantage of checking syntax for you), or in your Child Theme's `functions.php`, or in a file with a PHP extension in your `/wp-content/mu-plugins/` directory. 
 
-Currently you can find these filters by searching the plugin code for `apply_filters`. We will be gradually adding to the list of available filters here in future documentation.
+### Filter List
 
+Currently you can find these filters by searching the plugin code for `apply_filters( 'radio_station'`. Af full list of available filters will be gradually added here in future plugin documentation.

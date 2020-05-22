@@ -67,6 +67,7 @@
 // - Trim Excerpt
 // - Shorten String
 // - Sanitize Values
+// - Sanitize Shortcode Values
 // === Translations ===
 // - Translate Weekday
 // - Translate Month
@@ -2827,30 +2828,40 @@ function radio_station_get_language( $lang = false ) {
 // 2.3.0: added permalink argument
 function radio_station_trim_excerpt( $content, $length = false, $more = false, $permalink = false ) {
 
+	$excerpt = '';
 	$raw_content = $content;
-	$content = strip_shortcodes( $content );
-	// TODO: check for Gutenberg plugin-only equivalent ?
-	if ( function_exists( 'excerpt_remove_blocks' ) ) {
-		$content = excerpt_remove_blocks( $content );
-	}
-	$content = apply_filters( 'the_content', $content );
-	$content = str_replace( ']]>', ']]&gt;', $content );
+	
+	// 2.3.2: added check for content
+	if ( '' != trim( $content ) ) {
+		
+		$content = strip_shortcodes( $content );
 
-	if ( !$length ) {
-		$length = 35;
-		// $length = apply_filters( 'radio_station_excerpt_length', $length );
-		$length = (int) apply_filters( 'radio_station_excerpt_length', $length );
+		if ( function_exists( 'excerpt_remove_blocks' ) ) {
+			$content = excerpt_remove_blocks( $content );
+		} 
+		// TODO: check for Gutenberg plugin-only equivalent ?
+		// elseif ( function_exists( 'gutenberg_remove_blocks' ) {
+		//	$content = gutenberg_remove_blocks( $content );
+		// }
+		$content = apply_filters( 'the_content', $content );
+		$content = str_replace( ']]>', ']]&gt;', $content );
+
+		if ( !$length ) {
+			$length = 35;
+			// $length = apply_filters( 'radio_station_excerpt_length', $length );
+			$length = (int) apply_filters( 'radio_station_excerpt_length', $length );
+		}
+		if ( !$more ) {
+			$more = ' [&hellip;]';
+			// $more = apply_filters( 'excerpt_more', $more);
+			$more = apply_filters( 'radio_station_excerpt_more', ' [&hellip;]' );
+		}
+		// 2.3.0: added link wrapper
+		if ( $permalink ) {
+			$more = ' <a href="'. esc_url( $permalink ) . '">' . $more . '</a>';
+		}
+		$excerpt = wp_trim_words( $content, $length, $more );
 	}
-	if ( !$more ) {
-		$more = ' [&hellip;]';
-		// $more = apply_filters( 'excerpt_more', $more);
-		$more = apply_filters( 'radio_station_excerpt_more', ' [&hellip;]' );
-	}
-	// 2.3.0: added link wrapper
-	if ( $permalink ) {
-		$more = ' <a href="'. esc_url( $permalink ) . '">' . $more . '</a>';
-	}
-	$excerpt = wp_trim_words( $content, $length, $more );
 
 	$excerpt = apply_filters( 'radio_station_trim_excerpt', $excerpt, $raw_content, $length, $more, $permalink );
 	return $excerpt;
@@ -2882,6 +2893,91 @@ function radio_station_sanitize_values( $data, $keys ) {
 		}
 	}
 	return $sanitized;
+}
+
+// -------------------------
+// Sanitize Shortcode Values
+// -------------------------
+// 2.3.2: added for AJAX widget loading
+function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
+
+	$atts = array();
+	
+	if ( 'current-show' == $type ) {
+
+		// --- current show attribute keys ---
+		$keys = array(
+			'title'          => 'text',
+			'limit'          => 'integer',
+			'show_avatar'    => 'boolean',
+			'show_link'      => 'boolean',
+			'show_sched'     => 'boolean',
+			'show_playlist'  => 'boolean',
+			'show_all_sched' => 'boolean',
+			'show_desc'      => 'boolean',
+			'time'           => 'integer',
+			'default_name'   => 'text',
+			'display_hosts'  => 'boolean',
+			'link_hosts'     => 'boolean',
+			'avatar_width'   => 'integer',
+			'title_position' => 'slug',
+			'ajax_load'      => 'boolean',
+			'countdown'      => 'boolean',
+			'dynamic'        => 'boolean',
+			'widget'         => 'boolean',
+			'id'             => 'integer',
+			'instance'       => 'integer',
+		);
+	
+	} elseif ( 'upcoming-shows' == $type ) {
+
+		// --- upcoming shows attribute keys ---
+		$keys = array(
+			'title'          => 'text',
+			'limit'          => 'integer',
+			'show_avatar'    => 'boolean',
+			'show_link'      => 'boolean',
+			'time'           => 'integer',
+			'show_sched'     => 'boolean',
+			'default_name'   => 'string',
+			'display_hosts'  => 'boolean',
+			'link_hosts'     => 'boolean',
+			'avatar_width'   => 'integer',
+			'title_position' => 'slug',
+			'ajax_load'      => 'boolean',
+			'countdown'      => 'boolean',
+			'dynamic'        => 'boolean',
+			'widget'         => 'boolean',
+			'id'             => 'integer',
+			'instance'       => 'integer',
+		);
+		
+	} elseif ( 'current-playlist' == $type ) {
+	
+		// --- current playlist attribute keys ---
+		$keys = array(
+			'title'     => 'text',
+			'artist'    => 'boolean',
+			'song'      => 'boolean',
+			'album'     => 'boolean',
+			'label'     => 'boolean',
+			'comments'  => 'boolean',
+			'ajax_load' => 'boolean',
+			'countdown' => 'boolean',
+			'dynamic'   => 'boolean',
+			'widget'    => 'boolean',
+			'id'        => 'integer',
+			'instance'  => 'integer',
+		);	
+	}
+	
+	// --- handle extra keys ---
+	if ( $extras && is_array( $extras ) && ( count( $extras ) > 0 ) ) {
+		$keys = array_merge( $keys, $extras );
+	}
+	
+	$atts = radio_station_sanitize_values( $_REQUEST, $keys );
+	return $atts;
 }
 
 

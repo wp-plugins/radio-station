@@ -22,6 +22,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 	public function form( $instance ) {
 
 		$instance = wp_parse_args( (array) $instance, array( 'title' => '' ) );
+		
 		$title = $instance['title'];
 		$display_djs = isset( $instance['display_djs'] ) ? $instance['display_djs'] : false;
 		$djavatar = isset( $instance['djavatar'] ) ? $instance['djavatar'] : false;
@@ -32,15 +33,25 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		$show_sched = isset( $instance['show_sched'] ) ? $instance['show_sched'] : false;
 
 		// 2.2.4: added title position, avatar width and DJ link options
+		// 2.3.0: added countdown field option
+		// 2.3.2: added AJAX load option
 		$title_position = isset( $instance['title_position'] ) ? $instance['title_position'] : 'right';
 		$avatar_width = isset( $instance['avatar_width'] ) ? $instance['avatar_width'] : '75';
 		$link_djs = isset( $instance['link_djs'] ) ? $instance['link_djs'] : '';
-		// 2.3.0: added countdown field option
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : '';
+		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : 0;
 
 		// 2.3.0: convert template style code to straight php echo
+		// 2.3.2: added AJAX load option field
 		$fields = '
 		<p>
+			<label for="' . esc_attr( $this->get_field_id( 'ajax' ) ) . '">
+			<input id="' .esc_attr( $this->get_field_id( 'ajax' ) ) . '" name="' . esc_attr( $this->get_field_name( 'ajax' ) ) . '" type="checkbox" ' . checked( $ajax, true, false ) . '>
+				' . esc_html( __( 'AJAX Load Widget?', 'radio-station' ) ) . '
+			</label>
+        </p>
+        
+        <p>
 			<label for="' . esc_attr( $this->get_field_id( 'title' ) ) . '">
 				' . esc_html( __( 'Title', 'radio-station' ) ) . ':
 				<input class="widefat" id="' . esc_attr( $this->get_field_id( 'title' ) ) . '" name="' . esc_attr( $this->get_field_name( 'title' ) ) . '" type="text" value="' . esc_attr( $title ) . '" />
@@ -151,6 +162,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 	public function update( $new_instance, $old_instance ) {
 
 		$instance = $old_instance;
+		
 		$instance['title'] = $new_instance['title'];
 		$instance['display_djs'] = isset( $new_instance['display_djs'] ) ? 1 : 0;
 		$instance['djavatar'] = isset( $new_instance['djavatar'] ) ? 1 : 0;
@@ -162,10 +174,12 @@ class DJ_Upcoming_Widget extends WP_Widget {
 
 		// 2.2.4: added title position, avatar width and DJ link settings
 		// 2.3.0: added countdown display option
+		// 2.3.2: added AJAX load option
 		$instance['title_position'] = $new_instance['title_position'];
 		$instance['avatar_width'] = $new_instance['avatar_width'];
 		$instance['link_djs'] = isset( $new_instance['link_djs'] ) ? 1 : 0;
 		$instance['countdown'] = isset( $new_instance['countdown'] ) ? 1 : 0;
+		$instance['ajax'] = isset( $new_instance['ajax'] ) ? 1 : 0;
 
 		// 2.3.0: added widget filter instance to update
 		$instance = apply_filters( 'radio_station_upcoming_shows_widget_update', $instance, $new_instance, $old_instance );
@@ -198,14 +212,17 @@ class DJ_Upcoming_Widget extends WP_Widget {
 
 		// 2.2.4: added title position, avatar width and DJ link settings
 		// 2.3.0: added countdown display option
+		// 2.3.2: added AJAX load option
 		$position = empty( $instance['title_position'] ) ? 'right' : $instance['title_position'];
 		$width = empty( $instance['avatar_width'] ) ? '75' : $instance['avatar_width'];
 		$link_djs = isset( $instance['link_djs'] ) ? $instance['link_djs'] : '';
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : 0;
 		$dynamic = isset( $instance['dynamic'] ) ? $instance['dynamic'] : 0;
+		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : 0;
 
 		// --- set shortcode attributes ---
 		// 2.3.0: map widget options to shortcode attributes
+		// 2.3.2: added AJAX load option
 		$atts = array(
 			// --- legacy widget options ---
 			'title'          => $title,
@@ -226,6 +243,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			'dynamic'        => $dynamic,
 			'widget'         => 1,
 			'id'             => $id,
+			'ajax'           => $ajax,
 		);
 
 		// --- before widget ---

@@ -1,5 +1,5 @@
 === Radio Station ===
-Contributors: tonyzeoli, majick, nourma
+Contributors: tonyzeoli, majick
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
@@ -183,6 +183,12 @@ You may translate the plugin into another language. Please visit our [WordPress 
 8. Show Conflict Display
 
 == Changelog ==
+
+= 2.3.2 =
+* Update: Plugin Loader (1.1.2) with settings link fix
+* Fixed: added check for empty role capabilities
+* Fixed: added settings submenu redirection fix
+* Added: AJAX widget load option (to bypass page caches)
 
 = 2.3.1 =
 * Update: Plugin Loader (1.1.1) with Freemius first path fix

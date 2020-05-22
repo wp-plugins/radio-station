@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.3.1
+Version: 2.3.1.1
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -98,6 +98,7 @@ define( 'RADIO_STATION_PRODUCER_SLUG', 'rs-producer' );
 
 // --- check and define CPT slugs ---
 // TODO: prefix original slugs and update post/taxonomy data
+// ... and then add new slugs to template hierarchy ...
 if ( get_option( 'radio_show_cpts_prefixed' ) ) {
 	define( 'RADIO_STATION_SHOW_SLUG', 'rs-show' );
 	define( 'RADIO_STATION_PLAYLIST_SLUG', 'rs-playlist' );
@@ -133,9 +134,17 @@ require RADIO_STATION_DIR . '/includes/class-current-show-widget.php';
 require RADIO_STATION_DIR . '/includes/class-upcoming-shows-widget.php';
 require RADIO_STATION_DIR . '/includes/class-current-playlist-widget.php';
 
+// --- Player ---
+// 2.3.1.1: load radio player prototype (if present)
+$player_file = RADIO_STATION_DIR . '/player/radio-player.php';
+if ( file_exists( $player_file ) ) {
+	require $player_file;
+}
+
 // --- Feature Development ---
 // 2.3.0: add feature branch development includes
-$features = array( 'class-radio-clock-widget', 'import-export' );
+// 2.3.1: added radio player widget file
+$features = array( 'class-radio-clock-widget', 'class-radio-player-widget', 'import-export' );
 foreach ( $features as $feature ) {
 	$filepath = RADIO_STATION_DIR . '/includes/' . $feature . '.php';
 	if ( file_exists ( $filepath ) ) {
@@ -336,6 +345,27 @@ $options = array(
 		'pro'     => true,
 	),
 
+	// --- [Pro] Available Views ===
+	// 2.3.2: added additional views option
+	'schedule_views'      => array(
+		'type'    => 'multicheck',
+		'label'   => __( 'Available Views', 'radio-station' ),
+		// note: unstyled list view not included in defaults
+		'default' => array( 'table', 'tabs' ),
+		'value'		=> 'yes',
+		'options'	=> array(
+			'table' => __( 'Table View', 'radio-station' ),
+			'tabs'  => __( 'Tabbed View', 'radio-station' ),
+			'list'  => __( 'List View', 'radio-station' ),
+			// 'grid'  => __( 'Grid View', 'radio-station' ),
+			// 'calendar' => __( 'Calendar View', 'radio-station' );
+		),
+		'helper'  => __( 'Switcher Views available on Master Schedule.', 'radio-station' ),
+		'tab'     => 'pages',
+		'section' => 'schedule',
+		'pro'     => true,
+	),
+
 	// === Show Page ===
 
 	// --- Show Blocks Position ---
@@ -368,9 +398,10 @@ $options = array(
 	),
 
 	// --- Show Header Image ---
+	// 2.3.2: added plural to option label
 	'show_header_image' => array(
 		'type'    => 'checkbox',
-		'label'   => __( 'Content Header Image', 'radio-station' ),
+		'label'   => __( 'Content Header Images', 'radio-station' ),
 		'value'   => 'yes',
 		'default' => '',
 		'helper'  => __( 'If your chosen template does not display the Featured Image, enable this and use the Content Header Image box on the Show edit screen instead.', 'radio-station' ),
@@ -455,13 +486,13 @@ $options = array(
 		'section' => 'archives',
 	),
 
-	// ? --- Override Shows Archive --- ?
+	// ? --- Redirect Shows Archive --- ?
 	// 'show_archive_override' => array(
-	// 	'label'   => __( 'Override Shows Archive', 'radio-station' ),
+	// 	'label'   => __( 'Redirect Shows Archive', 'radio-station' ),
 	// 	'type'    => 'checkbox',
 	// 	'value'   => 'yes',
 	// 	'default' => '',
-	// 	'helper'  => __( '', 'radio-station' ),
+	// 	'helper'  => __( 'Redirect Custom Post Type Archive for Shows to Shows Archive Page.', 'radio-station' ),
 	// 	'tab'     => 'pages',
 	// 	'section' => 'archives',
 	// ),
@@ -488,13 +519,13 @@ $options = array(
 		'section' => 'archives',
 	),
 
-	// ? --- Override Overrides Archive --- ?
+	// ? --- Redirect Overrides Archive --- ?
 	// 'override_archive_override' => array(
-	// 	'label'   => __( 'Override Overrides Archive', 'radio-station' ),
+	// 	'label'   => __( 'Redirect Overrides Archive', 'radio-station' ),
 	// 	'type'    => 'checkbox',
 	// 	'value'   => 'yes',
 	// 	'default' => '',
-	// 	'helper'  => __( '', 'radio-station' ),
+	// 	'helper'  => __( 'Redirect Custom Post Type Archive for Overrides to Overrides Archive Page.', 'radio-station' ),
 	// 	'tab'     => 'pages',
 	// 	'section' => 'archives',
 	// ),
@@ -521,13 +552,13 @@ $options = array(
 		'section' => 'archives',
 	),
 
-	// ? --- Override Playlists Archive --- ?
+	// ? --- Redirect Playlists Archive --- ?
 	// 'playlist_archive_override' => array(
-	// 	'label'   => __( 'Override Playlists Archive', 'radio-station' ),
+	// 	'label'   => __( 'Redirect Playlists Archive', 'radio-station' ),
 	// 	'type'    => 'checkbox',
 	// 	'value'   => 'yes',
 	// 	'default' => '',
-	// 	'helper'  => __( '', 'radio-station' ),
+	// 	'helper'  => __( 'Redirect Custom Post Type Archive for Playlists to Playlist Archive Page.', 'radio-station' ),
 	// 	'tab'     => 'pages',
 	// 	'section' => 'archives',
 	// ),
@@ -554,13 +585,13 @@ $options = array(
 		'section' => 'archives',
 	),
 
-	// ? --- Override Genres Archives --- ?
+	// ? --- Redirect Genres Archives --- ?
 	// 'genre_archive_override' => array(
-	//  'label'   => __( 'Override Genres Archive', 'radio-station' ),
+	//  'label'   => __( 'Redirect Genres Archive', 'radio-station' ),
 	//	'type'    => 'checkbox',
 	//	'value'   => 'yes',
 	//	'default' => '',
-	//	'helper'  => __( '', 'radio-station' ),
+	//	'helper'  => __( 'Redirect Taxonomy Archive for Genres to Genres Archive Page.', 'radio-station' ),
 	//	'tab'     => 'pages',
 	//	'section' => 'archives',
 	// ),
@@ -920,8 +951,12 @@ add_action( 'wp_enqueue_scripts', 'radio_station_localize_script' );
 function radio_station_localize_script() {
 
 	// --- create settings object ---
-	$js = "var radio = {}; ";
+	$js = "var radio = {}; radio.labels = {}; radio.units = P{;";
 
+	// --- set AJAX URL ---
+	// 2.3.2: add admin AJAX URL
+	$js .= "radio.ajax_url = '" . esc_url( admin_url( 'admin-ajax.php' ) ) . "'; " . PHP_EOL;
+	
 	// --- clock time format ---
 	$clock_format = radio_station_get_setting( 'clock_time_format' );
 	$js .= "radio.clock_format = '" . esc_js( $clock_format ) . "'; " . PHP_EOL;
@@ -1004,6 +1039,7 @@ function radio_station_localize_script() {
 	$js .= ");" . PHP_EOL;
 
 	// --- translated time unit strings ---
+	// TODO: convert units to single object
 	$js .= "radio.units_am = '" . esc_js( radio_station_translate_meridiem( 'am' ) ) . "'; " . PHP_EOL;
 	$js .= "radio.units_pm = '" . esc_js( radio_station_translate_meridiem( 'pm' ) ) . "'; " . PHP_EOL;
 	$js .= "radio.units_second = '" . esc_js( __( 'Second', 'radio-station' ) ) . "'; " . PHP_EOL;
@@ -1025,6 +1061,33 @@ function radio_station_localize_script() {
 	// --- add inline script ---
 	wp_add_inline_script( 'radio-station', $js );
 
+}
+
+// -----------------------------------------
+// Fix to Redirect Plugin Settings Menu Link
+// -----------------------------------------
+// 2.3.2: added settings submenu page redirection fix
+add_action( 'init', 'radio_station_settings_page_redirect' );
+function radio_station_settings_page_redirect() {
+	
+	// --- bug out if not admin page ---
+	if ( !is_admin() ) {
+		return;
+	}
+
+	// --- but out if not plugin settings page ---
+	if ( !isset( $_REQUEST['page'] ) || ( 'radio-station' != $_REQUEST['page'] ) ) {
+		return;
+	}
+
+	// --- check if link is for options-general.php ---
+	if ( strstr( $_SERVER['REQUEST_URI'], '/options-general.php' ) ) {
+	
+		// --- redirect to plugin settings page (admin.php) ---	
+		$url = add_query_arg( 'page', 'radio-station', admin_url( 'admin.php' ) );
+		wp_redirect( $url );
+		exit;
+	}
 }
 
 
@@ -1878,9 +1941,13 @@ function radio_station_set_roles() {
 	// 2.3.0: check/add profile capabilities to hosts
 	$wp_roles->add_role( 'dj', __( 'DJ / Host', 'radio-station' ), $caps );
 	$role_caps = $wp_roles->roles['dj']['capabilities'];
+	// 2.3.1.1: added check if role caps is an array
+	if ( !is_array( $role_caps ) ) {
+		$role_caps = array();
+	}
 	$host_caps = array( 'edit_hosts', 'edit_published_hosts', 'delete_hosts', 'read_hosts', 'publish_hosts' );
 	foreach ( $host_caps as $cap ) {
-		if ( !array_key_exists( $cap, $role_caps ) || ( !$role_caps[$cap] ) ) {
+		if ( !array_key_exists( $cap, $role_caps ) || !$role_caps[$cap] ) {
 			$wp_roles->add_cap( 'dj', $cap, true );
 		}
 	}
@@ -1889,9 +1956,13 @@ function radio_station_set_roles() {
 	// 2.3.0: add equivalent capability role for Show Producer
 	$wp_roles->add_role( 'producer', __( 'Show Producer', 'radio-station' ), $caps );
 	$role_caps = $wp_roles->roles['producer']['capabilities'];
+	// 2.3.1.1: added check if role caps is an array
+	if ( !is_array( $role_caps ) ) {
+		$role_caps = array();
+	}
 	$producer_caps = array( 'edit_producers', 'edit_published_producers', 'delete_producers', 'read_producers', 'publish_producers' );
 	foreach ( $producer_caps as $cap ) {
-		if ( !array_key_exists( $cap, $role_caps ) || ( !$role_caps[$cap] ) ) {
+		if ( !array_key_exists( $cap, $role_caps ) || !$role_caps[$cap] ) {
 			$wp_roles->add_cap( 'producer', $cap, true );
 		}
 	}
@@ -1964,6 +2035,10 @@ function radio_station_set_roles() {
 
 		// --- grant show edit capabilities to author users ---
 		$author_caps = $wp_roles->roles['author']['capabilities'];
+		// 2.3.1.1: added check if role caps is an array
+		if ( !is_array( $author_caps ) ) {
+			$author_caps = array();
+		}
 		$extra_caps = array(
 			'edit_shows',
 			'edit_published_shows',
@@ -2045,6 +2120,10 @@ function radio_station_set_roles() {
 
 		// --- grant show edit capabilities to editor users ---
 		$editor_caps = $wp_roles->roles['editor']['capabilities'];
+		// 2.3.1.1: added check if capabilities is an array
+		if ( !is_array( $editor_caps ) ) {
+			$editor_caps = array();
+		}
 		foreach ( $edit_caps as $cap ) {
 			if ( !array_key_exists( $cap, $editor_caps ) || ( !$editor_caps[$cap] ) ) {
 				$wp_roles->add_cap( 'editor', $cap, true );
@@ -2054,6 +2133,10 @@ function radio_station_set_roles() {
 
 	// --- grant all plugin capabilities to admin users ---
 	$admin_caps = $wp_roles->roles['administrator']['capabilities'];
+	// 2.3.1.1: added check if capabilities is an array
+	if ( !is_array( $admin_caps ) ) {
+		$admin_caps = array();
+	}
 	foreach ( $edit_caps as $cap ) {
 		if ( !array_key_exists( $cap, $admin_caps ) || ( !$admin_caps[$cap] ) ) {
 			$wp_roles->add_cap( 'administrator', $cap, true );
@@ -2072,7 +2155,7 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args ) {
 	global $post, $wp_roles;
 
 	// --- check if super admin ---
-	// 2.3.1: fix to not revoke edit caps from super admin
+	// ? fix to not revoke edit caps from super admin ?
 	// (not implemented, causing connection reset error)
 	// if ( function_exists( 'is_super_admin' ) && is_super_admin() ) {
 	//	return $allcaps;
@@ -2189,7 +2272,8 @@ function radio_station_debug( $data, $echo = true, $file = false ) {
 	// --- maybe output debug info ---
 	if ( $echo ) {
 		// 2.3.0: added span wrap for hidden display
-		echo '<span style="display:none;">';
+		// 2.3.1.1: added class for page source searches
+		echo '<span class="radio-station-debug" style="display:none;">';
 		// phpcs:ignore WordPress.Security.OutputNotEscaped
 		echo $data;
 		echo '</span>' . PHP_EOL;

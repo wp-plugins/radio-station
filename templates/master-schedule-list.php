@@ -114,7 +114,8 @@ foreach ( $weekdays as $day ) {
 						$host_count = count( $show['hosts'] );
 						$hosts .= '<span class="show-dj-names-leader">';
 						$hosts .= esc_html( __( 'with', 'radio-station' ) );
-						$host .= ' </span>';
+						// 2.3.2: fix variable to close span tag
+						$hosts .= ' </span>';
 
 						foreach ( $show['hosts'] as $host ) {
 							$count ++;
