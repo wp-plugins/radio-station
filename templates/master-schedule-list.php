@@ -201,7 +201,9 @@ foreach ( $weekdays as $day ) {
 					// 2.3.0: filter show file by show and context
 					$show_file = get_post_meta( $show['id'], 'show_file', true );
 					$show_file = apply_filters( 'radio_station_schedule_show_link', $show_file, $show['id'], 'list' );
-					if ( $show_file && !empty( $show_file ) ) {
+					// 2.3.2: check disable download meta
+					$disable_download = get_post_meta( $show['id'], 'show_download', true );
+					if ( $show_file && !empty( $show_file ) && !$disable_download ) {
 						$output .= '<div class="show-file">';
 						$output .= '<a href="' . esc_url( $show_file ) . '">';
 						$output .= esc_html( __( 'Audio File', 'radio-station' ) );

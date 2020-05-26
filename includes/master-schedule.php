@@ -77,6 +77,8 @@ function radio_station_master_schedule( $atts ) {
 			$defaults['show_image'] = 1;
 			$defaults['show_hosts'] = 1;
 			$defaults['show_genres'] = 1;
+			// 2.3.2: show description for tabbed view
+			$defaults['show_desc'] = 1;
 		} elseif ( ( 'list' == $atts['view'] ) || in_array( 'list', $views ) ) {
 			$defaults['show_genres'] = 1;
 		}
@@ -364,7 +366,7 @@ function radio_station_master_schedule_selector() {
 	$genre_links = array();
 	foreach ( $genres as $i => $genre ) {
 		$slug = sanitize_title_with_dashes( $genre->name );
-		$javascript = 'javascript:radio_show_highlight(\'' . $slug . '\')';
+		$javascript = 'javascript:radio_genre_highlight(\'' . $slug . '\')';
 		$title = __( 'Click to toggle Highlight of Shows with this Genre.', 'radio-station' );
 		$genre_link = '<a id="genre-highlight-' . esc_attr( $slug ) . '" class="genre-highlight" href="' . $javascript . '" title="' . esc_attr( $title ) . '">';
 		$genre_link .= esc_html( $genre->name ) . '</a>';
@@ -378,7 +380,7 @@ function radio_station_master_schedule_selector() {
 	// 2.3.0: improved to highlight / unhighlight multiple genres
 	// 2.3.0: improved to work with table, tabs or list view
 	$js = "var highlighted_genres = new Array();
-	function radio_show_highlight(genre) {
+	function radio_genre_highlight(genre) {
 		if (jQuery('#genre-highlight-'+genre).hasClass('highlighted')) {
 			jQuery('#genre-highlight-'+genre).removeClass('highlighted');
 
@@ -417,11 +419,46 @@ function radio_station_master_schedule_selector() {
 // 2.3.0: added for table responsiveness
 function radio_station_master_schedule_table_js() {
 
+	// 2.3.2: added current show highlighting cycle
 	$js = "/* Trigger Responsive Table */
-	jQuery(document).ready(function() {radio_table_responsive();} );
+	jQuery(document).ready(function() {
+		radio_table_responsive();
+		radio_times_highlight();
+		setTimeout(radio_times_highlight, 60000);
+	});
 	jQuery(window).resize(function () {
 		radio_resize_debounce(radio_table_responsive, 500, 'scheduletable');
 	});
+
+	/* Current Time Highlighting */
+	function radio_times_highlight() {
+		radio.current_time = Math.floor( (new Date()).getTime() / 1000 );
+		radio.offset_time = radio.current_time + radio.timezone_offset;
+		jQuery('.master-program-day').each(function() {
+			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
+			if (start < radio.offset_time) {
+				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
+				if (end > radio.offset_time) {jQuery(this).addClass('current-day');}
+				else {jQuery(this).removeClass('current-day');}
+			} else {jQuery(this).removeClass('current-day');}		
+		});
+		jQuery('.master-program-hour').each(function() {
+			hour = parseInt(jQuery(this).find('.master-program-server-hour').attr('data'));
+			current = new Date(radio.offset_time * 1000).toISOString();
+			currenthour = current.substr(11, 2);
+    		if (currenthour.substr(0,1) == '0') {currenthour = hours.substr(1,1);}
+			if (hour == currenthour) {jQuery(this).addClass('current-hour');}
+			else {jQuery(this).removeClass('current-hour');}
+		});
+		jQuery('.master-show-entry').each(function() {
+			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
+			if (start < radio.offset_time) {	
+				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
+				if (end > radio.offset_time) {jQuery(this).addClass('nowplaying');}
+				else {jQuery(this).removeClass('nowplaying');}
+			} else {jQuery(this).removeClass('nowplaying');}
+		});
+	}
 
 	/* Make Table Responsive */
 	function radio_table_responsive() {
@@ -518,11 +555,37 @@ function radio_station_master_schedule_tabs_js() {
 	// --- tabbed view responsiveness ---
 	// 2.3.0: added for tabbed responsiveness
 	$js .= "/* Trigger Responsive Tabs */
-	jQuery(document).ready(function() {radio_tabs_responsive();} );
+	jQuery(document).ready(function() {
+		radio_tabs_responsive();
+		radio_show_highlight();
+		setTimeout(radio_show_highlight, 60000);
+	});
 	jQuery(window).resize(function () {
 		radio_resize_debounce(radio_tabs_responsive, 500, 'scheduletabs');
 	});
 
+	/* Current Show Highlighting */
+	function radio_show_highlight() {
+		radio.current_time = Math.floor( (new Date()).getTime() / 1000 );
+		radio.offset_time = radio.current_time + radio.timezone_offset;
+		jQuery('.master-schedule-tabs-day').each(function() {
+			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
+			if (start < radio.offset_time) {
+				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
+				if (end > radio.offset_time) {jQuery(this).addClass('current-day');}
+				else {jQuery(this).removeClass('current-day');}
+			} else {jQuery(this).removeClass('current-day');}		
+		});		
+		jQuery('.master-schedule-tabs-show').each(function() {
+			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
+			if (start < radio.offset_time) {	
+				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
+				if (end > radio.offset_time) {jQuery(this).addClass('nowplaying');}
+				else {jQuery(this).removeClass('nowplaying');}
+			} else {jQuery(this).removeClass('nowplaying');}
+		});
+	}
+	
 	/* Make Tabs Responsive */
 	function radio_tabs_responsive() {
 		tabswidth = jQuery('#master-schedule-tabs').width();

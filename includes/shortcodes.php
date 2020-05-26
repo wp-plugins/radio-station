@@ -1176,13 +1176,14 @@ function radio_station_current_show_shortcode( $atts ) {
 	if ( !$atts['widget'] ) {
 
 		// 2.3.0: add unique id to widget shortcode
+		// 2.3.2: add shortcode wrap class
 		if ( !isset( $radio_station_data['widgets']['current-show'] ) ) {
 			$radio_station_data['widgets']['current-show'] = 0;
 		} else {
 			$radio_station_data['widgets']['current-show']++;
 		}
 		$id = 'current-show-widget-' . $radio_station_data['widgets']['current-show'];
-		$output .= '<div id="' . esc_attr( $id ) . '" class="current-show-embedded on-air-embedded dj-on-air-embedded">';
+		$output .= '<div id="' . esc_attr( $id ) . '" class="current-show-wrap current-show-embedded on-air-embedded dj-on-air-embedded">';
 
 		// --- shortcode only title ---
 		if ( !empty( $atts['title'] ) ) {
@@ -1704,20 +1705,21 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 	// 2.3.0: use new get next shows function
 	$shows = radio_station_get_next_shows( $atts['limit'] );
 	if ( RADIO_STATION_DEBUG ) {
-		$output .= '<span style="display:none;">' . print_r( $shows, true ) . '</span>';
+		$output .= '<span class="upcoming-shows-debug" style="display:none;">' . print_r( $shows, true ) . '</span>';
 	}
 
 	// --- open shortcode only wrapper ---
 	if ( !$atts['widget'] ) {
 
 		// 2.3.0: add unique id to widget shortcode
+		// 2.3.2: add shortcode wrap class
 		if ( !isset( $radio_station_data['widgets']['upcoming-shows'] ) ) {
 			$radio_station_data['widgets']['upcoming-shows'] = 0;
 		} else {
 			$radio_station_data['widgets']['upcoming-shows']++;
 		}
 		$id = 'upcoming-shows-widget-' . $radio_station_data['widgets']['upcoming-shows'];
-		$output .= '<div id="' . esc_attr( $id ) . '" class="upcoming-shows-embedded on-air-embedded dj-coming-up-embedded">';
+		$output .= '<div id="' . esc_attr( $id ) . '" class="upcoming-shows-wrap upcoming-shows-embedded on-air-embedded dj-coming-up-embedded">';
 
 		// --- maybe output shortcode title ---
 		if ( !empty( $atts['title'] ) ) {
@@ -2125,13 +2127,15 @@ function radio_station_current_playlist_shortcode( $atts ) {
 	if ( !$atts['widget'] ) {
 
 		// 2.3.0: add unique id to widget shortcode
+		// 2.3.2: fix to shortcode classes
+		// 2.3.2: add shortcode wrap class
 		if ( !isset( $radio_station_data['widgets']['current-playlist'] ) ) {
 			$radio_station_data['widgets']['current-playlist'] = 0;
 		} else {
 			$radio_station_data['widgets']['current-playlist']++;
 		}
 		$id = 'show-playlist-widget-' . $radio_station_data['widgets']['current-playlist'];
-		$output .= '<div id="' . esc_attr( $id ) . '" class="upcoming-shows-embedded on-air-embedded dj-coming-up-embedded">';
+		$output .= '<div id="' . esc_attr( $id ) . '" class="current-playlist-wrap current-playlist-embedded now-playing-embedded">';
 
 		// --- shortcode title ---
 		if ( !empty( $atts['title'] ) ) {

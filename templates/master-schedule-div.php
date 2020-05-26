@@ -152,7 +152,9 @@ foreach ( $master_list as $hour => $days ) {
 				// 2.3.0: filter show file by show and context
 				$show_file = get_post_meta( $show['id'], 'show_file', true );
 				$show_file = apply_filters( 'radio_station_schedule_show_file', $show_file, $show['id'], 'div' );
-				if ( $show_file && ! empty( $show_file ) ) {
+				// 2.3.2: check disable download meta
+				$disable_download = get_post_meta( $show['id'], 'show_download', true );
+				if ( $show_file && ! empty( $show_file ) && !$disable_download ) {
 					$output .= ' <span class="show-file"><a href="' . esc_url( $show_file ) . '">' . esc_html( __( 'Audio File', 'radio-station' ) ) . '</a>';
 				}
 

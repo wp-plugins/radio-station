@@ -171,7 +171,8 @@ class DJ_Widget extends WP_Widget {
 
 		// --- filter and output ---
 		// 2.3.0: added field filter for extra fields
-		$fields = apply_filters( 'radio_station_current_show_widget_fields', $fields, $instance );
+		// 2.3.2: fix for second and third filter arguments
+		$fields = apply_filters( 'radio_station_current_show_widget_fields', $fields, $this, $instance );
 		echo $fields;
 	}
 
@@ -278,8 +279,9 @@ class DJ_Widget extends WP_Widget {
 
 		// --- open widget container ---
 		// 2.3.0: add unique id to widget
+		// 2.3.2: add class to widget
 		$id = 'current-show-widget-' . $id;
-		echo '<div id="' . esc_attr( $id ) . '" class="widget">';
+		echo '<div id="' . esc_attr( $id ) . '" class="current-show-wrap widget">';
 
 		// --- widget title ---
 		// phpcs:ignore WordPress.Security.OutputNotEscaped

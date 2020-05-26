@@ -2558,6 +2558,8 @@ function radio_station_convert_hour( $hour, $timeformat = 24, $suffix = true ) {
 			}
 		}
 	}
+	// 2.3.2: fix for possible double spacing
+	$hour = str_replace( '  ', ' ', $hour );
 
 	return $hour;
 }
@@ -2975,7 +2977,8 @@ function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
 	if ( $extras && is_array( $extras ) && ( count( $extras ) > 0 ) ) {
 		$keys = array_merge( $keys, $extras );
 	}
-	
+
+	// --- sanitize values by key type ---
 	$atts = radio_station_sanitize_values( $_REQUEST, $keys );
 	return $atts;
 }

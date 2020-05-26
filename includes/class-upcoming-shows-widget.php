@@ -252,8 +252,9 @@ class DJ_Upcoming_Widget extends WP_Widget {
 
 		// --- open widget container ---
 		// 2.3.0: add unique id to widget
+		// 2.3.2: add class to widget
 		$id = 'upcoming-shows-widget-' . $id;
-		echo '<div id="' . esc_attr( $id ) . '" class="widget">';
+		echo '<div id="' . esc_attr( $id ) . '" class="upcoming-shows-wrap widget">';
 
 		// --- output widget title ---
 		// phpcs:ignore WordPress.Security.OutputNotEscaped

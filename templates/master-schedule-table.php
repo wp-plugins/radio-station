@@ -51,7 +51,10 @@ foreach ( $weekdays as $i => $weekday ) {
 		$heading = radio_station_translate_weekday( $heading, true );
 
 		// --- get weekdate subheading ---
+		// 2.3.2: set day start and end times
 		$weekdate = $weekdates[$weekday];
+		$day_start_time = strtotime( $weekdate );
+		$day_end_time = $day_start_time + ( 24 * 60 * 60 );
 		$subheading = date( 'jS M', strtotime( $weekdate ) );
 
 		// --- set heading classes ---
@@ -79,6 +82,10 @@ foreach ( $weekdays as $i => $weekday ) {
 		$output .= '<div class="shift-right-arrow">';
 		$output .= '<a href="javacript:void(0);" onclick="return radio_shift_day(\'right\');" title="' . esc_attr( __( 'Next Day', 'radio-station' ) ) . '">' . $arrows['right'] . '</a>';
 		$output .= '</div>';
+		// 2.3.2: add day start and end time date
+		$output .= '<span class="rs-time rs-start-time" data="' . esc_attr( $day_start_time ) . '"></span>';
+		$output .= '<span class="rs-time rs-end-time" data="' . esc_attr( $day_end_time ) . '"></span>';
+		
 		$output .= '</th>';
 		
 	} 
@@ -130,9 +137,9 @@ foreach ( $hours as $hour ) {
 	
 	$output .= '<div class="master-program-server-hour rs-time" data="' . esc_attr( $raw_hour ) . '" data-format="' . esc_attr( $data_format ) . '">';
 	$output .= esc_html( $hour_display );
+	$output .= '</div>';
 	$output .= '<br>';
 	$output .= '<div class="master-program-user-hour rs-time" data="' . esc_attr( $raw_hour ) . '" data-format="' . esc_attr( $data_format ) . '"></div>';
-	$output .= '</div>';
 	$output .= '</th>';
 
 	foreach ( $weekdays as $i => $weekday ) {
@@ -285,6 +292,12 @@ foreach ( $hours as $hour ) {
 
 							// --- display empty div (for highlighting) ---
 							$cell .= '&nbsp;';
+							
+							// 2.3.2: set shift times for highlighting
+							$shift_start_time = strtotime( $weekdates[$shift['day']] . ' ' . $shift['start'] );
+							$shift_end_time = strtotime( $weekdates[$shift['day']] . ' ' . $shift['end'] );
+							$cell .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '"></span>';
+							$cell .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '"></span>';
 
 						} else {
 
@@ -413,7 +426,9 @@ foreach ( $hours as $hour ) {
 								$show_file = get_post_meta( $show['id'], 'show_file', true );
 							}
 							$show_file = apply_filters( 'radio_station_schedule_show_file', $show_file, $show['id'], 'table' );
-							if ( $show_file && !empty( $show_file ) ) {
+							// 2.3.2: check disable download meta
+							$disable_download = get_post_meta( $show['id'], 'show_download', true );
+							if ( $show_file && !empty( $show_file ) && !$disable_download ) {
 								$cell .= '<div class="show-file">';
 								$cell .= '<a href="' . esc_url( $show_file ) . '">';
 								$cell .= esc_html( __( 'Audio File', 'radio-station' ) );
@@ -453,7 +468,6 @@ foreach ( $hours as $hour ) {
 							$showcontinued = false;
 						}
 					}
-
 				}
 			}
 

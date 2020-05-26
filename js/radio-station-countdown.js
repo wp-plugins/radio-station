@@ -20,7 +20,7 @@ function radio_countdown() {
     /* Current Show Countdown */
     jQuery('.current-show-end').each(function() {
     	showendtime = parseInt(jQuery(this).val());
-        diff =  showendtime - radio.server_time;
+        diff = showendtime - radio.server_time;
         if (radio.debug) {
         	showend = new Date(showendtime * 1000);
         	console.log('Show End: ' + showend.toISOString() + '(' + showend.getTime() + ')');

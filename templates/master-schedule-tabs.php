@@ -56,6 +56,10 @@ foreach ( $weekdays as $i => $weekday ) {
 		// 2.2.2: use translate function for weekday string
 		$display_day = radio_station_translate_weekday( $weekday );
 
+		// 2.3.2: set day start and end times
+		$day_start_time = strtotime( $weekdates[$weekday] . ' 00:00');
+		$day_end_time = $day_start_time + ( 24 * 60 * 60 );
+
 		// 2.3.0: added left/right arrow responsive controls
 		// 2.3.1: added (negative) return to arrow onclick functions
 		$arrows = array( 'right' => '&#9658;', 'left' => '&#9668;' );
@@ -69,6 +73,9 @@ foreach ( $weekdays as $i => $weekday ) {
 		$output .= '<a href="javacript:void(0);" onclick="return radio_shift_tab(\'right\');" title="' . esc_attr( __( 'Next Day', 'radio-station' ) ) . '">' . $arrows['right'] . '</a>';
 		$output .= '</div>';
 		$output .= '<div id="master-schedule-tab-bottom-' . strtolower( $weekday ) . '" class="master-schedule-tab-bottom"></div>';
+		// 2.3.2: add start and end day times for automatic highlighting
+		$output .= '<span class="rs-time rs-start-time" data="' . esc_attr( $day_start_time ) . '"></span>';
+		$output .= '<span class="rs-time rs-end-time" data="' . esc_attr( $day_end_time ) . '"></span>';
 		$output .= '</li>';
 
 		// 2.2.7: separate headings from panels for tab view
@@ -88,8 +95,10 @@ foreach ( $weekdays as $i => $weekday ) {
 
 			$foundshows = true;
 
+			$j = 0;
 			foreach ( $shifts as $shift ) {
 
+				$j++;
 				$show = $shift['show'];
 
 				$show_link = false;
@@ -97,6 +106,10 @@ foreach ( $weekdays as $i => $weekday ) {
 					$show_link = $show['url'];
 				}
 				$show_link = apply_filters( 'radio_station_schedule_show_link', $show_link, $show['id'], 'tabs' );
+
+				// --- convert shift time data ---
+				$shift_start_time = strtotime( $shift['day'] . ' ' . $shift['start'] );
+				$shift_end_time = strtotime( $shift['day'] . ' ' . $shift['end'] );
 
 				// 2.3.0: add genre classes for highlighting
 				$classes = array( 'master-schedule-tabs-show' );
@@ -106,9 +119,22 @@ foreach ( $weekdays as $i => $weekday ) {
 						$classes[] = strtolower( $term->slug );
 					}
 				}
-				$class = implode( ' ' , $classes );
+				// 2.3.2: add first and last classes
+				if ( 1 == $j ) {
+					$classes[] = 'first-show';
+				}
+				if ( $j == count( $shifts ) ) {
+					$classes[] = 'last-show';
+				}				
+				
+				// 2.3.2: check for now playing shift
+				if ( ( $now >= $shift_start_time ) && ( $now < $shift_end_time ) ) {
+					$classes[] = 'nowplaying';
+				}
 
-				$panels .= '<li class="' . esc_attr( $class ) . '">';
+				// --- open list item ---
+				$classlist = implode( ' ' , $classes );
+				$panels .= '<li class="' . esc_attr( $classlist ) . '">';
 
 				// --- Show Image ---
 				// (defaults to display on)
@@ -185,10 +211,6 @@ foreach ( $weekdays as $i => $weekday ) {
 				// --- show times ---
 				if ( $atts['show_times'] ) {
 
-					// --- convert shift time data ---
-					$shift_start_time = strtotime( $shift['day'] . ' ' . $shift['start'] );
-					$shift_end_time = strtotime( $shift['day'] . ' ' . $shift['end'] );
-
 					// --- convert shift time for display ---
 					// 2.3.0: updated to use new schedule data
 					if ( '00:00 am' == $shift['start'] ) {
@@ -217,6 +239,12 @@ foreach ( $weekdays as $i => $weekday ) {
 					$panels .= '<div class="show-user-time" id="show-user-time-' . esc_attr( $tcount ) . '"></div>';
 					$tcount ++;
 
+				} else {
+				
+					// 2.3.2: added for now playing check
+					$panels .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="H:i"></span>';
+					$panels .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="H:i"></span>';
+
 				}
 
 				// --- encore ---
@@ -240,7 +268,9 @@ foreach ( $weekdays as $i => $weekday ) {
 					// 2.3.0: filter audio file by show and context
 					$show_file = get_post_meta( $show['id'], 'show_file', true );
 					$show_file = apply_filters( 'radio_station_schedule_show_link', $show_file, $show['id'], 'tabs' );
-					if ( $show_file && !empty( $show_file ) ) {
+					// 2.3.2: check show download meta
+					$disable_download = get_post_meta( $show['id'], 'show_download', true );				
+					if ( $show_file && !empty( $show_file ) && !$disable_download ) {
 						$panels .= '<div class="show-file">';
 						$panels .= '<a href="' . esc_url( $show_file ) . '">';
 						$panels .= esc_html( __( 'Audio File', 'radio-station' ) );
@@ -295,7 +325,8 @@ foreach ( $weekdays as $i => $weekday ) {
 		}
 
 		if ( !$foundshows ) {
-			$panels .= '<li class="master-schedule-tabs-show">';
+			// 2.3.2: added no shows class
+			$panels .= '<li class="master-schedule-tabs-show master-schedule-tabs-no-shows">';
 			$panels .= esc_html( __( 'No Shows scheduled for this day.', 'radio-station' ) );
 			$panels .= '</li>';
 		}

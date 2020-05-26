@@ -384,6 +384,10 @@ function radio_station_playlist_metabox() {
 	$entries = get_post_meta( $post->ID, 'playlist', false );
 	$c = 1;
 
+	// --- set arrow titles ---
+	$move_up_title = __( 'Move Track Up', 'radio-station' );
+	$move_down_title = __( 'Move Track Down', 'radio-station' );
+
 	echo '<div id="meta_inner">';
 
 	echo '<table id="here" class="widefat">';
@@ -406,18 +410,33 @@ function radio_station_playlist_metabox() {
 			     || isset( $track['playlist_entry_comments'] ) || isset( $track['playlist_entry_new'] )
 			     || isset( $track['playlist_entry_status'] ) ) {
 
-				echo '<tr id="track-' . esc_attr( $c ) . '-rowa">';
-				echo '<td>' . esc_html( $c ) . '</td>';
+				// --- track row a ---
+				$class = '';
+				if ( 1 == $c ) {
+					$class = 'first-track';
+				} elseif ( $c == count( $entries[0] ) ) {
+					$class = 'last-track';
+				}
+				echo '<tr id="track-' . esc_attr( $c ) . '-rowa" class="track-rowa ' . esc_attr( $class ) . '">';
+				
+				// --- track count ---
+				echo '<td><span class="track-count">' . esc_html( $c ) . '</span></td>';
+				
+				// --- track entry inputs ---
 				echo '<td><input type="text" name="playlist[' . esc_attr( $c ) . '][playlist_entry_artist]" value="' . esc_attr( $track['playlist_entry_artist'] ) . '" style="width:150px;"></td>';
 				echo '<td><input type="text" name="playlist[' . esc_attr( $c ) . '][playlist_entry_song]" value="' . esc_attr( $track['playlist_entry_song'] ) . '" style="width:150px;"></td>';
 				echo '<td><input type="text" name="playlist[' . esc_attr( $c ) . '][playlist_entry_album]" value="' . esc_attr( $track['playlist_entry_album'] ) . '" style="width:150px;"></td>';
 				echo '<td><input type="text" name="playlist[' . esc_attr( $c ) . '][playlist_entry_label]" value="' . esc_attr( $track['playlist_entry_label'] ) . '" style="width:150px;"></td>';
+				echo '</tr>';
+				
+				// --- track row b ---
+				echo '<tr id="track-' . esc_attr( $c ) . '-rowb" class="track-rowb ' . esc_attr( $class ) . '">';
 
-				echo '</tr><tr id="track-' . esc_attr( $c ) . '-rowb">';
-
+				// --- track comments ---
 				echo '<td colspan="3">' . esc_html__( 'Comments', 'radio-station' ) . ' ';
 				echo '<input type="text" name="playlist[' . esc_attr( $c ) . '][playlist_entry_comments]" value="' . esc_attr( $track['playlist_entry_comments'] ) . '" style="width:300px;"></td>';
 
+				// --- track meta ---
 				echo '<td class="track-meta">';
 				echo '<div>' . esc_html( __( 'New', 'radio-station' ) ) . ':</div>';
 				$track['playlist_entry_new'] = isset( $track['playlist_entry_new'] ) ? $track['playlist_entry_new'] : false;
@@ -428,8 +447,22 @@ function radio_station_playlist_metabox() {
 				echo '<option value="played" ' . selected( $track['playlist_entry_status'], 'played', false ) . '>' . esc_html__( 'Played', 'radio-station' ) . '</option>';
 				echo '</select></div></td>';
 
-				echo '<td align="right"><span id="track-' . esc_attr( $c ) . '" class="remove-track button-secondary" style="cursor: pointer;">' . esc_html( __( 'Remove', 'radio-station' ) ) . '</span></td>';
+				// 2.3.2: added move track arrows
+				echo '<td class="track-controls">';
+				echo '<div class="track-move">' . esc_html( __( 'Move', 'radio-station') ) . ': </div>';
+				echo '<div class="track-arrow-up" onclick="radio_move_track(\'up\', ' . esc_attr( $c ) . ');" title="' . esc_attr( $move_up_title ) . '">&#9652</div>';
+				echo '<div class="track-arrow-down" onclick="radio_move_track(\'down\', ' . esc_attr( $c ) . ');" title="' . esc_attr( $move_down_title ) . '">&#9662</div>';
+
+				// --- remove track button ---
+				echo '<div id="track-' . esc_attr( $c ) . '-remove" class="remove-track button-secondary">' . esc_html( __( 'Remove', 'radio-station' ) ) . '</div>';
+				echo '</td>';
 				echo '</tr>';
+				
+				// --- track row c ---
+				// TODO: add track time input fields ?
+				// echo '<tr id="track-' . esc_attr( $c ) . '-rowc" class="track-rowc ' . esc_attr( $class ) . '">';
+				// echo '</tr>';
+				
 				$c ++;
 			}
 		}
@@ -438,51 +471,140 @@ function radio_station_playlist_metabox() {
 	
 	// 2.3.0: added track meta style fix
 	// 2.3.2: added track meta select font size fix
-	echo '<style>.track-meta div {display:inline-block; margin-right:3px;}
-	.track-meta select {font-size: 12px;}</style>';
+	// 2.3.2: added track move arrow styles
+	echo '<style>.track-meta div {display: inline-block; margin-right: 3px;}
+	.track-meta select {font-size: 12px;}
+	.track-arrow-up, .track-arrow-down {font-size: 32px; line-height: 24px; cursor: pointer;}
+	tr.first-track .track-arrow-up, tr.last-track .track-arrow-down {display: none;}
+	tr.first-track .track-arrow-down {margin-left: 20px;}
+	.track-controls .track-arrow-up, .track-controls .track-arrow-down,
+	.track-controls .track-move, .track-controls .remove-track {display: inline-block; vertical-align: middle;}
+	.track-controls .remove-track {float: right; margin-right: 20px; padding: 0 5px; font-size: 11px; cursor: pointer;}
+	.add-track {cursor: pointer; display:block; width: 150px; padding: 8px; text-align: center; line-height: 1em;}
+	</style>';
 
 	// 2.3.2: change from button-primary to button-secondary
     echo '<center>';
-    echo '<a class="add-track button-secondary" style="cursor: pointer; margin-top: 10px;">' . esc_html( __( 'Add Track', 'radio-station' ) ) . '</a>';
+    echo '<a class="add-track button-secondary" style="margin-top: 10px;">' . esc_html( __( 'Add Track', 'radio-station' ) ) . '</a>';
     echo '</center>';
     
     echo '<div style="clear: both;"></div>';
 
+	// --- move track up or down ---
+	// 2.3.2: added move track function
+	$js = "function radio_move_track(updown, n) {
+		/* swap track rows */
+		if (updown == 'up') {
+			m = n - 1;
+			jQuery('#track-'+n+'-rowa').insertBefore('#track-'+m+'-rowa');
+			jQuery('#track-'+n+'-rowb').insertAfter('#track-'+n+'-rowa');
+			/* jQuery('#track-'+n+'-rowc').insertAfter('#track-'+n+'-rowb'); */
+		}
+		if (updown == 'down') {
+			m = n + 1; 
+			jQuery('#track-'+n+'-rowa').insertAfter('#track-'+m+'-rowb');
+			jQuery('#track-'+n+'-rowb').insertAfter('#track-'+n+'-rowa');
+			/* jQuery('#track-'+n+'-rowc').insertAfter('#track-'+n+'-rowb'); */
+		}
+		/* reset track classes */
+		radio_track_classes();
+
+		/* swap track count */
+		jQuery('#track-'+n+'-rowa .track-count').html(m);
+		jQuery('#track-'+m+'-rowa .track-count').html(n);
+		
+		/* swap input name keys */
+		jQuery('#track-'+n+'-rowa input, #track-'+n+'-rowb input, #track-'+n+'-rowb select').each(function() {
+			jQuery(this).attr('name', jQuery(this).attr('name').replace('['+n+']', '['+m+']'));
+		});
+		jQuery('#track-'+m+'-rowa input, #track-'+m+'-rowb input, #track-'+m+'-rowb select').each(function() {
+			jQuery(this).attr('name', jQuery(this).attr('name').replace('['+m+']', '['+n+']'));
+		});
+		
+		/* swap arrow actions */
+		jQuery('#track-'+n+'-rowb .track-arrow-up').attr('onclick', 'radio_move_track(\"up\", '+m+');');
+		jQuery('#track-'+n+'-rowb .track-arrow-down').attr('onclick', 'radio_move_track(\"down\", '+m+');');
+		jQuery('#track-'+m+'-rowb .track-arrow-up').attr('onclick', 'radio_move_track(\"up\", '+n+');');
+		jQuery('#track-'+m+'-rowb .track-arrow-down').attr('onclick', 'radio_move_track(\"down\", '+n+');');
+
+		/* swap row IDs */
+		jQuery('#track-'+m+'-rowa').attr('id', 'track-0-rowa');
+		jQuery('#track-'+m+'-rowb').attr('id', 'track-0-rowb');
+		jQuery('#track-'+m+'-remove').attr('id', 'track-0-remove');
+		jQuery('#track-'+n+'-rowa').attr('id', 'track-'+m+'-rowa');
+		jQuery('#track-'+n+'-rowb').attr('id', 'track-'+m+'-rowb');
+		jQuery('#track-'+n+'-remove').attr('id', 'track-'+m+'-remove');
+		jQuery('#track-0-rowa').attr('id', 'track-'+n+'-rowa');
+		jQuery('#track-0-rowb').attr('id', 'track-'+n+'-rowb');
+		jQuery('#track-0-remove').attr('id', 'track-'+n+'-remove');
+	}
+	function radio_track_classes() {
+		/* reset first and last classes */
+		jQuery('.track-rowa, .track-rowb, .track-rowc').removeClass('first-track').removeClass('last-track');
+		jQuery('.track-rowa').first().addClass('first-track'); jQuery('.track-rowa').last().addClass('last-track');
+		jQuery('.track-rowb').first().addClass('first-track'); jQuery('.track-rowb').last().addClass('last-track');
+		jQuery('.track-rowc').first().addClass('first-track'); jQuery('.track-rowc').last().addClass('last-track');
+	}" . PHP_EOL;
+
 	// 2.3.0: set javascript as string to enqueue
-	// 2.3.2: added missing track-meta cell class to script
-	$js = "
-		jQuery(document).ready(function() {
-			var count = " . esc_js( $c ) . ";
-			jQuery('.add-track').click(function() {
+	// 2.3.2: added missing track-meta cell class
+	// 2.3.2: added track move arrows
+	// 2.3.2: added first and last row classes
+	// 2.3.2: reset first and last classes on remove
+	$js .= "jQuery(document).ready(function() {
+		var count = " . esc_js( $c ) . ";
+		jQuery('.add-track').click(function() {
 
-				output = '<tr id=\"track-'+count+'-rowa\"><td>'+count+'</td>';
-					output += '<td><input type=\"text\" name=\"playlist['+count+'][playlist_entry_artist]\" value=\"\" style=\"width:150px;\"></td>';
-					output += '<td><input type=\"text\" name=\"playlist['+count+'][playlist_entry_song]\" value=\"\" style=\"width:150px;\"></td>';
-					output += '<td><input type=\"text\" name=\"playlist['+count+'][playlist_entry_album]\" value=\"\" style=\"width:150px;\"></td>';
-					output += '<td><input type=\"text\" name=\"playlist['+count+'][playlist_entry_label]\" value=\"\" style=\"width:150px;\"></td>';
-				output += '</tr><tr id=\"track-'+count+'-rowb\">';
-					output += '<td colspan=\"3\">" . esc_js( __( 'Comments', 'radio-station' ) ) . ": <input type=\"text\" name=\"playlist['+count+'][playlist_entry_comments]\" value=\"\" style=\"width:300px;\"></td>';
-					output += '<td class=\"track-meta\"><div>" . esc_js( __( 'New', 'radio-station' ) ) . ":</div>';
-					output += '<div><input type=\"checkbox\" name=\"playlist['+count+'][playlist_entry_new]\"></div>';
-					output += '<div style=\"margin-left:5px;\">" . esc_js( __( 'Status', 'radio-station' ) ) . ":</div>';
-					output += '<div><select name=\"playlist['+count+'][playlist_entry_status]\">';
-						output += '<option value=\"queued\">" . esc_js( __( 'Queued', 'radio-station' ) ) . "</option>';
-						output += '<option value=\"played\">" . esc_js( __( 'Played', 'radio-station' ) ) . "</option>';
-					output += '</select></div></td>';
-					output += '<td align=\"right\"><span id=\"track-'+count+'\" class=\"remove-track button-secondary\" style=\"cursor: pointer;\">" . esc_js( __( 'Remove', 'radio-station' ) ) . "</span></td>';
-				output += '</tr>';
+			/* prev = count - 1;
+			if (prev > 0) {
+				jQuery('#track-'+prev+'-rowa, #track-'+prev+'-rowb, #track-'+prev+'-rowc').removeClass('last-track');
+			} */
 
-				jQuery('#here').append(output);
-				count = count + 1;
-				return false;
-			});
-			jQuery('.remove-track').live('click', function() {
-				rowid = jQuery(this).attr('id');
-				jQuery('#'+rowid+'-rowa').remove();
-				jQuery('#'+rowid+'-rowb').remove();
+			if (count == 1) {classes = 'first-track last-track';} else {classes = 'last-track';}
+			output = '<tr id=\"track-'+count+'-rowa\" class=\"track-rowa '+classes+'\">';
+				output += '<td><span class=\"track-count\">'+count+'</span></td>';
+				output += '<td><input type=\"text\" name=\"playlist['+count+'][playlist_entry_artist]\" value=\"\" style=\"width:150px;\"></td>';
+				output += '<td><input type=\"text\" name=\"playlist['+count+'][playlist_entry_song]\" value=\"\" style=\"width:150px;\"></td>';
+				output += '<td><input type=\"text\" name=\"playlist['+count+'][playlist_entry_album]\" value=\"\" style=\"width:150px;\"></td>';
+				output += '<td><input type=\"text\" name=\"playlist['+count+'][playlist_entry_label]\" value=\"\" style=\"width:150px;\"></td>';
+			output += '</tr>';
+			output += '<tr id=\"track-'+count+'-rowb\" class=\"track-rowb '+classes+'\">';
+				output += '<td colspan=\"3\">" . esc_js( __( 'Comments', 'radio-station' ) ) . ": <input type=\"text\" name=\"playlist['+count+'][playlist_entry_comments]\" value=\"\" style=\"width:300px;\"></td>';
+				output += '<td class=\"track-meta\"><div>" . esc_js( __( 'New', 'radio-station' ) ) . ":</div>';
+				output += '<div><input type=\"checkbox\" name=\"playlist['+count+'][playlist_entry_new]\"></div>';
+				output += '<div style=\"margin-left:5px;\">" . esc_js( __( 'Status', 'radio-station' ) ) . ":</div>';
+				output += '<div><select name=\"playlist['+count+'][playlist_entry_status]\">';
+					output += '<option value=\"queued\">" . esc_js( __( 'Queued', 'radio-station' ) ) . "</option>';
+					output += '<option value=\"played\">" . esc_js( __( 'Played', 'radio-station' ) ) . "</option>';
+				output += '</select></div></td>';
+				output += '<td class=\"track-controls\">';
+					output += '<div class=\"track-move\">" . esc_js( __( 'Move', 'radio-station') ) . "</div>: ';
+					output += '<div class=\"track-arrow-up\" onclick=\"radio_move_track(\'up\', '+count+');\" title=\"" . esc_js( $move_up_title ) . "\">&#9652</div>';
+					output += '<div class=\"track-arrow-down\" onclick=\"radio_move_track(\'down\', '+count+');\" title=\"" . esc_js( $move_down_title ) . "\">&#9662</div>';
+					output += '<div id=\"track-'+count+'-remove\" class=\"remove-track button-secondary\">" . esc_js( __( 'Remove', 'radio-station' ) ) . "</div>';
+				output += '</td>';
+			output += '</tr>';
+			/* output += '<tr id=\"track-'+count+'-rowc\" class=\"track-rowc '+classes+'\">';
+			output += '</tr>'; */
+
+			jQuery('#here').append(output);
+			count = count + 1;
+			radio_track_classes();
+			return false;
+		});
+		jQuery('.remove-track').live('click', function() {
+			id = jQuery(this).attr('id').replace('-remove', '');
+			jQuery('#'+id+'-rowa, #'+id+'-rowb, #'+id+'-rowc').remove();
+			count = count - 1;
+			radio_track_classes();
+			
+			/* renumber track count */
+			var trackcount = 1;
+			jQuery('.track-rowa').each(function() {
+				jQuery(this).find('.track-count').html(trackcount); trackcount++;
 			});
 		});
-	";
+	});";
 
 	// --- enqueue inline script ---
 	// 2.3.0: enqueue instead of echoing
@@ -490,8 +612,9 @@ function radio_station_playlist_metabox() {
 
 	echo '</div>';
 
-	// TODO: maybe just trigger click of publish button ?
-    echo '<div id="publishing-action-bottom">';
+	// 2.3.2: removed publish button duplication
+	// TODO: trigger publish click or AJAX track save ?
+    /* echo '<div id="publishing-action-bottom">';
         echo '<br/><br/>';
 
 		$can_publish = current_user_can( 'publish_playlists' );
@@ -541,7 +664,7 @@ function radio_station_playlist_metabox() {
             echo '<input name="original_publish" type="hidden" id="original_publish" value="' . esc_attr( __( 'Update', 'radio-station' ) ) . '"/>';
             echo '<input name="save" type="submit" class="button-primary" id="publish" tabindex="50" accesskey="o" value="' . esc_attr( __( 'Update Playlist', 'radio-station' ) ) . '"/>';
 		}
-    echo '</div>';
+    echo '</div>'; */
 }
 
 // -----------------------------------
@@ -1332,7 +1455,7 @@ function radio_station_show_shifts_metabox() {
 			$list .= '<ul class="' . esc_attr( $classlist ) . '">';
 
 			// --- shift day selection ---
-			$list .= '<li class="first">';
+			$list .= '<li class="first-item">';
 			$list .= esc_html( __( 'Day', 'radio-station' ) ) . ': ';
 
 			$class = '';
@@ -1440,7 +1563,7 @@ function radio_station_show_shifts_metabox() {
 
 			// --- remove shift icon ---
 			// 2.3.0: change remove button to icon
-			$list .= '<li class="last">';
+			$list .= '<li class="last-item">';
 			$title = __( 'Remove Shift', 'radio-station' );
 			$list .= '<span class="remove-shift dashicons dashicons-no" title="' . esc_attr( $title ) . '" style="cursor: pointer;"></span>';
 			// $list .= '<span class="remove-shift button button-secondary" style="cursor: pointer;">';
@@ -1512,7 +1635,7 @@ function radio_station_show_shifts_metabox() {
 	// 2.3.2: fix centering by removing span wrapper
 	// 2.3.2: change from button-primary to button-secondary
 	echo '<center>';
-    echo '<a class="add-shift button-secondary" style="cursor: pointer; display:block; width: 150px; padding: 8px; text-align: center; line-height: 1em;">' . esc_html( __( 'Add Shift', 'radio-station' ) ) . '</a>';
+    echo '<a class="add-shift button-secondary" style="margin-top: 10px;">' . esc_html( __( 'Add Shift', 'radio-station' ) ) . '</a>';
     echo '</center>';
 
 	// 2.3.0: added confirmation to remove shift button
@@ -1562,7 +1685,7 @@ function radio_station_show_shifts_metabox() {
 		function radio_add_shift(values) {
 			count = count + 1;
 			output = '<ul class=\"show-shift\">';
-				output += '<li class=\"first\">';
+				output += '<li class=\"first-item\">';
 					output += '" . esc_js( __( 'Day', 'radio-station' ) ) . ": ';
 					output += '<select name=\"show_sched[new-' + count + '][day]\" id=\"shift-new-' + count +'-day\">';";
 
@@ -1656,7 +1779,7 @@ function radio_station_show_shifts_metabox() {
 			output += '<span class=\"duplicate-shift dashicons dashicons-admin-page\" title=\"" . esc_js( __( 'Duplicate Shift', 'radio-station' ) ) . "\" style=\"cursor: pointer;\"></span>';
 		output += '</li>';
 
-		output += '<li class=\"last\">';
+		output += '<li class=\"last-item\">';
 			output += '<span class=\"remove-shift dashicons dashicons-no\" title=\"" . esc_js( __( 'Remove Shift', 'radio-station' ) ) . "\" style=\"cursor: pointer;\"></span>';
 		output += '</li>';
 
@@ -1672,38 +1795,19 @@ function radio_station_show_shifts_metabox() {
 
 	// --- shift display styles ---
 	// 2.3.2: added dashed border to new shift
-	echo '<style>#here .show-shift {border 2px dashed green;}
-	.show-shift {
-		list-style: none;
-		margin-bottom: 10px;
-		border: 2px solid green;
-	}
-	.show-shift li {
-		display: inline-block;
-		vertical-align: middle;
-		margin-left: 20px;
-		margin-top: 10px;
-		margin-bottom: 10px;
-	}
-	.show-shift li.first {
-		margin-left: 10px;
-	}
-	.show-shift li.last {
-		margin-right: 10px;
-	}        
-	.show-shift.disabled {
-		border: 2px dashed orange;
-	}        
-	.show-shift.conflicts {
-		outline: 2px solid red;
-	}        
-	.show-shift.disabled.conflicts {
-		border: 2px dashed red;
-		outline: none;
-	}        
-	.show-shift select.incomplete {
-		border: 2px solid orange;
-	}</style>';
+	echo '<style>
+	#here .show-shift {border: 2px dashed green;}
+	.show-shift {list-style: none; margin-bottom: 10px;	border: 2px solid green;}
+	.show-shift li {display: inline-block; vertical-align: middle;
+		margin-left: 20px; margin-top: 10px; margin-bottom: 10px;}
+	.show-shift li.first-item {margin-left: 10px;}
+	.show-shift li.last-item {margin-right: 10px;}        
+	.show-shift.disabled {border: 2px dashed orange;}        
+	.show-shift.conflicts {outline: 2px solid red;}        
+	.show-shift.disabled.conflicts {border: 2px dashed red;	outline: none;}        
+	.show-shift select.incomplete {border: 2px solid orange;}
+	.add-shift {cursor: pointer; display:block; width: 150px; padding: 8px; text-align: center; line-height: 1em;}
+	</style>';
 
 	echo '</div>';
 }

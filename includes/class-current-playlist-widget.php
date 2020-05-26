@@ -193,8 +193,9 @@ class Playlist_Widget extends WP_Widget {
 
 			// --- open widget container ---
 			// 2.3.0: add unique id to widget
+			// 2.3.2: add class to widget
 			$id = 'current-playlist-widget-' . $id;
-			echo '<div id="' . esc_attr( $id ) . '" class="widget">';
+			echo '<div id="' . esc_attr( $id ) . '" class="current-playlist-wrap widget">';
 
 			// --- output widget title ---
 			// phpcs:ignore WordPress.Security.OutputNotEscaped
