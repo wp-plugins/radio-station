@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.3.1.2
+Version: 2.3.1.3
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -174,15 +174,37 @@ $options = array(
 		'section' => 'broadcast',
 	),
 
-	// ? --- Alternative Stream URL --- ?
-	// 'streaming_alt' => array(
+	// --- Fallback Stream Format ---
+	// 'fallback_url' => array(
+	// 	'type'    => 'select',
+	// 	'options' => array( 'mp3', 'aac' ), // ...
+	// 	'label'   => __( 'Streaming Format', 'radio-station' ),
+	//	'default' => 'mp3',
+	// 	'helper'  => __( 'Select streaming fallback for streaming URL.', 'radio-station' ),
+	// 	'tab'     => 'general',
+	// 	'section' => 'broadcast',
+	// ),
+
+	// --- Fallback Stream URL ---
+	// 'fallback_url' => array(
 	// 	'type'    => 'text',
 	// 	'options' => 'URL',
 	// 	'label'   => __( 'Fallback Stream URL', 'radio-station' ),
-	// 	'default' => __( 'Enter an alternative Streaming URL for Player fallback.', 'radio-station' ),
+	//  'default' => '',
+	// 	'helper'  => __( 'Enter an alternative Streaming URL for Player fallback.', 'radio-station' ),
 	// 	'tab'     => 'general',
 	// 	'section' => 'broadcast',
-	// 	'pro'     => true,
+	// ),
+
+	// --- Fallback Stream Format ---
+	// 'fallback_url' => array(
+	// 	'type'    => 'text',
+	// 	'options' => array( 'mp3', 'aac' ), // ...
+	// 	'label'   => __( 'Fallback Format', 'radio-station' ),
+	//	'default' => 'mp3',
+	// 	'helper'  => __( 'Select streaming fallback for fallback URL.', 'radio-station' ),
+	// 	'tab'     => 'general',
+	// 	'section' => 'broadcast',
 	// ),
 
 	// --- Main Radio Language ---
@@ -902,6 +924,7 @@ function radio_station_enqueue_script( $scriptkey, $deps = array(), $infooter = 
 	if ( $template ) {
 
 		$version = filemtime( $template['file'] );
+		// $version = radio_station_plugin_version();
 		$url = $template['url'];
 
 		// --- enqueue script ---

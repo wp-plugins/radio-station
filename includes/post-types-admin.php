@@ -2406,6 +2406,10 @@ function radio_station_show_save_data( $post_id ) {
 		do_action( 'radio_station_clear_data', 'show', $post_id );
 		do_action( 'radio_station_clear_data', 'show_meta', $post_id );
 		
+		// --- set last updated schedule time ---
+		// 2.3.2: added for data API use
+		update_option( 'radio_station_schedule_updated', time() );
+		
 		// --- maybe send directory ping ---
 		// 2.3.1: added directory update ping option
 		radio_station_send_directory_ping();
@@ -2866,6 +2870,10 @@ function radio_station_master_override_save_showpostdata( $post_id ) {
 		delete_transient( 'radio_station_current_schedule' );
 		delete_transient( 'radio_station_current_show' );
 		delete_transient( 'radio_station_next_show' );
+		
+		// --- set last updated schedule time ---
+		// 2.3.2: added for data API use
+		update_option( 'radio_station_schedule_updated', time() );
 		
 		// --- maybe send directory ping ---
 		// 2.3.1: added directory update ping option

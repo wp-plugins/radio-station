@@ -7,7 +7,7 @@
 // --------------
 // Version: 1.1.2
 // --------------
-// * changelog at end of file! *
+// Note: Changelog and structure at end of file.
 //
 // ============
 // Loader Usage
@@ -121,10 +121,13 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 		public function __construct( $args ) {
 
 			// --- set debug switch ---
-			// TODO: prefix debug switch ?
 			// 1.1.2: added debug switch check
-			if ( isset( $_REQUEST['debug'] ) ) {
-				if ( ( '1' == $_REQUEST['debug'] ) || ( 'yes' == $_REQUEST['debug'] ) ) {
+			$prefix = ''; 
+			if ( $args['settings'] ) {
+				$prefix = '-' . $args['settings'];
+			}
+			if ( isset( $_REQUEST[$prefix . 'debug'] ) ) {
+				if ( ( '1' == $_REQUEST[$prefix . 'debug'] ) || ( 'yes' == $_REQUEST[$prefix . 'debug'] ) ) {
 					$this->debug = true;
 				}
 			}
@@ -242,6 +245,15 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			}
 
 			return $value;
+		}
+		
+		// ------------------
+		// Get Plugin Version
+		// ------------------
+		// 1.1.2: added get plugin version function
+		public function plugin_version() {
+			$args = $this->args;
+			return $args['version'];
 		}
 
 		// -----------------
@@ -937,9 +949,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 		}
 
 
-		// ===============
-		// --- Loading ---
-		// ===============
+		// ======================
+		// --- Plugin Loading ---
+		// ======================
 
 		// --------------------
 		// Load Plugin Settings
@@ -1065,9 +1077,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			}
 		}
 
-		// -------------
-		// Readme Viewer
-		// -------------
+		// ------------------
+		// Readme Viewer AJAX
+		// ------------------
 		public function readme_viewer() {
 
 			$args = $this->args;
@@ -1332,9 +1344,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 		}
 
 
-		// =============
-		// --- Admin ---
-		// =============
+		// ====================
+		// --- Plugin Admin ---
+		// ====================
 
 		// -----------------
 		// Add Settings Menu
@@ -1979,9 +1991,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 		}
 
-		// ------------
+		// -----------
 		// Setting Row
-		// ------------
+		// -----------
 		// 1.0.9: added for automatic Settings table generation
 		public function setting_row( $option ) {
 
@@ -2386,9 +2398,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			return $row;
 		}
 
-		// ----------------
-		// Settings Scripts
-		// ----------------
+		// ---------------
+		// Setting Scripts
+		// ---------------
 		// 1.0.9: added settings page scripts
 		public function setting_scripts() {
 
@@ -2403,9 +2415,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			}
 		}
 
-		// ---------------
-		// Settings Styles
-		// ---------------
+		// --------------
+		// Setting Styles
+		// --------------
 		public function setting_styles() {
 
 			$styles = array();
@@ -2511,9 +2523,9 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 			}
 		}
 
-		// -------------------
-		// Get Loader Instance
-		// -------------------
+		// ---------------------
+		// Get Freemius Instance
+		// ---------------------
 		// 2.3.0: added function for getting Freemius class instance
 		if ( !function_exists( 'radio_station_freemius_instance' ) ) {
 			function radio_station_freemius_instance() {
@@ -2526,7 +2538,7 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 		// ---------------
 		// Get Plugin Data
 		// ---------------
-		// 2.3.0: added function for getting plugin data
+		// 1.1.1: added function for getting plugin data
 		if ( !function_exists( 'radio_station_plugin_data' ) ) {
 			function radio_station_plugin_data() {
 				$namespace = radio_station_get_radio_station_slug( __FUNCTION__ );
@@ -2535,6 +2547,34 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 				return $instance->plugin_data();
 			}
 		}
+
+		// ------------------
+		// Get Plugin Version
+		// ------------------
+		// 1.1.2: added function for getting plugin version
+		if ( !function_exists( 'radio_station_plugin_version' ) ) {
+			function radio_station_plugin_version() {
+				$namespace = radio_station_get_radio_station_slug( __FUNCTION__ );
+				$instance = $GLOBALS[$namespace . '_instance'];
+
+				return $instance->plugin_version();
+			}
+		}
+
+		// -----------------
+		// Set Pro Namespace
+		// -----------------
+		if ( !function_exists( 'radio_station_pro_namespace' ) ) {
+			function radio_station_pro_namespace( $pronamespace ) {
+				$namespace = radio_station_get_radio_station_slug( __FUNCTION__ );
+				$instance = $GLOBALS[$namespace . '_instance'];
+				$instance->pro_namespace( $pronamespace );
+			}
+		}
+
+		// ===============
+		// Plugin Settings
+		// ===============
 
 		// ------------
 		// Add Settings
@@ -2628,17 +2668,8 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 				$instance->delete_settings();
 			}
 		}
-
-		// -----------------
-		// Set Pro Namespace
-		// -----------------
-		if ( !function_exists( 'radio_station_pro_namespace' ) ) {
-			function radio_station_pro_namespace( $pronamespace ) {
-				$namespace = radio_station_get_radio_station_slug( __FUNCTION__ );
-				$instance = $GLOBALS[$namespace . '_instance'];
-				$instance->pro_namespace( $pronamespace );
-			}
-		}
+		
+		
 
 		// -----------
 		// Message Box
@@ -2706,6 +2737,50 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 
 
 // =========
+// STRUCTURE
+// =========
+//
+// === Loader Class ===
+// - Initialize Loader
+// - Setup Plugin
+// - Get Plugin Data
+// - Get Plugin Version
+// - Set Pro Namespace
+// === Plugin Settings ===
+// - Get Default Settings
+// - Add Settings
+// - Maybe Transfer Settings
+// - Get All Plugin Settings
+// - Get Plugin Setting
+// - Reset Plugin Settings
+// - Update Plugin Settings
+// - Validate Plugin Setting
+// === Plugin Loading ===
+// - Load Plugin Settings
+// - Add Actions
+// - Load Helper Libraries
+// - Maybe Load Thickbox
+// - Readme Viewer AJAX
+// === Freemius Loading ===
+// - Load Freemius
+// - Filter Freemius Connect
+// - Freemius Connect Message
+// - Connect Update Message
+// === Plugin Admin ===
+// - Add Settings Menu
+// - Plugin Page Links
+// - Message Box
+// - Notice Boxer
+// - Plugin Page Header
+// - Settings Page
+// - Settings Table
+// - Setting Row
+// - Settings Scripts
+// - Settings Styles
+// === Namespaced Functions ===
+
+
+// =========
 // CHANGELOG
 // =========
 
@@ -2713,6 +2788,7 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // - fix for filtering of plugin options
 // - fix for plugin page link URL
 // - added menu added and debug switches
+// - added get plugin version function
 
 // == 1.1.1 ==
 // - remove admin_url wrapper on Freemius first-path value

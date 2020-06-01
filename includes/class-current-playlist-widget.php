@@ -34,7 +34,7 @@ class Playlist_Widget extends WP_Widget {
 		$comments = isset( $instance['comments'] ) ? $instance['comments'] : false;
 		$hide_empty = isset( $instance['hide_empty'] ) ? $instance['hide_empty'] : true;
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : false;
-		$ajax_load = isset( $instance['ajax'] ) ? $instance['ajax'] : false;
+		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : false;
 
 		// 2.3.0: convert template style code to strings
 		// 2.3.2: added AJAX load option field

@@ -41,7 +41,7 @@ class DJ_Widget extends WP_Widget {
 		$avatar_width = isset( $instance['avatar_width'] ) ? $instance['avatar_width'] : '';
 		$link_djs = isset( $instance['link_djs'] ) ? $instance['link_djs'] : '';
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : false;
-		$ajax = isset( $instance['ajax_load'] ) ? $instance['ajax_load'] : false;
+		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : false;
 
 		// 2.3.0: convert template style code to strings
 		// 2.3.2: added AJAX load option field
@@ -195,7 +195,7 @@ class DJ_Widget extends WP_Widget {
 
 		// 2.2.4: added title position and avatar width settings
 		// 2.3.0: added countdown display option
-		// 2.3.2: added ajax_load option
+		// 2.3.2: added ajax load option
 		$instance['title_position'] = $new_instance['title_position'];
 		$instance['avatar_width'] = $new_instance['avatar_width'];
 		$instance['link_djs'] = isset( $new_instance['link_djs'] ) ? 1 : 0;

@@ -8,8 +8,10 @@ $weekdays = radio_station_get_schedule_weekdays();
 $schedule = radio_station_get_current_schedule();
 $hours = radio_station_get_hours();
 $now = strtotime( current_time( 'mysql' ) );
+$date = date( 'Y-m-d', $now );
 $am = str_replace( ' ', '', radio_station_translate_meridiem( 'am' ) );
 $pm = str_replace( ' ', '', radio_station_translate_meridiem( 'pm' ) );
+$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 
 // --- filter show avatar size ---
 $avatar_size = apply_filters( 'radio_station_schedule_show_avatar_size', 'thumbnail', 'tabs' );
@@ -25,30 +27,45 @@ $output .= '<ul id="master-list" class="master-list">';
 
 $tcount = 0;
 // 2.3.0: loop weekdays instead of legacy master list
-foreach ( $weekdays as $day ) {
+foreach ( $weekdays as $weekday ) {
 
 	// --- maybe skip all days but those specified ---
 	$skip_day = false;
 	if ( $atts['days'] ) {
 		$days = explode( ',', $atts['day'] );
 		$days = trim( $days );
-		if ( !in_array( $day, $days ) ) {
+		if ( !in_array( $weekday, $days ) ) {
 			$skip_day = true;
 		}
 	}
 	
 	if ( !$skip_day ) {
 
-		// 2.2.2: use translate function for weekday string
-		$display_day = radio_station_translate_weekday( $day );
-		$output .= '<li class="master-list-day" id="list-header-' . strtolower( $day ) . '">';
-		$output .= '<span class="master-list-day-name">' . esc_html( $display_day ) . '</span>';
+		// 2.3.2: add classes 
+		$classes = array( 'master-list-day' );
+		$weekdate = $weekdates[$weekday];
+		if ( $weekdate == $date ) {
+			$classes[] = 'current-day';
+		}		
+		$classlist = implode( ' ', $classes );
 
-		$output .= '<ul class="master-list-day-' . esc_attr( strtolower( $day ) ) . '-list">';
+		// 2.2.2: use translate function for weekday string
+		$display_day = radio_station_translate_weekday( $weekday );
+		$output .= '<li id="list-header-' . strtolower( $weekday ) . '" class="' . esc_attr( $classlist ) . '" >';
+		$output .= '<span class="master-list-day-name">' . esc_html( $display_day ) . '</span>';
+		
+		// 2.3.2: add output of day start and end times
+		$day_start_time = strtotime( $weekdates[$weekday] . ' 00:00');
+		$day_end_time = $day_start_time + ( 24 * 60 * 60 );
+		$output .= '<span class="rs-time rs-start-time" data="' . esc_attr( $day_start_time ) . '"></span>';
+		$output .= '<span class="rs-time rs-end-time" data="' . esc_attr( $day_end_time ) . '"></span>';
+
+		// --- open day list ---
+		$output .= '<ul class="master-list-day-' . esc_attr( strtolower( $weekday ) ) . '-list">';
 
 		// --- get shifts for this day ---
-		if ( isset( $schedule[$day] ) ) {
-			$shifts = $schedule[$day];
+		if ( isset( $schedule[$weekday] ) ) {
+			$shifts = $schedule[$weekday];
 		} else {
 			$shifts = array();
 		}
@@ -58,6 +75,10 @@ foreach ( $weekdays as $day ) {
 			foreach ( $shifts as $shift ) {
 
 				$show = $shift['show'];
+
+				// --- convert shift time data ---
+				$shift_start_time = strtotime( $weekdate . ' ' . $shift['start'] );
+				$shift_end_time = strtotime( $weekdate . ' ' . $shift['end'] );
 
 				// 2.3.0: filter show link by show and context
 				$show_link = false;
@@ -73,9 +94,14 @@ foreach ( $weekdays as $day ) {
 						$classes[] = strtolower( $term->slug );
 					}
 				}
-				$class = implode( ' ', $classes );
+				// 2.3.2: check for now playing shift
+				if ( ( $now >= $shift_start_time ) && ( $now < $shift_end_time ) ) {
+					$classes[] = 'nowplaying';
+				}
 
-				$output .= '<li class="' . esc_attr( $class ) . '">';
+				// --- open show list item ---
+				$classlist = implode( ' ', $classes );
+				$output .= '<li class="' . esc_attr( $classlist ) . '">';
 
 				// --- show avatar ---
 				if ( $atts['show_image'] ) {
@@ -145,10 +171,6 @@ foreach ( $weekdays as $day ) {
 
 				// --- show time ---
 				if ( $atts['show_times'] ) {
-
-					// --- convert shift time data ---
-					$shift_start_time = strtotime( $shift['day'] . ' ' . $shift['start'] );
-					$shift_end_time = strtotime( $shift['day'] . ' ' . $shift['end'] );
 
 					// --- convert shift time for display ---
 					// 2.3.0: updated to use new schedule data

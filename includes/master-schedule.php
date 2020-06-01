@@ -181,6 +181,7 @@ function radio_station_master_schedule( $atts ) {
 
 		return $output;
 	} elseif ( 'list' == $atts['view'] ) {
+		add_action( 'wp_footer', 'radio_station_master_schedule_list_js' );
 		$template = radio_station_get_template( 'file', 'master-schedule-list.php' );
 		require $template;
 
@@ -349,10 +350,6 @@ function radio_station_master_schedule( $atts ) {
 // ----------------------
 function radio_station_master_schedule_selector() {
 
-	// --- open genre highlighter div ---
-	$html = '<div id="master-genre-list">';
-	$html .= '<span class="heading">' . esc_html( __( 'Genres', 'radio-station' ) ) . ': </span>';
-
 	// --- get genres ---
 	$args = array(
 		'hide_empty' => true,
@@ -360,6 +357,14 @@ function radio_station_master_schedule_selector() {
 		'order'      => 'ASC',
 	);
 	$genres = get_terms( RADIO_STATION_GENRES_SLUG, $args );
+	// 2.3.2: bug out if there are no genre terms
+	if ( !$genres || !is_array( $genres ) ) {
+		return '';
+	}
+
+	// --- open genre highlighter div ---
+	$html = '<div id="master-genre-list">';
+	$html .= '<span class="heading">' . esc_html( __( 'Genres', 'radio-station' ) ) . ': </span>';
 
 	// --- genre highlight links ---
 	// 2.3.0: fix by imploding with genre link spacer
@@ -420,7 +425,7 @@ function radio_station_master_schedule_selector() {
 function radio_station_master_schedule_table_js() {
 
 	// 2.3.2: added current show highlighting cycle
-	$js = "/* Trigger Responsive Table */
+	$js = "/* Initialize Table */
 	jQuery(document).ready(function() {
 		radio_table_responsive();
 		radio_times_highlight();
@@ -554,7 +559,7 @@ function radio_station_master_schedule_tabs_js() {
 
 	// --- tabbed view responsiveness ---
 	// 2.3.0: added for tabbed responsiveness
-	$js .= "/* Trigger Responsive Tabs */
+	$js .= "/* Initialize Tabs */
 	jQuery(document).ready(function() {
 		radio_tabs_responsive();
 		radio_show_highlight();
@@ -667,3 +672,42 @@ function radio_station_master_schedule_tabs_js() {
 	// 2.3.0: enqueue instead of echoing
 	wp_add_inline_script( 'radio-station', $js );
 }
+
+// --------------------
+// List View Javascript
+// --------------------
+// 2.3.2: added for list schedule view
+function radio_station_master_schedule_list_js() {
+
+	// --- list view javascript ---
+	$js = "/* Initialize List */
+	jQuery(document).ready(function() {
+		radio_list_highlight();
+		setTimeout(radio_list_highlight, 60000);
+	});
+	/* Current Show Highlighting */
+	function radio_list_highlight() {
+		radio.current_time = Math.floor( (new Date()).getTime() / 1000 );
+		radio.offset_time = radio.current_time + radio.timezone_offset;
+		jQuery('.master-list-day').each(function() {
+			start = parseInt(jQuery(this).find('.rs-start-time').first().attr('data'));
+			if (start < radio.offset_time) {
+				end = parseInt(jQuery(this).find('.rs-end-time').first().attr('data'));
+				if (end > radio.offset_time) {jQuery(this).addClass('current-day');}
+				else {jQuery(this).removeClass('current-day');}
+			} else {jQuery(this).removeClass('current-day');}		
+		});		
+		jQuery('.master-list-day-item').each(function() {
+			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
+			if (start < radio.offset_time) {	
+				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
+				if (end > radio.offset_time) {jQuery(this).addClass('nowplaying');}
+				else {jQuery(this).removeClass('nowplaying');}
+			} else {jQuery(this).removeClass('nowplaying');}
+		});
+	}";
+	
+	// --- enqueue script inline ---
+	wp_add_inline_script( 'radio-station', $js );
+}	
+	

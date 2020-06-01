@@ -859,16 +859,19 @@ function radio_station_get_override_data_meta( $override ) {
 // --------------------
 // Get Current Schedule
 // --------------------
-function radio_station_get_current_schedule() {
+// 2.3.2: added optional time argument
+function radio_station_get_current_schedule( $time = false ) {
 
 	global $radio_station_data;
 
 	// --- maybe get cached schedule ---
-	$schedule = get_transient( 'radio_station_current_schedule' );
-	if ( $schedule ) {
-		$schedule = apply_filters( 'radio_station_current_schedule', $schedule );
+	if ( !$time ) {
+		$schedule = get_transient( 'radio_station_current_schedule' );
 		if ( $schedule ) {
-			return $schedule;
+			$schedule = apply_filters( 'radio_station_current_schedule', $schedule );
+			if ( $schedule ) {
+				return $schedule;
+			}
 		}
 	}
 
@@ -876,7 +879,11 @@ function radio_station_get_current_schedule() {
 	$show_shifts = radio_station_get_show_shifts();
 	
 	// --- get weekdates ---
-	$now = strtotime( current_time( 'mysql' ) );
+	if ( !$time ) {
+		$now = strtotime( current_time( 'mysql' ) );
+	} else {
+		$now = $time;
+	}
 	$weekdays = radio_station_get_schedule_weekdays();
 	$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 	// 2.3.1: add empty keys to ensure overrides are checked
@@ -1041,7 +1048,8 @@ function radio_station_get_current_schedule() {
 			// --- sort the shifts using 24 hour time ---
 			$shifts = $show_shifts[$day];
 			if ( count( $shifts ) > 0 ) {
-				$new_shifts = array();
+				// 2.3.2: fix to clear shift keys between days
+				$new_shifts = $shift_keys = array();
 				$keys = array_keys( $shifts );
 				foreach ( $keys as $i => $key ) {
 					$converted = radio_station_convert_shift_time( $key, 24 );
@@ -1049,10 +1057,11 @@ function radio_station_get_current_schedule() {
 					$keys[$key] = $shift_keys[$key] = $converted;
 				}
 				sort( $shift_keys );
-				print_r( $shift_keys );
 				foreach ( $shift_keys as $shift_key ) {
-					$key = array_search( $shift_key, $keys );
-					$new_shifts[$key] = $shifts[$key];
+					if ( in_array( $shift_key, $keys ) ) {
+						$key = array_search( $shift_key, $keys );
+						$new_shifts[$key] = $shifts[$key];
+					}
 				}
 				$shifts = $show_shifts[$day] = $new_shifts;
 			}
@@ -1060,6 +1069,7 @@ function radio_station_get_current_schedule() {
 			if ( RADIO_STATION_DEBUG ) {
 				echo "Shift Keys: " . print_r( $keys, true ) . PHP_EOL;
 				echo "Sorted Keys: " . print_r( $shift_keys, true ) . PHP_EOL;
+				echo "Sorted Shifts: " . print_r( $new_shifts, true ) . PHP_EOL;
 			}
 			
 			// --- add directly any remaining overrides ---
@@ -1078,7 +1088,7 @@ function radio_station_get_current_schedule() {
 			$shifts = $show_shifts[$day];
 			// ksort( $shifts );
 			if ( RADIO_STATION_DEBUG ) {
-				echo "Shifts: " . print_r( $shifts, true ) . PHP_EOL;
+				echo "New Day Shifts: " . print_r( $shifts, true ) . PHP_EOL;
 				// echo "Done Overrides: " . print_r( $done_overrides, true ) . PHP_EOL;
 			}
 		}
@@ -1139,10 +1149,16 @@ function radio_station_get_current_schedule() {
 						$shift['day'] = $day;
 						$current_show = $shift;
 						$expires = $shift_end_time - $now - 1;
+						// cache for one hour max
 						if ( $expires > 3600 ) {
 							$expires = 3600;
-						} // cache for one hour max
-						set_transient( 'radio_station_current_show', $current_show, $expires );
+						} 
+						// 2.3.2: set temporary transient if time is specified
+						if ( !$time ) {
+							set_transient( 'radio_station_current_show', $current_show, $expires );
+						} else {
+							set_transient( 'radio_station_current_show_temp', $current_show, $expires );
+						}
 					}
 
 					// --- debug point ---
@@ -1177,21 +1193,30 @@ function radio_station_get_current_schedule() {
 					if ( $next_expires > ( $expires + 3600 ) ) {
 						$next_expires = $expires + 3600;
 					}
-					set_transient( 'radio_station_next_show', $next_show, $next_expires );
-
+					// 2.3.2: set temporary transient if time is specified
+					if ( !$time ) {
+						set_transient( 'radio_station_next_show', $next_show, $next_expires );
+					} else {
+						set_transient( 'radio_station_next_show_temp', $next_show, $next_expires );
+					}
+					
 				} elseif ( isset( $next_show['split'] ) && $next_show['split'] ) {
 
 					// --- recombine split next shift ---
 					$next_show['end'] = $shift['end'];
 					unset( $next_show['split'] );
-					set_transient( 'radio_station_next_show', $next_show, $next_expires );
-
+					// 2.3.2: set temporary transient if time is specified
+					if ( !$time ) {
+						set_transient( 'radio_station_next_show', $next_show, $next_expires );
+					} else {
+						set_transient( 'radio_station_next_show_temp', $next_show, $next_expires );
+					}
 				}
 			}
 		}
 	}
 
-	// --- get next show if we did not find a current one ---
+	// --- get next show if we did not find one ---
 	if ( !isset( $next_show ) ) {
 		// --- pass calculated shifts with limit of 1 ---
 		$next_shows = radio_station_get_next_shows( 1, $show_shifts );
@@ -1199,11 +1224,16 @@ function radio_station_get_current_schedule() {
 			$next_show = $next_shows[0];
 			$shift_end_time = strtotime( $weekdates[$next_show['day']] . ' ' . $next_show['end'] );
 			$next_expires = $shift_end_time - $now - 1;
-			set_transient( 'radio_station_next_show', $next_show, $next_expires );
+			// 2.3.2: set temporary transient if time is specified
+			if ( !$time ) {
+				set_transient( 'radio_station_next_show', $next_show, $next_expires );
+			} else {
+				set_transient( 'radio_station_next_show_temp', $next_show, $next_expires );
+			}
 		}
 	}
 
-	// TODO: edge case where current show or next show is split
+	// TODO: handle possible edge case where current show or next show is split
 	// ...but actually unfinished due to end of schedule week ?
 
 	// --- debug point ---
@@ -1224,11 +1254,17 @@ function radio_station_get_current_schedule() {
 
 	// --- cache current schedule data ---
 	if ( isset( $current_show ) ) {
-		set_transient( 'radio_station_current_schedule', $show_shifts, $expires );
+		// 2.3.2: set temporary transient if time is specified
+		if ( !$time ) {
+			set_transient( 'radio_station_current_schedule', $show_shifts, $expires );
+		} else {
+			set_transient( 'radio_station_current_schedule_temp', $show_shifts, $expires );
+		}
 	}
 
 	// --- filter and return ---
-	$show_shifts = apply_filters( 'radio_station_current_schedule', $show_shifts );
+	// 2.3.2: added time argument to filter
+	$show_shifts = apply_filters( 'radio_station_current_schedule', $show_shifts, $time );
 
 	return $show_shifts;
 }
@@ -1237,19 +1273,31 @@ function radio_station_get_current_schedule() {
 // Get Current Show
 // ----------------
 // 2.3.0: added new get current show function
-function radio_station_get_current_show() {
+// 2.3.2: added optional time argument
+function radio_station_get_current_show( $time = false ) {
+
+	$current_show = false;
 
 	// --- get cached current show value ---
-	$current_show = get_transient( 'radio_station_current_show' );
+	if ( !$time ) {
+		$current_show = get_transient( 'radio_station_current_show' );
+	}
 
 	// --- if not set it has expired so recheck schedule ---
+	// 2.3.2: fix for trailing space in transient name string
 	if ( !$current_show ) {
-		$schedule = radio_station_get_current_schedule();
-		$current_show = get_transient( 'radio_station_current_show ' );
+		if ( !$time ) {
+			$schedule = radio_station_get_current_schedule();
+			$current_show = get_transient( 'radio_station_current_show' );
+		} else {
+			$schedule = radio_station_get_current_schedule( $time );
+			$current_show = get_transient( 'radio_station_current_show_temp' );
+		}
 	}
 
 	// --- filter and return ---
-	$current_show = apply_filters( 'radio_station_current_show', $current_show );
+	// 2.3.2: added time argument to filter
+	$current_show = apply_filters( 'radio_station_current_show', $current_show, $time );
 
 	return $current_show;
 }
@@ -1258,19 +1306,30 @@ function radio_station_get_current_show() {
 // Get Next Show
 // -------------
 // 2.3.0: added new get next show function
-function radio_station_get_next_show() {
+// 2.3.2: added optional time argument
+function radio_station_get_next_show( $time = false ) {
+
+	$next_show = false;
 
 	// --- get cached current show value ---
-	$next_show = get_transient( 'radio_station_next_show' );
-
-	// --- if not set it has expired so recheck schedule ---
-	if ( !$next_show ) {
-		$schedule = radio_station_get_current_schedule();
+	if ( !$time ) {
 		$next_show = get_transient( 'radio_station_next_show' );
 	}
 
+	// --- if not set it has expired so recheck schedule ---
+	if ( !$next_show ) {
+		if ( !$time ) {
+			$schedule = radio_station_get_current_schedule();
+			$next_show = get_transient( 'radio_station_next_show' );
+		} else {
+			$schedule = radio_station_get_current_schedule( $time );
+			$next_show = get_transient( 'radio_station_next_show_temp' );
+		}
+	}
+
 	// --- filter and return ---
-	$next_show = apply_filters( 'radio_station_next_show', $next_show );
+	// 2.3.2: added time argument to filter
+	$next_show = apply_filters( 'radio_station_next_show', $next_show, $time );
 
 	return $next_show;
 }
@@ -1279,12 +1338,17 @@ function radio_station_get_next_show() {
 // Get Next Shows
 // --------------
 // 2.3.0: added new get next shows function
-function radio_station_get_next_shows( $limit = 3, $show_shifts = false ) {
+// 2.3.2: added optional time argument
+function radio_station_get_next_shows( $limit = 3, $show_shifts = false, $time = false ) {
 
 	// --- get all show shifts ---
 	// (this check is needed to prevent an endless loop!)
 	if ( !$show_shifts ) {
-		$show_shifts = radio_station_get_current_schedule();
+		if ( !$time ) {
+			$show_shifts = radio_station_get_current_schedule();
+		} else {
+			$show_shifts = radio_station_get_current_schedule( $time );
+		}
 	}
 
 	// --- loop (remaining) shifts to add show data ---
@@ -2923,7 +2987,7 @@ function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
 			'link_hosts'     => 'boolean',
 			'avatar_width'   => 'integer',
 			'title_position' => 'slug',
-			'ajax_load'      => 'boolean',
+			'ajax'           => 'boolean',
 			'countdown'      => 'boolean',
 			'dynamic'        => 'boolean',
 			'widget'         => 'boolean',
@@ -2946,7 +3010,7 @@ function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
 			'link_hosts'     => 'boolean',
 			'avatar_width'   => 'integer',
 			'title_position' => 'slug',
-			'ajax_load'      => 'boolean',
+			'ajax'           => 'boolean',
 			'countdown'      => 'boolean',
 			'dynamic'        => 'boolean',
 			'widget'         => 'boolean',
@@ -2964,7 +3028,7 @@ function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
 			'album'     => 'boolean',
 			'label'     => 'boolean',
 			'comments'  => 'boolean',
-			'ajax_load' => 'boolean',
+			'ajax'      => 'boolean',
 			'countdown' => 'boolean',
 			'dynamic'   => 'boolean',
 			'widget'    => 'boolean',

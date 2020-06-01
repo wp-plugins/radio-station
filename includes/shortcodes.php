@@ -1070,6 +1070,7 @@ function radio_station_current_show_shortcode( $atts ) {
 	// 2.3.0: set default default_name text
 	// 2.3.0: set default time format to plugin setting
 	// 2.3.2: added AJAX load attribute
+	// 2.3.2: added for_time attribute
 	$time_format = radio_station_get_setting( 'clock_time_format' );
 	$defaults = array(
 		// --- legacy options ---
@@ -1093,6 +1094,7 @@ function radio_station_current_show_shortcode( $atts ) {
 		'dynamic'        => 0,
 		'widget'         => 0,
 		'id'             => '',
+		'for_time'       => 0,
 	);
 	// 2.3.0: convert old attributes for DJs to hosts
 	if ( isset( $atts['display_djs'] ) && !isset( $atts['display_hosts'] ) ) {
@@ -1170,7 +1172,12 @@ function radio_station_current_show_shortcode( $atts ) {
 
 	// --- get current show ---
 	// 2.3.0: use new get current show function
-	$current_shift = radio_station_get_current_show();
+	// 2.3.2: added attribute to pass time argument
+	if ( $atts['for_time'] ) {
+		$current_shift = radio_station_get_current_show( $atts['for_time'] );
+	} else {
+		$current_shift = radio_station_get_current_show();
+	}
 
 	// --- open shortcode div wrapper ---
 	if ( !$atts['widget'] ) {
@@ -1615,6 +1622,7 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 	// 2.3.0: set default time format to plugin setting
 	// 2.3.2: added AJAX load attribute
+	// 2.3.2: added for_time attribute
 	$time_format = radio_station_get_setting( 'clock_time_format' );
 	$defaults = array(
 		// --- legacy options ---
@@ -1637,6 +1645,7 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 		'dynamic'           => 0,
 		'widget'            => 0,
 		'id'                => '',
+		'for_time'          => 0,
 	);
 	// 2.3.0: convert old attributes for DJs to hosts
 	if ( isset( $atts['display_djs'] ) && !isset( $atts['display_hosts'] ) ) {
@@ -1703,7 +1712,11 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 	// --- get the upcoming shows ---
 	// 2.3.0: use new get next shows function
-	$shows = radio_station_get_next_shows( $atts['limit'] );
+	if ( $atts['for_time'] ) {
+		$shows = radio_station_get_next_shows( $atts['limit'], false, $atts['for_time'] );
+	} else {
+		$shows = radio_station_get_next_shows( $atts['limit'] );
+	}
 	if ( RADIO_STATION_DEBUG ) {
 		$output .= '<span class="upcoming-shows-debug" style="display:none;">' . print_r( $shows, true ) . '</span>';
 	}
@@ -2070,6 +2083,7 @@ function radio_station_current_playlist_shortcode( $atts ) {
 
 	// --- get shortcode attributes ---
 	// 2.3.2: added AJAX load attribute
+	// 2.3.2: added for_time attribute
 	$defaults = array(
 		// --- legacy options ---
 		'title'     => '',
@@ -2084,6 +2098,7 @@ function radio_station_current_playlist_shortcode( $atts ) {
 		'dynamic'   => 0,
 		'widget'    => 0,
 		'id'        => '',
+		'for_time'  => 0,
 	);
 	// 2.3.0: renamed shortcode identifier to current-playlist
 	$atts = shortcode_atts( $defaults, $atts, 'current-playlist' );
@@ -2121,7 +2136,11 @@ function radio_station_current_playlist_shortcode( $atts ) {
 	}
 
 	// --- fetch the current playlist ---
-	$playlist = radio_station_get_now_playing();
+	if ( $atts['for_time'] ) {
+		$playlist = radio_station_get_now_playing( $time );
+	} else {
+		$playlist = radio_station_get_now_playing();
+	}
 
 	// --- shortcode only wrapper ---
 	if ( !$atts['widget'] ) {
