@@ -34,14 +34,18 @@ class Playlist_Widget extends WP_Widget {
 		$comments = isset( $instance['comments'] ) ? $instance['comments'] : false;
 		$hide_empty = isset( $instance['hide_empty'] ) ? $instance['hide_empty'] : true;
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : false;
-		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : false;
+		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : '';
 
 		// 2.3.0: convert template style code to strings
 		// 2.3.2: added AJAX load option field
 		$fields = '
 		<p>
 			<label for="' . esc_attr( $this->get_field_id( 'ajax' ) ) . '">
-			<input id="' .esc_attr( $this->get_field_id( 'ajax' ) ) . '" name="' . esc_attr( $this->get_field_name( 'ajax' ) ) . '" type="checkbox" ' . checked( $ajax, true, false ) . '>
+				<select id="' .esc_attr( $this->get_field_id( 'ajax' ) ) . '" name="' . esc_attr( $this->get_field_name( 'ajax' ) ) . '">
+					<option value="" ' . selected( $ajax, '', false ) . '>' . esc_html( __( 'Default', 'radio-station' ) ) . '</option>
+					<option value="on" ' . selected( $ajax, 'on', false ) . '>' . esc_html( __( 'On', 'radio-station' ) ) . '</option>
+					<option value="off" ' . selected( $ajax, 'off', false ) . '>' . esc_html( __( 'Off', 'radio-station' ) ) . '</option>
+				</select>
 				' . esc_html( __( 'AJAX Load Widget?', 'radio-station' ) ) . '
 			</label>
         </p>
@@ -124,7 +128,7 @@ class Playlist_Widget extends WP_Widget {
 		$instance['comments'] = isset( $new_instance['comments'] ) ? 1 : 0;
 		$instance['hide_empty'] = isset( $new_instance['hide_empty'] ) ? 1 : 0;
 		$instance['countdown'] = isset( $new_instance['countdown'] ) ? 1 : 0;
-		$instance['ajax'] = isset( $new_instance['ajax'] ) ? 1 : 0;
+		$instance['ajax'] = isset( $new_instance['ajax'] ) ? $new_instance['ajax'] : 0;
 
 		// 2.3.0: apply filters to widget instance update
 		$instance = apply_filters( 'radio_station_playlist_widget_update', $instance, $new_instance, $old_instance );

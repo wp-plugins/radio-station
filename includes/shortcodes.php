@@ -1066,6 +1066,11 @@ function radio_station_current_show_shortcode( $atts ) {
 
 	$output = '';
 
+	// 2.3.2: get default AJAX load settings
+	$ajax = radio_station_get_setting( 'ajax_loading' );
+	$ajax = ( 'yes' == $ajax ) ? 1 : 0;
+	$dynamic = apply_filters( 'radio_station_current_show_dynamic', 0, $atts );
+
 	// --- get shortcode attributes ---
 	// 2.3.0: set default default_name text
 	// 2.3.0: set default time format to plugin setting
@@ -1090,8 +1095,8 @@ function radio_station_current_show_shortcode( $atts ) {
 		'title_position' => 'right',
 		'link_hosts'     => 0,
 		'countdown'      => 0,
-		'ajax'           => 0,
-		'dynamic'        => 0,
+		'ajax'           => $ajax,
+		'dynamic'        => $dynamic,
 		'widget'         => 0,
 		'id'             => '',
 		'for_time'       => 0,
@@ -1116,28 +1121,30 @@ function radio_station_current_show_shortcode( $atts ) {
 	// --- maybe do AJAX load ---
 	// 2.3.2 added widget AJAX loading
 	$atts['ajax'] = apply_filters( 'radio_station_widgets_ajax_override', $atts['ajax'], 'current-show', $atts['widget'] );
-	if ( $atts['ajax'] && ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) ) {
-	
-		// --- AJAX load via iframe ---
-		$ajax_url = admin_url( 'admin-ajax.php' );
-		$instance = $radio_station_data['current_show_instance'];
-		$html = '<div id="rs-current-show-' . esc_attr( $instance ) . '"></div>';
-		$html .= '<iframe id="rs-current-show-' . esc_attr( $instance ) . '-loader" src="javascript:void(0);" style="display:none;"></iframe>';
-		$html .= "<script>timestamp = Math.floor( (new Date()).getTime() / 1000 );
-			url = '" . esc_url( $ajax_url ) . "?action=radio_station_current_show';
-			url += '&instance=" . esc_attr( $instance ) . "&timestamp='+timestamp;";
-			$html .= "url += '";
-			foreach ( $atts as $key => $value ) {
-				$html .= "&" . esc_attr( $key ) . "=" . esc_attr( $value );
-			}			
-			$html .= "'; ";
-		$html .= "document.getElementById('rs-current-show-" . esc_attr( $instance ) ."-loader').src = url;";
-		$html .= "</script>";
+	if ( ( 1 == $atts['ajax'] ) || ( 'on' == $ajax ) ) {
+		if ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) {
 
-		// --- enqueue shortcode styles ---
-		radio_station_enqueue_style( 'shortcodes' );
-	
-		return $html;
+			// --- AJAX load via iframe ---
+			$ajax_url = admin_url( 'admin-ajax.php' );
+			$instance = $radio_station_data['current_show_instance'];
+			$html = '<div id="rs-current-show-' . esc_attr( $instance ) . '"></div>';
+			$html .= '<iframe id="rs-current-show-' . esc_attr( $instance ) . '-loader" src="javascript:void(0);" style="display:none;"></iframe>';
+			$html .= "<script>timestamp = Math.floor( (new Date()).getTime() / 1000 );
+				url = '" . esc_url( $ajax_url ) . "?action=radio_station_current_show';
+				url += '&instance=" . esc_attr( $instance ) . "&timestamp='+timestamp;";
+				$html .= "url += '";
+				foreach ( $atts as $key => $value ) {
+					$html .= "&" . esc_attr( $key ) . "=" . esc_attr( $value );
+				}			
+				$html .= "'; ";
+			$html .= "document.getElementById('rs-current-show-" . esc_attr( $instance ) ."-loader').src = url;";
+			$html .= "</script>";
+
+			// --- enqueue shortcode styles ---
+			radio_station_enqueue_style( 'shortcodes' );
+
+			return $html;
+		}
 	}
 
 	// 2.3.0: maybe set float class and avatar width style
@@ -1620,6 +1627,11 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 	$output = '';
 
+	// 2.3.2: get default AJAX load settings
+	$ajax = radio_station_get_setting( 'ajax_loading' );
+	$ajax = ( 'yes' == $ajax ) ? 1 : 0;
+	$dynamic = apply_filters( 'radio_station_upcoming_shows_dynamic', 0, $atts );
+
 	// 2.3.0: set default time format to plugin setting
 	// 2.3.2: added AJAX load attribute
 	// 2.3.2: added for_time attribute
@@ -1641,8 +1653,8 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 		'avatar_width'      => '',
 		'title_position'    => 'right',
 		'countdown'         => 0,
-		'ajax'              => 0,
-		'dynamic'           => 0,
+		'ajax'              => $ajax,
+		'dynamic'           => $dynamic,
 		'widget'            => 0,
 		'id'                => '',
 		'for_time'          => 0,
@@ -1667,28 +1679,30 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 	// --- maybe do AJAX load ---
 	// 2.3.2 added widget AJAX loading
 	$atts['ajax'] = apply_filters( 'radio_station_widgets_ajax_override', $atts['ajax'], 'upcoming-shows', $atts['widget'] );
-	if ( $atts['ajax'] && ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) ) {
+	if ( ( 1 == $atts['ajax'] ) || ( 'on' == $atts['ajax'] ) ) {
+		if ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) {
 	
-		// --- AJAX load via iframe ---
-		$ajax_url = admin_url( 'admin-ajax.php' );
-		$instance = $radio_station_data['upcoming_shows_instance'];
-		$html = '<div id="rs-upcoming-shows-' . esc_attr( $instance ) . '"></div>';
-		$html .= '<iframe id="rs-upcoming-shows-' . esc_attr( $instance ) . '-loader" src="javascript:void(0);" style="display:none;"></iframe>';
-		$html .= "<script>timestamp = Math.floor( (new Date()).getTime() / 1000 );
-			url = '" . esc_url( $ajax_url ) . "?action=radio_station_upcoming_shows';
-			url += '&instance=" . esc_attr( $instance ) . "&timestamp='+timestamp;";
-			$html .= "url += '";
-			foreach ( $atts as $key => $value ) {
-				$html .= "&" . esc_attr( $key ) . "=" . esc_attr( $value );
-			}			
-			$html .= "'; ";
-		$html .= "document.getElementById('rs-upcoming-shows-" . esc_attr( $instance ) ."-loader').src = url;";
-		$html .= "</script>";
+			// --- AJAX load via iframe ---
+			$ajax_url = admin_url( 'admin-ajax.php' );
+			$instance = $radio_station_data['upcoming_shows_instance'];
+			$html = '<div id="rs-upcoming-shows-' . esc_attr( $instance ) . '"></div>';
+			$html .= '<iframe id="rs-upcoming-shows-' . esc_attr( $instance ) . '-loader" src="javascript:void(0);" style="display:none;"></iframe>';
+			$html .= "<script>timestamp = Math.floor( (new Date()).getTime() / 1000 );
+				url = '" . esc_url( $ajax_url ) . "?action=radio_station_upcoming_shows';
+				url += '&instance=" . esc_attr( $instance ) . "&timestamp='+timestamp;";
+				$html .= "url += '";
+				foreach ( $atts as $key => $value ) {
+					$html .= "&" . esc_attr( $key ) . "=" . esc_attr( $value );
+				}			
+				$html .= "'; ";
+			$html .= "document.getElementById('rs-upcoming-shows-" . esc_attr( $instance ) ."-loader').src = url;";
+			$html .= "</script>";
 
-		// --- enqueue shortcode styles ---
-		radio_station_enqueue_style( 'shortcodes' );
-	
-		return $html;
+			// --- enqueue shortcode styles ---
+			radio_station_enqueue_style( 'shortcodes' );
+
+			return $html;
+		}
 	}
 
 	// 2.2.4: maybe set float class and avatar width style
@@ -2081,6 +2095,11 @@ function radio_station_current_playlist_shortcode( $atts ) {
 
 	$output = '';
 
+	// 2.3.2: get default AJAX load settings
+	$ajax = radio_station_get_setting( 'ajax_loading' );
+	$ajax = ( 'yes' == $ajax ) ? 1 : 0;
+	$dynamic = apply_filters( 'radio_station_current_playlist_dynamic', 0, $atts );
+		
 	// --- get shortcode attributes ---
 	// 2.3.2: added AJAX load attribute
 	// 2.3.2: added for_time attribute
@@ -2093,9 +2112,9 @@ function radio_station_current_playlist_shortcode( $atts ) {
 		'label'     => 0,
 		'comments'  => 0,
 		// --- new options ---
-		'ajax'      => 0,
 		'countdown' => 0,
-		'dynamic'   => 0,
+		'ajax'      => $ajax,
+		'dynamic'   => $dynamic,
 		'widget'    => 0,
 		'id'        => '',
 		'for_time'  => 0,
@@ -2111,28 +2130,30 @@ function radio_station_current_playlist_shortcode( $atts ) {
 	// --- maybe do AJAX load ---
 	// 2.3.2 added widget AJAX loading
 	$atts['ajax'] = apply_filters( 'radio_station_widgets_ajax_override', $atts['ajax'], 'current-playlist', $atts['widget'] );
-	if ( $atts['ajax'] && ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) ) {
+	if ( ( 1 == $atts['ajax'] ) || ( 'on' == $ajax ) ) {
+		if ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) {
 	
-		// --- AJAX load via iframe ---
-		$ajax_url = admin_url( 'admin-ajax.php' );
-		$instance = $radio_station_data['current_playlist_instance'];
-		$html = '<div id="rs-current-playlist-' . esc_attr( $instance ) . '"></div>';
-		$html .= '<iframe id="rs-current-playlist-' . esc_attr( $instance ) . '-loader" src="javascript:void(0);" style="display:none;"></iframe>';
-		$html .= "<script>timestamp = Math.floor( (new Date()).getTime() / 1000 );
-			url = '" . esc_url( $ajax_url ) . "?action=radio_station_current_playlist';
-			url += '&instance=" . esc_attr( $instance ) . "&timestamp='+timestamp;";
-			$html .= "url += '";
-			foreach ( $atts as $key => $value ) {
-				$html .= "&" . esc_attr( $key ) . "=" . esc_attr( $value );
-			}			
-			$html .= "'; ";
-		$html .= "document.getElementById('rs-current-playlist-" . esc_attr( $instance ) ."-loader').src = url;";
-		$html .= "</script>";
+			// --- AJAX load via iframe ---
+			$ajax_url = admin_url( 'admin-ajax.php' );
+			$instance = $radio_station_data['current_playlist_instance'];
+			$html = '<div id="rs-current-playlist-' . esc_attr( $instance ) . '"></div>';
+			$html .= '<iframe id="rs-current-playlist-' . esc_attr( $instance ) . '-loader" src="javascript:void(0);" style="display:none;"></iframe>';
+			$html .= "<script>timestamp = Math.floor( (new Date()).getTime() / 1000 );
+				url = '" . esc_url( $ajax_url ) . "?action=radio_station_current_playlist';
+				url += '&instance=" . esc_attr( $instance ) . "&timestamp='+timestamp;";
+				$html .= "url += '";
+				foreach ( $atts as $key => $value ) {
+					$html .= "&" . esc_attr( $key ) . "=" . esc_attr( $value );
+				}			
+				$html .= "'; ";
+			$html .= "document.getElementById('rs-current-playlist-" . esc_attr( $instance ) ."-loader').src = url;";
+			$html .= "</script>";
 
-		// --- enqueue shortcode styles ---
-		radio_station_enqueue_style( 'shortcodes' );
-	
-		return $html;
+			// --- enqueue shortcode styles ---
+			radio_station_enqueue_style( 'shortcodes' );
+
+			return $html;
+		}
 	}
 
 	// --- fetch the current playlist ---

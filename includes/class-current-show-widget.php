@@ -41,14 +41,18 @@ class DJ_Widget extends WP_Widget {
 		$avatar_width = isset( $instance['avatar_width'] ) ? $instance['avatar_width'] : '';
 		$link_djs = isset( $instance['link_djs'] ) ? $instance['link_djs'] : '';
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : false;
-		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : false;
+		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : '';
 
 		// 2.3.0: convert template style code to strings
 		// 2.3.2: added AJAX load option field
 		$fields = '
 		<p>
 			<label for="' . esc_attr( $this->get_field_id( 'ajax' ) ) . '">
-			<input id="' .esc_attr( $this->get_field_id( 'ajax' ) ) . '" name="' . esc_attr( $this->get_field_name( 'ajax' ) ) . '" type="checkbox" ' . checked( $ajax, true, false ) . '>
+				<select id="' .esc_attr( $this->get_field_id( 'ajax' ) ) . '" name="' . esc_attr( $this->get_field_name( 'ajax' ) ) . '">
+					<option value="" ' . selected( $ajax, '', false ) . '>' . esc_html( __( 'Default', 'radio-station' ) ) . '</option>
+					<option value="on" ' . selected( $ajax, 'on', false ) . '>' . esc_html( __( 'On', 'radio-station' ) ) . '</option>
+					<option value="off" ' . selected( $ajax, 'off', false ) . '>' . esc_html( __( 'Off', 'radio-station' ) ) . '</option>
+				</select>
 				' . esc_html( __( 'AJAX Load Widget?', 'radio-station' ) ) . '
 			</label>
         </p>
@@ -200,7 +204,7 @@ class DJ_Widget extends WP_Widget {
 		$instance['avatar_width'] = $new_instance['avatar_width'];
 		$instance['link_djs'] = isset( $new_instance['link_djs'] ) ? 1 : 0;
 		$instance['countdown'] = isset( $new_instance['countdown'] ) ? 1 : 0;
-		$instance['ajax'] = isset( $new_instance['ajax'] ) ? 1 : 0;		
+		$instance['ajax'] = isset( $new_instance['ajax'] ) ? $new_instance['ajax'] : 0;		
 
 		// 2.3.0: filter widget update instance
 		$instance = apply_filters( 'radio_station_current_show_widget_update', $instance, $new_instance, $old_instance );
@@ -218,8 +222,7 @@ class DJ_Widget extends WP_Widget {
 			$id = $radio_station_data['widgets']['current-show'] = 0;
 		} else {
 			$id = $radio_station_data['widgets']['current-show']++;
-		}
-		
+		}		
 
 		// 2.3.0: filter widget_title whether empty or not
 		$title = empty( $instance['title'] ) ? '' : $instance['title'];

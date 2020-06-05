@@ -39,14 +39,18 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		$avatar_width = isset( $instance['avatar_width'] ) ? $instance['avatar_width'] : '75';
 		$link_djs = isset( $instance['link_djs'] ) ? $instance['link_djs'] : '';
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : '';
-		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : 0;
+		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : '';
 
 		// 2.3.0: convert template style code to straight php echo
 		// 2.3.2: added AJAX load option field
 		$fields = '
 		<p>
 			<label for="' . esc_attr( $this->get_field_id( 'ajax' ) ) . '">
-			<input id="' .esc_attr( $this->get_field_id( 'ajax' ) ) . '" name="' . esc_attr( $this->get_field_name( 'ajax' ) ) . '" type="checkbox" ' . checked( $ajax, true, false ) . '>
+				<select id="' .esc_attr( $this->get_field_id( 'ajax' ) ) . '" name="' . esc_attr( $this->get_field_name( 'ajax' ) ) . '">
+					<option value="" ' . selected( $ajax, '', false ) . '>' . esc_html( __( 'Default', 'radio-station' ) ) . '</option>
+					<option value="on" ' . selected( $ajax, 'on', false ) . '>' . esc_html( __( 'On', 'radio-station' ) ) . '</option>
+					<option value="off" ' . selected( $ajax, 'off', false ) . '>' . esc_html( __( 'Off', 'radio-station' ) ) . '</option>
+				</select>
 				' . esc_html( __( 'AJAX Load Widget?', 'radio-station' ) ) . '
 			</label>
         </p>

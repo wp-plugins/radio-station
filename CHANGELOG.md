@@ -11,9 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Update: Plugin Loader (1.1.2) with settings link fix
 * Fixed: added check for empty role capabilities
 * Fixed: added settings submenu redirection fix
+* Fixed: show and override midnight end conflict
+* Fixed: metaboxes disappearing on position sorting
 * Added: AJAX widget load option (to bypass page caches)
-* Added: automated show schedule highlighting (table/tabs)
+* Added: automated show schedule highlighting (table/tabs/list)
 * Added: playlist track arrows for re-ordering tracks
+* Added: AJAX save of show shifts and playlist tracks
+* Added: post type editing metabox position filtering
 
 ### 2.3.1
 * Update: Plugin Loader (1.1.1) with Freemius first path fix

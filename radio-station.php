@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.3.1.3
+Version: 2.3.1.4
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -684,6 +684,31 @@ $options = array(
 		'section' => 'single',
 	),
 
+	// === Widgets ===
+
+	// --- AJAX Loading ---
+	'ajax_widgets' => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'AJAX Load Widgets?', 'radio-station' ),
+		'default' => 'yes',
+		'value'   => 'yes',
+		'helper'  => __( 'Defaults plugin widgets to AJAX loading. Can also be set on individual widgets.', 'radio-station' ),
+		'tab'     => 'widgets',
+		'section' => 'loading',
+	),
+	
+	// --- Dynamic Reloading ---
+	'dynamic_reload' => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Dynamic Reloading?', 'radio-station' ),
+		'default' => 'yes',
+		'value'   => 'yes',
+		'helper'  => __( 'Automatically reload all plugin widgets on change of current Show. Can also be set on individual widgets.', 'radio-station' ),
+		'tab'     => 'widgets',
+		'section' => 'loading',
+		'pro'     => true,
+	),
+
 
 	// === Roles / Capabilities / Permissions  ===
 	// 2.3.0: added new capability and role options
@@ -740,14 +765,17 @@ $options = array(
 	// === Tabs and Sections ===
 
 	// --- Tab Labels ---
+	// 2.3.2: add widget options tab
 	'tabs'                    => array(
 		'general'   => __( 'General', 'radio-station' ),
 		'pages'     => __( 'Pages', 'radio-station' ),
 		'templates' => __( 'Templates', 'radio-station' ),
+		'widgets'   => __( 'Widgets', 'radio-station' ),
 		'roles'     => __( 'Roles', 'radio-station' ),
 	),
 
 	// --- Section Labels ---
+	// 2.3.2: add widget loading section
 	'sections'                => array(
 		'station'     => __( 'Station', 'radio-station' ),
 		'broadcast'   => __( 'Broadcast', 'radio-station' ),
@@ -758,6 +786,7 @@ $options = array(
 		'schedule'    => __( 'Schedule Page', 'radio-station' ),
 		'show'        => __( 'Show Pages', 'radio-station' ),
 		'archives'    => __( 'Archives', 'radio-station' ),
+		'loading'     => __( 'Widget Loading', 'radio-station' ),
 		'permissions' => __( 'Permissions', 'radio-station' ),
 	),
 );
@@ -852,7 +881,8 @@ add_action( 'init', 'radio_station_check_version', 9 );
 function radio_station_check_version() {
 
 	// --- get current and stored versions ---
-	$version = radio_station_loader_instance()->version;
+	// 2.3.2: use plugin version function
+	$version = radio_station_plugin_version();
 	$stored_version = get_option( 'radio_station_version', false );
 
 	// --- check current against stored version ---
@@ -923,8 +953,14 @@ function radio_station_enqueue_script( $scriptkey, $deps = array(), $infooter = 
 	$template = radio_station_get_template( 'both', $filename, 'js' );
 	if ( $template ) {
 
-		$version = filemtime( $template['file'] );
-		// $version = radio_station_plugin_version();
+		// 2.3.2: use plugin version for releases 
+		$plugin_version = radio_station_plugin_version();
+		if ( 5 == strlen( $plugin_version ) ) {
+			$version = $plugin_version;
+		} else {
+			$version = filemtime( $template['file'] );
+		}
+		
 		$url = $template['url'];
 
 		// --- enqueue script ---
@@ -955,7 +991,13 @@ function radio_station_enqueue_style( $stylekey ) {
 		if ( $template ) {
 
 			// --- use found template values ---
-			$version = filemtime( $template['file'] );
+			// 2.3.2: use plugin version for releases
+			$plugin_version = radio_station_plugin_version();
+			if ( 5 == strlen( $plugin_version ) ) {
+				$version = $plugin_version;
+			} else {
+				$version = filemtime( $template['file'] );
+			}
 			$url = $template['url'];
 
 			// --- enqueue styles in footer ---
