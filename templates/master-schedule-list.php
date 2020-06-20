@@ -4,13 +4,20 @@
  */
 
 // --- get all the required info ---
-$weekdays = radio_station_get_schedule_weekdays();
 $schedule = radio_station_get_current_schedule();
 $hours = radio_station_get_hours();
-$now = strtotime( current_time( 'mysql' ) );
-$date = date( 'Y-m-d', $now );
+$now = radio_station_get_now();
+$date = radio_station_get_time( 'date', $now );
 $am = str_replace( ' ', '', radio_station_translate_meridiem( 'am' ) );
 $pm = str_replace( ' ', '', radio_station_translate_meridiem( 'pm' ) );
+
+// --- get schedule days and dates ---
+// 2.3.2: allow for start day attibute
+if ( isset( $atts['start_day'] ) && $atts['start_day'] ) {
+	$weekdays = radio_station_get_schedule_weekdays( $atts['start_day'] );
+} else {
+	$weekdays = radio_station_get_schedule_weekdays();
+}
 $weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 
 // --- filter show avatar size ---
@@ -32,9 +39,14 @@ foreach ( $weekdays as $weekday ) {
 	// --- maybe skip all days but those specified ---
 	$skip_day = false;
 	if ( $atts['days'] ) {
-		$days = explode( ',', $atts['day'] );
-		$days = trim( $days );
-		if ( !in_array( $weekday, $days ) ) {
+		$days = explode( ',', $atts['days'] );
+		$found_day = false;
+		foreach ( $days as $day ) {
+			if ( trim( strtolower( $day ) ) == strtolower( $weekday ) ) {
+				$found_day = true;
+			}
+		}
+		if ( !$found_day ) {
 			$skip_day = true;
 		}
 	}
@@ -55,7 +67,8 @@ foreach ( $weekdays as $weekday ) {
 		$output .= '<span class="master-list-day-name">' . esc_html( $display_day ) . '</span>';
 		
 		// 2.3.2: add output of day start and end times
-		$day_start_time = strtotime( $weekdates[$weekday] . ' 00:00');
+		// 2.3.2: replace strtotime with to_time for timezones
+		$day_start_time = radio_station_to_time( $weekdates[$weekday] . ' 00:00' );
 		$day_end_time = $day_start_time + ( 24 * 60 * 60 );
 		$output .= '<span class="rs-time rs-start-time" data="' . esc_attr( $day_start_time ) . '"></span>';
 		$output .= '<span class="rs-time rs-end-time" data="' . esc_attr( $day_end_time ) . '"></span>';
@@ -77,8 +90,9 @@ foreach ( $weekdays as $weekday ) {
 				$show = $shift['show'];
 
 				// --- convert shift time data ---
-				$shift_start_time = strtotime( $weekdate . ' ' . $shift['start'] );
-				$shift_end_time = strtotime( $weekdate . ' ' . $shift['end'] );
+				// 2.3.2: replace strtotime with to_time for timezones
+				$shift_start_time = radio_station_to_time( $weekdate . ' ' . $shift['start'] );
+				$shift_end_time = radio_station_to_time( $weekdate . ' ' . $shift['end'] );
 
 				// 2.3.0: filter show link by show and context
 				$show_link = false;
@@ -182,11 +196,21 @@ foreach ( $weekdays as $weekday ) {
 					}
 					if ( 24 == (int) $atts['time'] ) {
 						$start = radio_station_convert_shift_time( $shift['start'], 24 );
-						$end = radio_station_convert_shift_time( $shift['end'], 24 );
+						// 2.3.2: display real end of split shift
+						if ( isset( $shift['split'] ) && $shift['split'] && isset( $shift['real_end'] ) ) {
+							$end = radio_station_convert_shift_time( $shift['real_end'], 24 );
+						} else {
+							$end = radio_station_convert_shift_time( $shift['end'], 24 );
+						}
 						$data_format = "H:i";
 					} else {
 						$start = str_replace( array( 'am', 'pm'), array( ' ' . $am, ' ' . $pm), $shift['start'] );
-						$end = str_replace( array( 'am', 'pm'), array( '  ' . $am, ' ' . $pm), $shift['end'] );
+						// 2.3.2: display real end of split shift
+						if ( isset( $shift['split'] ) && $shift['split'] && isset( $shift['real_end'] ) ) {
+							$end = str_replace( array( 'am', 'pm'), array( ' ' . $am, ' ' . $pm ), $shift['real_end'] );
+						} else {
+							$end = str_replace( array( 'am', 'pm'), array( ' ' . $am, ' ' . $pm ), $shift['end'] );
+						}
 						$data_format = "g:i a";
 					}
 

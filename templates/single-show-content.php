@@ -369,33 +369,28 @@ if ( !$active || !$shifts ) {
 } else {
 
 	// --- get timezone and offset ---
-	$timezone = radio_station_get_setting( 'timezone_location' );
-	if ( !$timezone || ( '' == $timezone ) ) {
-		// --- fallback to WordPress timezone ---
-		$timezone = get_option( 'timezone_string' );
-		if ( false !== strpos( $timezone, 'Etc/GMT' ) ) {
-			$timezone = '';
-		}
-		if ( '' == $timezone ) {
-			$offset = get_option( 'gmt_offset' );
-		}
-	}
-	if ( $timezone && ( '' != $timezone ) ) {
+	// 2.3.2: use get timezone function
+	$timezone = radio_station_get_timezone();
+	if ( strstr( $timezone, 'UTC' ) ) {
+		$offset = str_replace( 'UTC', '', $timezone );
+	} else {
 		$timezone_code = radio_station_get_timezone_code( $timezone );
 		$datetimezone = new DateTimeZone( $timezone );
 		$offset = $datetimezone->getOffset( new DateTime() );
 		$offset = round( $offset / 60 / 60 );
-	}
-	if ( strstr( (string) $offset, '.' ) ) {
-		if ( substr( $offset, - 2, 2 ) == '.5' ) {
-			$offset = str_replace( '.5', ':30', $offset );
-		} elseif ( substr( $offset, - 3, 3 ) == '.75' ) {
-			$offset = str_replace( '.75', ':45', $offset );
-		} elseif ( substr( $offset, - 3, 3 ) == '.25' ) {
-			$offset = str_replace( '.25', ':15', $offset );
+
+		if ( strstr( (string) $offset, '.' ) ) {
+			if ( substr( $offset, - 2, 2 ) == '.5' ) {
+				$offset = str_replace( '.5', ':30', $offset );
+			} elseif ( substr( $offset, - 3, 3 ) == '.75' ) {
+				$offset = str_replace( '.75', ':45', $offset );
+			} elseif ( substr( $offset, - 3, 3 ) == '.25' ) {
+				$offset = str_replace( '.25', ':15', $offset );
+			}
 		}
 	}
-	if ( 0 == $offset ) {
+	
+	if ( ( 0 == $offset ) || ( '' == $offset ) ) {
 		$utc_offset = '';
 	} elseif ( $offset > 0 ) {
 		$utc_offset = '+' . $offset;
@@ -410,7 +405,7 @@ if ( !$active || !$shifts ) {
 	} else {
 		$blocks['show_times'] .= esc_html( $timezone_code );
 		$blocks['show_times'] .= '<span class="show-offset">';
-		$blocks['show_times'] .= ' (' . esc_html( __( 'UTC', 'radio-station' ) ) . $utc_offset . ')';
+		$blocks['show_times'] .= ' [' . esc_html( __( 'UTC', 'radio-station' ) ) . $utc_offset . ']';
 		$blocks['show_times'] .= '</span>';
 	}
 
@@ -423,7 +418,7 @@ if ( !$active || !$shifts ) {
 	$am = radio_station_translate_meridiem( 'am' );
 	$pm = radio_station_translate_meridiem( 'pm' );
 	$weekdays = radio_station_get_schedule_weekdays();
-	$current_time = strtotime( current_time( 'mysql' ) );
+	$now = radio_station_get_now();
 	foreach ( $weekdays as $day ) {
 		$show_times = array();
 		if ( $shifts && is_array( $shifts ) && ( count( $shifts ) > 0 ) ) {
@@ -431,10 +426,11 @@ if ( !$active || !$shifts ) {
 				if ( $day == $shift['day'] ) {
 
 					// --- convert shift info ---
+					// 2.3.2: replace strtotime with to_time for timezones
 					$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
 					$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
-					$shift_start_time = strtotime( $start );
-					$shift_end_time = strtotime( $end );
+					$shift_start_time = radio_station_to_time( $start );
+					$shift_end_time = radio_station_to_time( $end );
 					if ( $shift_end_time < $shift_start_time ) {
 						$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 					}
@@ -452,7 +448,7 @@ if ( !$active || !$shifts ) {
 
 					// --- check if current shift ---
 					$classes = array( 'show-shift-time' );
-					if ( ( $current_time > $shift_start_time ) && ( $current_time < $shift_end_time ) ) {
+					if ( ( $now > $shift_start_time ) && ( $now < $shift_end_time ) ) {
 						$classes[] = 'current-shift';
 					}
 					$class = implode( ' ', $classes );

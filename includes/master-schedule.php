@@ -44,6 +44,7 @@ function radio_station_master_schedule( $atts ) {
 	// 2.3.0: added link_hosts attribute (default off)
 	// 2.3.0: set default time format according to plugin setting
 	// 2.3.0: set default table display to new table formatting
+	// 2.3.2: added start_day attribute (for use width days)
 	$time_format = (int) radio_station_get_setting( 'clock_time_format' );
 	$defaults = array(
 		'time'              => $time_format,
@@ -51,6 +52,7 @@ function radio_station_master_schedule( $atts ) {
 		'show_link'         => 1,
 		'view'              => 'table',
 		'days'				=> false,
+		'start_day'			=> false,
 		'divheight'         => 45,
 		// 'list'           => 0, // converted above / deprecated
 		// 'show_djs'       => 0, // converted above / deprecated
@@ -425,6 +427,7 @@ function radio_station_master_schedule_selector() {
 function radio_station_master_schedule_table_js() {
 
 	// 2.3.2: added current show highlighting cycle
+	// 2.3.2: fix to currenthour substr
 	$js = "/* Initialize Table */
 	jQuery(document).ready(function() {
 		radio_table_responsive();
@@ -439,6 +442,8 @@ function radio_station_master_schedule_table_js() {
 	function radio_times_highlight() {
 		radio.current_time = Math.floor( (new Date()).getTime() / 1000 );
 		radio.offset_time = radio.current_time + radio.timezone_offset;
+		if (radio.debug) {console.log(radio.current_time+' - '+radio.offset_time);}
+		if (radio.timezone_adjusted) {radio.offset_time = radio.current_time;}
 		jQuery('.master-program-day').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
 			if (start < radio.offset_time) {
@@ -449,15 +454,18 @@ function radio_station_master_schedule_table_js() {
 		});
 		jQuery('.master-program-hour').each(function() {
 			hour = parseInt(jQuery(this).find('.master-program-server-hour').attr('data'));
-			current = new Date(radio.offset_time * 1000).toISOString();
+			offset_time = radio.current_time + radio.timezone_offset;
+			current = new Date(offset_time * 1000).toISOString();
 			currenthour = current.substr(11, 2);
-    		if (currenthour.substr(0,1) == '0') {currenthour = hours.substr(1,1);}
+    		if (currenthour.substr(0,1) == '0') {currenthour = currenthour.substr(1,1);}
 			if (hour == currenthour) {jQuery(this).addClass('current-hour');}
 			else {jQuery(this).removeClass('current-hour');}
 		});
 		jQuery('.master-show-entry').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
-			if (start < radio.offset_time) {	
+			if (radio.debug) {console.log(start);}
+			if (start < radio.offset_time) {
+				if (radio.debug) {console.log('^^^^^^^');}
 				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
 				if (end > radio.offset_time) {jQuery(this).addClass('nowplaying');}
 				else {jQuery(this).removeClass('nowplaying');}
@@ -573,6 +581,8 @@ function radio_station_master_schedule_tabs_js() {
 	function radio_show_highlight() {
 		radio.current_time = Math.floor( (new Date()).getTime() / 1000 );
 		radio.offset_time = radio.current_time + radio.timezone_offset;
+		if (radio.debug) {console.log(radio.current_time+' - '+radio.offset_time);}
+		if (radio.timezone_adjusted) {radio.offset_time = radio.current_time;}
 		jQuery('.master-schedule-tabs-day').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
 			if (start < radio.offset_time) {
@@ -583,7 +593,9 @@ function radio_station_master_schedule_tabs_js() {
 		});		
 		jQuery('.master-schedule-tabs-show').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
-			if (start < radio.offset_time) {	
+			if (radio.debug) {console.log(start);}
+			if (start < radio.offset_time) {
+				if (radio.debug) {console.log('^^^^^^^');}
 				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
 				if (end > radio.offset_time) {jQuery(this).addClass('nowplaying');}
 				else {jQuery(this).removeClass('nowplaying');}
@@ -689,6 +701,7 @@ function radio_station_master_schedule_list_js() {
 	function radio_list_highlight() {
 		radio.current_time = Math.floor( (new Date()).getTime() / 1000 );
 		radio.offset_time = radio.current_time + radio.timezone_offset;
+		if (radio.timezone_adjusted) {radio.offset_time = radio.current_time;}
 		jQuery('.master-list-day').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').first().attr('data'));
 			if (start < radio.offset_time) {

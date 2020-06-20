@@ -311,7 +311,7 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 		$am = radio_station_translate_meridiem( 'am' );
 		$pm = radio_station_translate_meridiem( 'pm' );
 	}
-
+	
 	// --- check for results ---
 	$list = '<div class="' . esc_attr( $type ) . '-archives">';
 	if ( !$archive_posts || !is_array( $archive_posts ) || ( count( $archive_posts ) == 0 ) ) {
@@ -378,12 +378,14 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 				$list .= "<div class='override-archive-date'>";
 
 				// --- convert date info ---
-				$day = date( 'l', strtotime( $datetime['date'] ) );
+				// 2.3.2: replace strtotime with to_time for timezones
+				$date_time = radio_station_to_time( $datetime['date'] );
+				$day = radio_station_get_time( 'day', $date_time );
 				$display_day = radio_station_translate_weekday( $day );
 				$start = $datetime['start_hour'] . ':' . $datetime['start_min'] . ' ' . $datetime['start_meridian'];
 				$end = $datetime['end_hour'] . ':' . $datetime['end_min'] . ' ' . $datetime['end_meridian'];
-				$shift_start_time = strtotime( $datetime['day'] . ' ' . $start );
-				$shift_end_time = strtotime( $datetime['day'] . ' ' . $end );
+				$shift_start_time = radio_station_to_time( $datetime['day'] . ' ' . $start );
+				$shift_end_time = radio_station_to_time( $datetime['day'] . ' ' . $end );
 				if ( $shift_start_time > $shift_end_time ) {
 					$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 				}
@@ -1067,8 +1069,8 @@ function radio_station_current_show_shortcode( $atts ) {
 	$output = '';
 
 	// 2.3.2: get default AJAX load settings
-	$ajax = radio_station_get_setting( 'ajax_loading' );
-	$ajax = ( 'yes' == $ajax ) ? 1 : 0;
+	$ajax = radio_station_get_setting( 'ajax_widgets' );
+	$ajax = ( 'yes' == $ajax ) ? 'on' : 'off';
 	$dynamic = apply_filters( 'radio_station_current_show_dynamic', 0, $atts );
 
 	// --- get shortcode attributes ---
@@ -1121,20 +1123,21 @@ function radio_station_current_show_shortcode( $atts ) {
 	// --- maybe do AJAX load ---
 	// 2.3.2 added widget AJAX loading
 	$atts['ajax'] = apply_filters( 'radio_station_widgets_ajax_override', $atts['ajax'], 'current-show', $atts['widget'] );
-	if ( ( 1 == $atts['ajax'] ) || ( 'on' == $ajax ) ) {
+	if ( 'on' == $atts['ajax'] ) {
 		if ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) {
 
 			// --- AJAX load via iframe ---
 			$ajax_url = admin_url( 'admin-ajax.php' );
 			$instance = $radio_station_data['current_show_instance'];
-			$html = '<div id="rs-current-show-' . esc_attr( $instance ) . '"></div>';
+			$html = '<div id="rs-current-show-' . esc_attr( $instance ) . '" class="ajax-widget"></div>';
 			$html .= '<iframe id="rs-current-show-' . esc_attr( $instance ) . '-loader" src="javascript:void(0);" style="display:none;"></iframe>';
 			$html .= "<script>timestamp = Math.floor( (new Date()).getTime() / 1000 );
 				url = '" . esc_url( $ajax_url ) . "?action=radio_station_current_show';
 				url += '&instance=" . esc_attr( $instance ) . "&timestamp='+timestamp;";
 				$html .= "url += '";
 				foreach ( $atts as $key => $value ) {
-					$html .= "&" . esc_attr( $key ) . "=" . esc_attr( $value );
+					$value = radio_station_encode_uri_component( $value );
+					$html .= "&" . esc_js( $key ) . "=" . esc_js( $value );
 				}			
 				$html .= "'; ";
 			$html .= "document.getElementById('rs-current-show-" . esc_attr( $instance ) ."-loader').src = url;";
@@ -1267,7 +1270,7 @@ function radio_station_current_show_shortcode( $atts ) {
 
 			// --- get weekdates ---
 			// 2.3.0: use dates for reliability
-			$now = strtotime( current_time( 'mysql' ) );
+			$now = radio_station_get_now();
 			$weekdays = radio_station_get_schedule_weekdays();
 			$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 
@@ -1276,6 +1279,7 @@ function radio_station_current_show_shortcode( $atts ) {
 				// --- convert shift info ---
 				// 2.2.2: translate weekday for display
 				// 2.3.0: use dates for reliability
+				// 2.3.2: replace strtotime with to_time for timezones
 				$display_day = radio_station_translate_weekday( $shift['day'] );
 				$weekdate = $weekdates[$shift['day']];
 				if ( isset( $shift['start'] ) ) {
@@ -1285,8 +1289,8 @@ function radio_station_current_show_shortcode( $atts ) {
 					$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
 					$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
 				}			
-				$shift_start_time = strtotime( $weekdates[$shift['day']] . ' ' . $start );
-				$shift_end_time = strtotime( $weekdates[$shift['day']] . ' ' . $end );
+				$shift_start_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $start );
+				$shift_end_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $end );
 				if ( $shift_start_time > $shift_end_time ) {
 					$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 				}
@@ -1364,7 +1368,7 @@ function radio_station_current_show_shortcode( $atts ) {
 			$show_avatar = radio_station_get_show_avatar( $show['id'] );
 			$show_avatar = apply_filters( 'radio_station_current_show_avatar', $show_avatar, $show['id'], $atts );
 			if ( $show_avatar ) {
-				$html['avatar'] .= '<div class="current-show-avatar on-air-dj-avatar' . esc_attr( $floatclass ) . '" ' . $widthstyle . '>';
+				$html['avatar'] = '<div class="current-show-avatar on-air-dj-avatar' . esc_attr( $floatclass ) . '" ' . $widthstyle . '>';
 				if ( $show_link ) {
 					$html['avatar'] .= '<a href="' . esc_url( $show_link ) . '">' . $show_avatar . '</a>';
 				} else {
@@ -1577,6 +1581,14 @@ function radio_station_current_show() {
 	// --- sanitize shortcode attributes ---
 	$atts = radio_station_sanitize_shortcode_values( 'current-show' );
 
+	// 2.3.2: maybe add delay if no current show transient
+	if ( !isset( $atts['for_time'] ) || !$atts['for_time'] ) {
+		$current_show = get_transient( 'radio_station_current_show' );
+		if ( !$current_show ) {
+			sleep( 2 );
+		}
+	}
+
 	// --- output widget contents ---
 	echo '<div id="widget-contents">';
 	echo radio_station_current_show_shortcode( $atts );
@@ -1628,8 +1640,8 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 	$output = '';
 
 	// 2.3.2: get default AJAX load settings
-	$ajax = radio_station_get_setting( 'ajax_loading' );
-	$ajax = ( 'yes' == $ajax ) ? 1 : 0;
+	$ajax = radio_station_get_setting( 'ajax_widgets' );
+	$ajax = ( 'yes' == $ajax ) ? 'on' : 'off';
 	$dynamic = apply_filters( 'radio_station_upcoming_shows_dynamic', 0, $atts );
 
 	// 2.3.0: set default time format to plugin setting
@@ -1679,20 +1691,21 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 	// --- maybe do AJAX load ---
 	// 2.3.2 added widget AJAX loading
 	$atts['ajax'] = apply_filters( 'radio_station_widgets_ajax_override', $atts['ajax'], 'upcoming-shows', $atts['widget'] );
-	if ( ( 1 == $atts['ajax'] ) || ( 'on' == $atts['ajax'] ) ) {
+	if ( 'on' == $atts['ajax'] ) {
 		if ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) {
 	
 			// --- AJAX load via iframe ---
 			$ajax_url = admin_url( 'admin-ajax.php' );
 			$instance = $radio_station_data['upcoming_shows_instance'];
-			$html = '<div id="rs-upcoming-shows-' . esc_attr( $instance ) . '"></div>';
+			$html = '<div id="rs-upcoming-shows-' . esc_attr( $instance ) . '" class="ajax-widget"></div>';
 			$html .= '<iframe id="rs-upcoming-shows-' . esc_attr( $instance ) . '-loader" src="javascript:void(0);" style="display:none;"></iframe>';
 			$html .= "<script>timestamp = Math.floor( (new Date()).getTime() / 1000 );
 				url = '" . esc_url( $ajax_url ) . "?action=radio_station_upcoming_shows';
 				url += '&instance=" . esc_attr( $instance ) . "&timestamp='+timestamp;";
 				$html .= "url += '";
 				foreach ( $atts as $key => $value ) {
-					$html .= "&" . esc_attr( $key ) . "=" . esc_attr( $value );
+					$value = radio_station_encode_uri_component( $value );
+					$html .= "&" . esc_js( $key ) . "=" . esc_js( $value );
 				}			
 				$html .= "'; ";
 			$html .= "document.getElementById('rs-upcoming-shows-" . esc_attr( $instance ) ."-loader').src = url;";
@@ -1811,15 +1824,17 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 				// --- convert dates ---
 				// 2.3.0: use weekdates for reliability
-				$now = strtotime( current_time( 'mysql' ) );
+				$now = radio_station_get_now();
 				$weekdays = radio_station_get_schedule_weekdays();
 				$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 
 				// --- convert shift info ---
 				// 2.2.2: fix to weekday value to be translated
+				// 2.3.2: replace strtotime with to_time for timezones
+				// 2.3.2: use exact shift date in time calculations
 				$display_day = radio_station_translate_weekday( $shift['day'] );
-				$shift_start_time = strtotime ( $weekdates[$shift['day']] . ' ' . $shift['start'] );
-				$shift_end_time = strtotime( $weekdates[$shift['day']] . ' ' . $shift['end'] );
+				$shift_start_time = radio_station_to_time( $shift['date'] . ' ' . $shift['start'] );
+				$shift_end_time = radio_station_to_time( $shift['date'] . ' ' . $shift['end'] );
 				if ( $shift_end_time < $shift_start_time ) {
 					$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 				}
@@ -2096,8 +2111,8 @@ function radio_station_current_playlist_shortcode( $atts ) {
 	$output = '';
 
 	// 2.3.2: get default AJAX load settings
-	$ajax = radio_station_get_setting( 'ajax_loading' );
-	$ajax = ( 'yes' == $ajax ) ? 1 : 0;
+	$ajax = radio_station_get_setting( 'ajax_widgets' );
+	$ajax = ( 'yes' == $ajax ) ? 'on' : 'off';
 	$dynamic = apply_filters( 'radio_station_current_playlist_dynamic', 0, $atts );
 		
 	// --- get shortcode attributes ---
@@ -2130,20 +2145,21 @@ function radio_station_current_playlist_shortcode( $atts ) {
 	// --- maybe do AJAX load ---
 	// 2.3.2 added widget AJAX loading
 	$atts['ajax'] = apply_filters( 'radio_station_widgets_ajax_override', $atts['ajax'], 'current-playlist', $atts['widget'] );
-	if ( ( 1 == $atts['ajax'] ) || ( 'on' == $ajax ) ) {
+	if ( 'on' == $atts['ajax'] ) {
 		if ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) {
 	
 			// --- AJAX load via iframe ---
 			$ajax_url = admin_url( 'admin-ajax.php' );
 			$instance = $radio_station_data['current_playlist_instance'];
-			$html = '<div id="rs-current-playlist-' . esc_attr( $instance ) . '"></div>';
+			$html = '<div id="rs-current-playlist-' . esc_attr( $instance ) . '" class="ajax-widget"></div>';
 			$html .= '<iframe id="rs-current-playlist-' . esc_attr( $instance ) . '-loader" src="javascript:void(0);" style="display:none;"></iframe>';
 			$html .= "<script>timestamp = Math.floor( (new Date()).getTime() / 1000 );
 				url = '" . esc_url( $ajax_url ) . "?action=radio_station_current_playlist';
 				url += '&instance=" . esc_attr( $instance ) . "&timestamp='+timestamp;";
 				$html .= "url += '";
 				foreach ( $atts as $key => $value ) {
-					$html .= "&" . esc_attr( $key ) . "=" . esc_attr( $value );
+					$value = radio_station_encode_uri_component( $value );
+					$html .= "&" . esc_js( $key ) . "=" . esc_js( $value );
 				}			
 				$html .= "'; ";
 			$html .= "document.getElementById('rs-current-playlist-" . esc_attr( $instance ) ."-loader').src = url;";
@@ -2158,7 +2174,7 @@ function radio_station_current_playlist_shortcode( $atts ) {
 
 	// --- fetch the current playlist ---
 	if ( $atts['for_time'] ) {
-		$playlist = radio_station_get_now_playing( $time );
+		$playlist = radio_station_get_now_playing( $atts['for_time'] );
 	} else {
 		$playlist = radio_station_get_now_playing();
 	}
@@ -2269,16 +2285,17 @@ function radio_station_current_playlist_shortcode( $atts ) {
 				foreach ( $playlist['shifts'] as $shift ) {
 
 					// --- convert shift info ---
+					// 2.3.2: replace strtotime with to_time for timezones
 					$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
 					$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
-					$shift_start_time = strtotime( $start );
-					$shift_end_time = strtotime( $end );
+					$shift_start_time = radio_station_to_time( $start );
+					$shift_end_time = radio_station_to_time( $end );
 					if ( $start > $end ) {
 						$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 					}
 
 					// --- check currently playing show time ---
-					$now = strtotime( current_time( 'mysql' ) );
+					$now = radio_station_get_now();
 					if ( ( $now > $shift_start_time ) && ( $now < $shift_end_time ) ) {
 
 						// --- hidden input for playlist end time ---
@@ -2384,11 +2401,11 @@ function radio_station_countdown_enqueue() {
 	radio_station_enqueue_script( 'radio-station-countdown', array( 'radio-station' ), true );
 
 	// --- set countdown labels ---
-	$js = "radio.label_showstarted = '" . esc_js( __( 'This Show has started.', 'radio-station' ) ) . "';
-	radio.label_showended = '" . esc_js( __( 'This Show has ended.', 'radio-station' ) ) . "';
-	radio.label_playlistended = '" . esc_js( __( 'This Playlist has ended.', 'radio-station') ) . "';
-	radio.label_timecommencing = '" . esc_js( __( 'Commencing in', 'radio-station' ) ) . "';
-	radio.label_timeremaining = '" . esc_js( __( 'Remaining Time', 'radio-station' ) ) . "'; 
+	$js = "radio.labels.showstarted = '" . esc_js( __( 'This Show has started.', 'radio-station' ) ) . "';
+	radio.labels.showended = '" . esc_js( __( 'This Show has ended.', 'radio-station' ) ) . "';
+	radio.labels.playlistended = '" . esc_js( __( 'This Playlist has ended.', 'radio-station') ) . "';
+	radio.labels.timecommencing = '" . esc_js( __( 'Commencing in', 'radio-station' ) ) . "';
+	radio.labels.timeremaining = '" . esc_js( __( 'Remaining Time', 'radio-station' ) ) . "'; 
 	";
 
 	// --- add script inline ---

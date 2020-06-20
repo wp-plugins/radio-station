@@ -2,7 +2,7 @@
 
 /**
  * @package Radio Station
- * @version 2.3.1
+ * @version 2.3.2
  */
 /*
 
@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.3.1.4
+Version: 2.3.1.5
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -1020,7 +1020,7 @@ function radio_station_localize_script() {
 
 	// --- set AJAX URL ---
 	// 2.3.2: add admin AJAX URL
-	$js .= "radio.ajax_url = '" . esc_url( admin_url( 'admin-ajax.php' ) ) . "'; " . PHP_EOL;
+	$js .= "radio.ajax_url = '" . esc_url( admin_url( 'admin-ajax.php' ) ) . "'; ";
 	
 	// --- clock time format ---
 	$clock_format = radio_station_get_setting( 'clock_time_format' );
@@ -1031,50 +1031,58 @@ function radio_station_localize_script() {
 	$js .= "if (window.matchMedia('(pointer: coarse)').matches) {radio.touchscreen = true;} else {radio.touchscreen = false;} " . PHP_EOL;
 
 	// --- radio timezone ---
-	$timezone = radio_station_get_setting( 'timezone_location' );
-	if ( !$timezone || ( '' == $timezone ) ) {
-		// --- fallback to WordPress timezone ---
-		$timezone = get_option( 'timezone_string' );
-		if ( false !== strpos( $timezone, 'Etc/GMT' ) ) {
-			$timezone = '';
+	// 2.3.2: added get timezone function
+	$timezone = radio_station_get_timezone();
+	
+	// if ( isset( $offset ) ) {
+	if ( stristr( $timezone, 'UTC' ) ) {
+
+		if ( 'UTC' == $timezone ) {
+			$offset = '0';
+		} else {
+			$offset = str_replace( 'UTC', '', $timezone );
 		}
-		if ( '' == $timezone ) {
-			$offset = get_option( 'gmt_offset' );
-		}
-	}
-	if ( isset( $offset ) ) {
-		if ( !$offset ) {
-			$offset = 0;
-		}
-		// $offset = intval( $offset ) * 60 * 60 * 1000;
-		$js .= "radio.timezone_offset = " . esc_js( $offset ) . "; ";
-		if ( 0 == $offset ) {
+		$js .= "radio.timezone_offset = " . esc_js( $offset * 60 * 60 ) . "; ";
+		if ( '0' == $offset ) {
 			$offset = '';
 		} elseif ( $offset > 0 ) {
 			$offset = '+' . $offset;
 		}
 		$js .= "radio.timezone_code = 'UTC" . esc_js( $offset ) . "'; ";
 		$js .= "radio.timezone_utc = '" . esc_js( $offset ) . "'; ";
+		$js .= "radio.timezone_utczone = true; ";
+
 	} else {
+
 		// --- get offset and code from timezone location ---
 		$datetimezone = new DateTimeZone( $timezone );
 		$offset = $datetimezone->getOffset( new DateTime() );
+		$offset_hours = $offset / ( 60 * 60 );
 		if ( 0 == $offset ) {
 			$utc_offset = '';
 		} elseif ( $offset > 0 ) {
-			$utc_offset = '+' . $offset;
+			$utc_offset = '+' . $offset_hours;
 		} else {
-			$utc_offset = $offset;
+			$utc_offset = $offset_hours;
 		}
-		$utc_offset = 'UTC' . $utc_offset;
+		$utc_offset = 'UTC' . $utc_offset_hours;
 		$code = radio_station_get_timezone_code( $timezone );
 		$js .= "radio.timezone_location = '" . esc_js( $timezone ) . "'; ";
 		$js .= "radio.timezone_offset = " . esc_js( $offset ) . "; ";
 		$js .= "radio.timezone_code = '" . esc_js( $timezone ) . "'; ";
 		$js .= "radio.timezone_utc = '" . esc_js( $utc_offset ) . "'; ";
-	}
+		$js .= "radio.timezone_utczone = false; ";
 
+	}
+	
+	if ( defined( 'RADIO_STATION_USE_SERVER_TIMES' ) && RADIO_STATION_USE_SERVER_TIMES ) {
+		$js .= "radio.timezone_adjusted = false; ";
+	} else {
+		$js .= "radio.timezone_adjusted = true; ";
+	}
+		
 	// --- set user timezone offset ---
+	// (and convert offset minutes to seconds)
 	$js .= "radio.user_offset = (new Date()).getTimezoneOffset() * 60; ";
 
 	// --- translated months array ---
@@ -1105,16 +1113,16 @@ function radio_station_localize_script() {
 
 	// --- translated time unit strings ---
 	// TODO: convert units to single object
-	$js .= "radio.units_am = '" . esc_js( radio_station_translate_meridiem( 'am' ) ) . "'; " . PHP_EOL;
-	$js .= "radio.units_pm = '" . esc_js( radio_station_translate_meridiem( 'pm' ) ) . "'; " . PHP_EOL;
-	$js .= "radio.units_second = '" . esc_js( __( 'Second', 'radio-station' ) ) . "'; " . PHP_EOL;
-	$js .= "radio.units_seconds = '" . esc_js( __( 'Seconds', 'radio-station' ) ) . "';" . PHP_EOL;
-	$js .= "radio.units_minute = '" . esc_js( __( 'Minute', 'radio-station' ) ) . "';" . PHP_EOL;
-	$js .= "radio.units_minutes = '" . esc_js( __( 'Minutes', 'radio-station' ) ) . "';" . PHP_EOL;
-	$js .= "radio.units_hour = '" . esc_js( __( 'Hour', 'radio-station' ) ) . "';" . PHP_EOL;
-	$js .= "radio.units_hours = '" . esc_js( __( 'Hours', 'radio-station' ) ) . "';" . PHP_EOL;
-	$js .= "radio.units_day = '" . esc_js( __( 'Day', 'radio-station' ) ) . "';" . PHP_EOL;
-	$js .= "radio.units_days = '" . esc_js( __( 'Days', 'radio-station' ) ) . "';" . PHP_EOL;
+	$js .= "radio.units.am = '" . esc_js( radio_station_translate_meridiem( 'am' ) ) . "'; ";
+	$js .= "radio.units.pm = '" . esc_js( radio_station_translate_meridiem( 'pm' ) ) . "'; ";
+	$js .= "radio.units.second = '" . esc_js( __( 'Second', 'radio-station' ) ) . "'; ";
+	$js .= "radio.units.seconds = '" . esc_js( __( 'Seconds', 'radio-station' ) ) . "';";
+	$js .= "radio.units.minute = '" . esc_js( __( 'Minute', 'radio-station' ) ) . "';";
+	$js .= "radio.units.minutes = '" . esc_js( __( 'Minutes', 'radio-station' ) ) . "';";
+	$js .= "radio.units.hour = '" . esc_js( __( 'Hour', 'radio-station' ) ) . "';";
+	$js .= "radio.units.hours = '" . esc_js( __( 'Hours', 'radio-station' ) ) . "';";
+	$js .= "radio.units.day = '" . esc_js( __( 'Day', 'radio-station' ) ) . "';";
+	$js .= "radio.units.days = '" . esc_js( __( 'Days', 'radio-station' ) ) . "';";
 
 	// --- set debug flag ---
 	if ( defined( 'RADIO_STATION_DEBUG' ) && RADIO_STATION_DEBUG ) {

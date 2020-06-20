@@ -139,8 +139,9 @@ function radio_station_get_station_data() {
 	$schedule_url = radio_station_get_schedule_url();
 	$language = radio_station_get_language();
 
-	$now = strtotime( current_time( 'mysql' ) );
-	$date_time = date( 'Y-m-d H:i:s', $now );
+	// 2.3.2: use get date function with timezone
+	$now = radio_station_get_now();
+	$date_time = radio_station_get_time( 'datetime', $now );
 	
 	// 2.3.2: get schedule last updated time
 	$updated = get_option( 'radio_station_schedule_updated' );

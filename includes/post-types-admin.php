@@ -432,6 +432,10 @@ function radio_station_playlist_metabox() {
     echo '</td><td></td></tr></table>';
   
     echo '<div style="clear: both;"></div>';
+    
+    // --- move new tracks message ---
+    // 2.3.2: added new track move message
+    echo '<center>' . __( 'Tracks marked New are moved to the end of Playlist on update.', 'radio-station' ) . '</center>';
 
 	// --- clear all tracks function ---
 	$confirm_clear = __( 'Are you sure you want to clear the track list?', 'radio-station' );
@@ -659,8 +663,7 @@ function radio_station_playlist_metabox() {
 // 2.3.2: separated tracklist table (for AJAX)
 function radio_station_playlist_track_table( $entries ) {
 
-	$c = 1;
-
+	// --- open track table ---
 	echo '<table id="track-table" class="widefat">';
 	echo '<tr>';
 	echo '<th></th><th><b>' . esc_html( __( 'Artist', 'radio-station' ) ) . '</b></th>';
@@ -669,7 +672,7 @@ function radio_station_playlist_track_table( $entries ) {
 	echo '<th><b>' . esc_html( __( 'Record Label', 'radio-station' ) ) . '</th>';
 	echo '</tr>';
 
-	// --- button titles ---
+	// --- set button titles ---
 	// 2.3.2: added titles for icon buttons
 	$move_up_title = __( 'Move Track Up', 'radio-station' );
 	$move_down_title = __( 'Move Track Down', 'radio-station' );
@@ -677,6 +680,7 @@ function radio_station_playlist_track_table( $entries ) {
 	$remove_title = __( 'Remove Track', 'radio-station' );
 
 	// 2.3.2: removed [0] array key
+	$c = 1;
 	if ( isset( $entries ) && !empty( $entries ) ) {
 
 		foreach ( $entries as $track ) {
@@ -914,9 +918,13 @@ function radio_station_playlist_save_data( $post_id ) {
 
 			// move songs that are still queued to the end of the list so that order is maintained
 			foreach ( $playlist as $i => $song ) {
-				if ( 'queued' === $song['playlist_entry_status'] ) {
-					// 2.3.2: unset before adding to maintain ordered track count
+				// 2.3.2: move songs marked as new to the end instead of queued
+				// if ( 'queued' === $song['playlist_entry_status'] ) {
+				if ( $song['playlist_entry_new'] ) {
+					// 2.3.2: unset before adding to maintain (now ordered) track count
+					// 2.3.2: unset new flag from track record now it has been moved
 					unset( $playlist[$i] );
+					unset( $song['playlist_entry_new'] );
 					$playlist[] = $song;
 				}
 			}
@@ -1882,13 +1890,13 @@ function radio_station_show_shifts_table( $post_id ) {
 			$shift['unique_id'] = $unique_id;
 			if ( isset( $shift['day'] ) && ( '' != $shift['day'] ) ) {
 				// --- group shifts by days of week ---
-				$starttime = strtotime( 'next ' . $shift['day'] . ' ' . $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'] );
+				$starttime = radio_station_to_time( 'next ' . $shift['day'] . ' ' . $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'] );
 				// 2.3.0: simplify by getting day index
 				$i = array_search( $shift['day'], $days );
 				$day_shifts[$i][$starttime . '.' . $j] = $shift;
 			} else {
 				// --- to still allow shift time sorting if day is not set ---
-				$starttime = strtotime( '1981-04-28 ' . $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'] );
+				$starttime = radio_station_to_time( '1981-04-28 ' . $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'] );
 				$day_shifts[7][$starttime . '.' . $j] = $shift;
 			}
 			$j ++;
@@ -2857,14 +2865,15 @@ function radio_station_show_column_data( $column, $post_id ) {
 		}
 
 		// 2.3.0: check using dates for reliability
-		$now = strtotime( current_time( 'mysql' ) );
+		$now = radio_station_get_now();
 		$weekdays = radio_station_get_schedule_weekdays();
 		$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 
 		$shifts = get_post_meta( $post_id, 'show_sched', true );
-		if ( $shifts && ( count( $shifts ) > 0 ) ) {
+		if ( $shifts && is_array( $shifts ) && ( count( $shifts ) > 0 ) ) {
+			$sorted_shifts = array();
 			foreach ( $shifts as $shift ) {
-				$timestamp = strtotime( $weekdates[$shift['day']] . ' ' . $shift['start_hour'] . ":" . $shift['start_min'] . " " . $shift['start_meridian'] );
+				$timestamp = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $shift['start_hour'] . ":" . $shift['start_min'] . " " . $shift['start_meridian'] );
 				$sortedshifts[$timestamp] = $shift;
 			}
 			ksort( $sortedshifts );
@@ -2906,8 +2915,8 @@ function radio_station_show_column_data( $column, $post_id ) {
 				// --- get shift start and end times ---
 				$start = $shift['start_hour'] . ":" . $shift['start_min'] . $shift['start_meridian'];
 				$end = $shift['end_hour'] . ":" . $shift['end_min'] . $shift['end_meridian'];
-				$start_time = strtotime( $weekdates[$shift['day']] . ' ' . $start );
-				$end_time = strtotime( $weekdates[$shift['day']] . ' ' . $end );
+				$start_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $start );
+				$end_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $end );
 
 				// --- make weekday filter selections bold ---
 				// 2.3.0: fix to bolding only if weekday isset
@@ -3288,12 +3297,13 @@ function radio_station_override_column_data( $column, $post_id ) {
 
 	$override = get_post_meta( $post_id, 'show_override_sched', true );
 	if ( 'override_date' == $column ) {
-		$datetime = strtotime( $override['date'] );
-		$month = date( 'F', $datetime );
+		$datetime = radio_station_to_time( $override['date'] );
+		$month = radio_station_get_time( 'F', $datetime );
 		$month = radio_station_translate_month( $month );
-		$weekday = date( 'l', $datetime );
+		$weekday = radio_station_get_time( 'day', $datetime );
 		$weekday = radio_station_translate_weekday( $weekday );
-		echo esc_html( $weekday ) . ' ' . esc_html( date( 'j', $datetime ) ) . ' ' . esc_html( $month ) . ' ' . esc_html( date( 'Y', $datetime ) );
+		echo esc_html( $weekday ) . ' ' . esc_html( radio_station_get_time( 'j', $datetime ) ) . ' ';
+		echo esc_html( $month ) . ' ' . esc_html( radio_station_get_time( 'Y', $datetime ) );
 	} elseif ( 'start_time' == $column ) {
 		echo esc_html( $override['start_hour'] ) . ':' . esc_html( $override['start_min'] ) . ' ' . esc_html( $override['start_meridian'] );
 	} elseif ( 'end_time' == $column ) {
@@ -3317,12 +3327,12 @@ function radio_station_override_column_data( $column, $post_id ) {
 		}
 
 		// --- get the override weekday and convert to 24 hour time ---
-		$datetime = strtotime( $override['date'] );
-		$weekday = date( 'l', $datetime );
+		$datetime = radio_station_to_time( $override['date'] );
+		$weekday = radio_station_get_time( 'day', $datetime );
 
 		// --- get start and end override times ---
-		$override_start = strtotime( $override['date'] . ' ' . $override['start_hour'] . ':' . $override['start_min'] . ' ' . $override['start_meridian'] );
-		$override_end = strtotime( $override['date'] . ' ' . $override['end_hour'] . ':' . $override['end_min'] . ' ' . $override['end_meridian'] );
+		$override_start = radio_station_to_time( $override['date'] . ' ' . $override['start_hour'] . ':' . $override['start_min'] . ' ' . $override['start_meridian'] );
+		$override_end = radio_station_to_time( $override['date'] . ' ' . $override['end_hour'] . ':' . $override['end_min'] . ' ' . $override['end_meridian'] );
 		// (if the end time is less than start time, adjust end to next day)
 		if ( $override_end <= $override_start ) {
 			$override_end = $override_end + 86400;
@@ -3340,9 +3350,10 @@ function radio_station_override_column_data( $column, $post_id ) {
 
 					// --- get start and end shift times ---
 					// 2.3.0: validate shift time to check if complete
+					// 2.3.2: replace strtotime with to_time for timezones
 					$time = radio_station_validate_shift( $time );
-					$shift_start = strtotime( $override['date'] . ' ' . $time['start_hour'] . ':' . $time['start_min'] . ' ' . $time['start_meridian'] );
-					$shift_end = strtotime( $override['date'] . ' ' . $time['end_hour'] . ':' . $time['end_min'] . ' ' . $time['end_meridian'] );
+					$shift_start = radio_station_to_time( $override['date'] . ' ' . $time['start_hour'] . ':' . $time['start_min'] . ' ' . $time['start_meridian'] );
+					$shift_end = radio_station_to_time( $override['date'] . ' ' . $time['end_hour'] . ':' . $time['end_min'] . ' ' . $time['end_meridian'] );
 					if ( ( $shift_start == $shift_end ) || ( $shift_start > $shift_end ) ) {
 						$shift_end = $shift_end + 86400;
 					}
@@ -3420,7 +3431,7 @@ function radio_station_override_date_filter( $post_type, $which ) {
 	if ( RADIO_STATION_OVERRIDE_SLUG !== $post_type ) {
 		return;
 	}
-
+	
 	// --- get all show override months / years ---
 	global $wpdb;
 	$overridequery = "SELECT ID FROM " . $wpdb->posts . " WHERE post_type = '" . RADIO_STATION_OVERRIDE_SLUG . "'";
@@ -3430,9 +3441,9 @@ function radio_station_override_date_filter( $post_type, $which ) {
 		foreach ( $results as $result ) {
 			$post_id = $result['ID'];
 			$override = get_post_meta( $post_id, 'show_override_date', true );
-			$datetime = strtotime( $override );
-			$month = date( 'm', $datetime );
-			$year = date( 'Y', $datetime );
+			$datetime = radio_station_to_time( $override );
+			$month = radio_station_get_time( 'm', $datetime );
+			$year = radio_station_get_time( 'Y', $datetime );
 			$months[$year . $month]['year'] = $year;
 			$months[$year . $month]['month'] = $month;
 		}
@@ -3465,10 +3476,11 @@ function radio_station_override_date_filter( $post_type, $which ) {
 // 2.2.7: added filter for custom column sorting
 add_action( 'pre_get_posts', 'radio_station_columns_query_filter' );
 function radio_station_columns_query_filter( $query ) {
+
 	if ( !is_admin() || !$query->is_main_query() ) {
 		return;
 	}
-
+	
 	// --- Shows by Shift Days Filtering ---
 	if ( RADIO_STATION_SHOW_SLUG === $query->get( 'post_type' ) ) {
 
@@ -3504,8 +3516,9 @@ function radio_station_columns_query_filter( $query ) {
 								// 2.3.0: replace old with new 24 hour conversion
 								// $shiftstart = $shifttime['start_hour'] . ':' . $shifttime['start_min'] . ":00";
 								// $shiftstart = radio_station_convert_schedule_to_24hour( $shift );
+								// 2.3.2: replace strtotime with to_time for timezones
 								$shiftstart = $shift['start_hour'] . ':' . $shift['start_min'] . $shift['start_meridian'];
-								$shifttime = strtotime( $weekday . ' ' . $shiftstart );
+								$shifttime = radio_station_to_time( $weekday . ' ' . $shiftstart );
 								// 2.3.0: check for earliest shift for that day
 								if ( !$prevtime || ( $shifttime < $prevtime ) ) {
 									$shiftstart = radio_station_convert_shift_time( $shiftstart, 24 ) . ':00';
@@ -3574,6 +3587,7 @@ function radio_station_columns_query_filter( $query ) {
 			// --- apply override year/month filtering ---
 			if ( isset( $_GET['month'] ) && ( '0' != $_GET['month'] ) ) {
 				$yearmonth = $_GET['month'];
+				// TODO: adjust for timezone..?
 				$start_date = date( $yearmonth . '01' );
 				$end_date = date( $yearmonth . 't' );
 				$meta_query = array(

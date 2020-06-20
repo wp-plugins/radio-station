@@ -273,8 +273,12 @@ class DJ_Widget extends WP_Widget {
 			'dynamic'        => $dynamic,
 			'widget'         => 1,
 			'id'             => $id,
-			'ajax'           => $ajax,
 		);
+
+		// 2.3.2: only set AJAX attribute if overriding default
+		if ( in_array( $ajax, array( 'on', 'off' ) ) ) {
+			$atts['ajax'] = $ajax;
+		}
 
 		// --- before widget ---
 		// phpcs:ignore WordPress.Security.OutputNotEscaped

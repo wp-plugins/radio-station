@@ -183,7 +183,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		$instance['avatar_width'] = $new_instance['avatar_width'];
 		$instance['link_djs'] = isset( $new_instance['link_djs'] ) ? 1 : 0;
 		$instance['countdown'] = isset( $new_instance['countdown'] ) ? 1 : 0;
-		$instance['ajax'] = isset( $new_instance['ajax'] ) ? 1 : 0;
+		$instance['ajax'] = isset( $new_instance['ajax'] ) ? $new_instance['ajax'] : 0;
 
 		// 2.3.0: added widget filter instance to update
 		$instance = apply_filters( 'radio_station_upcoming_shows_widget_update', $instance, $new_instance, $old_instance );
@@ -247,8 +247,12 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			'dynamic'        => $dynamic,
 			'widget'         => 1,
 			'id'             => $id,
-			'ajax'           => $ajax,
 		);
+
+		// 2.3.2: only set AJAX attribute if overriding default
+		if ( in_array( $ajax, array( 'on', 'off' ) ) ) {
+			$atts['ajax'] = $ajax;
+		}
 
 		// --- before widget ---
 		// phpcs:ignore WordPress.Security.OutputNotEscaped

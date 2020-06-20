@@ -6,8 +6,9 @@
 function radio_countdown() {
 
     radio.current_time = Math.floor( (new Date()).getTime() / 1000 );
-	radio.user_time = radio.current_time + radio.user_offset;
+	radio.user_time = radio.current_time - radio.user_offset;
 	radio.server_time = radio.current_time + radio.timezone_offset;
+
 	if (radio.debug) {
 		console.log('Current Time: ' + (new Date()).toISOString() + '(' + radio.current_time + ')');
 		console.log('User Offset: ' + radio.user_offset + ' - Server Offset: ' + radio.timezone_offset);
@@ -26,8 +27,8 @@ function radio_countdown() {
         	console.log('Show End: ' + showend.toISOString() + '(' + showend.getTime() + ')');
         	console.log('Current Show Ends in: '+diff+'s');
         }
-        if (diff < 1) {countdown = radio.label_showended; jQuery(this).removeClass('current-show-end');}
-        else {countdown = radio_countdown_display(diff, radio.label_timeremaining);}
+        if (diff < 1) {countdown = radio.labels.showended; jQuery(this).removeClass('current-show-end');}
+        else {countdown = radio_countdown_display(diff, radio.labels.timeremaining);}
         jQuery(this).parent().find('.rs-countdown').html(countdown);
     });
 
@@ -43,9 +44,9 @@ function radio_countdown() {
             console.log('Next Show Start in: '+diffa+'s - Next Show End in:'+diffb+'s');
         }
         if (diffa < 1) {
-            if (diffb < 1) {countdown = radio.label_showended; jQuery(this).removeClass('upcoming-show-times');}
-            else {countdown = radio.label_showstarted;}
-        } else {countdown = radio_countdown_display(diffa, radio.label_timecommencing);}
+            if (diffb < 1) {countdown = radio.labels.showended; jQuery(this).removeClass('upcoming-show-times');}
+            else {countdown = radio.labels.showstarted;}
+        } else {countdown = radio_countdown_display(diffa, radio.labels.timecommencing);}
         jQuery(this).parent().find('.rs-countdown').html(countdown);
     });
 
@@ -54,7 +55,7 @@ function radio_countdown() {
         diff = parseInt(jQuery(this).val()) - radio.server_time;
         if (radio.debug) {console.log('Current Playlist Ends in: '+diff);}
         if (diff < 1) {countdown = playlistended; jQuery(this).removeClass('current-playlist-end');}
-        else {countdown = radio_countdown_display(diff, radio.label_timeremaining);}
+        else {countdown = radio_countdown_display(diff, radio.labels.timeremaining);}
         jQuery(this).parent().find('.rs-countdown').html(countdown);
     });
     
@@ -66,11 +67,13 @@ function radio_countdown() {
 
 /* Get Countdown Display */
 function radio_countdown_display(diff, label) {
-    countdown = new Date(diff * 1000).toISOString();
-    hours = countdown.substr(11, 2);
-    if (hours.substr(0,1) == '0') {hours = hours.substr(1,1);}
-    minutes = countdown.substr(14, 2);
-    seconds = countdown.substr(17, 2);
+	hours = Math.floor( diff / 3600 );
+	if (hours > 0) {diff = diff - (hours * 3600);}
+	minutes = Math.floor( diff / 60 );
+	if (minutes > 0) {diff = diff - (minutes * 60);}
+	if (minutes < 10) {minutes = '0'+minutes;}
+	seconds = diff;
+	if (seconds < 10) {seconds = '0'+seconds;}
     display = '<span class="rs-label">'+label+'</span>: <span class="rs-hours">'+hours+'</span><span "rs-sep">:</span>';
     display += '<span class="rs-minutes">'+minutes+'</span><span class="rs-sep">:</span><span class="rs-seconds">'+seconds+'</span>';
     return display;

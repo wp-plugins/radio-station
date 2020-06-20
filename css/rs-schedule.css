@@ -53,6 +53,10 @@
 	height: 100%;
 }
 
+#master-program-schedule #master-program-hour-heading, #master-program-schedule  .master-program-hour-row {
+	width: 100px;
+}
+
 #master-program-schedule th {
 	width: auto;
 	text-align: center;
