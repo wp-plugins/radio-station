@@ -269,16 +269,19 @@ function radio_station_get_show_shifts( $check_conflicts = true ) {
 
 						// --- shift is valid so continue checking ---
 						// 2.3.2: replace strtotime with to_time for timezones
+						// 2.3.2: fix to conver to 24 hour format first
 						$day = $shift['day'];
 						$thisdate = $weekdates[$day];
-						$midnight = radio_station_to_time( $thisdate . ' 11:59:59 am' ) + 1;
+						$midnight = radio_station_to_time( $thisdate . ' 23:59:59' ) + 1;
 						$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
 						$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
-						$start_time = radio_station_to_time( $thisdate . ' ' . $start );
+						$start_time = radio_station_convert_shift_time( $start );
+						$start_time = radio_station_to_time( $thisdate . ' ' . $start_time );
 						if ( ( '11:59:59 pm' == $end ) || ( '12:00 am' == $end ) ) {
 							// 2.3.2: simplify using existing midnight time
 							$end_time = $midnight;
 						} else {
+							$end_time = radio_station_convert_shift_time( $end );
 							$end_time = radio_station_to_time( $thisdate . ' ' . $end );
 						}
 						if ( isset( $shift['encore'] ) && ( 'on' == $shift['encore'] ) ) {
@@ -372,9 +375,16 @@ function radio_station_get_show_shifts( $check_conflicts = true ) {
 		}
 	}
 
+	// --- reorder by weekdays ---
+	// 2.3.2: added for passing to shift checker
+	$sorted_shifts = array();
+	foreach ( $weekdays as $weekday ) {
+		$sorted_shifts[$weekday] = $all_shifts[$weekday];
+	}
+	
 	// --- debug point ---
 	if ( RADIO_STATION_DEBUG ) {
-		$debug = "Sorted Shifts" . PHP_EOL . PHP_EOL . print_r( $all_shifts, true );
+		$debug = "Sorted Shifts" . PHP_EOL . PHP_EOL . print_r( $sorted_shifts, true );
 		radio_station_debug( $debug );
 	}
 
@@ -465,17 +475,18 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 				// --- add the override data ---
 				if ( $inrange ) {
 				
-					// 2.3.2: use get time function
+					// 2.3.2: get day from date directly
 					// $thisday = date( 'l', $date_time );
-					// $thisdate = date( 'Y-m-d', $date_time );
-					$thisday = radio_station_get_time( 'day', $date_time );
-					$thisdate = radio_station_get_time( 'date', $date_time );
+					$day = date( 'l', strtotime( $date ) );
 
 					// 2.3.2: replace strtotime with to_time for timezones
+					// 2.3.2: fix to conver to 24 hour format first
 					$start = $data['start_hour'] . ':' . $data['start_min'] . ' ' . $data['start_meridian'];
 					$end = $data['end_hour'] . ':' . $data['end_min'] . ' ' . $data['end_meridian'];
-					$override_start_time = radio_station_to_time( $thisdate . ' ' . $start );
-					$override_end_time = radio_station_to_time( $thisdate . ' ' . $end );
+					$start_time = radio_station_convert_shift_time( $start );
+					$end_time = radio_station_convert_shift_time( $end );
+					$override_start_time = radio_station_to_time( $date . ' ' . $start_time );
+					$override_end_time = radio_station_to_time( $date . ' ' . $end_time );
 					// 2.3.2: fix for overrides ending at midnight
 					if ( '12:00 am' == $end ) {
 						$override_end_time = $override_end_time + ( 24 * 60 * 60 );
@@ -488,8 +499,8 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 							'override' => $override['ID'],
 							'name'     => $override['post_title'],
 							'slug'     => $override['post_name'],
-							'date'     => $thisdate,
-							'day'      => $thisday,
+							'date'     => $date,
+							'day'      => $day,
 							'start'    => $start,
 							'end'      => $end,
 							'url'      => get_permalink( $override['ID'] ),
@@ -504,10 +515,10 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 							'override' => $override['ID'],
 							'name'     => $override['post_title'],
 							'slug'     => $override['post_name'],
-							'date'     => $thisdate,
-							'day'      => $thisday,
+							'date'     => $date,
+							'day'      => $day,
 							'start'    => $start,
-							'end'      => '11:59 pm',
+							'end'      => '11:59:59 pm',
 							'real_end' => $end,
 							'url'      => get_permalink( $override['ID'] ),
 							'split'    => true,
@@ -516,12 +527,11 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 
 						// --- set the next day split shift ---
 						// note: these should not wrap around to start of week
-						// 2.3.2: use get time function with timezone
-						$next_date_time = $date_time + ( 24 * 60 * 60 );
+						// 2.3.2: use get next date/day functions
 						// $nextday = date( 'l', $next_date_time );
 						// $nextdate = date( 'Y-m-d', $next_date_time );
-						$nextday = radio_station_get_time( 'day', $next_date_time );
-						$nextdate = radio_station_get_time( 'date', $next_date_time );
+						$nextdate = radio_station_get_next_date( $date );
+						$nextday = radio_station_get_next_day( $day );
 						
 						$override_data = array(
 							'override' => $override['ID'],
@@ -1011,11 +1021,13 @@ function radio_station_get_current_schedule( $time = false ) {
 							if ( !in_array( $override['date'] . '--' . $i, $done_overrides ) ) {
 
 								// 2.3.2: replace strtotime with to_time for timezones
-								// $show_shifts[$day][$override['start']] = $override;
-								$override_start_time = radio_station_to_time( $date . ' ' . $override['start'] );
-								$override_end_time = radio_station_to_time( $date . ' ' . $override['end'] );
-								if ( isset( $override['split'] ) && $override['split'] && ( '11:59 pm' == $override['end'] ) ) {
-									$override_end_time = $override_end_time + 60;
+								// 2.3.2: fix to convert to 24 hour format first
+								$override_start = radio_station_convert_shift_time( $override['start'] );
+								$override_end = radio_station_convert_shift_time( $override['end'] );
+								$override_start_time = radio_station_to_time( $date . ' ' . $override_start );
+								$override_end_time = radio_station_to_time( $date . ' ' . $override_end );
+								if ( isset( $override['split'] ) && $override['split'] && ( '11:59:59 pm' == $override['end'] ) ) {
+									$override_end_time = $override_end_time + 1;
 								} 
 								// 2.3.2: fix for non-split overrides ending on midnight
 								if ( $override_end_time < $override_start_time ) {
@@ -1028,10 +1040,13 @@ function radio_station_get_current_schedule( $time = false ) {
 									foreach ( $shifts as $start => $shift ) {
 
 										// 2.3.2: replace strtotime with to_time for timezones
-										$start_time = radio_station_to_time( $date . ' ' . $shift['start'] );
-										$end_time = radio_station_to_time( $date . ' ' . $shift['end'] );
-										if ( isset( $shift['split'] ) && $shift['split'] && ( '11:59 pm' == $shift['end'] ) ) {
-											$end_time = $end_time + 60;
+										// 2.3.2: fix to convert to 24 hour format first
+										$shift_start = radio_station_convert_shift_time( $shift['start'] );
+										$shift_end = radio_station_convert_shift_time( $shift['end'] );
+										$start_time = radio_station_to_time( $date . ' ' . $shift_start );
+										$end_time = radio_station_to_time( $date . ' ' . $shift_end );
+										if ( isset( $shift['split'] ) && $shift['split'] && ( '11:59:59 pm' == $shift['end'] ) ) {
+											$end_time = $end_time + 1;
 										}
 										// 2.3.2: fix for non-split shifts ending on midnight
 										if ( $end_time < $start_time ) {
@@ -1203,11 +1218,12 @@ function radio_station_get_current_schedule( $time = false ) {
 				if ( !isset( $current_show ) ) {
 
 					// --- get this shift start and end times ---
-					$shift_start = $weekdates[$day] . ' ' . $shift['start'];
-					$shift_end = $weekdates[$day] . ' ' . $shift['end'];
 					// 2.3.2: replace strtotime with to_time for timezones
-					$shift_start_time = radio_station_to_time( $shift_start );
-					$shift_end_time = radio_station_to_time( $shift_end );
+					// 2.3.2: fix to convert to 24 hour format first
+					$shift_start = radio_station_convert_shift_time( $shift['start'] );
+					$shift_end = radio_station_convert_shift_time( $shift['end'] );
+					$shift_start_time = radio_station_to_time( $weekdates[$day] . ' ' . $shift_start );
+					$shift_end_time = radio_station_to_time( $weekdates[$day] . ' ' . $shift_end );
 
 					// if ( isset( $shift['split'] ) && $shift['split'] && isset( $shift['real_end'] ) {
 					//	$nextdate = radio_station_get_time( 'date', $shift_end_time + ( 23 * 60 * 60 ) );
@@ -1281,8 +1297,11 @@ function radio_station_get_current_schedule( $time = false ) {
 
 					// --- get shift times ---
 					// 2.3.2: replace strtotime with to_time for timezones
-					$shift_start_time = radio_station_to_time( $weekdates[$day] . ' ' . $shift['start'] );
-					$shift_end_time = radio_station_to_time( $weekdates[$day] . ' ' . $shift['end'] );
+					// 2.3.2: fix to convert to 24 hour format first
+					$shift_time = radio_station_convert_shift_time( $shift['start'] );
+					$end_time = radio_station_convert_shift_time( $shift['end'] );
+					$shift_start_time = radio_station_to_time( $weekdates[$day] . ' ' . $shift_start );
+					$shift_end_time = radio_station_to_time( $weekdates[$day] . ' ' . $shift_end );
 					if ( $shift_start_time > $shift_end_time ) {
 						$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 					}
@@ -1352,9 +1371,12 @@ function radio_station_get_current_schedule( $time = false ) {
 		if ( count( $next_shows ) > 0 ) {
 
 			// 2.3.2: replace strtotime with to_time for timezones
+			// 2.3.2: fix to convert to 24 hour format first
 			$next_show = $next_shows[0];
-			$shift_start_time = radio_station_to_time( $weekdates[$next_show['day']] . ' ' . $next_show['start'] );
-			$shift_end_time = radio_station_to_time( $weekdates[$next_show['day']] . ' ' . $next_show['end'] );
+			$next_show_start = radio_station_convert_shift_time( $next_show['start'] );
+			$next_show_end = radio_station_convert_shift_time( $next_show['end'] );
+			$shift_start_time = radio_station_to_time( $weekdates[$next_show['day']] . ' ' . $next_show_start );
+			$shift_end_time = radio_station_to_time( $weekdates[$next_show['day']] . ' ' . $next_show_end );
 			
 			// 2.3.2: adjust for midnight -
 			if ( $shift_end_time < $shift_start_time ) {
@@ -1523,10 +1545,11 @@ function radio_station_get_next_shows( $limit = 3, $show_shifts = false, $time =
 
 				// --- get this shift start and end times ---
 				// 2.3.2: replace strtotime with to_time for timezones
-				$shift_start = $weekdates[$day] . ' ' . $shift['start'];
-				$shift_end = $weekdates[$day] . ' ' . $shift['end'];
-				$shift_start_time = radio_station_to_time( $shift_start );
-				$shift_end_time = radio_station_to_time( $shift_end );
+				// 2.3.2: fix to conver to 24 hour format first
+				$shift_start = radio_station_convert_shift_time( $shift['start'] );
+				$shift_end = radio_station_convert_shift_time( $shift['end'] );
+				$shift_start_time = radio_station_to_time( $weekdates[$day] . ' ' . $shift_start );
+				$shift_end_time = radio_station_to_time( $weekdates[$day] . ' ' . $shift_end );
 				
 				if ( RADIO_STATION_DEBUG ) {
 					echo '<span style="display:none;">';
@@ -1786,182 +1809,269 @@ function radio_station_check_shifts( $all_shifts ) {
 	$weekdays = radio_station_get_schedule_weekdays();
 	$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 	
-	$conflicts = array();
+	$conflicts = $checked_shifts = array();
 	if ( count( $all_shifts ) > 0 ) {
-		foreach ( $all_shifts as $day => $shifts ) {
+		$prev_shift = $prev_prev_shift = false;
+		// foreach ( $all_shifts as $day => $shifts ) {
+		foreach ( $weekdays as $day ) {
 
-			// --- get previous and next days for comparisons ---
-			// 2.3.2: fix to use week date schedule
-			// $thisdate = date( 'Y-m-d', strtotime( $now ) );
-			// $prevdate = date( 'Y-m-d', strtotime( $thisdate ) - ( 24 * 60 * 60 ) );
-			// $nextdate = date( 'Y-m-d', strtotime( $thisdate ) + ( 24 * 60 * 60 ) );
-			$thisdate = $weekdates[$day];
+			if ( isset( $all_shifts[$day] ) ) {
+				$shifts = $all_shifts[$day];				
 
-			// --- check for conflicts (overlaps) ---
-			$checked_shifts = array();
-			$prev_shift = false;
-			foreach ( $shifts as $key => $shift ) {
+				// --- get previous and next days for comparisons ---
+				// 2.3.2: fix to use week date schedule
+				// $thisdate = date( 'Y-m-d', strtotime( $now ) );
+				// $prevdate = date( 'Y-m-d', strtotime( $thisdate ) - ( 24 * 60 * 60 ) );
+				// $nextdate = date( 'Y-m-d', strtotime( $thisdate ) + ( 24 * 60 * 60 ) );
+				$thisdate = $weekdates[$day];
+				$date_time = radio_station_to_time( $weekdates[$day] . ' 00:00' );
 
-				// --- reset shift switches ---
-				$set_shift = true;
-				$conflict = $disabled = false;
-				if ( isset( $shift['disabled'] ) && ( 'yes' == $shift['disabled'] ) ) {
-					$disabled = true;
-				}
+				// --- check for conflicts (overlaps) ---
+				foreach ( $shifts as $key => $shift ) {
 
-				// --- account for midnight times ---
-				// 2.3.2: replace strtotime with to_time for timezones
-				if ( ( '00:00 am' == $shift['start'] ) || ( '12:00 am' == $shift['start'] ) ) {
-					$start_time = radio_station_to_time( $thisdate . ' 12:00 am' );
-				} else {
-					$start_time = radio_station_to_time( $thisdate . ' ' . $shift['start'] );
-				}
-				if ( ( '11:59:59 pm' == $shift['end'] ) || ( '12:00 am' == $shift['end'] ) ) {
-					$end_time = radio_station_to_time( $thisdate . ' 11:59:59 pm' ) + 1;
-				} else {
-					$end_time = radio_station_to_time( $thisdate . ' ' . $shift['end'] );
-				}
+					// --- set first shift checked ---
+					// 2.3.2: added for checking against last shift
+					if ( !isset( $first_shift ) ) {
+						$first_shift = $shift;
+					}
 
-				if ( false != $prev_shift ) {
+					// --- reset shift switches ---
+					$set_shift = true;
+					$conflict = $disabled = false;
+					if ( isset( $shift['disabled'] ) && ( 'yes' == $shift['disabled'] ) ) {
+						$disabled = true;
+					}
 
-					// note: previous shift start and end times set in previous loop iteration
+					// --- account for midnight times ---
+					// 2.3.2: replace strtotime with to_time for timezones
+					if ( ( '00:00 am' == $shift['start'] ) || ( '12:00 am' == $shift['start'] ) ) {
+						$start_time = radio_station_to_time( $thisdate . ' 00:00' );
+					} else {
+						$shift_start = radio_station_convert_shift_time( $shift['start'] );
+						$start_time = radio_station_to_time( $thisdate . ' ' . $shift_start );
+					}
+					if ( ( '11:59:59 pm' == $shift['end'] ) || ( '12:00 am' == $shift['end'] ) ) {
+						$end_time = radio_station_to_time( $thisdate . ' 11:59:59' ) + 1;
+					} else {
+						$shift_end = radio_station_convert_shift_time( $shift['end'] );
+						$end_time = radio_station_to_time( $thisdate . ' ' . $shift_end );
+					}
 
-					// --- detect shift conflicts ---
-					// (and maybe *attempt* to fix them up)
-					if ( isset( $prev_start_time ) && ( $start_time == $prev_start_time ) ) {
-						if ( $shift['split'] || $prev_shift['split'] ) {
-							$conflict = 'overlap';
-							if ( $shift['split'] && $prev_shift['split'] ) {
-								// - need to compare start times on previous day -
-								// 2.3.2: replace strtotime with to_time for timezones
-								$data = $shift['shift'];
-								$prevdata = $prev_shift['shift'];
-								$real_start_time = radio_station_to_time( $prevdate . ' ' . $data['real_start'] );
-								$prev_real_start_time = radio_station_to_time( $prevdate . ' ' . $prevdata['real_start'] );
-								if ( $real_start_time > $prev_real_start_time ) {
-									// - current shift started later (overwrite from midnight) -
+					if ( false != $prev_shift ) {
+
+						// note: previous shift start and end times set in previous loop iteration
+						if ( RADIO_STATION_DEBUG ) {
+							echo "Shift Date: " . $thisdate . " - Day: " . $day . " - Time: " . $date_time . PHP_EOL;
+							$prevdata = $prev_shift['shift'];
+							$prevday = $prevdata['day'];
+							$prevdate = $prevdata['date'];
+							echo "Previous Shift Date: " . $prevdate . " - Shift Day: " . $prevday . PHP_EOL;
+							echo "Shift: " . print_r( $shift, true );
+							echo "Previous Shift: " . print_r( $prev_shift, true );
+						}
+
+						// --- detect shift conflicts ---
+						// (and maybe *attempt* to fix them up)
+						if ( isset( $prev_start_time ) && ( $start_time == $prev_start_time ) ) {
+							if ( $shift['split'] || $prev_shift['split'] ) {
+								$conflict = 'overlap';
+								if ( $shift['split'] && $prev_shift['split'] ) {
+									// - need to compare start times on previous day -
+									// 2.3.2: replace strtotime with to_time for timezones
+									// 2.3.2: fix to convert to 24 hour format first
+									$data = $shift['shift'];
+									$real_start = radio_station_convert_shift_time( $data['real_start'] );
+									$shiftdate = radio_station_get_previous_date( $thisdate );
+									// $real_start_time = radio_station_to_time( $prevdate . ' ' . $real_start );
+									$real_start_time = radio_station_to_time( $shiftdate . ' ' . $real_start );
+
+									// 2.3.2: fix to calculation of previous shift day start time
+									$prevdata = $prev_shift['shift'];
+									// $prevday = $prevdata['day'];
+									// $prevdate = radio_station_get_previous_date( $thisdate, $prevday );
+									$prevdate = $prev_shift['date'];
+									$prev_real_start = radio_station_convert_shift_time( $prevdata['real_start'] );
+									$prev_real_start_time = radio_station_to_time( $prevdate . ' ' . $prev_real_start );
+
+									// --- compare start times ---
+									if ( $real_start_time > $prev_real_start_time ) {
+										// - current shift started later (overwrite from midnight) -
+										$set_shift = true;
+									} elseif ( $real_start_time == $prev_real_start_time ) {
+										// - do not duplicate, already recorded -
+										$conflict = false; 
+										// - total overlap, check last updated post time -
+										$updated = strtotime( $shift['updated'] );
+										$prev_updated = strtotime( $prev_shift['updated'] );
+										if ( $updated < $prev_updated ) {
+											$set_shift = false;
+										}
+									}
+								} elseif ( $shift['split'] ) {
+									// - the current shift has been split overnight -
+									// assume previous shift is correct (ignore new shift time)
+									$set_shift = false;
+								} elseif ( $prev_shift['split'] ) {
+									// the previous shift has been split overnight
+									// so we will assume the new shift start is correct
+									// (overwrites previous shift from midnight key)
 									$set_shift = true;
-								} elseif ( $real_start_time == $prev_real_start_time ) {
-									// - do not duplicate, already recorded -
-									$conflict = false; 
-									// - total overlap, check last updated post time -
-									$updated = strtotime( $shift['updated'] );
-									$prev_updated = strtotime( $prev_shift['updated'] );
-									if ( $updated < $prev_updated ) {
-										$set_shift = false;
+								}
+							} else {
+								$conflict = 'same_start';
+								// - we do not know which of these is correct -
+								// no solution here, so check most recent last updated time
+								// we will assume (without certainty) most recent is correct
+								$updated = strtotime( $shift['updated'] );
+								$prev_updated = strtotime( $prev_shift['updated'] );
+								if ( $updated < $prev_updated ) {
+									$set_shift = false;
+								}
+							}
+						} elseif ( isset( $prev_end_time ) && ( $start_time < $prev_end_time ) ) {
+
+							// --- set the previous shift end time to current shift start ---
+							$conflict = 'overlap';
+
+							// --- modify only if this shift is not disabled ---
+							if ( !$disabled ) {
+								// 2.3.2: variable type fix (from checked_shift)
+								// 2.3.2: fix for midnight starting aplit shifts
+								// 2.3.2: set checked shifts with day key directly
+								if ( '00:00 am' == $prev_shift['start'] ) {
+									$prev_shift['start'] = '12:00 am';
+								}
+								$checked_shifts[$day][$prev_shift['start']]['end'] = $shift['start'];
+								$checked_shifts[$day][$prev_shift['start']]['trimmed'] = true;
+
+								if ( RADIO_STATION_DEBUG ) {
+									echo "Previous Previous Shift: " . print_r( $prev_prev_shift, true );
+								}
+
+								// --- fix for real end of first part of previous split shift ---
+								if ( isset( $prev_shift['split'] ) && $prev_shift['split'] && isset( $prev_shift['real_start'] ) ) {
+									if ( isset( $prev_prev_shift ) && isset( $prev_prev_shift['split'] ) && $prev_prev_shift['split'] ) {
+										$checked_shifts[$prev_prev_shift['start']]['real_end'] = $shift['start'];
+										$checked_shifts[$prev_prev_shift['start']]['trimmed'] = true;
 									}
 								}
-							} elseif ( $shift['split'] ) {
-								// - the current shift has been split overnight -
-								// assume previous shift is correct (ignore new shift time)
-								$set_shift = false;
-							} elseif ( $prev_shift['split'] ) {
-								// the previous shift has been split overnight
-								// so we will assume the new shift start is correct
-								// (overwrites previous shift from midnight key)
-								$set_shift = true;
 							}
-						} else {
-							$conflict = 'same_start';
-							// - we do not know which of these is correct -
-							// no solution here, so check most recent last updated time
-							// we will assume (without certainty) most recent is correct
-							$updated = strtotime( $shift['updated'] );
-							$prev_updated = strtotime( $prev_shift['updated'] );
-							if ( $updated < $prev_updated ) {
-								$set_shift = false;
+
+							// --- conflict debug output ---
+							if ( RADIO_STATION_DEBUG ) {
+								$debug = "Conflicting Start Time: " . date( "m-d l H:i", $start_time ) . " (" . $start_time . ")" . PHP_EOL;
+								$debug .= '[ ' . radio_station_get_time( "m-d l H:i", $start_time ) . ' ]';
+								$debug .= "Overlaps previous End Time: " .  date( "m-d l H:i", $prev_end_time ) . " (" . $prev_end_time . ")" . PHP_EOL;
+								$debug .= '[ ' . radio_station_get_time( "m-d l H:i", $prev_end_time ) . ' ]';
+								// $debug .= "Shift: " . print_r( $shift, true );
+								// $debug .= "Previous Shift: " . print_r( $prev_shift, true );
+								radio_station_debug( $debug );
 							}
-						}
-					} elseif ( isset( $prev_end_time ) && ( $start_time < $prev_end_time ) ) {
-
-						// --- set the previous shift end time to current shift start ---
-						$conflict = 'overlap';
-
-						// --- modify only if this shift is not disabled ---
-						if ( !$disabled ) {
-							$checked_shift[$prev_shift['start']]['end'] = $shift['start'];
-							$checked_shift[$prev_shift['start']]['trimmed'] = true;
-						}
-
-						// --- conflict debug output ---
-						if ( RADIO_STATION_DEBUG ) {
-							$debug = "This Date: " . $thisdate . " - Next Date: " . $nextdate . " - Previous Date: " . $prevdate . PHP_EOL;
-							$debug .= "(Conflicting Start Time: " . date( "m-d l H:i", $start_time ) . " (" . $start_time . ")" . PHP_EOL;
-							$debug .= "Overlaps previous End Time: " . date( "m-d l H:i", $prev_end_time ) . " (" . $prev_end_time . ")" . PHP_EOL;
-							$debug .= "Shift: " . print_r( $shift, true );
-							$debug .= "Previous Shift: " . print_r( $prev_shift, true );
-							radio_station_debug( $debug );
 						}
 					}
-				}
 
-				// --- maybe store shift conflict data ---
-				if ( $conflict ) {
+					// --- maybe store shift conflict data ---
+					if ( $conflict ) {
 
-					// ---- set short shift time data ---
-					$shift_start = $shift['shift']['start_hour'] . ':' . $shift['shift']['start_min'] . $shift['shift']['start_meridian'];
-					$shift_end = $shift['shift']['end_hour'] . ':' . $shift['shift']['end_min'] . $shift['shift']['end_meridian'];
-					$prev_shift_start = $prev_shift['shift']['start_hour'] . ':' . $prev_shift['shift']['start_min'] . $prev_shift['shift']['start_meridian'];
-					$prev_shift_end = $prev_shift['shift']['end_hour'] . ':' . $prev_shift['shift']['end_min'] . $prev_shift['shift']['end_meridian'];
+						// ---- set short shift time data ---
+						$shift_start = $shift['shift']['start_hour'] . ':' . $shift['shift']['start_min'] . $shift['shift']['start_meridian'];
+						$shift_end = $shift['shift']['end_hour'] . ':' . $shift['shift']['end_min'] . $shift['shift']['end_meridian'];
+						$prev_shift_start = $prev_shift['shift']['start_hour'] . ':' . $prev_shift['shift']['start_min'] . $prev_shift['shift']['start_meridian'];
+						$prev_shift_end = $prev_shift['shift']['end_hour'] . ':' . $prev_shift['shift']['end_min'] . $prev_shift['shift']['end_meridian'];
 
-					// --- store conflict for this shift ---
-					$conflicts[$shift['show']][] = array(
-						'show'          => $shift['show'],
-						'day'           => $shift['shift']['day'],
-						'start'         => $shift_start,
-						'end'           => $shift_end,
-						'disabled'      => $disabled,
-						'with_show'     => $prev_shift['show'],
-						'with_day'      => $prev_shift['shift']['day'],
-						'with_start'    => $prev_shift_start,
-						'with_end'      => $prev_shift_end,
-						'with_disabled' => $prev_disabled,
-						'conflict'      => $conflict,
-						'duplicate'     => false,
-					);
-
-					// --- store for previous shift only if a different show ---
-					if ( $shift['show'] != $prev_shift['show'] ) {
-						$conflicts[$prev_shift['show']][] = array(
-							'show'          => $prev_shift['show'],
-							'day'           => $prev_shift['shift']['day'],
-							'start'         => $prev_shift_start,
-							'end'           => $prev_shift_end,
-							'disabled'      => $prev_disabled,
-							'with_show'     => $shift['show'],
-							'with_day'      => $shift['shift']['day'],
-							'with_start'    => $shift_start,
-							'with_end'      => $shift_end,
-							'with_disabled' => $disabled,
+						// --- store conflict for this shift ---
+						$conflicts[$shift['show']][] = array(
+							'show'          => $shift['show'],
+							'day'           => $shift['shift']['day'],
+							'start'         => $shift_start,
+							'end'           => $shift_end,
+							'disabled'      => $disabled,
+							'with_show'     => $prev_shift['show'],
+							'with_day'      => $prev_shift['shift']['day'],
+							'with_start'    => $prev_shift_start,
+							'with_end'      => $prev_shift_end,
+							'with_disabled' => $prev_disabled,
 							'conflict'      => $conflict,
-							'duplicate'     => true,
+							'duplicate'     => false,
 						);
+
+						// --- store for previous shift only if a different show ---
+						if ( $shift['show'] != $prev_shift['show'] ) {
+							$conflicts[$prev_shift['show']][] = array(
+								'show'          => $prev_shift['show'],
+								'day'           => $prev_shift['shift']['day'],
+								'start'         => $prev_shift_start,
+								'end'           => $prev_shift_end,
+								'disabled'      => $prev_disabled,
+								'with_show'     => $shift['show'],
+								'with_day'      => $shift['shift']['day'],
+								'with_start'    => $shift_start,
+								'with_end'      => $shift_end,
+								'with_disabled' => $disabled,
+								'conflict'      => $conflict,
+								'duplicate'     => true,
+							);
+						}
+					}
+
+					// --- set current shift to previous for next iteration ---
+					$prev_start_time = $start_time;
+					$prev_end_time = $end_time;
+					if ( $prev_shift ) {
+						$prev_prev_shift = $prev_shift;
+					}
+					$prev_shift = $shift;
+					$prev_disabled = $disabled;
+
+					// --- set the now checked shift data ---
+					// (...but only if not disabled!)
+					if ( $set_shift && !$disabled ) {
+						// - no longer need shift and post updated times -
+						unset( $shift['shift'] );
+						unset( $shift['updated'] );
+						if ( '00:00 am' == $shift['start'] ) {
+							$shift['start'] = '12:00 am';
+						}
+						// 2.3.2: set checked shifts with day key directly
+						$checked_shifts[$day][$shift['start']] = $shift;
 					}
 				}
-
-				// --- set current shift to previous for next iteration ---
-				$prev_start_time = $start_time;
-				$prev_end_time = $end_time;
-				$prev_shift = $shift;
-				$prev_disabled = $disabled;
-
-				// --- set the now checked shift data ---
-				// (...but only if not disabled!)
-				if ( $set_shift && !$disabled ) {
-					// - no longer need shift and post updated times -
-					unset( $shift['shift'] );
-					unset( $shift['updated'] );
-					if ( '00:00 am' == $shift['start'] ) {
-						$shift['start'] = '12:00 am';
-					}
-					$checked_shifts[$shift['start']] = $shift;
-				}
-
 			}
-
+			
 			// --- set checked shifts for day ---
-			$all_shifts[$day] = $checked_shifts;
+			// 2.3.2: set checked shifts with day key directly
+			// $all_shifts[$day] = $checked_shifts;
 		}
+	}
+
+	// --- check last shift against first shift ---
+	// 2.3.2: added for possible overlap (split by weekly schedule dates)
+	if ( isset( $shift ) && ( $shift != $first_shift ) ) {
+		
+		// --- use days for next week to compare ---
+		$shift_start = radio_station_convert_shift_time( $shift['start'] );
+		$last_shift_start = radio_station_to_time( 'next ' . $shift['day'] . ' ' . $shift_start );
+		$shift_end = radio_station_convert_shift_time( $first_shift['end'] );
+		$first_shift_end = radio_station_to_time( 'next ' . $first_shift['day'] . ' ' . $shift_end );
+
+		if ( RADIO_STATION_DEBUG ) {
+		
+			echo '0' . print_r( $shift, true ) . '1';
+			echo print_r( $first_shift, true ) . '2';
+			echo 'Last Shift Start: ' . $shift['day'] . ' ' . $shift_start . ' - (' . $last_shift_start . ')' . PHP_EOL;
+			echo 'First Shift End: ' . $shift['day'] . ' ' . $shift_end . ' - (' . $first_shift_end . ')' . PHP_EOL;
+			
+		}
+	
+		if ( $last_shift_start < $first_shift_end ) {
+
+			// --- record a conflict ---
+			if ( RADIO_STATION_DEBUG ) {
+				echo "SCHEDULE OVERLAP CONFLICT";
+			}
+		
+		}
+
 	}
 
 	// --- check if any conflicts found ---
@@ -1981,7 +2091,7 @@ function radio_station_check_shifts( $all_shifts ) {
 		delete_option( 'radio_station_schedule_conflicts' );
 	}
 
-	return $all_shifts;
+	return $checked_shifts;
 }
 
 // ------------------
@@ -2026,8 +2136,13 @@ function radio_station_check_shift( $show_id, $shift, $context = 'all' ) {
 	$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 
 	// --- get shift start and end time ---
-	$shift_start_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $shift['start_hour'] . ':' . $shift['start_min'] . $shift['start_meridian'] );
-	$shift_end_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $shift['end_hour'] . ':' . $shift['end_min'] . $shift['end_meridian'] );
+	// 2.3.2: fix to convert to 24 hour times first
+	$start_time =  $shift['start_hour'] . ':' . $shift['start_min'] . $shift['start_meridian'];
+	$end_time = $shift['end_hour'] . ':' . $shift['end_min'] . $shift['end_meridian'];
+	$start_time = radio_station_convert_shift_time( $start_time );
+	$end_time = radio_station_convert_shift_time( $end_time );
+	$shift_start_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $start_time );
+	$shift_end_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $end_time );
 	if ( $shift_end_time < $shift_start_time ) {
 		$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 	}
@@ -2047,9 +2162,12 @@ function radio_station_check_shift( $show_id, $shift, $context = 'all' ) {
 			foreach ( $day_shifts as $i => $day_shift ) {
 
 				// 2.3.2: replace strtotime with to_time for timezones
+				// 2.3.2: fix to convert to 24 hour times first
 				// note: no need to adjust times for midnight as shifts are already split
-				$day_shift_start_time = radio_station_to_time( $weekdates[$day] . ' ' . $day_shift['start'] );
-				$day_shift_end_time = radio_station_to_time( $weekdates[$day] . ' ' . $day_shift['end'] );
+				$shift_start = radio_station_convert_shift_time( $day_shift['start'] );
+				$shift_end = radio_station_convert_shift_time( $day_shift['end'] );
+				$day_shift_start_time = radio_station_to_time( $weekdates[$day] . ' ' . $shift_start );
+				$day_shift_end_time = radio_station_to_time( $weekdates[$day] . ' ' . $shift_end );
 				
 				if ( RADIO_STATION_DEBUG ) {
 					echo "with Shift for Show " . $day_shift['show'] . ": ";
@@ -2105,8 +2223,13 @@ function radio_station_check_new_shifts( $new_shifts ) {
 
 		// --- get shift A start and end times ---
 		// 2.3.2: replace strtotime with to_time for timezones
-		$shift_a_start_time = radio_station_to_time( $weekdates[$shift_a['day']] . ' ' . $shift_a['start_hour'] . ':' . $shift_a['start_min'] . $shift_a['start_meridian'] );
-		$shift_a_end_time = radio_station_to_time( $weekdates[$shift_a['day']] . ' ' . $shift_a['end_hour'] . ':' . $shift_a['end_min'] . $shift_a['end_meridian'] );
+		// 2.3.2: fix to convert to 24 hour format first
+		$shift_a_start = $shift_a['start_hour'] . ':' . $shift_a['start_min'] . $shift_a['start_meridian'];
+		$shift_a_end = $shift_a['end_hour'] . ':' . $shift_a['end_min'] . $shift_a['end_meridian'];
+		$shift_a_start = radio_station_convert_shift_time( $shift_a_start );
+		$shift_a_end = radio_station_convert_shift_time( $shift_a_end );
+		$shift_a_start_time = radio_station_to_time( $weekdates[$shift_a['day']] . ' ' . $shift_a_start );
+		$shift_a_end_time = radio_station_to_time( $weekdates[$shift_a['day']] . ' ' . $shift_a_end );
 		if ( $shift_a_end_time < $shift_a_start_time ) {
 			$shift_a_end_time = $shift_a_end_time + ( 24 * 60 * 60 );
 		}
@@ -2124,8 +2247,12 @@ function radio_station_check_new_shifts( $new_shifts ) {
 
 				// --- get shift B start and end times ---
 				// 2.3.2: replace strtotime with to_time for timezones
-				$shift_b_start_time = radio_station_to_time( $weekdates[$shift_b['day']] . ' ' . $shift_b['start_hour'] . ':' . $shift_b['start_min'] . $shift_b['start_meridian'] );
-				$shift_b_end_time = radio_station_to_time( $weekdates[$shift_b['day']] . ' ' . $shift_b['end_hour'] . ':' . $shift_b['end_min'] . $shift_b['end_meridian'] );
+				$shift_b_start = $shift_b['start_hour'] . ':' . $shift_b['start_min'] . $shift_b['start_meridian'];
+				$shift_b_end = $shift_b['end_hour'] . ':' . $shift_b['end_min'] . $shift_b['end_meridian'];
+				$shift_b_start = radio_station_convert_shift_time( $shift_b_start );
+				$shift_b_end = radio_station_convert_shift_time( $shift_b_end );
+				$shift_b_start_time = radio_station_to_time( $weekdates[$shift_b['day']] . ' ' . $shift_b_start );
+				$shift_b_end_time = radio_station_to_time( $weekdates[$shift_b['day']] . ' ' . $shift_b_end );
 				if ( $shift_b_end_time < $shift_b_start_time ) {
 					$shift_b_end_time = $shift_b_end_time + ( 24 * 60 * 60 );
 				}
@@ -2582,14 +2709,29 @@ function radio_station_get_timezone_code( $timezone ) {
 function radio_station_get_date_time( $timestring, $timezone ) {
 
 	if ( 'UTC' == $timezone ) {
-		$datetime = new DateTime( $timestring, new DateTimeZone( 'UTC' ) );
+		$utc = new DateTimeZone( 'UTC' );
+		$datetime = new DateTime( $timestring, $utc );
 	} elseif ( strstr( $timezone, 'UTC' ) ) {
 		$offset = str_replace( 'UTC', '', $timezone );
 		$offset = (int)$offset * 60 * 60;
-		$datetime = new DateTime( $timestring, new DateTimeZone( 'UTC' ) );
-		$timestamp = $datetime->getTimestamp();
-		$timestamp = $timestamp - $offset;
+		$utc = new DateTimeZone( 'UTC' );
+		$datetime = new DateTime( $timestring, $utc );
+		// echo "TS1: " . $datetime->getTimeStamp();
+		$timestamp = $datetime->format( 'U' );
+		// echo "DateTime: " . $datetime->format( 'Y-m-d H:i:s' );
+		// echo "Timestamp: " . $timestamp . " - Offset: " . $offset . PHP_EOL;
+		$timestamp = $timestamp + $offset;
+		// echo "Offset Timestamp: " . $timestamp;
 		$datetime->setTimestamp( $timestamp );
+		// echo "TS2: " . $datetime->getTimestamp();
+		// echo "Before: " . print_r( $datetime, true ) . PHP_EOL;
+		
+		// $datetime = new DateTime( '@' . $timestamp, $utc );
+		// echo "TS3: " . $datetime->getTimestamp();
+		// echo "After: " . print_r( $datetime, true ) . PHP_EOL;
+		// echo "THEN: " . $datetime->format( 'U' );
+		// echo "DateTime: " . $datetime->format( 'Y-m-d H:i:s' );
+		
 	} else {
 		$datetime = new DateTime( $timestring, new DateTimeZone( $timezone ) );
 	}
@@ -2607,7 +2749,18 @@ function radio_station_to_time( $timestring ) {
 	 	$time = strtotime( $timestring );
 	} else {		
 		$timezone = radio_station_get_timezone();
-		$datetime = radio_station_get_date_time( $timestring, $timezone );	
+		if ( strstr( $timezone, 'UTC' ) && ( 'UTC' != $timezone ) ) {
+			// --- fallback for UTC offsets ---
+			$offset = str_replace( 'UTC', '', $timezone );
+			$offset = (int)$offset * 60 * 60;
+			$utc = new DateTimeZone( 'UTC' );
+			$datetime = new DateTime( $timestring, $utc );
+			$timestamp = $datetime->getTimestamp();
+			$timestamp = $timestamp - $offset;
+			$datetime->setTimestamp( $timestamp );	
+		} else {
+			$datetime = radio_station_get_date_time( $timestring, $timezone );	
+		}
 		$time = $datetime->format( 'U' );
 		
 	}
@@ -2745,6 +2898,29 @@ function radio_station_get_timezone_options( $include_wp_timezone = false ) {
 	return $options;
 }
 
+// -----------------
+// Timezone Selector
+// -----------------
+// 2.3.2: added for user timezone selection
+function radio_station_timezone_selector( $id ) {	
+
+	$onchange = "radio_change_timezone('" . esc_js( $id ) . "');";
+	$select .= '<select id="' . esc_attr( $id ) . '-timezone-select" class="user-timezone-select" style="display:none;" onchange="' . $onchange . '">';
+	$select .= '<option value="">' . esc_html( __( 'Cancel', 'radio-station' ) ) . '</option>';
+	foreach ( $timezones as $timezone => $label ) {
+		if ( strstr( $timezone, '*OPTGROUP*' ) ) {
+			$select .= "<optgroup label='" . esc_attr( $label ) . "'>" . esc_html( $label ) . '</optgroup>';
+		} else {
+			$select .= '<option value="' . $timezone . '">' . esc_html( $label ) . '</option>';
+		}
+	}
+	$select .= 
+	$select .= '</select>';
+	
+	return $select;
+}
+
+
 // ---------------------
 // Get Schedule Weekdays
 // ---------------------
@@ -2794,6 +2970,28 @@ function radio_station_get_schedule_weekdays( $weekstart = false ) {
 	$weekdays = array_merge( $start, $after );
 	$weekdays = array_merge( $weekdays, $before );
 
+	return $weekdays;
+}
+
+// -----------
+// Get Weekday
+// -----------
+// 2.3.2: added get weekday from number helper
+function radio_station_get_weekday( $day_number = null ) {
+
+	$weekdays = array(
+		'Sunday',
+		'Monday',
+		'Tuesday',
+		'Wednesday',
+		'Thursday',
+		'Friday',
+		'Saturday',
+	);
+
+	if ( !is_null( $day_number ) ) {
+		return $weekdays[$day_number];
+	}
 	return $weekdays;
 }
 
@@ -2911,6 +3109,67 @@ function radio_station_get_previous_day( $day ) {
 	}
 
 	return '';
+}
+
+// -----------------
+// Get Previous Date
+// -----------------
+// 2.3.2: added for more reliable calculations
+function radio_station_get_previous_date( $date, $weekday = false ) {
+
+	// note: this is used internally so timezone not used
+	$timedate = strtotime( $date );
+	$timedate = $timedate - ( 24 * 60 * 60 );
+	if ( $weekday ) {
+		$day = date( 'l', $timedate );
+		if ( $day != $weekday ) {
+			$i = 0;
+			while ( $day != $weekday ) {
+				$timedate = $timedate - ( 24 * 60 * 60 );
+				$day = strtotime( 'l', $timedate );
+				if ( 8 == $i ) {
+					// - failback for while failure -
+					$timedate = strtotime( $date );
+					$previous_date = date( 'previous ' . $weekday, $timedate );
+					return $previous_date;
+				}
+				$i++;
+			}
+		}
+	}
+	$previous_date = date( 'Y-m-d', $timedate );
+	return $previous_date;
+}
+
+// -------------
+// Get Next Date
+// -------------
+// 2.3.2: added for more reliable calculations
+function radio_station_get_next_date( $date, $weekday = false ) {
+
+	// note: this is used internally so timezone not used
+	$timedate = strtotime( $date );
+	$timedate = $timedate + ( 24 * 60 * 60 );
+	if ( $weekday ) {
+		$day = date( 'l', $timedate );
+		if ( $day != $weekday ) {
+			$i = 0;
+			while ( $day != $weekday ) {
+				$timedate = $timedate + ( 24 * 60 * 60 );
+				$day = strtotime( 'l', $timedate );
+				if ( 8 == $i ) {
+					// - failback for while failure -
+					echo "WEEKDAY FAIL: " . $weekday;
+					$timedate = strtotime( $date );
+					$next_date = date( 'next ' . $weekday, $timedate );
+					return $next_date;
+				}
+				$i++;
+			}
+		}
+	}
+	$next_date = date( 'Y-m-d', $timedate );
+	return $next_date;
 }
 
 // -------------
@@ -3509,29 +3768,30 @@ function radio_station_translate_month( $month, $short = false ) {
 	if ( $short ) {
 
 		// --- translate abbreviated month ---
-		if ( 'Jan' === $month ) {
+		// 2.3.2: allow for short or long input match
+		if ( ( 'Jan' == $month ) || ( 'January' == $month ) ) {
 			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 1 ) );
-		} elseif ( 'Feb' === $month ) {
+		} elseif ( ( 'Feb' == $month ) || ( 'February' == $month ) ) {
 			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 2 ) );
-		} elseif ( 'Mar' === $month ) {
+		} elseif ( ( 'Mar' == $month ) || ( 'March' == $month ) ) {
 			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 3 ) );
-		} elseif ( 'Apr' === $month ) {
+		} elseif ( ( 'Apr' == $month ) || ( 'April' == $month ) ) {
 			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 4 ) );
-		} elseif ( 'May' === $month ) {
+		} elseif ( ( 'May' == $month ) || ( 'May' == $month ) ) {
 			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 5 ) );
-		} elseif ( 'Jun' === $month ) {
+		} elseif ( ( 'Jun' == $month ) || ( 'June' == $month ) ) {
 			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 6 ) );
-		} elseif ( 'Jul' === $month ) {
+		} elseif ( ( 'Jul' == $month ) || ( 'July' == $month ) ) {
 			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 7 ) );
-		} elseif ( 'Aug' === $month ) {
+		} elseif ( ( 'Aug' == $month ) || ( 'August' == $month ) ) {
 			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 8 ) );
-		} elseif ( 'Sep' === $month ) {
+		} elseif ( ( 'Sep' == $month ) || ( 'September' == $month ) ) {
 			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 9 ) );
-		} elseif ( 'Oct' === $month ) {
+		} elseif ( ( 'Oct' == $month ) || ( 'October' == $month ) ) {
 			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 10 ) );
-		} elseif ( 'Nov' === $month ) {
+		} elseif ( ( 'Nov' == $month ) || ( 'November' == $month ) ) {
 			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 11 ) );
-		} elseif ( 'Dec' === $month ) {
+		} elseif ( ( 'Dec' == $month ) || ( 'December' == $month ) ) {
 			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 12 ) );
 		} elseif ( ( intval( $month ) > 0 ) && ( intval( $month ) < 13 ) ) {
 			// 2.3.0: add support for numeric month value
@@ -3540,29 +3800,30 @@ function radio_station_translate_month( $month, $short = false ) {
 	} else {
 
 		// --- translate full month ---
-		if ( 'January' === $month ) {
+		// 2.3.2: allow for short or long input match
+		if ( ( 'Jan' == $month ) || ( 'January' == $month ) ) {
 			$month = $wp_locale->get_month( 1 );
-		} elseif ( 'February' === $month ) {
+		} elseif ( ( 'Feb' == $month ) || ( 'February' == $month ) ) {
 			$month = $wp_locale->get_month( 2 );
-		} elseif ( 'March' === $month ) {
+		} elseif ( ( 'Mar' == $month ) || ( 'March' == $month ) ) {
 			$month = $wp_locale->get_month( 3 );
-		} elseif ( 'April' === $month ) {
+		} elseif ( ( 'Apr' == $month ) || ( 'April' == $month ) ) {
 			$month = $wp_locale->get_month( 4 );
-		} elseif ( 'May' === $month ) {
+		} elseif ( ( 'May' == $month ) || ( 'May' == $month ) ) {
 			$month = $wp_locale->get_month( 5 );
-		} elseif ( 'June' === $month ) {
+		} elseif ( ( 'Jun' == $month ) || ( 'June' == $month ) ) {
 			$month = $wp_locale->get_month( 6 );
-		} elseif ( 'July' === $month ) {
+		} elseif ( ( 'Jul' == $month ) || ( 'July' == $month ) ) {
 			$month = $wp_locale->get_month( 7 );
-		} elseif ( 'August' === $month ) {
+		} elseif ( ( 'Aug' == $month ) || ( 'August' == $month ) ) {
 			$month = $wp_locale->get_month( 8 );
-		} elseif ( 'September' === $month ) {
+		} elseif ( ( 'Sep' == $month ) || ( 'September' == $month ) ) {
 			$month = $wp_locale->get_month( 9 );
-		} elseif ( 'October' === $month ) {
+		} elseif ( ( 'Oct' == $month ) || ( 'October' == $month ) ) {
 			$month = $wp_locale->get_month( 10 );
-		} elseif ( 'November' === $month ) {
+		} elseif ( ( 'Nov' == $month ) || ( 'November' == $month ) ) {
 			$month = $wp_locale->get_month( 11 );
-		} elseif ( 'December' === $month ) {
+		} elseif ( ( 'Dec' == $month ) || ( 'December' == $month ) ) {
 			$month = $wp_locale->get_month( 12 );
 		} elseif ( ( intval( $month ) > 0 ) && ( intval( $month ) < 13 ) ) {
 			// 2.3.0: add support for numeric month value

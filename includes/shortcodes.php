@@ -40,6 +40,15 @@
 add_shortcode( 'radio-timezone', 'radio_station_timezone_shortcode' );
 function radio_station_timezone_shortcode( $atts = array() ) {
 
+	global $radio_station_data;
+	
+	// --- set shortcode instance ---
+	if ( isset( $radio_station_data['timezone_instance'] ) ) {
+		$instance = $radio_station_data['timezone_instance'];
+	} else {
+		$instance = $radio_station_data['timezone_instance'] = 0;
+	}
+	
 	// --- get radio timezone values ---
 	$timezone = radio_station_get_setting( 'timezone_location' );
 	if ( !$timezone || ( '' == $timezone ) ) {
@@ -88,10 +97,18 @@ function radio_station_timezone_shortcode( $atts = array() ) {
 
 	// --- set shortcode output ---
 	$output = '<div class="radio-timezone-wrapper">';
-	$output .= '<span class="radio-timezone-title">';
+
+	$output .= '<div class="radio-timezone-title">';
 	$output .= esc_html( __( 'Radio Timezone', 'radio-station' ) );
-	$output .= '</span>: ';
-	$output .= '<span class="radio-timezone">' . esc_html( $timezone_display ) . '</span>';
+	$output .= '</div>: ';
+	$output .= '<div class="radio-timezone">' . esc_html( $timezone_display ) . '</div>';
+
+	// 2.3.2 allow for timezone selector ---	
+	$select = apply_filters( 'radio_station_clock_timezone_select', '', $instance, $atts );
+	if ( '' != $select ) {
+		$output .= $select;
+	}
+	
 	$output .= '</div>';
 
 	// --- filter and return ---
@@ -379,13 +396,16 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 
 				// --- convert date info ---
 				// 2.3.2: replace strtotime with to_time for timezones
+				// 2.3.2: fix to convert to 24 hour format first
 				$date_time = radio_station_to_time( $datetime['date'] );
 				$day = radio_station_get_time( 'day', $date_time );
 				$display_day = radio_station_translate_weekday( $day );
 				$start = $datetime['start_hour'] . ':' . $datetime['start_min'] . ' ' . $datetime['start_meridian'];
 				$end = $datetime['end_hour'] . ':' . $datetime['end_min'] . ' ' . $datetime['end_meridian'];
-				$shift_start_time = radio_station_to_time( $datetime['day'] . ' ' . $start );
-				$shift_end_time = radio_station_to_time( $datetime['day'] . ' ' . $end );
+				$start_time = radio_station_convert_shift_time( $start );
+				$end_time = radio_station_convert_shift_time( $end );
+				$shift_start_time = radio_station_to_time( $datetime['day'] . ' ' . $start_time );
+				$shift_end_time = radio_station_to_time( $datetime['day'] . ' ' . $end_time );
 				if ( $shift_start_time > $shift_end_time ) {
 					$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 				}
@@ -1280,6 +1300,7 @@ function radio_station_current_show_shortcode( $atts ) {
 				// 2.2.2: translate weekday for display
 				// 2.3.0: use dates for reliability
 				// 2.3.2: replace strtotime with to_time for timezones
+				// 2.3.2: fix to conver to 24 hour format first
 				$display_day = radio_station_translate_weekday( $shift['day'] );
 				$weekdate = $weekdates[$shift['day']];
 				if ( isset( $shift['start'] ) ) {
@@ -1288,9 +1309,11 @@ function radio_station_current_show_shortcode( $atts ) {
 				} else {
 					$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
 					$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
-				}			
-				$shift_start_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $start );
-				$shift_end_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $end );
+				}
+				$start_time = radio_station_convert_shift_time( $start );
+				$end_time = radio_station_convert_shift_time( $end );
+				$shift_start_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $start_time );
+				$shift_end_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $end_time );
 				if ( $shift_start_time > $shift_end_time ) {
 					$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 				}
@@ -1832,9 +1855,12 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 				// 2.2.2: fix to weekday value to be translated
 				// 2.3.2: replace strtotime with to_time for timezones
 				// 2.3.2: use exact shift date in time calculations
+				// 2.3.2: fix to convert to 24 hour format first
 				$display_day = radio_station_translate_weekday( $shift['day'] );
-				$shift_start_time = radio_station_to_time( $shift['date'] . ' ' . $shift['start'] );
-				$shift_end_time = radio_station_to_time( $shift['date'] . ' ' . $shift['end'] );
+				$shift_start = radio_station_convert_shift_time( $shift['start'] );
+				$shift_end = radio_station_convert_shift_time( $shift['end'] );
+				$shift_start_time = radio_station_to_time( $shift['date'] . ' ' . $shift_start );
+				$shift_end_time = radio_station_to_time( $shift['date'] . ' ' . $shift_end );
 				if ( $shift_end_time < $shift_start_time ) {
 					$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 				}
@@ -2286,10 +2312,13 @@ function radio_station_current_playlist_shortcode( $atts ) {
 
 					// --- convert shift info ---
 					// 2.3.2: replace strtotime with to_time for timezones
+					// 2.3.2: fix to convert to 24 hour format first
 					$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
 					$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
-					$shift_start_time = radio_station_to_time( $start );
-					$shift_end_time = radio_station_to_time( $end );
+					$start_time = radio_station_convert_shift_time( $start );
+					$end_time = radio_station_convert_shift_time( $end );
+					$shift_start_time = radio_station_to_time( $start_time );
+					$shift_end_time = radio_station_to_time( $end_time );
 					if ( $start > $end ) {
 						$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 					}

@@ -50,6 +50,11 @@ foreach ( $weekdays as $i => $weekday ) {
 		$days = explode( ',', $atts['days'] );
 		$found_day = false;
 		foreach ( $days as $day ) {
+			$day = trim( $day );
+			// 2.3.2: allow for numeric days (0=sunday to 6=saturday)
+			if ( is_numeric( $day ) && ( $day > -1 ) && ( $day < 7 ) ) {
+				$day = radio_station_get_weekday( $day );
+			}
 			if ( trim( strtolower( $day ) ) == strtolower( $weekday ) ) {
 				$found_day = true;
 			}
@@ -62,8 +67,15 @@ foreach ( $weekdays as $i => $weekday ) {
 	if ( !$skip_day ) {
 	
 		// --- set day column heading ---
-		$heading = substr( $weekday, 0, 3 );
-		$heading = radio_station_translate_weekday( $heading, true );
+		// 2.3.2: added check for short/long day display attribute
+		if ( !in_array( $atts['display_day'], array( 'short', 'full', 'long' ) ) ) {
+			$atts['display_day'] = 'short';
+		}
+		if ( 'short' == $atts['display_day'] ) {
+			$display_day = radio_station_translate_weekday( $weekday, true );
+		} elseif ( ( 'full' == $atts['display_day'] ) || ( 'long' == $atts['display_day'] ) ) {
+			$display_day = radio_station_translate_weekday( $weekday, false );
+		}
 
 		// --- get weekdate subheading ---
 		// 2.3.2: set day start and end times
@@ -72,8 +84,25 @@ foreach ( $weekdays as $i => $weekday ) {
 		$weekdate = $weekdates[$weekday];
 		$day_start_time = radio_station_to_time( $weekdate . ' 00:00:00' );
 		$day_end_time = $day_start_time + ( 24 * 60 * 60 );
+		
+		// 2.3.2: add attribute for date subheading format (see PHP date() format)
 		// $subheading = date( 'jS M', strtotime( $weekdate ) );
-		$subheading = radio_station_get_time( 'jS M', $day_start_time );
+		if ( $atts['display_date'] ) {
+			$date_subheading = radio_station_get_time( $atts['display_date'], $day_start_time );
+		} else {
+			$date_subheading = radio_station_get_time( 'j', $day_start_time );
+		}
+
+		// 2.3.2: add attribute for short or long month display
+		$month = radio_station_get_time( 'F', $day_start_time );
+		if ( $atts['display_month'] && !in_array( $atts['display_month'], array( 'short', 'full', 'long' ) ) ) {
+			$atts['display_month'] = 'short';
+		}
+		if ( ( 'long' == $atts['display_month'] ) || ( 'full' == $atts['display_month'] ) ) {
+			$date_subheading .= ' ' . radio_station_translate_month( $month, false );
+		} elseif ( 'short' == $atts['display_month'] ) {
+			$date_subheading .= ' ' . radio_station_translate_month( $month, true );
+		}
 
 		// --- set heading classes ---
 		// 2.3.0: add day and check for highlighting
@@ -87,6 +116,7 @@ foreach ( $weekdays as $i => $weekday ) {
 		// --- output table column heading ---
 		// 2.3.0: added left/right arrow responsive controls
 		// 2.3.1: added (negative) return to arrow onclick functions
+		// 2.3.2: added check for optional display_date attribute
 		$arrows = array( 'right' => '&#9658;', 'left' => '&#9668;' );
 		$arrows = apply_filters( 'radio_station_schedule_arrows', $arrows, 'table' );
 		$output .= '<th class="' . esc_attr( $class ) . '">';
@@ -94,8 +124,14 @@ foreach ( $weekdays as $i => $weekday ) {
 		$output .= '<a href="javascript:void(0);" onclick="return radio_shift_day(\'left\');" title="' . esc_attr( __( 'Previous Day', 'radio-station' ) ) . '">' . $arrows['left'] . '</a>';
 		$output .= '</div>';
 		$output .= '<div class="headings">';
-		$output .= '<div class="day-heading">' . esc_html( $heading ) . '</div>';
-		$output .= '<div class="date-subheading">' . esc_html( $subheading ) . '</div>';
+		$output .= '<div class="day-heading"';
+		if ( $atts['display_date'] ) {
+			$output .= ' title="' . esc_attr( $date_subheading ) . '"';
+		}
+		$output .= '>' . esc_html( $display_day ) . '</div>';
+		if ( $atts['display_date'] ) {
+			$output .= '<div class="date-subheading">' . esc_html( $date_subheading ) . '</div>';
+		}
 		$output .= '</div>';
 		$output .= '<div class="shift-right-arrow">';
 		$output .= '<a href="javacript:void(0);" onclick="return radio_shift_day(\'right\');" title="' . esc_attr( __( 'Next Day', 'radio-station' ) ) . '">' . $arrows['right'] . '</a>';
@@ -170,6 +206,11 @@ foreach ( $hours as $hour ) {
 			$days = explode( ',', $atts['days'] );
 			$found_day = false;
 			foreach ( $days as $day ) {
+			$day = trim( $day );
+				// 2.3.2: allow for numeric days (0=sunday to 6=saturday)
+				if ( is_numeric( $day ) && ( $day > -1 ) && ( $day < 7 ) ) {
+					$day = radio_station_get_weekday( $day );
+				}
 				if ( trim( strtolower( $day ) ) == strtolower( $weekday ) ) {
 					$found_day = true;
 				}
@@ -214,17 +255,20 @@ foreach ( $hours as $hour ) {
 
 					// --- get shift start and end times ---
 					// 2.3.2: replace strtotime with to_time function for timezone
+					// 2.3.2: fix to convert to 24 hour format first
 					$display = $nowplaying = false;
 					if ( '00:00 am' == $shift['start'] ) {
-						$shift_start = radio_station_to_time( $weekdate . ' 12:00 am' );
+						$shift_start = radio_station_to_time( $weekdate . ' 00:00' );
 					} else {
-						$shift_start = radio_station_to_time( $weekdate . ' ' . $shift['start'] );
+						$shift_start = radio_station_convert_shift_time( $shift['start'] );
+						$shift_start = radio_station_to_time( $weekdate . ' ' . $shift_start );
 					}
 					if ( ( '11:59:59 pm' == $shift['end'] ) || ( '12:00 am' == $shift['end'] ) ) {
 						// - bugfixed to not use $nextday here -
-						$shift_end = radio_station_to_time( $weekdate . ' 11:59:59 pm' ) + 1;
+						$shift_end = radio_station_to_time( $weekdate . ' 23:59:59' ) + 1;
 					} else {
-						$shift_end = radio_station_to_time( $weekdate . ' ' . $shift['end'] );
+						$shift_end = radio_station_convert_shift_time( $shift['end'] );
+						$shift_end = radio_station_to_time( $weekdate . ' ' . $shift_end );
 					}
 
 					// --- check if the shift is starting / started ---
@@ -514,6 +558,9 @@ foreach ( $hours as $hour ) {
 			}
 			if ( $cellshifts > 0 ) {
 				$cellclasses[] = $cellshifts . '-shifts';
+			} else {
+				// 2.3.2: add no-shifts class
+				$cellclasses[] = 'no-shifts';
 			}
 			$cellclass = implode( ' ', $cellclasses );
 			$output .= '<td class="' . $cellclass . '">';

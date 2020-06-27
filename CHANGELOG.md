@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed: master schedule specify days attribute bug
 * Fixed: display real end time of overnight split shifts
 * Fixed: master schedule display with days attribute
+* Fixed: logic for Affected Shifts in override list
+* Fixed: removed auto-tab selection change on tab view resize
 * Added: AJAX widget load option (to bypass page caches)
 * Added: automated show schedule highlighting (table/tabs/list)
 * Added: playlist track arrows for re-ordering tracks

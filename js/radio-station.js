@@ -14,6 +14,18 @@ function radio_scroll_to(id) {
 	} else {elem.lastjump = null;}
 }
 
+/* Get Day of Week */
+function radio_get_weekday(dayweek) {
+	if (dayweek == '0') {day = 'sunday';}
+	if (dayweek == '1') {day = 'monday';}
+	if (dayweek == '2') {day = 'tuesday';}
+	if (dayweek == '3') {day = 'wednesday';}
+	if (dayweek == '4') {day = 'thursday';}
+	if (dayweek == '5') {day = 'friday';}
+	if (dayweek == '6') {day = 'saturday';}
+	return day;
+}
+
 /* Cookie Value Function */
 /* since @2.3.2 */
 radio_cookie = {

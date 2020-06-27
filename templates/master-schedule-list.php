@@ -37,11 +37,17 @@ $tcount = 0;
 foreach ( $weekdays as $weekday ) {
 
 	// --- maybe skip all days but those specified ---
+	// 2.3.2: improve days attribute checking logic
 	$skip_day = false;
 	if ( $atts['days'] ) {
 		$days = explode( ',', $atts['days'] );
 		$found_day = false;
 		foreach ( $days as $day ) {
+			$day = trim( $day );
+			// 2.3.2: allow for numeric days (0=sunday to 6=saturday)
+			if ( is_numeric( $day ) && ( $day > -1 ) && ( $day < 7 ) ) {
+				$day = radio_station_get_weekday( $day );
+			}
 			if ( trim( strtolower( $day ) ) == strtolower( $weekday ) ) {
 				$found_day = true;
 			}
@@ -53,6 +59,35 @@ foreach ( $weekdays as $weekday ) {
 	
 	if ( !$skip_day ) {
 
+		// 2.3.2: added check for short/long day display attribute
+		if ( !in_array( $atts['display_day'], array( 'short', 'full', 'long' ) ) ) {
+			$atts['display_day'] = 'long';
+		}
+		if ( 'short' == $atts['display_day'] ) {
+			$display_day = radio_station_translate_weekday( $weekday, true );
+		} elseif ( ( 'full' == $atts['display_day'] ) || ( 'long' == $atts['display_day'] ) ) {
+			$display_day = radio_station_translate_weekday( $weekday, false );
+		}
+
+		// 2.3.2: add attribute for date subheading format (see PHP date() format)
+		// $subheading = date( 'jS M', strtotime( $weekdate ) );
+		if ( $atts['display_date'] ) {
+			$date_subheading = radio_station_get_time( $atts['display_date'], $day_start_time );
+		} else {
+			$date_subheading = radio_station_get_time( 'j', $day_start_time );
+		}
+
+		// 2.3.2: add attribute for short or long month display
+		$month = radio_station_get_time( 'F', $day_start_time );
+		if ( $atts['display_month'] && !in_array( $atts['display_month'], array( 'short', 'full', 'long' ) ) ) {
+			$atts['display_month'] = 'short';
+		}
+		if ( ( 'long' == $atts['display_month'] ) || ( 'full' == $atts['display_month'] ) ) {
+			$date_subheading .= ' ' . radio_station_translate_month( $month, false );
+		} elseif ( 'short' == $atts['display_month'] ) {
+			$date_subheading .= ' ' . radio_station_translate_month( $month, true );
+		}
+
 		// 2.3.2: add classes 
 		$classes = array( 'master-list-day' );
 		$weekdate = $weekdates[$weekday];
@@ -62,9 +97,17 @@ foreach ( $weekdays as $weekday ) {
 		$classlist = implode( ' ', $classes );
 
 		// 2.2.2: use translate function for weekday string
+		// 2.3.2: added optional display-date attribute
 		$display_day = radio_station_translate_weekday( $weekday );
 		$output .= '<li id="list-header-' . strtolower( $weekday ) . '" class="' . esc_attr( $classlist ) . '" >';
-		$output .= '<span class="master-list-day-name">' . esc_html( $display_day ) . '</span>';
+		$output .= '<span class="master-list-day-name"';
+		if ( !$atts['display_date'] ) {
+			$output .= ' title="' . esc_attr( $date_subheading ) . '"';
+		}
+		$output .= '>' . esc_html( $display_day ) . '</span>';
+		if ( $atts['display_date'] ) {
+			$output .= ' <span class="master-list-day-date">' . esc_html( $date_subheading ) . '</span>';
+		}
 		
 		// 2.3.2: add output of day start and end times
 		// 2.3.2: replace strtotime with to_time for timezones
@@ -74,7 +117,7 @@ foreach ( $weekdays as $weekday ) {
 		$output .= '<span class="rs-time rs-end-time" data="' . esc_attr( $day_end_time ) . '"></span>';
 
 		// --- open day list ---
-		$output .= '<ul class="master-list-day-' . esc_attr( strtolower( $weekday ) ) . '-list">';
+		$output .= '<ul class="master-list-day-' . esc_attr( strtolower( $display_day ) ) . '-list">';
 
 		// --- get shifts for this day ---
 		if ( isset( $schedule[$weekday] ) ) {
@@ -91,8 +134,11 @@ foreach ( $weekdays as $weekday ) {
 
 				// --- convert shift time data ---
 				// 2.3.2: replace strtotime with to_time for timezones
-				$shift_start_time = radio_station_to_time( $weekdate . ' ' . $shift['start'] );
-				$shift_end_time = radio_station_to_time( $weekdate . ' ' . $shift['end'] );
+				// 2.3.2: fix to convert to 24 hour format first
+				$shift_start = radio_station_convert_shift_time( $shift['start'] );
+				$shift_end = radio_station_convert_shift_time( $shift['end'] );
+				$shift_start_time = radio_station_to_time( $weekdate . ' ' . $shift_start );
+				$shift_end_time = radio_station_to_time( $weekdate . ' ' . $shift_end );
 
 				// 2.3.0: filter show link by show and context
 				$show_link = false;

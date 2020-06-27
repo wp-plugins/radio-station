@@ -40,11 +40,17 @@ $tcount = 0;
 foreach ( $weekdays as $i => $weekday ) {
 
 	// --- maybe skip all days but those specified ---
+	// 2.3.2: improve days attribute checking logic
 	$skip_day = false;
 	if ( $atts['days'] ) {
 		$days = explode( ',', $atts['days'] );
 		$found_day = false;
 		foreach ( $days as $day ) {
+			$day = trim( $day );
+			// 2.3.2: allow for numeric days (0=sunday to 6=saturday)
+			if ( is_numeric( $day ) && ( $day > -1 ) && ( $day < 7 ) ) {
+				$day = radio_station_get_weekday( $day );
+			}
 			if ( trim( strtolower( $day ) ) == strtolower( $weekday ) ) {
 				$found_day = true;
 			}
@@ -56,6 +62,41 @@ foreach ( $weekdays as $i => $weekday ) {
 
 	if ( !$skip_day ) {
 
+		// 2.3.2: set day start and end times
+		// 2.3.2: replace strtotime with to_time for timezones
+		$day_start_time = radio_station_to_time( $weekdates[$weekday] . ' 00:00' );
+		$day_end_time = $day_start_time + ( 24 * 60 * 60 );
+
+		// 2.2.2: use translate function for weekday string
+		// 2.3.2: added check for short/long day display attribute
+		if ( !in_array( $atts['display_day'], array( 'short', 'full', 'long' ) ) ) {
+			$atts['display_day'] = 'long';
+		}
+		if ( 'short' == $atts['display_day'] ) {
+			$display_day = radio_station_translate_weekday( $weekday, true );
+		} elseif ( ( 'full' == $atts['display_day'] ) || ( 'long' == $atts['display_day'] ) ) {
+			$display_day = radio_station_translate_weekday( $weekday, false );
+		}
+
+		// 2.3.2: add attribute for date subheading format (see PHP date() format)
+		// $subheading = date( 'jS M', strtotime( $weekdate ) );
+		if ( $atts['display_date'] ) {
+			$date_subheading = radio_station_get_time( $atts['display_date'], $day_start_time );
+		} else {
+			$date_subheading = radio_station_get_time( 'j', $day_start_time );
+		}
+
+		// 2.3.2: add attribute for short or long month display
+		$month = radio_station_get_time( 'F', $day_start_time );
+		if ( $atts['display_month'] && !in_array( $atts['display_month'], array( 'short', 'full', 'long' ) ) ) {
+			$atts['display_month'] = 'short';
+		}
+		if ( ( 'long' == $atts['display_month'] ) || ( 'full' == $atts['display_month'] ) ) {
+			$date_subheading .= ' ' . radio_station_translate_month( $month, false );
+		} elseif ( 'short' == $atts['display_month'] ) {
+			$date_subheading .= ' ' . radio_station_translate_month( $month, true );
+		}
+
 		// --- set tab classes ---	
 		$weekdate = $weekdates[$weekday];
 		$classes = array( 'master-schedule-tabs-day', 'day-' . $i );
@@ -63,25 +104,29 @@ foreach ( $weekdays as $i => $weekday ) {
 			$classes[] = 'current-day';
 			$classes[] = 'selected-day';
 		}
-		$class = implode( ' ', $classes );
-
-		// 2.2.2: use translate function for weekday string
-		$display_day = radio_station_translate_weekday( $weekday );
-
-		// 2.3.2: set day start and end times
-		// 2.3.2: replace strtotime with to_time for timezones
-		$day_start_time = radio_station_to_time( $weekdates[$weekday] . ' 00:00' );
-		$day_end_time = $day_start_time + ( 24 * 60 * 60 );
+		$classlist  = implode( ' ', $classes );
 
 		// 2.3.0: added left/right arrow responsive controls
 		// 2.3.1: added (negative) return to arrow onclick functions
 		$arrows = array( 'right' => '&#9658;', 'left' => '&#9668;' );
 		$arrows = apply_filters( 'radio_station_schedule_arrows', $arrows, 'tabs' );
-		$output .= '<li id="master-schedule-tabs-header-' . strtolower( $weekday ) . '" class="' . esc_attr( $class ) . '">';
+		$output .= '<li id="master-schedule-tabs-header-' . strtolower( $weekday ) . '" class="' . esc_attr( $classlist ) . '">';
 		$output .= '<div class="shift-left-arrow">';
 		$output .= '<a href="javacript:void(0);" onclick="return radio_shift_tab(\'left\');" title="' . esc_attr( __( 'Previous Day', 'radio-station' ) ) . '">' . $arrows['left'] . '</a>';
 		$output .= '</div>';
-		$output .= '<div class="master-schedule-tabs-day-name">' . esc_html( $display_day ) . '</div>';
+		
+		// 2.3.2: added optional display_date attribute and subheading
+		$output .= '<div class="master-schedule-tabs-headings">';
+		$output .= '<div class="master-schedule-tabs-day-name"';
+		if ( !$atts['display_date'] ) {
+			$output .= ' title="' . esc_attr( $date_subheading ) . '"';
+		}
+		$output .= '>' . esc_html( $display_day ) . '</div>';
+		if ( $atts['display_date'] ) {
+			$output .= '<div class="master-schedule-tabs-date">' . esc_html( $date_subheading ) . '</div>';
+		}
+		$output .= '</div>';
+		
 		$output .= '<div class="shift-right-arrow">';
 		$output .= '<a href="javacript:void(0);" onclick="return radio_shift_tab(\'right\');" title="' . esc_attr( __( 'Next Day', 'radio-station' ) ) . '">' . $arrows['right'] . '</a>';
 		$output .= '</div>';
@@ -92,7 +137,12 @@ foreach ( $weekdays as $i => $weekday ) {
 		$output .= '</li>';
 
 		// 2.2.7: separate headings from panels for tab view
-		$panels .= '<ul class="master-schedule-tabs-panel" id="master-schedule-tabs-day-' . strtolower( $weekday ) . '">';
+		$panels .= '<ul class="master-schedule-tabs-panel" id="master-schedule-tabs-day-' . esc_attr( strtolower( $weekday ) ) . '">';
+
+		// 2.3.2: added extra current day display
+		$display_day = radio_station_translate_weekday( $weekday, false );
+		$panels .= '<div class="master-schedule-tabs-selected" id="master-schedule-tabs-selected-' . esc_attr( strtolower( $weekday ) ) . '">';
+		$panels .= __( 'Viewing', 'radio-station' ) . ': ' . esc_html( $display_day ) . '</div>';
 
 		// --- get shifts for this day ---
 		if ( isset( $schedule[$weekday] ) ) {
@@ -122,8 +172,11 @@ foreach ( $weekdays as $i => $weekday ) {
 
 				// --- convert shift time data ---
 				// 2.3.2: replace strtotime with to_time for timezones
-				$shift_start_time = radio_station_to_time( $shift['day'] . ' ' . $shift['start'] );
-				$shift_end_time = radio_station_to_time( $shift['day'] . ' ' . $shift['end'] );
+				// 2.3.2: fix to convert to 24 hour format first
+				$shift_start = radio_station_convert_shift_time( $shift['start'] );
+				$shift_end = radio_station_convert_shift_time( $shift['end'] );
+				$shift_start_time = radio_station_to_time( $shift['day'] . ' ' . $shift_start );
+				$shift_end_time = radio_station_to_time( $shift['day'] . ' ' . $shift_end );
 
 				// 2.3.0: add genre classes for highlighting
 				$classes = array( 'master-schedule-tabs-show' );

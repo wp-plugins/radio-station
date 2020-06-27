@@ -45,22 +45,30 @@ function radio_station_master_schedule( $atts ) {
 	// 2.3.0: set default time format according to plugin setting
 	// 2.3.0: set default table display to new table formatting
 	// 2.3.2: added start_day attribute (for use width days)
+	// 2.3.2: added display_day, display_date and display_month attributes
 	$time_format = (int) radio_station_get_setting( 'clock_time_format' );
 	$defaults = array(
+
+		// --- control display options ---
+		'selector'          => 1,
+		'clock'             => 1,
+	
+		// --- schedule display options ---
 		'time'              => $time_format,
 		'show_times'		=> 1,
 		'show_link'         => 1,
 		'view'              => 'table',
 		'days'				=> false,
 		'start_day'			=> false,
+		'display_day'		=> 'short',
+		'display_date'		=> 'jS',
+		'display_month'		=> 'short',
 		'divheight'         => 45,
 		// 'list'           => 0, // converted above / deprecated
 		// 'show_djs'       => 0, // converted above / deprecated
 		// 'display_show_time' => 1, // converted above / deprecated
 
-		// --- new display options ---
-		'selector'          => 1,
-		'clock'             => 1,
+		// --- show display options ---
 		'show_image'        => 0,
 		'show_desc'			=> 0,
 		'show_hosts'        => 0,
@@ -79,10 +87,15 @@ function radio_station_master_schedule( $atts ) {
 			$defaults['show_image'] = 1;
 			$defaults['show_hosts'] = 1;
 			$defaults['show_genres'] = 1;
-			// 2.3.2: show description for tabbed view
+			// 2.3.2: add show description for tabbed view
 			$defaults['show_desc'] = 1;
+			// 2.3.2: display day/date attributes
+			$defaults['display_day'] = 'full';
+			$defaults['display_date'] = false;
 		} elseif ( ( 'list' == $atts['view'] ) || in_array( 'list', $views ) ) {
 			$defaults['show_genres'] = 1;
+			// 2.3.2: display date attribute
+			$defaults['display_date'] = false;
 		}
 	}
 
@@ -174,6 +187,7 @@ function radio_station_master_schedule( $atts ) {
 		$template = radio_station_get_template( 'file', 'master-schedule-table.php' );
 		require $template;
 
+		$output = apply_filters( 'master_schedule_table_view', $output, $atts );
 		return $output;
 	} elseif ( 'tabs' == $atts['view'] ) {
 		// 2.2.7: add tabbed view javascript to footer
@@ -181,12 +195,14 @@ function radio_station_master_schedule( $atts ) {
 		$template = radio_station_get_template( 'file', 'master-schedule-tabs.php' );
 		require $template;
 
+		$output = apply_filters( 'master_schedule_tabs_view', $output, $atts );
 		return $output;
 	} elseif ( 'list' == $atts['view'] ) {
 		add_action( 'wp_footer', 'radio_station_master_schedule_list_js' );
 		$template = radio_station_get_template( 'file', 'master-schedule-list.php' );
 		require $template;
 
+		$output = apply_filters( 'master_schedule_list_view', $output, $atts );
 		return $output;
 	}
 
@@ -465,10 +481,11 @@ function radio_station_master_schedule_table_js() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
 			if (radio.debug) {console.log(start);}
 			if (start < radio.offset_time) {
-				if (radio.debug) {console.log('^^^^^^^');}
 				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
-				if (end > radio.offset_time) {jQuery(this).addClass('nowplaying');}
-				else {jQuery(this).removeClass('nowplaying');}
+				if (end > radio.offset_time) {
+					jQuery(this).addClass('nowplaying');
+					if (radio.debug) {console.log('^^^^^^^');}
+				} else {jQuery(this).removeClass('nowplaying');}
 			} else {jQuery(this).removeClass('nowplaying');}
 		});
 	}
@@ -486,27 +503,20 @@ function radio_station_master_schedule_table_js() {
 
 		columns = 0; firstcolumn = -1;
 		for (i = 0; i < 7; i++) {
-			jQuery('.master-program-day.day-'+i).removeClass('first-column');
-			jQuery('.master-program-day.day-'+i).removeClass('last-column');
+			jQuery('.master-program-day.day-'+i).removeClass('first-column').removeClass('last-column');
 			if ( ((i + 1) > startcolumn) && (columns < daycolumns) ) {
-				jQuery('.master-program-day.day-'+i).show();
-				jQuery('.show-info.day-'+i).show();
+				jQuery('.master-program-day.day-'+i+', .show-info.day-'+i).show();
 				if (firstcolumn < 0) { 
+					if (i > 0) {jQuery('.master-program-day.day-'+i).addClass('first-column');}
 					firstcolumn = 0;
-					if (i > 0) {
-						jQuery('.master-program-day.day-'+i).addClass('first-column');
-					}
 				}
 				lastcolumn = i; columns++;
 			} else {
-				jQuery('.master-program-day.day-'+i).hide();
-				jQuery('.show-info.day-'+i).hide();
+				jQuery('.master-program-day.day-'+i+', .show-info.day-'+i).hide();
 			}
 		}
+		if (lastcolumn < 6) {jQuery('.master-program-day.day-'+lastcolumn).addClass('last-column');}
 
-		if (lastcolumn < 6) {
-			jQuery('.master-program-day.day-'+lastcolumn).addClass('last-column');
-		}
 		if (radio.debug) {
 			console.log('Day Columns:' +daycolumns);
 			console.log('Selected Column: '+selected);
@@ -544,17 +554,21 @@ function radio_station_master_schedule_table_js() {
 function radio_station_master_schedule_tabs_js() {
 
 	// --- tab switching function ---
+	// 2.3.2: added fallback if current day is not viewed
+	// TODO: check user timezone offset for getday
 	$js = "jQuery(document).ready(function() {
-		dayweek = new Date().getDay();
-		if (dayweek == '0') {day = 'sunday';}
-		if (dayweek == '1') {day = 'monday';}
-		if (dayweek == '2') {day = 'tuesday';}
-		if (dayweek == '3') {day = 'wednesday';}
-		if (dayweek == '4') {day = 'thursday';}
-		if (dayweek == '5') {day = 'friday';}
-		if (dayweek == '6') {day = 'saturday';}
-		jQuery('#master-schedule-tabs-header-'+day).addClass('active-day-tab');
-		jQuery('#master-schedule-tabs-day-'+day).addClass('active-day-panel');
+		date = new Date(); 
+		dayweek = date.getDay();
+		day = radio_get_weekday(dayweek);
+		console.log(date.toISOString());
+		console.log(serverdate.toISOString());
+		if (jQuery('#master-schedule-tabs-header-'+day).length) {
+			jQuery('#master-schedule-tabs-header-'+day).addClass('active-day-tab');
+			jQuery('#master-schedule-tabs-day-'+day).addClass('active-day-panel');
+		} else {
+			jQuery('.master-schedule-tabs-day').first().addClass('active-day-tab');
+			jQuery('.master-schedule-tabs-panel').first().addClass('active-day-panel');
+		}
 		jQuery('.master-schedule-tabs-day-name').bind('click', function (event) {
 			headerID = jQuery(event.target).closest('li').attr('id');
 			panelID = headerID.replace('header', 'day');
@@ -567,6 +581,7 @@ function radio_station_master_schedule_tabs_js() {
 
 	// --- tabbed view responsiveness ---
 	// 2.3.0: added for tabbed responsiveness
+	// 2.3.2: display selected day message if outside view
 	$js .= "/* Initialize Tabs */
 	jQuery(document).ready(function() {
 		radio_tabs_responsive();
@@ -605,16 +620,20 @@ function radio_station_master_schedule_tabs_js() {
 	
 	/* Make Tabs Responsive */
 	function radio_tabs_responsive() {
+	
+		jQuery('.master-schedule-tabs-selected').hide();
 		tabswidth = jQuery('#master-schedule-tabs').width();
 		daycolumns = Math.floor(tabswidth / 125);
 		if (daycolumns < 1) {daycolumns = 1;} else if (daycolumns > 7) {daycolumns = 7;}
+		fallback = false; selected = false;
 		for (i = 0; i < 7; i++) {
+			if (!fallback && jQuery('.master-schedule-tabs-day.day-'+i)) {fallback = i;}
 			if (jQuery('.master-schedule-tabs-day.day-'+i).hasClass('selected-day')) {selected = i;}
 		}
-		startcolumn = selected;
+		if (selected) {startcolumn = selected;} else {selected = startcolumn = fallback;}
 		if ((selected + daycolumns) > 6) {startcolumn = 7 - daycolumns;}
 
-		columns = 0; firstcolumn = -1;
+		activeday = false; columns = 0; firstcolumn = -1;
 		for (i = 0; i < 7; i++) {
 			if (jQuery('.master-schedule-tabs-day.day-'+i).hasClass('active-day-tab')) {
 				activeday = i;
@@ -646,13 +665,11 @@ function radio_station_master_schedule_tabs_js() {
 			console.log('Last Column: '+lastcolumn);
 		}
 
-		/* maybe change active clicked day if outside view */		
-		if (activeday > lastcolumn) {
-			jQuery('.master-schedule-tabs-day.day-'+lastcolumn+' .master-schedule-tabs-day-name').click();
-		} else if (activeday < startcolumn ) {
-			jQuery('.master-schedule-tabs-day.day-'+startcolumn+' .master-schedule-tabs-day-name').click();
-		}
-		
+		/* display selected day message if outside view */
+		if ( activeday && ( (activeday > lastcolumn) || (activeday < startcolumn ) ) ) {
+			weekday = radio_get_weekday(activeday);
+			jQuery('#master-schedule-tabs-selected-'+weekday).show();
+		}		
 	}
 	
 	/* Shift Day Left /  Right */

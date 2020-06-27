@@ -305,6 +305,22 @@ function radio_station_role_editor() {
 	echo " &rarr;</a>.";
 }
 
+// ----------------
+// Enqueue Semantic
+// ----------------
+function radio_station_enqueue_semantic() {
+
+	// --- enqueue semantic/ui styles ---
+	$suffix = '.min';
+	if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+		$suffix = '';
+	}
+	$semantic_css_url = plugins_url( 'vendor/semantic/ui/dist/semantic' . $suffix . '.css', RADIO_STATION_FILE );
+	wp_enqueue_style( 'semantic-ui-style', $semantic_css_url, array(), '2.4.1', 'all' );
+	$semantic_js_url = plugins_url( 'vendor/semantic/ui/dist/semantic' . $suffix . '.js', RADIO_STATION_FILE );
+	wp_enqueue_script( 'semantic-ui-script', $semantic_js_url, array(), '2.4.1', true );
+}
+
 // -------------------------------
 // Display Import/Export Show Page
 // -------------------------------
@@ -313,15 +329,7 @@ function radio_station_import_export_show_page() {
 	$importexport = RADIO_STATION_DIR . '/templates/import-export-shows.php';
 	if ( file_exists( $importexport ) ) {
 
-		// --- enqueue semantic/ui styles ---
-		$suffix = '.min';
-		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-			$suffix = '';
-		}
-		$semantic_css_url = plugins_url( 'vendor/semantic/ui/dist/semantic' . $suffix . '.css', RADIO_STATION_FILE );
-		wp_enqueue_style( 'semantic-ui-style', $semantic_css_url, array(), '2.4.1', 'all' );
-		$semantic_js_url = plugins_url( 'vendor/semantic/ui/dist/semantic' . $suffix . '.js', RADIO_STATION_FILE );
-		wp_enqueue_script( 'semantic-ui-script', $semantic_js_url, array(), '2.4.1', true );
+		radio_station_enqueue_semantic();
 
 		// --- display the import/export page ---
 		include $importexport;
@@ -1005,7 +1013,7 @@ function radio_station_settings_page_top() {
 	// --- free directory listing offer ---
 	// 2.3.1: added offer to top of admin settings
 	$now = time();
-	$offer_end = strtotime( '2020-07-01 00:01' );
+	$offer_end = strtotime( '2020-08-01 00:01' );
 	if ( $now < $offer_end ) {
 		if ( !get_option( 'radio_station_listing_offer_accepted' ) ) {
 			echo radio_station_listing_offer_content( false );
@@ -1037,7 +1045,7 @@ function radio_station_listing_offer_notice() {
 
 	// --- bug out if offer expired ---
 	$now = time();
-	$offer_end = strtotime( '2020-07-01 00:01' );
+	$offer_end = strtotime( '2020-08-01 00:01' );
 	if ( $now > $offer_end ) {
 		return;
 	}
@@ -1116,7 +1124,7 @@ function radio_station_listing_offer_content( $dismissable = true ) {
 	$blurb .= '</center><br>';
 
 	$blurb .= '<div style="font-size: 11px; line-height: 18px;">';
-	$blurb .= esc_html( __( 'Offer valid until end of June 2020.', 'radio-station' ) ) . '<br>';
+	$blurb .= esc_html( __( 'Offer valid until end of July 2020.', 'radio-station' ) ) . '<br>';
 	$blurb .= esc_html( __( 'Activate your 30 days before it ends!', 'radio-station' ) );
 	$blurb .= '</div>';
 

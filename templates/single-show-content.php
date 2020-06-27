@@ -427,10 +427,13 @@ if ( !$active || !$shifts ) {
 
 					// --- convert shift info ---
 					// 2.3.2: replace strtotime with to_time for timezones
+					// 2.3.2: fix to convert to 24 hour format first
 					$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
 					$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
-					$shift_start_time = radio_station_to_time( $start );
-					$shift_end_time = radio_station_to_time( $end );
+					$start_time = radio_station_convert_shift_time( $start );
+					$end_time = radio_station_convert_shift_time( $end );
+					$shift_start_time = radio_station_to_time( $start_time );
+					$shift_end_time = radio_station_to_time( $end_time );
 					if ( $shift_end_time < $shift_start_time ) {
 						$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 					}

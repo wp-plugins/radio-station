@@ -198,12 +198,14 @@ You may translate the plugin into another language. Please visit our [WordPress 
 * Fixed: master schedule specify days attribute bug
 * Fixed: display real end time of overnight split shifts
 * Fixed: master schedule display with days attribute
+* Fixed: logic for Affected Shifts in override list
+* Fixed: removed auto-tab selection change on tab view resize
 * Added: AJAX widget load option (to bypass page caches)
 * Added: automated show schedule highlighting (table/tabs/list)
 * Added: playlist track arrows for re-ordering tracks
 * Added: AJAX save of show shifts and playlist tracks
 * Added: post type editing metabox position filtering
-* Added: day_start attribute for Master Schedule shortcode
+* Added: more display attributes to Master Schedule shortcode
 
 = 2.3.1 =
 * Update: Plugin Loader (1.1.1) with Freemius first path fix
