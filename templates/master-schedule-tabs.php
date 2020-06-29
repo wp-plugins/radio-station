@@ -103,6 +103,7 @@ foreach ( $weekdays as $i => $weekday ) {
 		if ( $weekdate == $date ) {
 			$classes[] = 'current-day';
 			$classes[] = 'selected-day';
+			$classes[] = 'active-day-tab';
 		}
 		$classlist  = implode( ' ', $classes );
 
@@ -137,7 +138,13 @@ foreach ( $weekdays as $i => $weekday ) {
 		$output .= '</li>';
 
 		// 2.2.7: separate headings from panels for tab view
-		$panels .= '<ul class="master-schedule-tabs-panel" id="master-schedule-tabs-day-' . esc_attr( strtolower( $weekday ) ) . '">';
+		$classes = array( 'master-schedule-tabs-panel' );
+		if ( $weekdate == $date ) {
+			$classes[] = 'selected-day';
+			$classes[] = 'active-day-panel';
+		}
+		$classlist = implode( ' ', $classes );
+		$panels .= '<ul id="master-schedule-tabs-day-' . esc_attr( strtolower( $weekday ) ) . '" class="' . esc_attr( $classlist ) . '">';
 
 		// 2.3.2: added extra current day display
 		$display_day = radio_station_translate_weekday( $weekday, false );

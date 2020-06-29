@@ -187,6 +187,7 @@ You may translate the plugin into another language. Please visit our [WordPress 
 = 2.3.2 =
 * Update: Plugin Loader (1.1.2) with settings link fix
 * Improved: use plugin timezone setting for all times
+* Improved: show shift conflict checker logic
 * Fixed: handling of UTC only timezone settings
 * Fixed: added check for empty role capabilities
 * Fixed: added settings submenu redirection fix

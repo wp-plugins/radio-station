@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 2.3.2
 * Update: Plugin Loader (1.1.2) with settings link fix
 * Improved: use plugin timezone setting for all times
+* Improved: show shift conflict checker logic
 * Fixed: handling of UTC only timezone settings
 * Fixed: added check for empty role capabilities
 * Fixed: added settings submenu redirection fix
@@ -28,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added: playlist track arrows for re-ordering tracks
 * Added: AJAX save of show shifts and playlist tracks
 * Added: post type editing metabox position filtering
-* Added: day_start attribute for Master Schedule shortcode
+* Added: more display attributes to Master Schedule shortcode
 
 ### 2.3.1
 * Update: Plugin Loader (1.1.1) with Freemius first path fix

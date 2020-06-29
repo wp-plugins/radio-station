@@ -59,6 +59,10 @@ foreach ( $weekdays as $weekday ) {
 	
 	if ( !$skip_day ) {
 
+		// 2.3.2: move up calculations for date display
+		$day_start_time = radio_station_to_time( $weekdates[$weekday] . ' 00:00' );
+		$day_end_time = $day_start_time + ( 24 * 60 * 60 );
+
 		// 2.3.2: added check for short/long day display attribute
 		if ( !in_array( $atts['display_day'], array( 'short', 'full', 'long' ) ) ) {
 			$atts['display_day'] = 'long';
@@ -111,8 +115,6 @@ foreach ( $weekdays as $weekday ) {
 		
 		// 2.3.2: add output of day start and end times
 		// 2.3.2: replace strtotime with to_time for timezones
-		$day_start_time = radio_station_to_time( $weekdates[$weekday] . ' 00:00' );
-		$day_end_time = $day_start_time + ( 24 * 60 * 60 );
 		$output .= '<span class="rs-time rs-start-time" data="' . esc_attr( $day_start_time ) . '"></span>';
 		$output .= '<span class="rs-time rs-end-time" data="' . esc_attr( $day_end_time ) . '"></span>';
 

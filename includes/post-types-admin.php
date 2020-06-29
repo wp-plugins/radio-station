@@ -1891,7 +1891,7 @@ function radio_station_show_shifts_table( $post_id ) {
 			$j = 1;
 			$shift['unique_id'] = $unique_id;
 			$shift_start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
-			$shift_start = radio_station_convert_shift_time( $shift_time );
+			$shift_start = radio_station_convert_shift_time( $shift_start );
 			if ( isset( $shift['day'] ) && ( '' != $shift['day'] ) ) {
 				// --- group shifts by days of week ---
 				$starttime = radio_station_to_time( 'next ' . $shift['day'] . ' ' . $shift_start );
@@ -2881,14 +2881,19 @@ function radio_station_show_column_data( $column, $post_id ) {
 		$shifts = get_post_meta( $post_id, 'show_sched', true );
 		if ( $shifts && is_array( $shifts ) && ( count( $shifts ) > 0 ) ) {
 
-			$sorted_shifts = array();
+			$sorted_shifts = $dayless_shifts = array();
 			foreach ( $shifts as $shift ) {
-				// 2.3.2: fix to convert shift time to 24 hour format
-				$shift_time = $shift['start_hour'] . ":" . $shift['start_min'] . ' ' . $shift['start_meridian'];
-				$shift_time = radio_station_convert_shift_time( $shift_time );
-				$shift_time = $weekdates[$shift['day']] . $shift_time;
-				$timestamp = radio_station_to_time( $shift_time );
-				$sortedshifts[$timestamp] = $shift;
+				// 2.3.2: added check that shift day is not empty
+				if ( isset( $shift['day'] ) && ( '' != $shift['day'] ) ) {
+					// 2.3.2: fix to convert shift time to 24 hour format
+					$shift_time = $shift['start_hour'] . ":" . $shift['start_min'] . ' ' . $shift['start_meridian'];
+					$shift_time = radio_station_convert_shift_time( $shift_time );
+					$shift_time = $weekdates[$shift['day']] . $shift_time;
+					$timestamp = radio_station_to_time( $shift_time );
+					$sortedshifts[$timestamp] = $shift;
+				} else {
+					$dayless_shifts[] = $shift;
+				}
 			}
 			ksort( $sortedshifts );
 
@@ -2956,6 +2961,19 @@ function radio_station_show_column_data( $column, $post_id ) {
 				}
 				echo "</div>";
 			}
+
+			// --- dayless shifts ---
+			// 2.3.2: added separate display of dayless shifts			
+			if ( count( $dayless_shifts ) > 0 ) {
+				foreach ( $dayless_shifts as $shift ) {
+					$title = __( 'This shift is disabled as no day is set.', 'radio-station' );
+					echo "<div class='show-shift disabled' title='" . esc_attr( $title ) . "'>";
+					$start = $shift['start_hour'] . ":" . $shift['start_min'] . $shift['start_meridian'];
+					$end = $shift['end_hour'] . ":" . $shift['end_min'] . $shift['end_meridian'];
+					echo esc_html( $start ) . " - " . esc_html( $end );
+					echo "</div>";
+				}
+			}			
 		} 
 
 	} elseif ( 'hosts' == $column ) {
@@ -3412,7 +3430,8 @@ function radio_station_override_column_data( $column, $post_id ) {
 					// 2.3.2: fix to override overlap checking logic
 					if ( ( ( $override_start < $shift_start ) && ( $override_end > $shift_start ) )
 					     || ( $override_start == $shift_start ) 
-					     || ( ( $override_start > $shift_start ) && ( $override_start < $shift_end ) ) ) {
+					     || ( ( $override_start > $shift_start ) && ( $override_end < $shift_end ) )
+					     || ( ( $override_start > $shift_start ) && ( $override_start < $shift_end ) && ( $override_start < $shift_end ) ) ) {
 
 						// 2.3.0: adjust cell display to two line (to allow for long show titles)
 						$active = get_post_meta( $show_shift['post_id'], 'show_active', true );
