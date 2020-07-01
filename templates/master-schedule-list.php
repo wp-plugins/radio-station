@@ -59,7 +59,7 @@ foreach ( $weekdays as $weekday ) {
 	
 	if ( !$skip_day ) {
 
-		// 2.3.2: move up calculations for date display
+		// 2.3.2: move up time calculations for optional date display
 		$day_start_time = radio_station_to_time( $weekdates[$weekday] . ' 00:00' );
 		$day_end_time = $day_start_time + ( 24 * 60 * 60 );
 

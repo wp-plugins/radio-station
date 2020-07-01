@@ -1551,6 +1551,11 @@ function radio_station_show_shifts_metabox() {
 	echo '<div id="meta_inner">';
 	echo '<div id="shifts-list">';
 
+	// 2.3.2: added to bypass shift check on add (for debugging)
+	if ( isset( $_REQUEST['check-bypass'] ) && ( '1' == $_REQUEST['check-bypass'] ) ) {
+		echo '<input type="hidden" name="check-bypass" value="1">';
+	}
+
 	// --- output show shifts table ---
 	// 2.3.2: separated table function (for AJAX saving)
 	$table = radio_station_show_shifts_table( $post->ID );
@@ -2771,6 +2776,9 @@ function radio_station_show_save_data( $post_id ) {
 
 			// --- output new show shifts list ---
 			echo '<div id="shifts-list">';
+			if ( isset( $_REQUEST['check-bypass'] ) && ( '1' == $_REQUEST['check-bypass'] ) ) {
+				echo '<input type="hidden" name="check-bypass" value="1">';
+			}
 			$table = radio_station_show_shifts_table( $post_id );
 			if ( $table['conflicts'] ) {
 				radio_station_shifts_conflict_message();
@@ -3429,23 +3437,31 @@ function radio_station_override_column_data( $column, $post_id ) {
 					// --- compare override time overlaps to get affected shows ---
 					// 2.3.2: fix to override overlap checking logic
 					if ( ( ( $override_start < $shift_start ) && ( $override_end > $shift_start ) )
+						 || ( ( $override_start < $shift_start ) && ( $override_end > $shift_end ) )
 					     || ( $override_start == $shift_start ) 
 					     || ( ( $override_start > $shift_start ) && ( $override_end < $shift_end ) )
-					     || ( ( $override_start > $shift_start ) && ( $override_start < $shift_end ) && ( $override_start < $shift_end ) ) ) {
+					     || ( ( $override_start > $shift_start ) && ( $override_start < $shift_end ) ) ) {
 
 						// 2.3.0: adjust cell display to two line (to allow for long show titles)
-						$active = get_post_meta( $show_shift['post_id'], 'show_active', true );
-						if ( 'on' != $active ) {
-							echo "[<i>" . esc_html( __( 'Inactive Show', 'radio-station' ) ) . "</i>]<br>";
+						// 2.3.2: deduplicate show check (if same show as last show displayed)
+						if ( !isset( $last_show ) || ( $last_show != $show_shift['post_id'] ) ) {
+							$active = get_post_meta( $show_shift['post_id'], 'show_active', true );
+							if ( 'on' != $active ) {
+								echo "[<i>" . esc_html( __( 'Inactive', 'radio-station' ) ) . "</i>] ";
+							}
+							echo '<b>' . $show_shift['post_title'] . "</b><br>";
 						}
-						echo $show_shift['post_title'] . "<br>";
-						if ( $shift['disabled'] ) {
-							echo "[<i>" . esc_html( __( 'Disabled Shift', 'radio-station' ) ) . "</i>]<br>";
+						
+						if ( isset( $shift['disabled'] ) && $shift['disabled'] ) {
+							echo "[<i>" . esc_html( __( 'Disabled', 'radio-station' ) ) . "</i>] ";
 						}
 						echo radio_station_translate_weekday( $shift['day'] );
 						echo " " . esc_html( $shift['start_hour'] ) . ":" . esc_html( $shift['start_min'] ) . esc_html( $shift['start_meridian'] );
 						echo " - " . esc_html( $shift['end_hour'] ) . ":" . esc_html( $shift['end_min'] ) . esc_html( $shift['end_meridian'] );
 						echo "<br>";
+						
+						// 2.3.2: store last show displayed
+						$last_show = $show_shift['post_id'];
 					}
 				}
 			}
