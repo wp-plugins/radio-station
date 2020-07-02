@@ -311,7 +311,7 @@ foreach ( $hours as $hour ) {
 						}
 					}
 
-					if ( isset( $_GET['shiftdebug'] ) && ( '1' == $_GET['shiftdebug'] ) ) {
+					if ( isset( $_GET['rs-shift-debug'] ) && ( '1' == $_GET['rs-shift-debug'] ) ) {
 						if ( !isset( $shiftdebug ) ) {$shiftdebug = '';}
 						$shiftdebug .= 'Now: ' . $now . ' (' . radio_station_get_time( 'datetime', $now ) . ') -- Today: ' . $today . '<br>';
 						$shiftdebug .= 'Day: ' . $weekday . ' - Raw Hour: ' . $raw_hour . ' - Hour: ' . $hour . ' - Hour Display: ' . $hour_display . '<br>';
@@ -464,12 +464,12 @@ foreach ( $hours as $hour ) {
 									}
 									$data_format = 'H:i';
 								} else {
-									$start = str_replace( array( 'am', 'pm'), array( ' ' . $am, ' ' . $pm ), $shift['start'] );
+									$start = str_replace( array( 'am', 'pm'), array( $am, $pm ), $shift['start'] );
 									// 2.3.2: display real end of split shift
 									if ( isset( $shift['split'] ) && $shift['split'] && isset( $shift['real_end'] ) ) {
-										$end = str_replace( array( 'am', 'pm'), array( ' ' . $am, ' ' . $pm ), $shift['real_end'] );
+										$end = str_replace( array( 'am', 'pm'), array( $am, $pm ), $shift['real_end'] );
 									} else {
-										$end = str_replace( array( 'am', 'pm'), array( ' ' . $am, ' ' . $pm ), $shift['end'] );
+										$end = str_replace( array( 'am', 'pm'), array( $am, $pm ), $shift['end'] );
 									}
 									$data_format = 'g:i a';
 								}
@@ -579,6 +579,6 @@ foreach ( $hours as $hour ) {
 
 $output .= '</table>';
 
-if ( isset( $_GET['shiftdebug'] ) && ( '1' == $_GET['shiftdebug'] ) ) {
+if ( isset( $_GET['rs-shift-debug'] ) && ( '1' == $_GET['rs-shift-debug'] ) ) {
 	$output .= $shiftdebug;
 }

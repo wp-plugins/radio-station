@@ -137,10 +137,26 @@ foreach ( $weekdays as $weekday ) {
 				// --- convert shift time data ---
 				// 2.3.2: replace strtotime with to_time for timezones
 				// 2.3.2: fix to convert to 24 hour format first
-				$shift_start = radio_station_convert_shift_time( $shift['start'] );
-				$shift_end = radio_station_convert_shift_time( $shift['end'] );
-				$shift_start_time = radio_station_to_time( $weekdate . ' ' . $shift_start );
-				$shift_end_time = radio_station_to_time( $weekdate . ' ' . $shift_end );
+				// 2.3.2: fix timestamps for midnight/split shifts
+				// $shift_start = radio_station_convert_shift_time( $shift['start'] );
+				// $shift_end = radio_station_convert_shift_time( $shift['end'] );
+				// $shift_start_time = radio_station_to_time( $shift['day'] . ' ' . $shift_start );
+				// $shift_end_time = radio_station_to_time( $shift['day'] . ' ' . $shift_end );
+				// if ( $shift_end_time < $shift_start_time ) {
+				// 	$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
+				// }
+				if ( '00:00 am' == $shift['start'] ) {
+					$shift_start_time = radio_station_to_time( $weekdate . ' 00:00' );
+				} else {
+					$shift_start = radio_station_convert_shift_time( $shift['start'] );
+					$shift_start_time = radio_station_to_time( $weekdate . ' ' . $shift_start );
+				}
+				if ( ( '11:59:59 pm' == $shift['end'] ) || ( '12:00 am' == $shift['end'] ) ) {
+					$shift_end_time = radio_station_to_time( $weekdate . ' 23:59:59' ) + 1;
+				} else {
+					$shift_end = radio_station_convert_shift_time( $shift['end'] );
+					$shift_end_time = radio_station_to_time( $weekdate . ' ' . $shift_end );
+				}
 
 				// 2.3.0: filter show link by show and context
 				$show_link = false;

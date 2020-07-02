@@ -566,6 +566,14 @@ You may translate the plugin into another language. Please visit our [WordPress 
 == Upgrade Notice ==
 
 = 2.3.1 =
+* Bugfix Update and Extended Directory Listing Offer
+* https://netmix.com/improved-netmix-directory/
+* AJAX Saving of Show Shifts and Playlist Tracks
+* AJAX Widget Loading to work with page caches
+* Automated current Show schedule highlighting
+* Improved timezones, overrides, shift checking and more
+
+= 2.3.1 =
 * Bugfix Update and Announcing New Netmix Station Directory!
 * https://netmix.com/announcing-new-netmix-directory/
 * Including minor fixes to major update release

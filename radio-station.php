@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.3.1.8
+Version: 2.3.1.9
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -1065,7 +1065,7 @@ function radio_station_localize_script() {
 		} else {
 			$utc_offset = $offset_hours;
 		}
-		$utc_offset = 'UTC' . $utc_offset_hours;
+		$utc_offset = 'UTC' . $utc_offset;
 		$code = radio_station_get_timezone_code( $timezone );
 		$js .= "radio.timezone_location = '" . esc_js( $timezone ) . "'; ";
 		$js .= "radio.timezone_offset = " . esc_js( $offset ) . "; ";
@@ -2313,12 +2313,20 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args ) {
 // Set Debug Mode Constant
 // -----------------------
 // 2.3.0: added debug mode constant
+// 2.3.2: added saving debug mode constant
 if ( !defined( 'RADIO_STATION_DEBUG' ) ) {
 	$rs_debug = false;
 	if ( isset( $_REQUEST['rs-debug'] ) && ( '1' == $_REQUEST['rs-debug'] ) ) {
 		$rs_debug = true;
 	}
 	define( 'RADIO_STATION_DEBUG', $rs_debug );
+}
+if ( !defined( 'RADIO_STATION_SAVE_DEBUG' ) ) {
+	$rs_save_debug = false;
+	if ( isset( $_REQUEST['rs-save-debug'] ) && ( '1' == $_REQUEST['rs-save-debug'] ) ) {
+		$rs_save_debug = true;
+	}
+	define( 'RADIO_STATION_SAVE_DEBUG', $rs_save_debug );
 }
 
 // --------------------------

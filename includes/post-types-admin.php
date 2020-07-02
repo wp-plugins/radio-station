@@ -1540,9 +1540,13 @@ function radio_station_show_shifts_metabox() {
 	$am = radio_station_translate_meridiem( 'am' );
 	$pm = radio_station_translate_meridiem( 'pm' );
 	
-	// --- hidden debug field ---
+	// --- hidden debug fields ---
+	// 2.3.2: added save debugging field
 	if ( RADIO_STATION_DEBUG ) {
 		echo '<input type="hidden" name="rs-debug" value="1">';
+	}
+	if ( RADIO_STATION_SAVE_DEBUG ) {
+		echo '<input type="hidden" name="rs-save-debug" value="1">';
 	}
 
 	// --- add nonce field for verification ---
@@ -2469,6 +2473,12 @@ function radio_station_show_save_data( $post_id ) {
 		}
 	}
 
+	// 2.3.2: check for post type slug match early
+	$post = get_post( $post_id );
+	if ( RADIO_STATION_SHOW_SLUG != $post->post_type ) {
+		return;
+	}
+
 	// --- set show meta changed flags ---
 	$show_meta_changed = $show_shifts_changed = false;
 
@@ -2533,18 +2543,25 @@ function radio_station_show_save_data( $post_id ) {
 		// 2.2.3: added show metadata value sanitization
 		$file = wp_strip_all_tags( trim( $_POST['show_file'] ) );
 		$email = sanitize_email( trim( $_POST['show_email'] ) );
-		$active = $_POST['show_active'];
+		$link = filter_var( trim( $_POST['show_link'] ), FILTER_SANITIZE_URL );
+		$patreon_id = sanitize_title( $_POST['show_patreon'] );
+
 		// 2.2.8: removed strict in_array checking
+		// 2.3.2: fix for unchecked boxes index warning
+		$active = $download = '';
+		if ( isset( $_POST['show_active'] ) ) {
+			$active = $_POST['show_active'];
+		}
 		if ( !in_array( $active, array( '', 'on' ) ) ) {
 			$active = '';
 		}
 		// 2.3.2: added download disable switch
-		$download = $_POST['show_download'];
-		if ( !in_array( $active, array( '', 'on' ) ) ) {
+		if ( isset( $_POST['show_download'] ) ) {
+			$download = $_POST['show_download'];
+		}
+		if ( !in_array( $download, array( '', 'on' ) ) ) {
 			$download = '';
 		}
-		$link = filter_var( trim( $_POST['show_link'] ), FILTER_SANITIZE_URL );
-		$patreon_id = sanitize_title( $_POST['show_patreon'] );
 
 		// --- get existing values and check if changed ---
 		// 2.3.0: added check against previous values
@@ -2715,13 +2732,20 @@ function radio_station_show_save_data( $post_id ) {
 					$conflicts = radio_station_check_shift( $post_id, $new_shifts[$i], 'shows' );
 					if ( $conflicts ) {
 						$disabled = true;
+						if ( RADIO_STATION_DEBUG ) {
+							echo "*Conflicting Shift Disabled*";
+						}
 					}
 				}
 
 				// --- disable if incomplete data or shift conflicts ---
 				if ( $disabled ) {
 					$new_shifts[$i]['disabled'] = 'yes';
+					if ( RADIO_STATION_DEBUG ) {
+						echo "*Shift Disabled*";
+					}
 				}
+
 			}
 
 			// --- recheck for conflicts with other shifts for this show ---
@@ -2802,8 +2826,43 @@ function radio_station_show_save_data( $post_id ) {
 		}
 	}
 
-	if ( RADIO_STATION_DEBUG ) {
-		exit;
+}
+
+// ------------------
+// Save Outpout Debug
+// ------------------
+add_action( 'save_post', 'radio_station_save_debug_start', 0 );
+function radio_station_save_debug_start( $post_id ) {
+	if ( !RADIO_STATION_SAVE_DEBUG ) {
+		return;
+	}
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+	$slugs = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG, RADIO_STATION_PLAYLIST_SLUG );
+	$post = get_post( $post_id );
+	if ( in_array( $post->post_type, $slugs ) ) {
+		ob_start();
+	}
+}
+add_action( 'save_post', 'radio_station_save_debug_end', 9999 );
+function radio_station_save_debug_end( $post_id ) {
+	if ( !RADIO_STATION_SAVE_DEBUG ) {
+		return;
+	}
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+	$slugs = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG, RADIO_STATION_PLAYLIST_SLUG );
+	$post = get_post( $post_id );
+	if ( in_array( $post->post_type, $slugs ) ) {
+		$contents = ob_get_contents();
+		ob_end_clean();
+		if ( strlen( $contents ) > 0 ) {
+			echo "Output Detected During Save (preventing redirect):<br>";
+			echo '<textarea rows="40" cols="80">' . $contents . '</textarea>';
+			exit;
+		}
 	}
 }
 
