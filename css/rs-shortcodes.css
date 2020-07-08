@@ -11,6 +11,24 @@
 	font-size: 0.8em;
 }
 
+/* Clock/Timezone Shortcodes */
+/* ------------------------- */
+.radio-timezone-title, .radio-timezone, .radio-user-timezone-title, .radio-user-timezone {
+	display: inline-block;
+}
+
+.radio-timezone-title, .radio-user-timezone-title, .radio-clock-title {
+	font-weight: bold;
+}
+
+.radio-user-timezone-title {
+	display: none; margin-left: 30px;
+}
+
+.user-timezone-change, .user-timezone-select {
+	display: inline-block;
+}
+
 /* Archive Shortcodes */
 /* ------------------ */
 

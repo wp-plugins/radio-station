@@ -160,11 +160,17 @@ function radio_station_add_admin_menus() {
 	do_action( 'radio_station_admin_submenu_middle' );
 	// add_submenu_page( 'radio-station', $rs . ' ' . __( 'Hosts', 'radio-station' ), __( 'Hosts', 'radio-station' ), 'edit_hosts', 'hosts' );
 	// add_submenu_page( 'radio-station', $rs . ' ' . __( 'Producers', 'radio-station' ), __( 'Producers', 'radio-station' ), 'edit_producers', 'producers' );
-	// add_submenu_page( 'radio-station', $rs . ' ' . __( 'Export Playlists', 'radio-station' ), __( 'Export Playlists', 'radio-station' ), $settingscap, 'playlist-export', 'radio_station_playlist_export_page' );
+	
+	// 2.3.2: as temporarily disabled, allow enabling export playlists via filter
+	$export_playlists = apply_filters( 'radio_station_export_playlists', false );
+	if ( $export_playlists ) {
+		add_submenu_page( 'radio-station', $rs . ' ' . __( 'Export Playlists', 'radio-station' ), __( 'Export Playlists', 'radio-station' ), $settingscap, 'playlist-export', 'radio_station_playlist_export_page' );
+	}
 
-	// --- import / export feature ---
+	// --- import / export shows feature ---
+	// note: not yet implemented in free version
 	if ( file_exists( RADIO_STATION_DIR . '/includes/import-export.php' ) ) {
-		add_submenu_page( 'radio-station', 	$rs . ' ' . __( 'Import/Export Show Data', 'radio-station' ), __( 'Import/Export', 'radio-station' ), 'manage_options', 'import-export-shows', 'radio_station_import_export_show_page' );
+		add_submenu_page( 'radio-station', 	$rs . ' ' . __( 'Import/Export Shows', 'radio-station' ), __( 'Import/Export', 'radio-station' ), 'manage_options', 'import-export-shows', 'radio_station_import_export_show_page' );
 	}
 	
 	add_submenu_page( 'radio-station', $rs . ' ' . __( 'Settings', 'radio-station' ), __( 'Settings', 'radio-station' ), $settingscap, 'radio-station', 'radio_station_settings_page' );	
@@ -305,22 +311,6 @@ function radio_station_role_editor() {
 	echo " &rarr;</a>.";
 }
 
-// ----------------
-// Enqueue Semantic
-// ----------------
-function radio_station_enqueue_semantic() {
-
-	// --- enqueue semantic/ui styles ---
-	$suffix = '.min';
-	if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-		$suffix = '';
-	}
-	$semantic_css_url = plugins_url( 'vendor/semantic/ui/dist/semantic' . $suffix . '.css', RADIO_STATION_FILE );
-	wp_enqueue_style( 'semantic-ui-style', $semantic_css_url, array(), '2.4.1', 'all' );
-	$semantic_js_url = plugins_url( 'vendor/semantic/ui/dist/semantic' . $suffix . '.js', RADIO_STATION_FILE );
-	wp_enqueue_script( 'semantic-ui-script', $semantic_js_url, array(), '2.4.1', true );
-}
-
 // -------------------------------
 // Display Import/Export Show Page
 // -------------------------------
@@ -329,10 +319,14 @@ function radio_station_import_export_show_page() {
 	$importexport = RADIO_STATION_DIR . '/templates/import-export-shows.php';
 	if ( file_exists( $importexport ) ) {
 
-		radio_station_enqueue_semantic();
-
 		// --- display the import/export page ---
 		include $importexport;
+
+		// --- enqueue Semenatic UI ---
+		// 2.3.2: conditional enqueue to be safe
+		if ( function_exists( 'radio_station_enqueue_semantic' ) ) {
+			radio_station_enqueue_semantic();
+		}
 	}
 }
 
@@ -378,7 +372,7 @@ function radio_station_plugin_docs_page() {
 		document.getElementById('doc-page-'+id).style.display = 'block';
 		if (hash != '') {
 			anchor = document.getElementById(hash);
-			atop = anchor.offsetTop; /* do not use 'top' */
+			atop = anchor.offsetTop; /* do not use 'top'! */
 			window.scrollTo(0, (atop-20));
 		}
 	}</script>";

@@ -207,6 +207,8 @@ You may translate the plugin into another language. Please visit our [WordPress 
 * Added: AJAX save of show shifts and playlist tracks
 * Added: post type editing metabox position filtering
 * Added: more display attributes to Master Schedule shortcode
+* Added: time format filters for time output displays
+* Added: javascript user timezone display on Master Schedule
 
 = 2.3.1 =
 * Update: Plugin Loader (1.1.1) with Freemius first path fix

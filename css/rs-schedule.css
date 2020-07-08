@@ -19,21 +19,11 @@
 	text-align: left;
 }
 
-#master-schedule-clock-wrapper .radio-clock-title, 
-#master-schedule-timezone-wrapper .radio-timezone-title,
-#master-schedule-timezone-wrapper .user-timezone-title {
-	font-weight: bold;
-}
-
-.radio-timezone-title, .radio-timezone, 
-.user-timezone-title, .user-timezone, .user-timezone-change, .user-timezone-select {
-	display: inline-block;
-}
 
 /* Genre Selector */
 /* -------------- */
 #master-genre-list {
-	font-size: 0.8em;
+	font-size: 1em;
 	float: left;
 }
 

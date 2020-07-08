@@ -47,15 +47,22 @@
 // - Patreon Supporter Button
 // - Patreon Button Styles
 // - Send Directory Ping
-// === Time Conversions
-// 
-//
-//
-// - Get Timezones Options
+// === Time Conversions ===
+// - Get Now
+// - Get Timezone
 // - Get Timezone Code
+// - Get Date Time Object
+// - String To Time
+// - Get Time
+// - Get Timezone Options
+// - Get Weekday(s)
+// - Get Month(s)
 // - Get Schedule Weekdays
+// - Get Schedule Weekdates
 // - Get Next Day
 // - Get Previous Day
+// - Get Next Date
+// - Get Previous Date
 // - Get All Hours
 // - Convert Hour to Time Format
 // - Convert Shift to Time Format
@@ -73,9 +80,12 @@
 // - Sanitize Shortcode Values
 // === Translations ===
 // - Translate Weekday
+// - Replace Weekdays
 // - Translate Month
+// - Replace Months
 // - Translate Meridiem
-
+// - Replace Meridiems
+// - Translate Time String
 
 // ----------------------
 // === Data Functions ===
@@ -964,7 +974,17 @@ function radio_station_get_current_schedule( $time = false ) {
 	if ( !$time ) {
 		$schedule = get_transient( 'radio_station_current_schedule' );
 		if ( $schedule ) {
-			$schedule = apply_filters( 'radio_station_current_schedule', $schedule );
+			$schedule = apply_filters( 'radio_station_current_schedule', $schedule, false );
+			if ( $schedule ) {
+				return $schedule;
+			}
+		}
+	} else {
+		// --- get schedule for time ---
+		// 2.3.2: added transient for time schedule
+		$schedule = get_transient( 'radio_station_current_schedule_' . $time );
+		if ( $schedule ) {
+			$schedule = apply_filters( 'radio_station_current_schedule', $schedule, $time );
 			if ( $schedule ) {
 				return $schedule;
 			}
@@ -1281,7 +1301,7 @@ function radio_station_get_current_schedule( $time = false ) {
 						if ( !$time ) {
 							set_transient( 'radio_station_current_show', $current_show, $expires );
 						} else {
-							set_transient( 'radio_station_current_show_temp', $current_show, $expires );
+							set_transient( 'radio_station_current_show_' . $time, $current_show, $expires );
 						}
 
 					} elseif ( $now > $shift_end_time ) {
@@ -1378,7 +1398,7 @@ function radio_station_get_current_schedule( $time = false ) {
 		if ( !$time ) {
 			set_transient( 'radio_station_next_show', $next_show, $next_expires );
 		} else {
-			set_transient( 'radio_station_next_show_temp', $next_show, $next_expires );
+			set_transient( 'radio_station_next_show_' . $time, $next_show, $next_expires );
 		}
 	}
 
@@ -1397,8 +1417,11 @@ function radio_station_get_current_schedule( $time = false ) {
 		}
 
 		// --- pass calculated shifts with limit of 1 ---
-		$next_shows = radio_station_get_next_shows( 1, $show_shifts );
-		if ( count( $next_shows ) > 0 ) {
+		// 2.3.2: added time argument
+		$next_shows = radio_station_get_next_shows( 1, $show_shifts, $time );
+		
+		// 2.3.2: set next show transient within next shows function
+		/* if ( count( $next_shows ) > 0 ) {
 
 			// 2.3.2: replace strtotime with to_time for timezones
 			// 2.3.2: fix to convert to 24 hour format first
@@ -1419,9 +1442,9 @@ function radio_station_get_current_schedule( $time = false ) {
 			if ( !$time ) {
 				set_transient( 'radio_station_next_show', $next_show, $next_expires );
 			} else {
-				set_transient( 'radio_station_next_show_temp', $next_show, $next_expires );
+				set_transient( 'radio_station_next_show_' . $time, $next_show, $next_expires );
 			}
-		}
+		} */
 	}
 
 	// TODO: handle possible edge case where current show or next show is split
@@ -1449,7 +1472,7 @@ function radio_station_get_current_schedule( $time = false ) {
 		if ( !$time ) {
 			set_transient( 'radio_station_current_schedule', $show_shifts, $expires );
 		} else {
-			set_transient( 'radio_station_current_schedule_temp', $show_shifts, $expires );
+			set_transient( 'radio_station_current_schedule_' . $time, $show_shifts, $expires );
 		}
 	}
 
@@ -1472,21 +1495,20 @@ function radio_station_get_current_show( $time = false ) {
 	// --- get cached current show value ---
 	if ( !$time ) {
 		$current_show = get_transient( 'radio_station_current_show' );
+	} else {
+		$current_show = get_transient( 'radio_station_current_show_' . $time );
 	}
 
 	// --- if not set it has expired so recheck schedule ---
 	// 2.3.2: fix for trailing space in transient name string
 	if ( !$current_show ) {
 	
-		// 2.3.2: clear current schedule to force recalculation
-		delete_transient( 'radio_station_current_schedule' );
-	
 		if ( !$time ) {
 			$schedule = radio_station_get_current_schedule();
 			$current_show = get_transient( 'radio_station_current_show' );
 		} else {
 			$schedule = radio_station_get_current_schedule( $time );
-			$current_show = get_transient( 'radio_station_current_show_temp' );
+			$current_show = get_transient( 'radio_station_current_show_' . $time );
 		}
 	}
 
@@ -1509,20 +1531,19 @@ function radio_station_get_next_show( $time = false ) {
 	// --- get cached current show value ---
 	if ( !$time ) {
 		$next_show = get_transient( 'radio_station_next_show' );
+	} else {
+		$next_show = get_transient( 'radio_station_next_show_' . $time );
 	}
 
 	// --- if not set it has expired so recheck schedule ---
 	if ( !$next_show ) {
-	
-		// 2.3.2: clear schedule transient to force recalculation
-		delete_transient( 'radio_station_current_schedule ');
 	
 		if ( !$time ) {
 			$schedule = radio_station_get_current_schedule();
 			$next_show = get_transient( 'radio_station_next_show' );
 		} else {
 			$schedule = radio_station_get_current_schedule( $time );
-			$next_show = get_transient( 'radio_station_next_show_temp' );
+			$next_show = get_transient( 'radio_station_next_show_' . $time );
 		}
 	}
 
@@ -1552,11 +1573,16 @@ function radio_station_get_next_shows( $limit = 3, $show_shifts = false, $time =
 
 	// --- loop (remaining) shifts to add show data ---
 	$next_shows = array();
-	$now = radio_station_get_now();
+	// 2.3.2: maybe set provided time as now
+	if ( $time ) {
+		$now = $time;
+	} else {
+		$now = radio_station_get_now();
+	}
 	
 	// 2.3.2: use get time function with timezone
 	// 2.3.2: fix to pass week day start as numerical (w)
-	$today = radio_station_get_time( 'w' );
+	$today = radio_station_get_time( 'w', $now );
 	$weekdays = radio_station_get_schedule_weekdays( $today );
 	$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 	
@@ -1575,7 +1601,7 @@ function radio_station_get_next_shows( $limit = 3, $show_shifts = false, $time =
 
 				// --- get this shift start and end times ---
 				// 2.3.2: replace strtotime with to_time for timezones
-				// 2.3.2: fix to conver to 24 hour format first
+				// 2.3.2: fix to convert to 24 hour format first
 				$shift_start = radio_station_convert_shift_time( $shift['start'] );
 				$shift_end = radio_station_convert_shift_time( $shift['end'] );
 				$shift_start_time = radio_station_to_time( $weekdates[$day] . ' ' . $shift_start );
@@ -1587,10 +1613,25 @@ function radio_station_get_next_shows( $limit = 3, $show_shifts = false, $time =
 					echo print_r( $shift, true ) . PHP_EOL;
 				}
 
+				// --- current show ---
+				if ( ( $now > $shift_start_time ) && ( $now < $shift_end_time ) ) {
+					if ( !isset( $current_show ) ) {
+						// TODO: recombine possible split shift to set current show ?
+						/* $current_show = $shift;
+						$expires = $shift_end_time - $now - 1;
+						if ( $expires > 3600 ) {
+							$expires = 3600;
+						} 
+						if ( !$time ) {
+							set_transient( 'radio_station_current_show', $current_show, $expires );
+						} else {
+							set_transient( 'radio_station_current_show_' . $time, $current_show, $expires );
+						} */
+					}
+				}
+
 				// --- check if show is upcoming ---
 				if ( $now < $shift_start_time ) {
-
-					if ( RADIO_STATION_DEBUG ) {echo "YES";}
 
 					// --- reset skip flag ---
 					$skip = false;
@@ -1603,18 +1644,14 @@ function radio_station_get_next_shows( $limit = 3, $show_shifts = false, $time =
 					} elseif ( isset( $shift['split'] ) && $shift['split'] ) {
 					
 						// --- dedupe for shifts split overnight ---
+						if ( isset( $shift['real_end'] ) ) {
+							$shift['end'] = $shift['real_end'];
+							$current_split = true;				
+						}
+						// (note: probably unnecessary)
 						if ( isset( $shift['real_start'] ) ) {
-							
-							// --- get real start day and time ---
 							$shift['day'] = radio_station_get_previous_day( $day );
 							$shift['start'] = $shift['real_start'];
-							
-						} elseif ( isset( $shift['real_end'] ) ) {
-						
-							// --- get real end time ---
-							$shift['end'] = $shift['real_end'];
-							$current_split = true;
-					
 						}
 					
 					} else {
@@ -1624,8 +1661,19 @@ function radio_station_get_next_shows( $limit = 3, $show_shifts = false, $time =
 
 					if ( !$skip ) {
 
+						// --- maybe set next show transient ---
+						if ( !isset( $next_show ) ) {
+							$next_show = $shift;
+							$next_expires = $shift_end_time - $now - 1;
+							if ( !$time ) {
+								set_transient( 'radio_station_next_show', $next_show, $next_expires );
+							} else {
+								set_transient( 'radio_station_next_show_' . $time, $next_show, $next_expires );
+							}
+						}
+
 						// --- add to next shows data ---
-						// 2.3.2: set date for widget
+						// 2.3.2: set date for widget display
 						$shift['date'] = $weekdates[$day];
 						$next_shows[] = $shift;
 
@@ -2833,6 +2881,15 @@ function radio_station_patreon_button_styles() {
 	#radio-station-patreon-button:hover {opacity:1 !important;}</style>';
 }
 
+// --------------------
+// Queue Directory Ping
+// --------------------
+// 2.3.2: queue directory ping on saving
+function radio_station_queue_directory_ping() {
+	$do_ping = radio_station_get_setting( 'ping_netmix_directory' );
+	if ( 'yes' != $do_ping ) {return;}
+	update_option( 'radio_station_ping_directory', '1' );
+}
 
 // -------------------
 // Send Directory Ping
@@ -2843,16 +2900,42 @@ function radio_station_send_directory_ping() {
 	if ( 'yes' != $do_ping ) {return;}
 	
 	// --- set the URL to ping ---
+	// 2.3.2: fix url_encode to urlencode
 	$site_url = site_url();
 	$url = add_query_arg( 'ping', 'directory', RADIO_STATION_NETMIX_DIR );
-	$url = add_query_arg( 'station-url', url_encode( $site_url ), $url );
+	$url = add_query_arg( 'station-url', urlencode( $site_url ), $url );
 	$url = add_query_arg( 'timestamp', time(), $url );
-	
+
 	// --- send the ping ---
-	$args = array( 'timeout' => 3 );
-	wp_remote_get( $url, $args );
+	$args = array( 'timeout' => 10 );
+	if ( !function_exists( 'wp_remote_get' ) ) {
+	 	include_once ABSPATH . WPINC . '/http.php';
+	}
+	$response = wp_remote_get( $url, $args );
+	if ( isset( $_GET['rs-test-ping'] ) && ( '1' == $_GET['rs-test-ping'] ) ) {
+		echo '<span style="display:none;">Directory Ping Response:</span>';
+		echo '<textarea style="display:none; float:right; width:700px; height:200px;">';
+		echo print_r( $response, true ) . '</textarea>';
+	}
+	return $response;
 }
 
+// -------------------
+// Check and Send Ping
+// -------------------
+// 2.3.2: send queued directory ping
+add_action( 'admin_footer', 'radio_station_check_directory_ping', 99 );
+function radio_station_check_directory_ping() {
+	$ping = get_option( 'radio_station_ping_directory' );
+	if ( $ping ) {
+		$response = radio_station_send_directory_ping();
+		if ( !is_wp_error( $response ) && isset( $response['response']['code'] ) && ( 200 == $response['response']['code'] ) ) {
+			delete_option( 'radio_station_ping_directory' );
+		}
+	} elseif ( isset( $_GET['rs-test-ping'] ) && ( '1' == $_GET['rs-test-ping'] ) ) {
+		$response = radio_station_send_directory_ping();
+	}
+}
 
 // ------------------------
 // === Time Conversions ===
@@ -3105,28 +3188,53 @@ function radio_station_get_timezone_options( $include_wp_timezone = false ) {
 	return $options;
 }
 
-// -----------------
-// Timezone Selector
-// -----------------
-// 2.3.2: added for user timezone selection
-function radio_station_timezone_selector( $id ) {	
+// --------------
+// Get Weekday(s)
+// --------------
+// 2.3.2: added get weekday from number helper
+function radio_station_get_weekday( $day_number = null ) {
 
-	$onchange = "radio_change_timezone('" . esc_js( $id ) . "');";
-	$select .= '<select id="' . esc_attr( $id ) . '-timezone-select" class="user-timezone-select" style="display:none;" onchange="' . $onchange . '">';
-	$select .= '<option value="">' . esc_html( __( 'Cancel', 'radio-station' ) ) . '</option>';
-	foreach ( $timezones as $timezone => $label ) {
-		if ( strstr( $timezone, '*OPTGROUP*' ) ) {
-			$select .= "<optgroup label='" . esc_attr( $label ) . "'>" . esc_html( $label ) . '</optgroup>';
-		} else {
-			$select .= '<option value="' . $timezone . '">' . esc_html( $label ) . '</option>';
-		}
+	$weekdays = array(
+		'Sunday',
+		'Monday',
+		'Tuesday',
+		'Wednesday',
+		'Thursday',
+		'Friday',
+		'Saturday',
+	);
+
+	if ( !is_null( $day_number ) ) {
+		return $weekdays[$day_number];
 	}
-	$select .= 
-	$select .= '</select>';
-	
-	return $select;
+	return $weekdays;
 }
 
+// ------------
+// Get Month(s)
+// ------------
+// 2.3.2: added get weekday from number helper
+function radio_station_get_month( $month_number = null ) {
+
+	$months = array(
+		'January',
+		'February',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December',
+	);
+	if ( !is_null( $month_number ) ) {
+		return $months[$month_number];
+	}
+	return $months;
+}
 
 // ---------------------
 // Get Schedule Weekdays
@@ -3177,28 +3285,6 @@ function radio_station_get_schedule_weekdays( $weekstart = false ) {
 	$weekdays = array_merge( $start, $after );
 	$weekdays = array_merge( $weekdays, $before );
 
-	return $weekdays;
-}
-
-// -----------
-// Get Weekday
-// -----------
-// 2.3.2: added get weekday from number helper
-function radio_station_get_weekday( $day_number = null ) {
-
-	$weekdays = array(
-		'Sunday',
-		'Monday',
-		'Tuesday',
-		'Wednesday',
-		'Thursday',
-		'Friday',
-		'Saturday',
-	);
-
-	if ( !is_null( $day_number ) ) {
-		return $weekdays[$day_number];
-	}
 	return $weekdays;
 }
 
@@ -3318,6 +3404,36 @@ function radio_station_get_previous_day( $day ) {
 	return '';
 }
 
+// -------------
+// Get Next Date
+// -------------
+// 2.3.2: added for more reliable calculations
+function radio_station_get_next_date( $date, $weekday = false ) {
+
+	// note: this is used internally so timezone not used
+	$timedate = strtotime( $date );
+	$timedate = $timedate + ( 24 * 60 * 60 );
+	if ( $weekday ) {
+		$day = date( 'l', $timedate );
+		if ( $day != $weekday ) {
+			$i = 0;
+			while ( $day != $weekday ) {
+				$timedate = $timedate + ( 24 * 60 * 60 );
+				$day = strtotime( 'l', $timedate );
+				if ( 8 == $i ) {
+					// - failback for while failure -
+					$timedate = strtotime( $date );
+					$next_date = date( 'next ' . $weekday, $timedate );
+					return $next_date;
+				}
+				$i++;
+			}
+		}
+	}
+	$next_date = date( 'Y-m-d', $timedate );
+	return $next_date;
+}
+
 // -----------------
 // Get Previous Date
 // -----------------
@@ -3346,37 +3462,6 @@ function radio_station_get_previous_date( $date, $weekday = false ) {
 	}
 	$previous_date = date( 'Y-m-d', $timedate );
 	return $previous_date;
-}
-
-// -------------
-// Get Next Date
-// -------------
-// 2.3.2: added for more reliable calculations
-function radio_station_get_next_date( $date, $weekday = false ) {
-
-	// note: this is used internally so timezone not used
-	$timedate = strtotime( $date );
-	$timedate = $timedate + ( 24 * 60 * 60 );
-	if ( $weekday ) {
-		$day = date( 'l', $timedate );
-		if ( $day != $weekday ) {
-			$i = 0;
-			while ( $day != $weekday ) {
-				$timedate = $timedate + ( 24 * 60 * 60 );
-				$day = strtotime( 'l', $timedate );
-				if ( 8 == $i ) {
-					// - failback for while failure -
-					echo "WEEKDAY FAIL: " . $weekday;
-					$timedate = strtotime( $date );
-					$next_date = date( 'next ' . $weekday, $timedate );
-					return $next_date;
-				}
-				$i++;
-			}
-		}
-	}
-	$next_date = date( 'Y-m-d', $timedate );
-	return $next_date;
 }
 
 // -------------
@@ -3899,7 +3984,8 @@ function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
 // important note: translated individually as cannot translate a variable
 // 2.2.7: use wp locale class to translate weekdays
 // 2.3.0: allow for abbreviated and long version changeovers
-function radio_station_translate_weekday( $weekday, $short = false ) {
+// 2.3.2: default short to null for more flexibility
+function radio_station_translate_weekday( $weekday, $short = null ) {
 
 	// 2.3.0: return empty for empty select option
 	if ( empty( $weekday ) ) {
@@ -3908,55 +3994,55 @@ function radio_station_translate_weekday( $weekday, $short = false ) {
 
 	global $wp_locale;
 
-	if ( $short ) {
+	$days = radio_station_get_weekday();
 
-		// --- translate abbreviated weekday ---
-		if ( ( 'Sunday' == $weekday ) || ( 'Sun' == $weekday ) ) {
-			$weekday = $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( 0 ) );
-		} elseif ( ( 'Monday' == $weekday ) || ( 'Mon' == $weekday ) ) {
-			$weekday = $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( 1 ) );
-		} elseif ( ( 'Tuesday' == $weekday ) || ( 'Tue' == $weekday ) ) {
-			$weekday = $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( 2 ) );
-		} elseif ( ( 'Wednesday' == $weekday ) || ( 'Wed' == $weekday ) ) {
-			$weekday = $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( 3 ) );
-		} elseif ( ( 'Thursday' == $weekday ) || ( 'Thu' == $weekday ) ) {
-			$weekday = $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( 4 ) );
-		} elseif ( ( 'Friday' == $weekday ) || ( 'Fri' == $weekday ) ) {
-			$weekday = $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( 5 ) );
-		} elseif ( ( 'Saturday' == $weekday ) || ( 'Sat' == $weekday ) ) {
-			$weekday = $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( 6 ) );
-		} elseif ( ( intval( $weekday ) > - 1 ) && ( intval( $weekday ) < 7 ) ) {
-			// 2.3.0: add support for numeric weekday value
-			$weekday = $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( $weekday ) );
+	// --- translate weekday ---
+	// 2.3.2: optimized weekday translations
+	foreach ( $days as $i => $day ) {
+		$abbr = substr( $day, 0, 3 );
+		if ( ( $weekday == $day ) || ( $weekday == $abbr ) ) {
+			if ( ( !$short && !is_null( $short ) ) 
+			  || ( is_null( $short ) && ( $weekday == $day ) ) ) {
+				return $wp_locale->get_weekday( $i );
+			} elseif ( $short || ( is_null( $short ) && ( weekday == $abbr ) ) ) {
+				return $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( $i ) );
+			}
 		}
-
-	} else {
-
-		// --- translate full weekday ---
-		// 2.2.7: fix to typo for Tuesday
-		// 2.3.0: fix to typo for Thursday (jeez!)
-		if ( ( 'Sunday' == $weekday ) || ( 'Sun' == $weekday ) ) {
-			$weekday = $wp_locale->get_weekday( 0 );
-		} elseif ( ( 'Monday' == $weekday ) || ( 'Mon' == $weekday ) ) {
-			$weekday = $wp_locale->get_weekday( 1 );
-		} elseif ( ( 'Tuesday' == $weekday ) || ( 'Tue' == $weekday ) ) {
-			$weekday = $wp_locale->get_weekday( 2 );
-		} elseif ( ( 'Wednesday' == $weekday ) || ( 'Wed' == $weekday ) ) {
-			$weekday = $wp_locale->get_weekday( 3 );
-		} elseif ( ( 'Thursday' == $weekday ) || ( 'Thu' == $weekday ) ) {
-			$weekday = $wp_locale->get_weekday( 4 );
-		} elseif ( ( 'Friday' == $weekday ) || ( 'Fri' == $weekday ) ) {
-			$weekday = $wp_locale->get_weekday( 5 );
-		} elseif ( ( 'Saturday' == $weekday ) || ( 'Sat' == $weekday ) ) {
-			$weekday = $wp_locale->get_weekday( 6 );
-		} elseif ( ( intval( $weekday ) > - 1 ) && ( intval( $weekday ) < 7 ) ) {
-			// 2.3.0: add support for numeric weekday value
-			$weekday = $wp_locale->get_weekday( $weekday );
-		}
-
 	}
 
+	// --- fallback if day number supplied ---
+	// 2.3.2: optimized day number fallback
+	$daynum = intval( $weekday );
+	if ( ( $daynum > -1 ) && ( $daynum < 7 ) ) {
+		if ( $short ) {
+			return $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( $daynum ) );
+		} else {
+			return $wp_locale->get_weekday( $daynum );	
+		}
+	}
+	
 	return $weekday;
+}
+
+// ----------------
+// Replace Weekdays
+// ----------------
+// 2.3.2: to replace with translated weekdays in a time string
+function radio_station_replace_weekday( $string ) {
+
+	$days = radio_station_get_weekday();
+	foreach( $days as $day ) {
+		$abbr = substr( $day, 0, 3 );
+		if ( strstr( $string, $day ) ) {
+			$translated = radio_station_translate_weekday( $day );
+			$string = str_replace( $day, $translated, $string );		
+		} elseif ( strstr( $string, $abbr ) ) {
+			$translated = radio_station_translate_weekday( $abbr );
+			$string = str_replace( $abbr, $translated, $string );
+		}
+	}	
+
+	return $string;
 }
 
 // ---------------
@@ -3964,7 +4050,8 @@ function radio_station_translate_weekday( $weekday, $short = false ) {
 // ---------------
 // important note: translated individually as cannot translate a variable
 // 2.2.7: use wp locale class to translate months
-function radio_station_translate_month( $month, $short = false ) {
+// 2.3.2: default short to null for more flexibility
+function radio_station_translate_month( $month, $short = null ) {
 
 	// 2.3.0: return empty for empty select option
 	if ( empty( $month ) ) {
@@ -3972,74 +4059,56 @@ function radio_station_translate_month( $month, $short = false ) {
 	}
 
 	global $wp_locale;
-	if ( $short ) {
 
-		// --- translate abbreviated month ---
-		// 2.3.2: allow for short or long input match
-		if ( ( 'Jan' == $month ) || ( 'January' == $month ) ) {
-			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 1 ) );
-		} elseif ( ( 'Feb' == $month ) || ( 'February' == $month ) ) {
-			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 2 ) );
-		} elseif ( ( 'Mar' == $month ) || ( 'March' == $month ) ) {
-			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 3 ) );
-		} elseif ( ( 'Apr' == $month ) || ( 'April' == $month ) ) {
-			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 4 ) );
-		} elseif ( ( 'May' == $month ) || ( 'May' == $month ) ) {
-			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 5 ) );
-		} elseif ( ( 'Jun' == $month ) || ( 'June' == $month ) ) {
-			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 6 ) );
-		} elseif ( ( 'Jul' == $month ) || ( 'July' == $month ) ) {
-			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 7 ) );
-		} elseif ( ( 'Aug' == $month ) || ( 'August' == $month ) ) {
-			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 8 ) );
-		} elseif ( ( 'Sep' == $month ) || ( 'September' == $month ) ) {
-			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 9 ) );
-		} elseif ( ( 'Oct' == $month ) || ( 'October' == $month ) ) {
-			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 10 ) );
-		} elseif ( ( 'Nov' == $month ) || ( 'November' == $month ) ) {
-			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 11 ) );
-		} elseif ( ( 'Dec' == $month ) || ( 'December' == $month ) ) {
-			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( 12 ) );
-		} elseif ( ( intval( $month ) > 0 ) && ( intval( $month ) < 13 ) ) {
-			// 2.3.0: add support for numeric month value
-			$month = $wp_locale->get_month_abbrev( $wp_locale->get_month( $month ) );
+	$months = radio_station_get_month();
+
+	// --- translate month ---
+	// 2.3.2: optimized month translations
+	foreach ( $months as $i => $fullmonth ) {
+		$abbr = substr( $fullmonth, 0, 3 );
+		if ( ( $month == $fullmonth ) || ( $month == $abbr ) ) {
+			if ( ( !$short && !is_null( $short ) ) 
+			  || ( is_null( $short ) && ( $month == $fullmonth ) ) ) {
+				return $wp_locale->get_month( $i );
+			} elseif ( $short || ( is_null( $short ) && ( weekday == $abbr ) ) ) {
+				return $wp_locale->get_month_abbrev( $wp_locale->get_month( $i ) );
+			}
 		}
-	} else {
-
-		// --- translate full month ---
-		// 2.3.2: allow for short or long input match
-		if ( ( 'Jan' == $month ) || ( 'January' == $month ) ) {
-			$month = $wp_locale->get_month( 1 );
-		} elseif ( ( 'Feb' == $month ) || ( 'February' == $month ) ) {
-			$month = $wp_locale->get_month( 2 );
-		} elseif ( ( 'Mar' == $month ) || ( 'March' == $month ) ) {
-			$month = $wp_locale->get_month( 3 );
-		} elseif ( ( 'Apr' == $month ) || ( 'April' == $month ) ) {
-			$month = $wp_locale->get_month( 4 );
-		} elseif ( ( 'May' == $month ) || ( 'May' == $month ) ) {
-			$month = $wp_locale->get_month( 5 );
-		} elseif ( ( 'Jun' == $month ) || ( 'June' == $month ) ) {
-			$month = $wp_locale->get_month( 6 );
-		} elseif ( ( 'Jul' == $month ) || ( 'July' == $month ) ) {
-			$month = $wp_locale->get_month( 7 );
-		} elseif ( ( 'Aug' == $month ) || ( 'August' == $month ) ) {
-			$month = $wp_locale->get_month( 8 );
-		} elseif ( ( 'Sep' == $month ) || ( 'September' == $month ) ) {
-			$month = $wp_locale->get_month( 9 );
-		} elseif ( ( 'Oct' == $month ) || ( 'October' == $month ) ) {
-			$month = $wp_locale->get_month( 10 );
-		} elseif ( ( 'Nov' == $month ) || ( 'November' == $month ) ) {
-			$month = $wp_locale->get_month( 11 );
-		} elseif ( ( 'Dec' == $month ) || ( 'December' == $month ) ) {
-			$month = $wp_locale->get_month( 12 );
-		} elseif ( ( intval( $month ) > 0 ) && ( intval( $month ) < 13 ) ) {
-			// 2.3.0: add support for numeric month value
-			$month = $wp_locale->get_month( $month );
-		}
-
 	}
 
+	// --- fallback if month number supplied ---
+	// 2.3.2: optimized month number fallback
+	$monthnum = intval( $month );
+	if ( ( $monthnum > 0 ) && ( $monthnum < 13 ) ) {
+		if ( $short ) {
+			return $wp_locale->get_month_abbrev( $wp_locale->get_month( $monthnum ) );
+		} else {
+			return $wp_locale->get_month( $monthnum );	
+		}
+	}
+	
 	return $month;
+}
+
+// --------------
+// Replace Months
+// --------------
+// 2.3.2: to replace with translated months in a time string
+function radio_station_replace_month( $string ) {
+
+	$months = radio_station_get_month();
+	foreach( $months as $month ) {
+		$abbr = substr( $month, 0, 3 );
+		if ( strstr( $string, $month ) ) {
+			$translated = radio_station_translate_month( $month );
+			$string = str_replace( $month, $translated, $string );		
+		} elseif ( strstr( $string, $abbr ) ) {
+			$translated = radio_station_translate_month( $abbr );
+			$string = str_replace( $abbr, $translated, $string );
+		}
+	}
+
+	return $string;
 }
 
 // ------------------
@@ -4052,3 +4121,51 @@ function radio_station_translate_meridiem( $meridiem ) {
 	return $wp_locale->get_meridiem( $meridiem );
 }
 
+// ----------------
+// Replace Meridiem
+// ----------------
+// 2.3.2: added optimized meridiem replacement
+function radio_station_replace_meridiem( $string ) {
+
+	global $radio_station_data;
+	if ( isset( $radio_station_data['meridiems'] ) ) {
+		$meridiems = $radio_station_data['meridiems'];
+	} else {
+		$meridiems = array(
+			'am'	=> radio_station_translate_meridiem( 'am' ),
+			'pm'	=> radio_station_translate_meridiem( 'pm' ),
+			'AM'	=> radio_station_translate_meridiem( 'AM' ),
+			'PM'	=> radio_station_translate_meridiem( 'PM' ),
+		);
+		$radio_station_data['meridiems'] = $meridiems;
+	}
+	
+	
+	if ( strstr( $string, 'am' ) ) {
+		$string = str_replace( 'am', $meridiems['am'], $string );
+	}
+	if ( strstr( $string, 'pm' ) ) {
+		$string = str_replace( 'pm', $meridiems['pm'], $string );
+	}
+	if ( strstr( $string, 'AM' ) ) {
+		$string = str_replace( 'AM', $meridiems['AM'], $string );
+	}
+	if ( strstr( $string, 'PM' ) ) {
+		$string = str_replace( 'PM', $meridiems['PM'], $string );
+	}
+
+	return $string;
+}
+
+// ---------------------
+// Translate Time String
+// ---------------------
+// 2.3.2: replace with translated month, day and meridiem in a string
+function radio_station_translate_time( $string ) {
+
+	$string = radio_station_replace_meridiem( $string );
+	$string = radio_station_replace_weekday( $string );
+	$string = radio_station_replace_month( $string );
+
+	return $string;
+}

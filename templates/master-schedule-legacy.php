@@ -17,7 +17,7 @@ $output .= '<tr class="master-program-day-row"> <th></th>';
 foreach ( $days_of_the_week as $weekday => $info ) {
 	// 2.2.2: fix to translate incorrect variable (heading)
 	$heading = substr( $weekday, 0, 3 );
-	$heading = radio_station_translate_weekday( $heading, true );
+	$heading = radio_station_translate_weekday( $heading );
 	$output .= '<th>' . $heading . '</th>';
 }
 $output .= '</tr>';

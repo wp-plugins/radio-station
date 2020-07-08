@@ -415,8 +415,17 @@ if ( !$active || !$shifts ) {
 	$blocks['show_times'] .= '<table class="show-times" cellpadding="0" cellspacing="0">';
 
 	$found_encore = false;
-	$am = radio_station_translate_meridiem( 'am' );
-	$pm = radio_station_translate_meridiem( 'pm' );
+
+	// --- get data format ---
+	// 2.3.2: set filterable time formats
+	if ( 24 == (int) $time_format ) {
+		$start_data_format = $end_data_format = 'H:i';
+	} else {
+		$start_data_format = $end_data_format = 'g:i a';
+	}
+	$start_data_format = apply_filters( 'radio_station_time_format_start', $start_data_format, 'show-template', $post_id );
+	$end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_format, 'show-template', $post_id );
+
 	$weekdays = radio_station_get_schedule_weekdays();
 	$now = radio_station_get_now();
 	foreach ( $weekdays as $day ) {
@@ -438,16 +447,11 @@ if ( !$active || !$shifts ) {
 						$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 					}
 
-					// --- maybe convert to 24 hour format ---
-					if ( 24 == (int) $time_format ) {
-						$start = radio_station_convert_shift_time( $start, 24 );
-						$end = radio_station_convert_shift_time( $end, 24 );
-						$data_format = 'H:i';
-					} else {
-						$start = str_replace( array( 'am', 'pm' ), array( $am, $pm ), $start );
-						$end = str_replace( array( 'am', 'pm' ), array( $am, $pm ), $end );
-						$data_format = 'g:i a';
-					}
+					// --- get shift time display ---
+					$start = radio_station_get_time( $start_data_format, $shift_start_time );
+					$end = radio_station_get_time( $end_data_format, $shift_end_time );
+					$start = radio_station_translate_time( $start );
+					$end = radio_station_translate_time( $end );				
 
 					// --- check if current shift ---
 					$classes = array( 'show-shift-time' );
@@ -460,7 +464,7 @@ if ( !$active || !$shifts ) {
 					$show_time = '<div class="' . esc_attr( $class ) . '">';
 					$show_time .= '<span class="rs-time rs-start-time" data-format="' . esc_attr( $data_format ) . '">' . esc_html( $start ) . '</span>';
 					$show_time .= '<span class="rs-sep"> - </span>';
-					$show_time .= '<span class="rs-time rs-end-time" data-format="' . esc_attr( $data_format ) . '">' . esc_html( $end ) . '</span>';
+					$show_time .= '<span class="rs-time rs-end-time" data-format="' . esc_attr( $end_data_format ) . '">' . esc_html( $end ) . '</span>';
 					if ( isset( $shift['encore'] ) && ( 'on' == $shift['encore'] ) ) {
 						$found_encore = true;
 						$show_time .= '<span class="show-encore">*</span>';

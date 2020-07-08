@@ -2473,12 +2473,6 @@ function radio_station_show_save_data( $post_id ) {
 		}
 	}
 
-	// 2.3.2: check for post type slug match early
-	$post = get_post( $post_id );
-	if ( RADIO_STATION_SHOW_SLUG != $post->post_type ) {
-		return;
-	}
-
 	// --- set show meta changed flags ---
 	$show_meta_changed = $show_shifts_changed = false;
 
@@ -2780,7 +2774,8 @@ function radio_station_show_save_data( $post_id ) {
 		
 		// --- maybe send directory ping ---
 		// 2.3.1: added directory update ping option
-		radio_station_send_directory_ping();
+		// 2.3.2: queue directory ping
+		radio_station_queue_directory_ping();
 	}
 	
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
@@ -2828,10 +2823,12 @@ function radio_station_show_save_data( $post_id ) {
 
 }
 
-// ------------------
-// Save Outpout Debug
-// ------------------
-add_action( 'save_post', 'radio_station_save_debug_start', 0 );
+// -----------------
+// Save Output Debug
+// -----------------
+add_action( 'save_post_' . RADIO_STATION_SHOW_SLUG, 'radio_station_save_debug_start', 0 );
+add_action( 'save_post_' . RADIO_STATION_OVERRIDE_SLUG, 'radio_station_save_debug_start', 0 );
+add_action( 'save_post_' . RADIO_STATION_PLAYLIST_SLUG, 'radio_station_save_debug_start', 0 );
 function radio_station_save_debug_start( $post_id ) {
 	if ( !RADIO_STATION_SAVE_DEBUG ) {
 		return;
@@ -2839,13 +2836,11 @@ function radio_station_save_debug_start( $post_id ) {
 	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 		return;
 	}
-	$slugs = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG, RADIO_STATION_PLAYLIST_SLUG );
-	$post = get_post( $post_id );
-	if ( in_array( $post->post_type, $slugs ) ) {
-		ob_start();
-	}
+	ob_start();
 }
-add_action( 'save_post', 'radio_station_save_debug_end', 9999 );
+add_action( 'save_post_' . RADIO_STATION_SHOW_SLUG, 'radio_station_save_debug_start', 9999 );
+add_action( 'save_post_' . RADIO_STATION_OVERRIDE_SLUG, 'radio_station_save_debug_start', 9999 );
+add_action( 'save_post_' . RADIO_STATION_PLAYLIST_SLUG, 'radio_station_save_debug_start', 9999 );
 function radio_station_save_debug_end( $post_id ) {
 	if ( !RADIO_STATION_SAVE_DEBUG ) {
 		return;
@@ -2853,16 +2848,12 @@ function radio_station_save_debug_end( $post_id ) {
 	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 		return;
 	}
-	$slugs = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG, RADIO_STATION_PLAYLIST_SLUG );
-	$post = get_post( $post_id );
-	if ( in_array( $post->post_type, $slugs ) ) {
-		$contents = ob_get_contents();
-		ob_end_clean();
-		if ( strlen( $contents ) > 0 ) {
-			echo "Output Detected During Save (preventing redirect):<br>";
-			echo '<textarea rows="40" cols="80">' . $contents . '</textarea>';
-			exit;
-		}
+	$contents = ob_get_contents();
+	ob_end_clean();
+	if ( strlen( $contents ) > 0 ) {
+		echo "Output Detected During Save (preventing redirect):<br>";
+		echo '<textarea rows="40" cols="80">' . $contents . '</textarea>';
+		exit;
 	}
 }
 
@@ -3267,8 +3258,8 @@ function radio_station_schedule_override_metabox() {
 // ------------------------
 // Update Schedule Override
 // ------------------------
-add_action( 'save_post', 'radio_station_master_override_save_showpostdata' );
-function radio_station_master_override_save_showpostdata( $post_id ) {
+add_action( 'save_post', 'radio_station_override_save_data' );
+function radio_station_override_save_data( $post_id ) {
 
 	// --- verify if this is an auto save routine ---
 	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
@@ -3364,7 +3355,8 @@ function radio_station_master_override_save_showpostdata( $post_id ) {
 		
 		// --- maybe send directory ping ---
 		// 2.3.1: added directory update ping option
-		radio_station_send_directory_ping();
+		// 2.3.2: queue directory ping
+		radio_station_queue_directory_ping();
 	}
 }
 

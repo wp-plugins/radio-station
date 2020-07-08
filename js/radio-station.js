@@ -65,3 +65,27 @@ var radio_resize_debounce = (function () {
 	};
 })();
 
+/* User Timezone Display */
+if (typeof jQuery == 'function') {
+	jQuery(document).ready(function() {
+		if (jQuery('.radio-user-timezone').length) {
+			userdatetime = new Date();
+			useroffset  = -(userdatetime.getTimezoneOffset());
+			if ((useroffset * 60) == radio.timezone_offset) {return;}
+			if (typeof jstz == 'function') {tz = jstz.determine().name();}
+			else {tz = Intl.DateTimeFormat().resolvedOptions().timeZone;}
+			if (tz.indexOf('/') > -1) {
+				tz = tz.replace('/', ', '); tz = tz.replace('_',' ');
+				houroffset = parseInt(useroffset);
+				if (houroffset == 0) {userzone = ' [UTC]';}
+				else {
+					houroffset = houroffset / 60;
+					if (houroffset > 0) {tz += ' [UTC+'+houroffset+']';}
+					else {tz += ' [UTC'+houroffset+']';}
+				}
+				jQuery('.radio-user-timezone').html(tz);
+				jQuery('.radio-user-timezone-title').show();
+			}
+		}
+	});
+}

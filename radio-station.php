@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.3.1.9
+Version: 2.3.1.10
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -355,6 +355,21 @@ $options = array(
 		'section' => 'schedule',
 	),
 
+	// --- Schedule Clock Display ---
+	/* 'schedule_clock'       => array(
+		'type'    => 'select',
+		'label'   => __( 'Schedule Clock?', 'radio-station' ),
+		'default' => 'clock',
+		'options' => array(
+			''         => __( 'None', 'radio-station' ),
+			'clock'    => __( 'Clock', 'radio-station' ),
+			'timezone' => __( 'Timezone', 'radio-station' ),
+		),
+		'helper'  => __( 'Radio Time section display above program Schedule.', 'radio-station' ),
+		'tab'     => 'pages',
+		'section' => 'schedule',
+	), */
+
 	// --- [Pro] Schedule Switcher ---
 	'schedule_switcher'   => array(
 		'type'    => 'checkbox',
@@ -691,7 +706,7 @@ $options = array(
 		'type'    => 'checkbox',
 		'label'   => __( 'AJAX Load Widgets?', 'radio-station' ),
 		'default' => 'yes',
-		'value'   => 'yes',
+		'value'   => '',
 		'helper'  => __( 'Defaults plugin widgets to AJAX loading. Can also be set on individual widgets.', 'radio-station' ),
 		'tab'     => 'widgets',
 		'section' => 'loading',
@@ -939,6 +954,14 @@ function radio_station_enqueue_scripts() {
 	// --- enqueue plugin script ---
 	// 2.3.0: added jquery dependency for inline script fragments
 	radio_station_enqueue_script( 'radio-station', array( 'jquery' ), true );
+	
+	// -- enqueue javascript timezone script ---
+	// $suffix = '.min';
+	// if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+	// 	$suffix = '';
+	// }
+	// $jstz_url = plugins_url( 'js/jstz' . $suffix . '.js', RADIO_STATION_FILE );
+	// wp_enqueue_script( 'jstz', $jstz_url, array(), '1.0.6', false );
 }
 
 // ---------------------

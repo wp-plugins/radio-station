@@ -9,7 +9,7 @@
 add_shortcode( 'master-schedule', 'radio_station_master_schedule' );
 function radio_station_master_schedule( $atts ) {
 
-	// --- make list attribute backward compatible ---
+	// --- make attributes backward compatible ---
 	// 2.3.0: convert old list attribute to view
 	if ( !isset( $atts['view'] ) && isset( $atts['list'] ) ) {
 		if ( 1 === (int) $atts['list'] ) {
@@ -28,11 +28,14 @@ function radio_station_master_schedule( $atts ) {
 		$atts['show_times'] = $atts['display_show_time'];
 		unset( $atts['display_show_time'] );
 	}
-	// 2.3.0: convert single_day to days
+	// 2.3.0: convert single_day attribute to days
 	if ( !isset( $atts['days'] ) && isset( $atts['single_day'] ) ) {
 		$atts['days'] = $atts['single_day'];
 		unset( $atts['single_day'] );
 	}
+
+	// --- get default clock display setting ---
+	$clock = radio_station_get_setting( 'schedule_clock' );
 
 	// --- merge shortcode attributes with defaults ---
 	// 2.3.0: added show_desc (default off)
@@ -51,7 +54,8 @@ function radio_station_master_schedule( $atts ) {
 
 		// --- control display options ---
 		'selector'          => 1,
-		'clock'             => 1,
+		'clock'             => $clock,
+		'timezone'			=> 1,
 	
 		// --- schedule display options ---
 		'time'              => $time_format,
@@ -64,9 +68,11 @@ function radio_station_master_schedule( $atts ) {
 		'display_date'		=> 'jS',
 		'display_month'		=> 'short',
 		'divheight'         => 45,
-		// 'list'           => 0, // converted above / deprecated
-		// 'show_djs'       => 0, // converted above / deprecated
-		// 'display_show_time' => 1, // converted above / deprecated
+
+		// --- converted and deprecated ---
+		// 'list'              => 0, 
+		// 'show_djs'          => 0,
+		// 'display_show_time' => 1,
 
 		// --- show display options ---
 		'show_image'        => 0,
@@ -84,17 +90,17 @@ function radio_station_master_schedule( $atts ) {
 		$atts['view'] = strtolower( $atts['view'] );
 		$views = explode( ',', $atts['view'] );
 		if ( ( 'tabs' == $atts['view'] ) || in_array( 'tabs', $views ) ) {
+			// 2.3.2: add show descriptions default for tabbed view
+			// 2.3.2: add display_ and display_date attributes
 			$defaults['show_image'] = 1;
 			$defaults['show_hosts'] = 1;
 			$defaults['show_genres'] = 1;
-			// 2.3.2: add show description for tabbed view
 			$defaults['show_desc'] = 1;
-			// 2.3.2: display day/date attributes
 			$defaults['display_day'] = 'full';
 			$defaults['display_date'] = false;
 		} elseif ( ( 'list' == $atts['view'] ) || in_array( 'list', $views ) ) {
+			// 2.3.2: add display date attribute
 			$defaults['show_genres'] = 1;
-			// 2.3.2: display date attribute
 			$defaults['display_date'] = false;
 		}
 	}
@@ -115,36 +121,36 @@ function radio_station_master_schedule( $atts ) {
 		$atts['clock'] = 0;
 	}
 
-	// --- get show selection links and clock display ---
-	// 2.3.0: added server/user clock display
-	if ( $atts['selector'] ) {
-		$selector = radio_station_master_schedule_selector();
-	}
-	if ( $atts['clock'] ) {
-		$clock = radio_station_clock_shortcode();
-	}
-
 	// --- table for selector and clock  ---
 	// 2.3.0: moved out from templates to apply to all views
+	// 2.3.2: moved shortcode calls inside and added filters
 	$output .= '<div id="master-schedule-controls-wrapper">';
 
 		$controls = array();
+		
+		// --- display radio clock or timezone (or neither)
 		if ( $atts['clock'] ) {
-			// --- display radio clock ---
+
+			// --- radio clock ---
 			$controls['clock'] = '<div id="master-schedule-clock-wrapper">';
-			$controls['clock'] .= $clock;
+			$clock_atts = apply_filters( 'radio_station_schedule_clock', array(), $atts );
+			$controls['clock'] .= radio_station_clock_shortcode( $clock_atts );
 			$controls['clock'] .= '</div>';
-		} else {
-			// --- display radio timezone ---
+
+		} elseif ( $atts['timezone'] ) {
+
+			// --- radio timezone ---
 			$controls['timezone'] = '<div id="master-schedule-timezone-wrapper">';
-			$controls['timezone'] .= radio_station_timezone_shortcode();
+			$timezone_atts = apply_filters( 'radio_station_schedule_clock', array(), $atts );
+			$controls['timezone'] .= radio_station_timezone_shortcode( $timezone_atts );
 			$controls['timezone'] .= '</div>';
+
 		}
 
+		// --- genre selector ---
 		if ( $atts['selector'] ) {
-			// --- display genre selector ---
 			$controls['selector'] = '<div id="master-schedule-selector-wrapper">';
-			$controls['selector'] .= $selector;
+			$controls['selector'] .= radio_station_master_schedule_selector();
 			$controls['selector'] .= '</div>';
 		}
 
@@ -152,10 +158,10 @@ function radio_station_master_schedule( $atts ) {
 		$control_order = array( 'clock', 'timezone', 'selector' );
 		$control_order = apply_filters( 'radio_station_schedule_control_order', $control_order, $atts );
 		
-		// 2.3.1: add filters for controls
+		// 2.3.1: add filter for controls HTML
 		$controls = apply_filters( 'radio_station_schedule_controls', $controls, $atts );
-		// print_r( $controls );
-		
+
+		// --- add ordered controls to output ---		
 		if ( is_array( $control_order ) && ( count( $control_order ) > 0 ) ) {
 			foreach ( $control_order as $control ) {
 				if ( isset( $controls[$control] ) && ( '' != $control ) ) {

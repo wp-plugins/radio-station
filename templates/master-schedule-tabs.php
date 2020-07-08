@@ -10,8 +10,18 @@ $hours = radio_station_get_hours();
 $now = radio_station_get_now();
 $date = radio_station_get_time( 'date', $now );
 $today =  radio_station_get_time( 'day', $now );
-$am = str_replace( ' ', '', radio_station_translate_meridiem( 'am' ) );
-$pm = str_replace( ' ', '', radio_station_translate_meridiem( 'pm' ) );
+// $am = str_replace( ' ', '', radio_station_translate_meridiem( 'am' ) );
+// $pm = str_replace( ' ', '', radio_station_translate_meridiem( 'pm' ) );
+
+// --- set shift time formats ---
+// 2.3.2: set time formats early
+if ( 24 == (int) $atts['time'] ) {
+	$start_data_format = $end_data_format = 'H:i';
+} else {
+	$start_data_format = $end_data_format = 'g:i a';
+}
+$start_data_format = apply_filters( 'radio_station_time_format_start', $start_data_format, 'schedule-tabs', $atts );
+$end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_format, 'schedule-tabs', $atts );
 
 // --- get schedule days and dates ---
 // 2.3.2: allow for start day attibute
@@ -201,6 +211,19 @@ foreach ( $weekdays as $i => $weekday ) {
 					$shift_end_time = radio_station_to_time( $weekdate . ' ' . $shift_end );
 				}
 
+				// --- get split shift real start and end times ---
+				// 2.3.2: added for shift display output
+				$real_shift_start = $real_shift_end = false;
+				if ( isset( $shift['split'] ) && $shift['split'] ) {
+					if ( isset( $shift['real_start'] ) ) {
+						$real_shift_start = radio_station_convert_shift_time( $shift['real_start'] );
+						$real_shift_start = radio_station_to_time( $weekdate . ' ' . $real_shift_start ) - ( 24 * 60 * 60 );
+					} elseif ( isset( $shift['real_end'] ) ) {
+						$real_shift_end = radio_station_convert_shift_time( $shift['real_end'] );
+						$real_shift_end = radio_station_to_time( $weekdate . ' ' . $real_shift_end ) + ( 24 * 60 * 60 );
+					}
+				}
+
 				// --- shift debug ---
 				// 2.3.2: added shift debugging
 				if ( isset( $_GET['rs-shift-debug'] ) && ( '1' == $_GET['rs-shift-debug'] ) ) {
@@ -312,7 +335,7 @@ foreach ( $weekdays as $i => $weekday ) {
 
 					// --- convert shift time for display ---
 					// 2.3.0: updated to use new schedule data
-					if ( '00:00 am' == $shift['start'] ) {
+					/* if ( '00:00 am' == $shift['start'] ) {
 						$shift['start'] = '12:00 am';
 					}
 					if ( '11:59:59 pm' == $shift['end'] ) {
@@ -336,12 +359,27 @@ foreach ( $weekdays as $i => $weekday ) {
 							$end = str_replace( array( 'am', 'pm'), array( ' ' . $am, ' ' . $pm ), $shift['end'] );
 						}
 						$data_format = 'g:i a';
+					} */
+
+					// --- get start and end times ---
+					// 2.3.2: maybe use real start and end times
+					if ( $real_shift_start ) {
+						$start = radio_station_get_time( $start_data_format, $real_shift_start );
+					} else {
+						$start = radio_station_get_time( $start_data_format, $shift_start_time );
 					}
+					if ( $real_shift_end ) {
+						$end = radio_station_get_time( $end_data_format, $real_shift_end );
+					} else {
+						$end = radio_station_get_time( $end_data_format, $shift_end_time );
+					}
+					$start = radio_station_translate_time( $start );
+					$end = radio_station_translate_time( $end );
 
 					// 2.3.0: filter show time by show and context
-					$show_time = '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="H:i">' . $start . '</span>';
+					$show_time = '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $start_data_format ) . '">' . esc_html( $start ) . '</span>';
 					$show_time .= '<span class="rs-sep"> ' . esc_html( __( 'to', 'radio-station' ) ) . ' </span>';
-					$show_time .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="H:i">' . $end . '</span>';
+					$show_time .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $end_data_format ) . '">' . esc_html( $end ) . '</span>';
 					$show_time = apply_filters( 'radio_station_schedule_show_time', $show_time, $show['id'], 'tabs' );
 
 					$panels .= '<div class="show-time" id="show-time-' . esc_attr( $tcount ) . '">' . $show_time . '</div>';
