@@ -249,7 +249,7 @@ foreach ( $hours as $hour ) {
 
 			// --- get weekdates ---
 			$weekdate = $weekdates[$weekday];
-			$nextdate = $weekdates[$nextday];		
+			// $nextdate = $weekdates[$nextday];
 
 			// --- get hour and next hour start and end times ---
 			// 2.3.1: fix to use untranslated hour (12 hr format bug)
@@ -335,19 +335,21 @@ foreach ( $hours as $hour ) {
 
 					if ( isset( $_GET['rs-shift-debug'] ) && ( '1' == $_GET['rs-shift-debug'] ) ) {
 						if ( !isset( $shiftdebug ) ) {$shiftdebug = '';}
-						$shiftdebug .= 'Now: ' . $now . ' (' . radio_station_get_time( 'datetime', $now ) . ') -- Today: ' . $today . '<br>';
-						$shiftdebug .= 'Day: ' . $weekday . ' - Raw Hour: ' . $raw_hour . ' - Hour: ' . $hour . ' - Hour Display: ' . $hour_display . '<br>';
-						$shiftdebug .= 'Hour Start: ' . $hour_start . ' (' . date( 'Y-m-d l H:i', $hour_start ) . ' - ' . radio_station_get_time( 'l H:i', $hour_start ) . ')<br>';
-						$shiftdebug .= 'Hour End: ' . $hour_end . ' (' . date( 'Y-m-d l H: i', $hour_end ) . ' - ' . radio_station_get_time( 'Y-m-d l H:i', $hour_end ) . ')<br>';
-						$shiftdebug .= 'Shift Start: ' . $shift_start_time . ' (' . date( 'Y-m-d l H: i', $shift_start_time ) . ' - ' . radio_station_get_time( 'Y-m-d l H:i', $shift_start_time ) . ')' . '<br>';
-						$shiftdebug .= 'Shift End: ' . $shift_end_time . ' (' . date( 'Y-m-d l H: i', $shift_end_time ) . ' - ' . radio_station_get_time( 'Y-m-d l H:i', $shift_end_time ) . ')' . '<br>';
-						$shiftdebug .= 'Display: ' . ( $display ? 'yes' : 'no' ) . ' - ';
-						$shiftdebug .= 'New Shift: ' . ( $newshift ? 'yes' : 'no' ) . ' - ';
-						$shiftdebug .= 'Now Playing: ' . ( $nowplaying ? 'YES' : 'no' ) . ' - ';
-						$shiftdebug .= 'Cell Continues: ' . ( $cellcontinued ? 'yes' : 'no' ) . ' - ';
-						$shiftdebug .= 'Overflow: ' . ( $overflow ? 'yes' : 'no' ) . ' - ';
-						$shiftdebug .= 'Show Continued: ' . ( $showcontinued ? 'yes' : 'no' ) . ' - ';
-						// $shiftdebug .= 'Shift: ' . print_r( $shift, true ) . '<br>';
+						if ( $display ) {
+							$shiftdebug .= 'Now: ' . $now . ' (' . radio_station_get_time( 'datetime', $now ) . ') -- Today: ' . $today . '<br>';
+							$shiftdebug .= 'Day: ' . $weekday . ' - Raw Hour: ' . $raw_hour . ' - Hour: ' . $hour . ' - Hour Display: ' . $hour_display . '<br>';
+							$shiftdebug .= 'Hour Start: ' . $hour_start . ' (' . date( 'Y-m-d l H:i', $hour_start ) . ' - ' . radio_station_get_time( 'Y-m-d l H:i', $hour_start ) . ')<br>';
+							$shiftdebug .= 'Hour End: ' . $hour_end . ' (' . date( 'Y-m-d l H: i', $hour_end ) . ' - ' . radio_station_get_time( 'Y-m-d l H:i', $hour_end ) . ')<br>';
+							$shiftdebug .= 'Shift Start: ' . $shift_start_time . ' (' . date( 'Y-m-d l H: i', $shift_start_time ) . ' - ' . radio_station_get_time( 'Y-m-d l H:i', $shift_start_time ) . ')' . '<br>';
+							$shiftdebug .= 'Shift End: ' . $shift_end_time . ' (' . date( 'Y-m-d l H: i', $shift_end_time ) . ' - ' . radio_station_get_time( 'Y-m-d l H:i', $shift_end_time ) . ')' . '<br>';
+							$shiftdebug .= 'Display: ' . ( $display ? 'yes' : 'no' ) . ' - ';
+							$shiftdebug .= 'New Shift: ' . ( $newshift ? 'yes' : 'no' ) . ' - ';
+							$shiftdebug .= 'Now Playing: ' . ( $nowplaying ? 'YES' : 'no' ) . ' - ';
+							$shiftdebug .= 'Cell Continues: ' . ( $cellcontinued ? 'yes' : 'no' ) . ' - ';
+							$shiftdebug .= 'Overflow: ' . ( $overflow ? 'yes' : 'no' ) . ' - ';
+							$shiftdebug .= 'Show Continued: ' . ( $showcontinued ? 'yes' : 'no' ) . ' - ';
+							// $shiftdebug .= 'Shift: ' . print_r( $shift, true ) . '<br>';
+						}
 					}
 
 					// --- maybe add shift display to the cell ---

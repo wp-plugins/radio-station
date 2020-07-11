@@ -3006,24 +3006,18 @@ function radio_station_get_date_time( $timestring, $timezone ) {
 		$offset = (int)$offset * 60 * 60;
 		$utc = new DateTimeZone( 'UTC' );
 		$datetime = new DateTime( $timestring, $utc );
-		// echo "TS1: " . $datetime->getTimeStamp();
 		$timestamp = $datetime->format( 'U' );
-		// echo "DateTime: " . $datetime->format( 'Y-m-d H:i:s' );
-		// echo "Timestamp: " . $timestamp . " - Offset: " . $offset . PHP_EOL;
 		$timestamp = $timestamp + $offset;
-		// echo "Offset Timestamp: " . $timestamp;
 		$datetime->setTimestamp( $timestamp );
-		// echo "TS2: " . $datetime->getTimestamp();
-		// echo "Before: " . print_r( $datetime, true ) . PHP_EOL;
-		
-		// $datetime = new DateTime( '@' . $timestamp, $utc );
-		// echo "TS3: " . $datetime->getTimestamp();
-		// echo "After: " . print_r( $datetime, true ) . PHP_EOL;
-		// echo "THEN: " . $datetime->format( 'U' );
-		// echo "DateTime: " . $datetime->format( 'Y-m-d H:i:s' );
-		
 	} else {
 		$datetime = new DateTime( $timestring, new DateTimeZone( $timezone ) );
+		// ...fix to set timestamp again just in case
+		// echo "A: " . print_r( $datetime, true ) . PHP_EOL;
+		// if ( '@' == substr( $timestring, 0, 1 ) ) {
+		//	$timestamp = substr( $timestring, 1, strlen( $timestring ) );
+		//	$datetime->setTimestamp( $timestamp );	
+		// }
+		// echo "B: " . print_r( $datetime, true ) . PHP_EOL;
 	}
 	
 	return $datetime;
@@ -3049,7 +3043,7 @@ function radio_station_to_time( $timestring ) {
 			$timestamp = $timestamp - $offset;
 			$datetime->setTimestamp( $timestamp );	
 		} else {
-			$datetime = radio_station_get_date_time( $timestring, $timezone );	
+			$datetime = radio_station_get_date_time( $timestring, $timezone );
 		}
 		$time = $datetime->format( 'U' );
 		
@@ -3085,7 +3079,13 @@ function radio_station_get_time( $key = false, $time = false ) {
 
 		// --- get timezone ---
 		$timezone = radio_station_get_timezone();
-		$datetime = radio_station_get_date_time( $timestring, $timezone );
+		if ( strstr( $timezone, 'UTC' ) ) {
+			$datetime = radio_station_get_date_time( $timestring, $timezone );
+		} else {
+			// ...and refix for location timezones
+			$datetime = new DateTime( $timestring, new DateTimeZone( 'UTC' ) );
+			$datetime->setTimezone( new DateTimeZone( $timezone ) );
+		}
 
 		// --- set formatted strings ---
 		$day = $datetime->format( 'l' );
@@ -3102,21 +3102,20 @@ function radio_station_get_time( $key = false, $time = false ) {
 		'timestamp' => $timestamp,
 	);
 	
-	if ( RADIO_STATION_DEBUG ) {
-		echo '<span style="display:none;">Time: ' . print_r( $times, true ) . '</span>';
-	}
-	
 	if ( $key ) {
 		if ( array_key_exists( $key, $times ) ) {
-			return $times[$key];
+			$time = $times[$key];
 		} elseif ( isset( $datetime ) ) {
-			return $datetime->format( $key );	
+			$time = $datetime->format( $key );	
 		} else {
-			return date( $key, $time );
+			$time = date( $key, $time );
 		}
-	} else {
-		return $time;
+	} elseif ( RADIO_STATION_DEBUG ) {
+		echo '<span style="display:none;">Time key not found: ' . $key . PHP_EOL;
+		echo 'Times: ' . print_r( $times, true ) . '</span>';
 	}
+	
+	return $time;
 }
 
 // --------------------

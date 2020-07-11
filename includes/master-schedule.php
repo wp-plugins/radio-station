@@ -602,8 +602,13 @@ function radio_station_master_schedule_tabs_js() {
 		if (radio.schedule_tabinit) {return;}
 		jQuery('.master-schedule-tabs-day').removeClass('active-day-tab');
 		jQuery('.master-schedule-tabs-panel').removeClass('active-day-panel');
-		jQuery('#master-schedule-tabs-header-'+day).addClass('active-day-tab');
-		jQuery('#master-schedule-tabs-day-'+day).addClass('active-day-panel');
+		if (!day) {
+			jQuery('.master-schedule-tabs-day').first().addClass('active-day-tab');
+			jQuery('.master-schedule-tabs-panel').first().addClass('active-day-panel');		
+		} else {
+			jQuery('#master-schedule-tabs-header-'+day).addClass('active-day-tab');
+			jQuery('#master-schedule-tabs-day-'+day).addClass('active-day-panel');
+		}
 		radio.schedule_tabinit = true;
 	}
 
@@ -622,7 +627,8 @@ function radio_station_master_schedule_tabs_js() {
 					day = jQuery(this).attr('id').replace('master-schedule-tabs-header-', '');
 					radio_set_active_tab(day);
 				} else {jQuery(this).removeClass('current-day');}
-			} else {jQuery(this).removeClass('current-day');}		
+			} else {jQuery(this).removeClass('current-day');}	
+			radio_set_active_tab(false);
 		});		
 		jQuery('.master-schedule-tabs-show').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
