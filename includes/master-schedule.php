@@ -463,9 +463,9 @@ function radio_station_master_schedule_table_js() {
 	/* Current Time Highlighting */
 	function radio_times_highlight() {
 		radio.current_time = Math.floor( (new Date()).getTime() / 1000 );
-		radio.offset_time = radio.current_time + radio.timezone_offset;
+		radio.offset_time = radio.current_time + radio.timezone.offset;
 		if (radio.debug) {console.log(radio.current_time+' - '+radio.offset_time);}
-		if (radio.timezone_adjusted) {radio.offset_time = radio.current_time;}
+		if (radio.timezone.adjusted) {radio.offset_time = radio.current_time;}
 		jQuery('.master-program-day').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
 			if (start < radio.offset_time) {
@@ -476,7 +476,7 @@ function radio_station_master_schedule_table_js() {
 		});
 		jQuery('.master-program-hour').each(function() {
 			hour = parseInt(jQuery(this).find('.master-program-server-hour').attr('data'));
-			offset_time = radio.current_time + radio.timezone_offset;
+			offset_time = radio.current_time + radio.timezone.offset;
 			current = new Date(offset_time * 1000).toISOString();
 			currenthour = current.substr(11, 2);
     		if (currenthour.substr(0,1) == '0') {currenthour = currenthour.substr(1,1);}
@@ -615,9 +615,9 @@ function radio_station_master_schedule_tabs_js() {
 	/* Current Show Highlighting */
 	function radio_show_highlight() {
 		radio.current_time = Math.floor( (new Date()).getTime() / 1000 );
-		radio.offset_time = radio.current_time + radio.timezone_offset;
+		radio.offset_time = radio.current_time + radio.timezone.offset;
 		if (radio.debug) {console.log(radio.current_time+' - '+radio.offset_time);}
-		if (radio.timezone_adjusted) {radio.offset_time = radio.current_time;}
+		if (radio.timezone.adjusted) {radio.offset_time = radio.current_time;}
 		jQuery('.master-schedule-tabs-day').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
 			if (start < radio.offset_time) {
@@ -628,8 +628,8 @@ function radio_station_master_schedule_tabs_js() {
 					radio_set_active_tab(day);
 				} else {jQuery(this).removeClass('current-day');}
 			} else {jQuery(this).removeClass('current-day');}	
-			radio_set_active_tab(false);
-		});		
+		});
+		radio_set_active_tab(false); /* fallback */
 		jQuery('.master-schedule-tabs-show').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
 			if (radio.debug) {console.log(start);}
@@ -741,8 +741,8 @@ function radio_station_master_schedule_list_js() {
 	/* Current Show Highlighting */
 	function radio_list_highlight() {
 		radio.current_time = Math.floor( (new Date()).getTime() / 1000 );
-		radio.offset_time = radio.current_time + radio.timezone_offset;
-		if (radio.timezone_adjusted) {radio.offset_time = radio.current_time;}
+		radio.offset_time = radio.current_time + radio.timezone.offset;
+		if (radio.timezone.adjusted) {radio.offset_time = radio.current_time;}
 		jQuery('.master-list-day').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').first().attr('data'));
 			if (start < radio.offset_time) {

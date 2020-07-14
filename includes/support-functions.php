@@ -473,14 +473,15 @@ function radio_station_get_show_shifts( $check_conflicts = true, $split = true )
 function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 
 	// --- convert dates to times for checking ---
-	// 2.3.2: replace strtotime with to_time for timezones
 	// (we allow an extra day either way for overflows)
+	// 2.3.2: replace strtotime with to_time for timezones
+	// 2.3.2: fix to variable conflict with start_time/end_time
 	if ( $start_date ) {
 		// 2.3.2: added missing backwards day allowance
-		$start_time = radio_station_to_time( $start_date  ) - ( 24 * 60 * 60 ) + 1;
+		$range_start_time = radio_station_to_time( $start_date  ) - ( 24 * 60 * 60 ) + 1;
 	}
 	if ( $end_date ) {
-		$end_time = radio_station_to_time( $end_date ) + ( 24 * 60 * 60 ) - 1 ;
+		$range_end_time = radio_station_to_time( $end_date ) + ( 24 * 60 * 60 ) - 1 ;
 	}
 
 	// --- get all override IDs ---
@@ -497,6 +498,7 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 	$override_list = array();
 	foreach ( $overrides as $i => $override ) {
 		$data = get_post_meta( $override['ID'], 'show_override_sched', true );
+	
 		if ( $data ) {
 			$date = $data['date'];
 			if ( '' != $date ) {
@@ -506,8 +508,8 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 				$inrange = true;
 
 				// --- check if in specified date range ---
-				if ( ( isset( $start_time ) && ( $date_time < $start_time ) )
-				     || ( isset( $end_time ) && ( $date_time > $end_time ) ) ) {
+				if ( ( isset( $range_start_time ) && ( $date_time < $range_start_time ) )
+				     || ( isset( $range_end_time ) && ( $date_time > $range_end_time ) ) ) {
 					$inrange = false;
 				}
 
@@ -1613,11 +1615,19 @@ function radio_station_get_next_shows( $limit = 3, $show_shifts = false, $time =
 					echo print_r( $shift, true ) . PHP_EOL;
 				}
 
-				// --- current show ---
+				// --- set current show ---
+				// 2.3.2: 
 				if ( ( $now > $shift_start_time ) && ( $now < $shift_end_time ) ) {
 					if ( !isset( $current_show ) ) {
-						// TODO: recombine possible split shift to set current show ?
-						/* $current_show = $shift;
+						// --- recombine possible split shift to set current show ---
+						$current_show = $shift;
+						if ( isset( $current_show['split'] ) && $current_show['split'] ) {
+							if ( isset( $current_show['real_start'] ) ) {
+								$current_show['start'] = $current_show['real_start'];
+							} elseif ( isset( $current_show['real_end'] ) ) {
+								$current_show['end'] = $current_show['real_end'];
+							}						
+						}
 						$expires = $shift_end_time - $now - 1;
 						if ( $expires > 3600 ) {
 							$expires = 3600;
@@ -1626,7 +1636,7 @@ function radio_station_get_next_shows( $limit = 3, $show_shifts = false, $time =
 							set_transient( 'radio_station_current_show', $current_show, $expires );
 						} else {
 							set_transient( 'radio_station_current_show_' . $time, $current_show, $expires );
-						} */
+						}
 					}
 				}
 
@@ -4068,9 +4078,9 @@ function radio_station_translate_month( $month, $short = null ) {
 		if ( ( $month == $fullmonth ) || ( $month == $abbr ) ) {
 			if ( ( !$short && !is_null( $short ) ) 
 			  || ( is_null( $short ) && ( $month == $fullmonth ) ) ) {
-				return $wp_locale->get_month( $i );
+				return $wp_locale->get_month( ( $i + 1 ) );
 			} elseif ( $short || ( is_null( $short ) && ( weekday == $abbr ) ) ) {
-				return $wp_locale->get_month_abbrev( $wp_locale->get_month( $i ) );
+				return $wp_locale->get_month_abbrev( $wp_locale->get_month( ( $i + 1 ) ) );
 			}
 		}
 	}

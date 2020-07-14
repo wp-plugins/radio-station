@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.3.1.11
+Version: 2.3.1.12
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -133,6 +133,7 @@ require RADIO_STATION_DIR . '/includes/shortcodes.php';
 require RADIO_STATION_DIR . '/includes/class-current-show-widget.php';
 require RADIO_STATION_DIR . '/includes/class-upcoming-shows-widget.php';
 require RADIO_STATION_DIR . '/includes/class-current-playlist-widget.php';
+require RADIO_STATION_DIR . '/includes/class-radio-clock-widget.php';
 
 // --- Player ---
 // 2.3.1.1: load radio player prototype (if present)
@@ -144,7 +145,7 @@ if ( file_exists( $player_file ) ) {
 // --- Feature Development ---
 // 2.3.0: add feature branch development includes
 // 2.3.1: added radio player widget file
-$features = array( 'class-radio-clock-widget', 'class-radio-player-widget', 'import-export' );
+$features = array( 'class-radio-player-widget', 'import-export' );
 foreach ( $features as $feature ) {
 	$filepath = RADIO_STATION_DIR . '/includes/' . $feature . '.php';
 	if ( file_exists ( $filepath ) ) {
@@ -356,7 +357,7 @@ $options = array(
 	),
 
 	// --- Schedule Clock Display ---
-	/* 'schedule_clock'       => array(
+	'schedule_clock'       => array(
 		'type'    => 'select',
 		'label'   => __( 'Schedule Clock?', 'radio-station' ),
 		'default' => 'clock',
@@ -368,7 +369,7 @@ $options = array(
 		'helper'  => __( 'Radio Time section display above program Schedule.', 'radio-station' ),
 		'tab'     => 'pages',
 		'section' => 'schedule',
-	), */
+	),
 
 	// --- [Pro] Schedule Switcher ---
 	'schedule_switcher'   => array(
@@ -1038,20 +1039,27 @@ function radio_station_enqueue_style( $stylekey ) {
 add_action( 'wp_enqueue_scripts', 'radio_station_localize_script' );
 function radio_station_localize_script() {
 
-	// --- create settings object ---
-	$js = "var radio = {}; radio.labels = {}; radio.units = {};";
+	// --- create settings objects ---
+	$js = "var radio = {}; radio.timezone = {}; radio.time = {}; radio.labels = {}; radio.units = {};";
 
 	// --- set AJAX URL ---
 	// 2.3.2: add admin AJAX URL
-	$js .= "radio.ajax_url = '" . esc_url( admin_url( 'admin-ajax.php' ) ) . "'; ";
+	$js .= "radio.ajax_url = '" . esc_url( admin_url( 'admin-ajax.php' ) ) . "';" . PHP_EOL;
 	
 	// --- clock time format ---
 	$clock_format = radio_station_get_setting( 'clock_time_format' );
-	$js .= "radio.clock_format = '" . esc_js( $clock_format ) . "'; " . PHP_EOL;
+	$js .= "radio.clock_format = '" . esc_js( $clock_format ) . "';" . PHP_EOL;
 
 	// --- detect touchscreens ---
 	// ref: https://stackoverflow.com/a/52855084/5240159
-	$js .= "if (window.matchMedia('(pointer: coarse)').matches) {radio.touchscreen = true;} else {radio.touchscreen = false;} " . PHP_EOL;
+	$js .= "if (window.matchMedia('(pointer: coarse)').matches) {radio.touchscreen = true;} else {radio.touchscreen = false;}" . PHP_EOL;
+
+	// --- set debug flag ---
+	if ( defined( 'RADIO_STATION_DEBUG' ) && RADIO_STATION_DEBUG ) {
+		$js .= "radio.debug = true;" . PHP_EOL;
+	} else {
+		$js .= "radio.debug = false;" . PHP_EOL;
+	}
 
 	// --- radio timezone ---
 	// 2.3.2: added get timezone function
@@ -1065,15 +1073,15 @@ function radio_station_localize_script() {
 		} else {
 			$offset = str_replace( 'UTC', '', $timezone );
 		}
-		$js .= "radio.timezone_offset = " . esc_js( $offset * 60 * 60 ) . "; ";
+		$js .= "radio.timezone.offset = " . esc_js( $offset * 60 * 60 ) . "; ";
 		if ( '0' == $offset ) {
 			$offset = '';
 		} elseif ( $offset > 0 ) {
 			$offset = '+' . $offset;
 		}
-		$js .= "radio.timezone_code = 'UTC" . esc_js( $offset ) . "'; ";
-		$js .= "radio.timezone_utc = '" . esc_js( $offset ) . "'; ";
-		$js .= "radio.timezone_utczone = true; ";
+		$js .= "radio.timezone.code = 'UTC" . esc_js( $offset ) . "'; ";
+		$js .= "radio.timezone.utc = '" . esc_js( $offset ) . "'; ";
+		$js .= "radio.timezone.utczone = true; ";
 
 	} else {
 
@@ -1090,69 +1098,76 @@ function radio_station_localize_script() {
 		}
 		$utc_offset = 'UTC' . $utc_offset;
 		$code = radio_station_get_timezone_code( $timezone );
-		$js .= "radio.timezone_location = '" . esc_js( $timezone ) . "'; ";
-		$js .= "radio.timezone_offset = " . esc_js( $offset ) . "; ";
-		$js .= "radio.timezone_code = '" . esc_js( $timezone ) . "'; ";
-		$js .= "radio.timezone_utc = '" . esc_js( $utc_offset ) . "'; ";
-		$js .= "radio.timezone_utczone = false; ";
+		$js .= "radio.timezone.location = '" . esc_js( $timezone ) . "'; ";
+		$js .= "radio.timezone.offset = " . esc_js( $offset ) . "; ";
+		$js .= "radio.timezone.code = '" . esc_js( $code ) . "'; ";
+		$js .= "radio.timezone.utc = '" . esc_js( $utc_offset ) . "'; ";
+		$js .= "radio.timezone.utczone = false; ";
 
 	}
 	
 	if ( defined( 'RADIO_STATION_USE_SERVER_TIMES' ) && RADIO_STATION_USE_SERVER_TIMES ) {
-		$js .= "radio.timezone_adjusted = false; ";
+		$js .= "radio.timezone.adjusted = false; ";
 	} else {
-		$js .= "radio.timezone_adjusted = true; ";
+		$js .= "radio.timezone.adjusted = true; ";
 	}
 		
 	// --- set user timezone offset ---
 	// (and convert offset minutes to seconds)
-	$js .= "radio.user_offset = (new Date()).getTimezoneOffset() * 60; ";
+	$js .= "radio.timezone.useroffset = (new Date()).getTimezoneOffset() * 60;" . PHP_EOL;
 
 	// --- translated months array ---
-	$js .= "radio.months = new Array(";
+	// 2.3.2: also translate short month labels
+	$js .= "radio.labels.months = new Array(";
+	$short = "radio.labels.smonths = new Array(";
 	$months = array( 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' );
 	foreach ( $months as $i => $month ) {
 		$month = radio_station_translate_month( $month );
+		$short_month = radio_station_translate_month( $month, true );
 		$month = str_replace( "'", "", $month );
+		$short_month = str_replace( "'", "", $short_month );
 		$js .= "'" . esc_js( $month ) . "'";
-		if ( $i < count( $months ) ) {
+		$short .= "'" . esc_js( $short_month ) . "'";
+		if ( $i < ( count( $months ) - 1 ) ) {
 			$js .= ", ";
+			$short .= ", ";
 		}
 	}
 	$js .= ");" . PHP_EOL;
+	$js .= $short . ");" . PHP_EOL;
 
 	// --- translated days array ---
-	$js .= "radio.days = new Array(";
+	// 2.3.2: also translate short day labels
+	$js .= "radio.labels.days = new Array(";
+	$short = "radio.labels.sdays = new Array(";
 	$days = array( 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' );
 	foreach ( $days as $i => $day ) {
 		$day = radio_station_translate_weekday( $day );
+		$short_day = radio_station_translate_weekday( $day, true );
 		$day = str_replace( "'", "", $day );
+		$short_day = str_replace( "'", "", $short_day );
 		$js .= "'" . esc_js( $day ) . "'";
-		if ( $i < count( $days ) ) {
+		$short .= "'" . esc_js( $short_day ) . "'";
+		if ( $i < ( count( $days ) - 1 ) ) {
 			$js .= ", ";
+			$short .= ", ";
 		}
 	}
 	$js .= ");" . PHP_EOL;
+	$js .= $short . ");" . PHP_EOL;
 
 	// --- translated time unit strings ---
 	// TODO: convert units to single object
 	$js .= "radio.units.am = '" . esc_js( radio_station_translate_meridiem( 'am' ) ) . "'; ";
 	$js .= "radio.units.pm = '" . esc_js( radio_station_translate_meridiem( 'pm' ) ) . "'; ";
 	$js .= "radio.units.second = '" . esc_js( __( 'Second', 'radio-station' ) ) . "'; ";
-	$js .= "radio.units.seconds = '" . esc_js( __( 'Seconds', 'radio-station' ) ) . "';";
-	$js .= "radio.units.minute = '" . esc_js( __( 'Minute', 'radio-station' ) ) . "';";
-	$js .= "radio.units.minutes = '" . esc_js( __( 'Minutes', 'radio-station' ) ) . "';";
-	$js .= "radio.units.hour = '" . esc_js( __( 'Hour', 'radio-station' ) ) . "';";
-	$js .= "radio.units.hours = '" . esc_js( __( 'Hours', 'radio-station' ) ) . "';";
-	$js .= "radio.units.day = '" . esc_js( __( 'Day', 'radio-station' ) ) . "';";
-	$js .= "radio.units.days = '" . esc_js( __( 'Days', 'radio-station' ) ) . "';";
-
-	// --- set debug flag ---
-	if ( defined( 'RADIO_STATION_DEBUG' ) && RADIO_STATION_DEBUG ) {
-		$js .= "radio.debug = true; " . PHP_EOL;
-	} else {
-		$js .= "radio.debug = false; " . PHP_EOL;
-	}
+	$js .= "radio.units.seconds = '" . esc_js( __( 'Seconds', 'radio-station' ) ) . "'; ";
+	$js .= "radio.units.minute = '" . esc_js( __( 'Minute', 'radio-station' ) ) . "'; ";
+	$js .= "radio.units.minutes = '" . esc_js( __( 'Minutes', 'radio-station' ) ) . "'; ";
+	$js .= "radio.units.hour = '" . esc_js( __( 'Hour', 'radio-station' ) ) . "'; ";
+	$js .= "radio.units.hours = '" . esc_js( __( 'Hours', 'radio-station' ) ) . "'; ";
+	$js .= "radio.units.day = '" . esc_js( __( 'Day', 'radio-station' ) ) . "'; ";
+	$js .= "radio.units.days = '" . esc_js( __( 'Days', 'radio-station' ) ) . "'; ";
 
 	// --- add inline script ---
 	wp_add_inline_script( 'radio-station', $js );
@@ -2360,10 +2375,14 @@ if ( !defined( 'RADIO_STATION_SAVE_DEBUG' ) ) {
 // 2.3.1: check clear show transients option
 add_action( 'init', 'radio_station_clear_transients' );
 function radio_station_clear_transients() {
-	if ( RADIO_STATION_DEBUG || ( 'yes' == radio_station_get_setting( 'clear_transients' ) ) ) {
-		delete_transient( 'radio_station_current_schedule' );
-		delete_transient( 'radio_station_current_show' );
-		delete_transient( 'radio_station_next_show' );
+	$clear_transients = radio_station_get_setting( 'clear_transients' );
+	if ( RADIO_STATION_DEBUG || ( 'yes' == $clear_transients ) ) {
+		// 2.3.2: do not clear on AJAX calls
+		if ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) {
+			delete_transient( 'radio_station_current_schedule' );
+			delete_transient( 'radio_station_current_show' );
+			delete_transient( 'radio_station_next_show' );
+		}
 	}
 }
 

@@ -1,7 +1,7 @@
 <?php
 
-/* Sidebar Widget - DJ On Air
- * Displays the current on-air show/DJ
+/* Current Show Widget - (DJ On Air)
+ * Displays the current on-air Show / DJ
  * Since 2.1.1
  */
 

@@ -1,6 +1,6 @@
 <?php
 
-/* Sidebar Widget - Upcoming DJ
+/* Upcoming Shows Widget - (Upcoming DJ)
  * Displays the the next show(s)/DJ(s) in the schedule
  * Since 2.1.1
  */

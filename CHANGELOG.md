@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Update: Plugin Loader (1.1.2) with settings link fix
 * Improved: use plugin timezone setting for all times
 * Improved: show shift conflict checker logic
+* Added: Radio Clock Widget for user/server time display
+* Added: AJAX widget load option (to bypass page caches)
+* Added: automated show schedule highlighting (table/tabs/list)
+* Added: playlist track arrows for re-ordering tracks
+* Added: AJAX save of show shifts and playlist tracks
+* Added: post type editing metabox position filtering
+* Added: more display attributes to Master Schedule shortcode
+* Added: time format filters for time output displays
+* Added: javascript user timezone display on Master Schedule
 * Fixed: handling of UTC only timezone settings
 * Fixed: added check for empty role capabilities
 * Fixed: added settings submenu redirection fix
@@ -24,14 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed: master schedule display with days attribute
 * Fixed: logic for Affected Shifts in override list
 * Fixed: removed auto-tab selection change on tab view resize
-* Added: AJAX widget load option (to bypass page caches)
-* Added: automated show schedule highlighting (table/tabs/list)
-* Added: playlist track arrows for re-ordering tracks
-* Added: AJAX save of show shifts and playlist tracks
-* Added: post type editing metabox position filtering
-* Added: more display attributes to Master Schedule shortcode
-* Added: time format filters for time output displays
-* Added: javascript user timezone display on Master Schedule
+* Fixed: Current Show widget schedule/countdown for Overrides
+* Fixed: multiple overrides in schedule range variable conflict
 
 ### 2.3.1
 * Update: Plugin Loader (1.1.1) with Freemius first path fix

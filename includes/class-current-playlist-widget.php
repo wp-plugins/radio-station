@@ -1,6 +1,6 @@
 <?php
 
-/* Sidebar Widget - Now Playing
+/* Current Playlist Widget - (Now Playing)
  * Displays the currently playing song according to the entered playlists
  * Since 2.1.1
  */

@@ -71,7 +71,7 @@ if (typeof jQuery == 'function') {
 		if (jQuery('.radio-user-timezone').length) {
 			userdatetime = new Date();
 			useroffset  = -(userdatetime.getTimezoneOffset());
-			if ((useroffset * 60) == radio.timezone_offset) {return;}
+			if ((useroffset * 60) == radio.timezone.offset) {return;}
 			if (typeof jstz == 'function') {tz = jstz.determine().name();}
 			else {tz = Intl.DateTimeFormat().resolvedOptions().timeZone;}
 			if (tz.indexOf('/') > -1) {
