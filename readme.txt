@@ -571,10 +571,10 @@ You may translate the plugin into another language. Please visit our [WordPress 
 == Upgrade Notice ==
 
 = 2.3.1 =
-* Bugfix Update and Extended Directory Listing Offer
-* https://netmix.com/improved-netmix-directory/
-* AJAX Saving of Show Shifts and Playlist Tracks
+* Improved Times, AJAX Loading and Bugfix Update 
+* https://netmix.com/radio-station-2-3-2-release/
 * Radio Clock Widget and Widget AJAX Loading
+* AJAX Saving of Show Shifts and Playlist Tracks
 * Automated current Show schedule highlighting
 * Improved timezones, overrides, shift checking and more
 

@@ -83,8 +83,9 @@ Example: `[current-playlist title="Current Song" artist="1" song="1" album="1" l
 [Demo Site Example Output](https://radiostationdemo.com/extra-shortcodes/current-playlist-widget/)
 
 ## Radio Clock Widget
+`[radio-clock]` (see [Radio Clock Shortcode](./Shortcodes.md#radio-clock-widget)
 
-A future version of Radio Station will include a Radio Clock Widget which will display the current Radio Station time in your selected Radio Station Timezone (via the Plugin Settings page.)
+As of 2.3.2, Radio Station now includes a Radio Clock Widget which will display the current Radio Station time in your selected Radio Station Timezone (via the Plugin Settings page) alongside the site visitor's current time (via browser detection.)
 
 ### [Pro] Timezone Switcher
 A future version of Radio Station Pro will include a user Timezone Switcher in the which will allow your listener's to select a timezone and display adjusted Schedule and Show times.
