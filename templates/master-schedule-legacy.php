@@ -17,7 +17,7 @@ $output .= '<tr class="master-program-day-row"> <th></th>';
 foreach ( $days_of_the_week as $weekday => $info ) {
 	// 2.2.2: fix to translate incorrect variable (heading)
 	$heading = substr( $weekday, 0, 3 );
-	$heading = radio_station_translate_weekday( $heading, true );
+	$heading = radio_station_translate_weekday( $heading );
 	$output .= '<th>' . $heading . '</th>';
 }
 $output .= '</tr>';
@@ -230,7 +230,9 @@ foreach ( $master_list as $hour => $days ) {
 				// 2.3.0: filter show file by show ID and context
 				$show_file = get_post_meta( $show['id'], 'show_file', true );
 				$show_file = apply_filters( 'radio_station_schedule_show_file', $show_file, $show['id'], 'legacy' );
-				if ( $show_file && !empty( $show_file ) ) {
+				// 2.3.2: check disable download meta
+				$disable_download = get_post_meta( $show['id'], 'show_download', true );
+				if ( $show_file && !empty( $show_file ) && !$disable_download ) {
 					// 2.3.0: added missing span close tag
 					$output .= '<span class="show-file"><a href="' . esc_url( $show_file ) . '">';
 					$output .= esc_html( __( 'Audio File', 'radio-station' ) ) . '</a>';

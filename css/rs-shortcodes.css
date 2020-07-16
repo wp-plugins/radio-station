@@ -11,6 +11,55 @@
 	font-size: 0.8em;
 }
 
+/* Timezone Shortcode */
+/* ------------------ */
+.radio-timezone-title, .radio-timezone, .radio-user-timezone-title, .radio-user-timezone {
+	display: inline-block;
+}
+
+.radio-timezone-title, .radio-user-timezone-title, .radio-clock-title {
+	font-weight: bold;
+}
+
+.radio-user-timezone-title {
+	display: none;
+	margin-left: 30px;
+}
+
+/* Clock Shortcode */
+/* --------------- */
+.radio-clock-title, .radio-server-time, .radio-server-date, .radio-server-zone,
+.radio-user-time, .radio-user-date, .radio-user-zone {
+	display: inline-block;
+}
+
+.radio-clock-title {
+	min-width: 100px;
+}
+
+.radio-server-time, .radio-user-time, .radio-server-date, .radio-user-date {
+	margin-left: 10px;
+}
+
+.radio-server-zone, .radio-user-zone {
+	margin-left: 20px;
+}
+
+.radio-station-clock-widget .radio-station-server-clock, .radio-station-clock-widget .radio-station-user-clock {
+	font-size: 0.9em;
+	margin-top: 10px;
+}
+
+.radio-station-clock-widget .radio-server-zone, .radio-station-clock-widget .radio-user-zone {
+	display: block;
+	margin-left: 110px;
+	font-size: 0.9em;
+}
+
+.user-timezone-change, .user-timezone-select {
+	display: inline-block;
+}
+
 /* Archive Shortcodes */
 /* ------------------ */
 
@@ -136,6 +185,10 @@
 	font-size: 0.85em;
 }
 
+.current-show-hosts, .upcoming-show-hosts, .on-air-dj-names {
+	overflow: hidden;
+}
+
 .current-show-list, .upcoming-shows-list,
 .on-air-list, .widget .on-air-list, .on-air-upcoming-list, .widget .on-air-upcoming-list {
 	list-style: none;
@@ -168,6 +221,7 @@
     font-size: 0.85em;
     margin-top: 10px;
     margin-bottom: 10px;
+    overflow: hidden;
 }
 
 .current-show-shifts, .upcoming-show-shifts, .on-air-dj-sched {

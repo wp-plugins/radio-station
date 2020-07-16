@@ -17,16 +17,14 @@
 	font-size: 0.8em;
 	vertical-align: top;
 	text-align: left;
+	margin-top: 10px;
 }
 
-#master-schedule-clock-wrapper .radio-clock-title, #master-schedule-timezone-wrapper .radio-timezone-title {
-	font-weight: bold;
-}
 
 /* Genre Selector */
 /* -------------- */
 #master-genre-list {
-	font-size: 0.8em;
+	font-size: 1em;
 	float: left;
 }
 
@@ -51,6 +49,10 @@
 
 #master-program-schedule tr {
 	height: 100%;
+}
+
+#master-program-schedule #master-program-hour-heading, #master-program-schedule  .master-program-hour-row {
+	width: 100px;
 }
 
 #master-program-schedule th {
@@ -153,7 +155,7 @@
 #master-program-schedule .show-info .master-show-entry {
 	position: relative;
 	display: block;
-	height: 100%;
+	/* height: 100%; */
 }
 
 #master-program-schedule .show-info .master-show-entry.finished {
@@ -293,10 +295,26 @@
 	margin-left: 0;
 }
 
-#master-schedule-tabs .master-schedule-tabs-day-name {
+#master-schedule-tabs .master-schedule-tabs-day.current-day {
+    border: 2px solid #000000;
+    border-bottom: 0;
+}
+
+#master-schedule-tabs .master-schedule-tabs-headings {
 	display: inline-block;
 	padding: 5px 10px 5px 10px;
+}
+
+#master-schedule-tabs .master-schedule-tabs-day-name {
+	/* display: inline-block;
+	padding: 5px 10px 5px 10px; */
+	display: block;
 	font-size: 1em;
+}
+
+#master-schedule-tabs .master-schedule-tabs-date {
+	display: block;
+	font-size: 0.75em;
 }
 
 #master-schedule-tabs .master-schedule-tabs-day.active-day-tab {
@@ -321,6 +339,12 @@
     z-index: 999;
 }
 
+#master-schedule-tab-panels .master-schedule-tabs-selected {
+	display: none;
+	padding: 10px 10px 0 10px;
+	margin: 0;
+}
+
 #master-schedule-tab-panels .master-schedule-tabs-panel {
 	display: none; 
 	float: left; 
@@ -333,10 +357,26 @@
 }
 
 #master-schedule-tab-panels .master-schedule-tabs-panel .master-schedule-tabs-show {
-	padding: 10px 20px;
-	margin: 0;
+	padding: 10px 10px;
+	margin: 0 10px;
 	clear: both;
 	list-style: none;
+}
+
+#master-schedule-tab-panels .master-schedule-tabs-panel .master-schedule-tabs-show.nowplaying {
+	border: 1px solid #F00000;
+}
+
+#master-schedule-tab-panels .master-schedule-tabs-panel .master-schedule-tabs-show.first-show {
+	margin-top: 20px;
+}
+
+#master-schedule-tab-panels .master-schedule-tabs-panel .master-schedule-tabs-show.last-show {
+	margin-bottom: 20px;
+}
+
+#master-schedule-tab-panels .master-schedule-tabs-panel .master-schedule-tabs-no-shows {
+	padding-top: 30px; padding-bottom: 30px;
 }
 
 #master-schedule-tab-panels .master-schedule-tabs-panel.active-day-panel {
@@ -356,9 +396,17 @@
 }
 
 #master-schedule-tab-panels .master-schedule-tabs-show .show-image {
-	margin-right: 20px;
-	min-width: 200px;
+	margin-right: 10px;
+	width: 180px;
 	text-align: center;
+}
+
+#master-schedule-tab-panels .master-schedule-tabs-show .show-info {
+	width: 260px;
+}
+
+#master-schedule-tab-panels .master-schedule-tabs-show .show-desc {
+	max-width: 400px;
 }
 
 #master-schedule-tab-panels .master-schedule-tabs-show .show-time,

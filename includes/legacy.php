@@ -385,11 +385,17 @@ function radio_station_dj_get_next( $limit = 1 ) {
 
 // --- get the most recently entered song ---
 // (used in DJ Widget, dj-widget shortcode, Playlist Widget, now-playing shortcode)
-function radio_station_get_now_playing() {
+// 2.3.2: added optional time argument
+function radio_station_get_now_playing( $time = false ) {
 
 	// --- get the currently playing show ---
 	// 2.3.0: added to prevent playlist/show mismatch!
-	$current_show = radio_station_get_current_show();
+	// 2.3.2: check current show using optional time
+	if ( !$time ) {
+		$current_show = radio_station_get_current_show();
+	} else {
+		$current_show = radio_station_get_current_show( $time );
+	}
 	if ( !$current_show ) {
 		return false;
 	}
@@ -399,7 +405,7 @@ function radio_station_get_now_playing() {
 	}
 	$show_id = $current_show['show']['id'];
 	
-	// TODO: match current playlist to show shift ?
+	// TODO: match current playlist to assigned show shift ?
 	if ( isset( $current_show['shifts'] ) ) {
 		$shifts = $current_show['shifts'];
 	}
@@ -464,7 +470,8 @@ function radio_station_get_now_playing() {
 	}
 
 	// --- filter and return tracks ---
-	$playlist = apply_filters( 'radio_station_show_now_playing', $playlist, $show_id );
+	// 2.3.2: added time argument to filter
+	$playlist = apply_filters( 'radio_station_show_now_playing', $playlist, $show_id, $time );
 
 	return $playlist;
 }

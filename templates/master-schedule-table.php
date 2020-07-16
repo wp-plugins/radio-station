@@ -6,12 +6,29 @@
 // --- get all the required info ---
 $schedule = radio_station_get_current_schedule();
 $hours = radio_station_get_hours();
-$now = strtotime( current_time( 'mysql' ) );
-$date = date( 'Y-m-d', $now );
-$today =  strtolower( date( 'l', $now ) );
-$am = str_replace( ' ', '', radio_station_translate_meridiem( 'am' ) );
-$pm = str_replace( ' ', '', radio_station_translate_meridiem( 'pm' ) );
-$weekdays = radio_station_get_schedule_weekdays();
+$now = radio_station_get_now();
+$date = radio_station_get_time( 'date', $now );
+$today = radio_station_get_time( 'day', $now );
+// $am = str_replace( ' ', '', radio_station_translate_meridiem( 'am' ) );
+// $pm = str_replace( ' ', '', radio_station_translate_meridiem( 'pm' ) );
+
+// --- set shift time formats ---
+// 2.3.2: set time formats early
+if ( 24 == (int) $atts['time'] ) {
+	$start_data_format = $end_data_format = 'H:i';
+} else {
+	$start_data_format = $end_data_format = 'g:i a';
+}
+$start_data_format = apply_filters( 'radio_station_time_format_start', $start_data_format, 'schedule-table', $atts );
+$end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_format, 'schedule-table', $atts );
+
+// --- get schedule days and dates ---
+// 2.3.2: allow for start day attibute
+if ( isset( $atts['start_day'] ) && $atts['start_day'] ) {
+	$weekdays = radio_station_get_schedule_weekdays( $atts['start_day'] );
+} else {
+	$weekdays = radio_station_get_schedule_weekdays();
+}
 $weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 
 // --- filter avatar size ---
@@ -30,16 +47,29 @@ $output .= '<div style="clear:both;"></div>';
 $output .= '<table id="master-program-schedule" cellspacing="0" cellpadding="0">';
 
 // --- weekday table headings row ---
+// 2.3.2: added hour column heading id
 $output .= '<tr class="master-program-day-row">';
-$output .= '<th></th>';
+$output .= '<th id="master-program-hour-heading"></th>';
+
 foreach ( $weekdays as $i => $weekday ) {
 
 	// --- maybe skip all days but those specified ---
+	// 2.3.2: improve days attribute checking logic
 	$skip_day = false;
 	if ( $atts['days'] ) {
-		$days = explode( ',', $atts['day'] );
-		$days = trim( $days );
-		if ( !in_array( $day, $days ) ) {
+		$days = explode( ',', $atts['days'] );
+		$found_day = false;
+		foreach ( $days as $day ) {
+			$day = trim( $day );
+			// 2.3.2: allow for numeric days (0=sunday to 6=saturday)
+			if ( is_numeric( $day ) && ( $day > -1 ) && ( $day < 7 ) ) {
+				$day = radio_station_get_weekday( $day );
+			}
+			if ( trim( strtolower( $day ) ) == strtolower( $weekday ) ) {
+				$found_day = true;
+			}
+		}
+		if ( !$found_day ) {
 			$skip_day = true;
 		}
 	}
@@ -47,17 +77,47 @@ foreach ( $weekdays as $i => $weekday ) {
 	if ( !$skip_day ) {
 	
 		// --- set day column heading ---
-		$heading = substr( $weekday, 0, 3 );
-		$heading = radio_station_translate_weekday( $heading, true );
+		// 2.3.2: added check for short/long day display attribute
+		if ( !in_array( $atts['display_day'], array( 'short', 'full', 'long' ) ) ) {
+			$atts['display_day'] = 'short';
+		}
+		if ( 'short' == $atts['display_day'] ) {
+			$display_day = radio_station_translate_weekday( $weekday, true );
+		} elseif ( ( 'full' == $atts['display_day'] ) || ( 'long' == $atts['display_day'] ) ) {
+			$display_day = radio_station_translate_weekday( $weekday, false );
+		}
 
 		// --- get weekdate subheading ---
+		// 2.3.2: set day start and end times
+		// 2.3.2: add subheading adjustment for timezone
+		// 2.3.2: replace strtotime with to_time function for timezone
 		$weekdate = $weekdates[$weekday];
-		$subheading = date( 'jS M', strtotime( $weekdate ) );
+		$day_start_time = radio_station_to_time( $weekdate . ' 00:00:00' );
+		$day_end_time = $day_start_time + ( 24 * 60 * 60 );
+		
+		// 2.3.2: add attribute for date subheading format (see PHP date() format)
+		// $subheading = date( 'jS M', strtotime( $weekdate ) );
+		if ( $atts['display_date'] ) {
+			$date_subheading = radio_station_get_time( $atts['display_date'], $day_start_time );
+		} else {
+			$date_subheading = radio_station_get_time( 'j', $day_start_time );
+		}
+
+		// 2.3.2: add attribute for short or long month display
+		$month = radio_station_get_time( 'F', $day_start_time );
+		if ( $atts['display_month'] && !in_array( $atts['display_month'], array( 'short', 'full', 'long' ) ) ) {
+			$atts['display_month'] = 'short';
+		}
+		if ( ( 'long' == $atts['display_month'] ) || ( 'full' == $atts['display_month'] ) ) {
+			$date_subheading .= ' ' . radio_station_translate_month( $month, false );
+		} elseif ( 'short' == $atts['display_month'] ) {
+			$date_subheading .= ' ' . radio_station_translate_month( $month, true );
+		}
 
 		// --- set heading classes ---
 		// 2.3.0: add day and check for highlighting
 		$classes = array( 'master-program-day', 'day-' . $i, strtolower( $weekday ), 'date-' . $weekdate );
-		if ( $weekdate == $date ) {
+		if ( ( $now > $day_start_time ) && ( $now < $day_end_time ) ) {
 			$classes[] = 'current-day';
 			$classes[] = 'selected-day';
 		}
@@ -66,6 +126,7 @@ foreach ( $weekdays as $i => $weekday ) {
 		// --- output table column heading ---
 		// 2.3.0: added left/right arrow responsive controls
 		// 2.3.1: added (negative) return to arrow onclick functions
+		// 2.3.2: added check for optional display_date attribute
 		$arrows = array( 'right' => '&#9658;', 'left' => '&#9668;' );
 		$arrows = apply_filters( 'radio_station_schedule_arrows', $arrows, 'table' );
 		$output .= '<th class="' . esc_attr( $class ) . '">';
@@ -73,12 +134,22 @@ foreach ( $weekdays as $i => $weekday ) {
 		$output .= '<a href="javascript:void(0);" onclick="return radio_shift_day(\'left\');" title="' . esc_attr( __( 'Previous Day', 'radio-station' ) ) . '">' . $arrows['left'] . '</a>';
 		$output .= '</div>';
 		$output .= '<div class="headings">';
-		$output .= '<div class="day-heading">' . esc_html( $heading ) . '</div>';
-		$output .= '<div class="date-subheading">' . esc_html( $subheading ) . '</div>';
+		$output .= '<div class="day-heading"';
+		if ( $atts['display_date'] ) {
+			$output .= ' title="' . esc_attr( $date_subheading ) . '"';
+		}
+		$output .= '>' . esc_html( $display_day ) . '</div>';
+		if ( $atts['display_date'] ) {
+			$output .= '<div class="date-subheading">' . esc_html( $date_subheading ) . '</div>';
+		}
 		$output .= '</div>';
 		$output .= '<div class="shift-right-arrow">';
 		$output .= '<a href="javacript:void(0);" onclick="return radio_shift_day(\'right\');" title="' . esc_attr( __( 'Next Day', 'radio-station' ) ) . '">' . $arrows['right'] . '</a>';
 		$output .= '</div>';
+		// 2.3.2: add day start and end time date
+		$output .= '<span class="rs-time rs-start-time" data="' . esc_attr( $day_start_time ) . '"></span>';
+		$output .= '<span class="rs-time rs-end-time" data="' . esc_attr( $day_end_time ) . '"></span>';
+		
 		$output .= '</th>';
 		
 	} 
@@ -101,16 +172,17 @@ foreach ( $hours as $hour ) {
 
 	// --- set data format for timezone conversions ---
 	if ( 24 == (int) $atts['time'] ) {
-		$data_format = "H:i";
+		$hour_data_format = "H:i";
 	} else {
-		$data_format = "g a";
+		$hour_data_format = "g a";
 	}
 
 	// --- set heading classes ---
 	// 2.3.0: check current hour for highlighting
 	// 2.3.1: fix to use untranslated hour (12 hr format bug)
+	// 2.3.2: replace strtotime with to_time function for timezone
 	$classes = array( 'master-program-hour' );
-	$hour_start = strtotime( $date . ' ' . $hour . ':00' );
+	$hour_start = radio_station_to_time( $date . ' ' . $hour . ':00' );
 	$hour_end = $hour_start + ( 60 * 60 );
 	if ( ( $now > $hour_start ) && ( $now < $hour_end ) ) {
 		$classes[] = 'current-hour';
@@ -128,21 +200,32 @@ foreach ( $hours as $hour ) {
 		$output .= '</span>';
 	}
 	
-	$output .= '<div class="master-program-server-hour rs-time" data="' . esc_attr( $raw_hour ) . '" data-format="' . esc_attr( $data_format ) . '">';
+	$output .= '<div class="master-program-server-hour rs-time" data="' . esc_attr( $raw_hour ) . '" data-format="' . esc_attr( $hour_data_format ) . '">';
 	$output .= esc_html( $hour_display );
-	$output .= '<br>';
-	$output .= '<div class="master-program-user-hour rs-time" data="' . esc_attr( $raw_hour ) . '" data-format="' . esc_attr( $data_format ) . '"></div>';
 	$output .= '</div>';
+	$output .= '<br>';
+	$output .= '<div class="master-program-user-hour rs-time" data="' . esc_attr( $raw_hour ) . '" data-format="' . esc_attr( $hour_data_format ) . '"></div>';
 	$output .= '</th>';
 
 	foreach ( $weekdays as $i => $weekday ) {
 
 		// --- maybe skip all days but those specified ---
+		// 2.3.2: improve days attribute checking logic
 		$skip_day = false;
 		if ( $atts['days'] ) {
-			$days = explode( ',', $atts['day'] );
-			$days = trim( $days );
-			if ( !in_array( $day, $days ) ) {
+			$days = explode( ',', $atts['days'] );
+			$found_day = false;
+			foreach ( $days as $day ) {
+			$day = trim( $day );
+				// 2.3.2: allow for numeric days (0=sunday to 6=saturday)
+				if ( is_numeric( $day ) && ( $day > -1 ) && ( $day < 7 ) ) {
+					$day = radio_station_get_weekday( $day );
+				}
+				if ( trim( strtolower( $day ) ) == strtolower( $weekday ) ) {
+					$found_day = true;
+				}
+			}
+			if ( !$found_day ) {
 				$skip_day = true;
 			}
 		}
@@ -166,11 +249,12 @@ foreach ( $hours as $hour ) {
 
 			// --- get weekdates ---
 			$weekdate = $weekdates[$weekday];
-			$nextdate = $weekdates[$nextday];		
+			// $nextdate = $weekdates[$nextday];
 
 			// --- get hour and next hour start and end times ---
 			// 2.3.1: fix to use untranslated hour (12 hr format bug)
-			$hour_start = strtotime( $weekdate . ' ' . $hour . ':00' );
+			// 2.3.2: replace strtotime with to_time function for timezone
+			$hour_start = radio_station_to_time( $weekdate . ' ' . $hour . ':00' );
 			$hour_end = $next_hour_start = $hour_start + ( 60 * 60 );
 			$next_hour_end = $hour_end + ( 60 * 60 );
 
@@ -180,30 +264,46 @@ foreach ( $hours as $hour ) {
 				if ( !isset( $shift['finished'] ) || !$shift['finished'] ) {
 
 					// --- get shift start and end times ---
+					// 2.3.2: replace strtotime with to_time function for timezone
+					// 2.3.2: fix to convert to 24 hour format first
 					$display = $nowplaying = false;
 					if ( '00:00 am' == $shift['start'] ) {
-						$shift_start = strtotime( $weekdate . ' 12:00 am' );
+						$shift_start_time = radio_station_to_time( $weekdate . ' 00:00' );
 					} else {
-						$shift_start = strtotime( $weekdate . ' ' . $shift['start'] );
+						$shift_start_time = radio_station_convert_shift_time( $shift['start'] );
+						$shift_start_time = radio_station_to_time( $weekdate . ' ' . $shift_start_time );
 					}
 					if ( ( '11:59:59 pm' == $shift['end'] ) || ( '12:00 am' == $shift['end'] ) ) {
-						// bugfixed to not use $nextday here
-						$shift_end = strtotime( $weekdate . ' 11:59:59 pm' ) + 1;
+						$shift_end_time = radio_station_to_time( $weekdate . ' 23:59:59' ) + 1;
 					} else {
-						$shift_end = strtotime( $weekdate . ' ' . $shift['end'] );
+						$shift_end_time = radio_station_convert_shift_time( $shift['end'] );
+						$shift_end_time = radio_station_to_time( $weekdate . ' ' . $shift_end_time );
+					}
+
+					// --- get split shift real start and end times ---
+					// 2.3.2: added for shift display output
+					$real_shift_start = $real_shift_end = false;
+					if ( isset( $shift['split'] ) && $shift['split'] ) {
+						if ( isset( $shift['real_start'] ) ) {
+							$real_shift_start = radio_station_convert_shift_time( $shift['real_start'] );
+							$real_shift_start = radio_station_to_time( $weekdate . ' ' . $real_shift_start ) - ( 24 * 60 * 60 );
+						} elseif ( isset( $shift['real_end'] ) ) {
+							$real_shift_end = radio_station_convert_shift_time( $shift['real_end'] );
+							$real_shift_end = radio_station_to_time( $weekdate . ' ' . $real_shift_end ) + ( 24 * 60 * 60 );
+						}
 					}
 
 					// --- check if the shift is starting / started ---
 					if ( isset( $shift['started'] ) && $shift['started'] ) {
-						// continue display of shift
+						// - continue display of shift -
 						if ( !isset( $cell ) ) {
 							$cellcontinued = true;
 						}
 						$display = $showcontinued = true;
 						$cellshifts ++;
-					} elseif ( ( $shift_start == $hour_start ) 
-						|| ( ( $shift_start > $hour_start ) && ( $shift_start < $next_hour_start ) ) ) {
-						// start display of shift
+					} elseif ( ( $shift_start_time == $hour_start ) 
+						|| ( ( $shift_start_time > $hour_start ) && ( $shift_start_time < $next_hour_start ) ) ) {
+						// - start display of shift -
 						$started = $shift['started'] = true;
 						$schedule[$weekday][$shift['start']] = $shift;
 						$display = $newshift = true;
@@ -213,40 +313,43 @@ foreach ( $hours as $hour ) {
 					}
 
 					// --- check if shift is current ---
-					if ( ( $now >= $shift_start ) && ( $now < $shift_end ) ) {
+					if ( ( $now >= $shift_start_time ) && ( $now < $shift_end_time ) ) {
 						$nowplaying = true;
 					}
 
 					// --- check if shift finishes in this hour ---
 					if ( isset( $shift['started'] ) && $shift['started'] ) {
-						if ( $shift_end == $hour_end ) {
+						if ( $shift_end_time == $hour_end ) {
 							$finished = $shift['finished'] = true;
 							$schedule[$weekday][$shift['start']] = $shift;
 							// $fullcell = true;
-						} elseif ( $shift_end < $hour_end ) {
+						} elseif ( $shift_end_time < $hour_end ) {
 							$finished = $shift['finished'] = true;
 							$schedule[$weekday][$shift['start']] = $shift;
-							// $percent = round( ( $shift_end - $hour_start ) / 3600 );
+							// $percent = round( ( $shift_end_time - $hour_start ) / 3600 );
 							// $partcell = true;
 						} else {
 							$overflow = true;
 						}
 					}
 
-					if ( isset( $_GET['shiftdebug'] ) && ( '1' == $_GET['shiftdebug'] ) ) {
-						$test .= 'Now: ' . $now . ' (' . date( 'Y-m-d l H:i', $now ) . ') -- Today: ' . $today . '<br>';
-						$test .= 'Day: ' . $weekday . ' - Raw Hour: ' . $raw_hour . ' - Hour: ' . $hour . ' - Hour Display: ' . $hour_display . '<br>';
-						$test .= 'Hour Start: ' . $hour_start . ' (' . date( 'l H:i', $hour_start ) . ')<br>';
-						$test .= 'Hour End: ' . $hour_end . ' (' . date( 'l H:i', $hour_end ) . ')<br>';
-						$test .= 'Shift Start: ' . $shift_start . ' (' . date( 'Y-m-d l H:i', $shift_start ) . ')' . '<br>';
-						$test .= 'Shift End: ' . $shift_end . ' (' . date( 'Y-m-d l H:i', $shift_end ) . ')' . '<br>';
-						$test .= 'Display: ' . ( $display ? 'yes' : 'no' ) . ' - ';
-						$test .= 'New Shift: ' . ( $newshift ? 'yes' : 'no' ) . ' - ';
-						$test .= 'Now Playing: ' . ( $nowplaying ? 'yes' : 'no' ) . ' - ';
-						$test .= 'Cell Continues: ' . ( $cellcontinued ? 'yes' : 'no' ) . ' - ';
-						$test .= 'Overflow: ' . ( $overflow ? 'yes' : 'no' ) . ' - ';
-						$test .= 'Show Continued: ' . ( $showcontinued ? 'yes' : 'no' ) . ' - ';
-						// $test .= print_r( $shift, true ) . '<br>';
+					if ( isset( $_GET['rs-shift-debug'] ) && ( '1' == $_GET['rs-shift-debug'] ) ) {
+						if ( !isset( $shiftdebug ) ) {$shiftdebug = '';}
+						if ( $display ) {
+							$shiftdebug .= 'Now: ' . $now . ' (' . radio_station_get_time( 'datetime', $now ) . ') -- Today: ' . $today . '<br>';
+							$shiftdebug .= 'Day: ' . $weekday . ' - Raw Hour: ' . $raw_hour . ' - Hour: ' . $hour . ' - Hour Display: ' . $hour_display . '<br>';
+							$shiftdebug .= 'Hour Start: ' . $hour_start . ' (' . date( 'Y-m-d l H:i', $hour_start ) . ' - ' . radio_station_get_time( 'Y-m-d l H:i', $hour_start ) . ')<br>';
+							$shiftdebug .= 'Hour End: ' . $hour_end . ' (' . date( 'Y-m-d l H: i', $hour_end ) . ' - ' . radio_station_get_time( 'Y-m-d l H:i', $hour_end ) . ')<br>';
+							$shiftdebug .= 'Shift Start: ' . $shift_start_time . ' (' . date( 'Y-m-d l H: i', $shift_start_time ) . ' - ' . radio_station_get_time( 'Y-m-d l H:i', $shift_start_time ) . ')' . '<br>';
+							$shiftdebug .= 'Shift End: ' . $shift_end_time . ' (' . date( 'Y-m-d l H: i', $shift_end_time ) . ' - ' . radio_station_get_time( 'Y-m-d l H:i', $shift_end_time ) . ')' . '<br>';
+							$shiftdebug .= 'Display: ' . ( $display ? 'yes' : 'no' ) . ' - ';
+							$shiftdebug .= 'New Shift: ' . ( $newshift ? 'yes' : 'no' ) . ' - ';
+							$shiftdebug .= 'Now Playing: ' . ( $nowplaying ? 'YES' : 'no' ) . ' - ';
+							$shiftdebug .= 'Cell Continues: ' . ( $cellcontinued ? 'yes' : 'no' ) . ' - ';
+							$shiftdebug .= 'Overflow: ' . ( $overflow ? 'yes' : 'no' ) . ' - ';
+							$shiftdebug .= 'Show Continued: ' . ( $showcontinued ? 'yes' : 'no' ) . ' - ';
+							// $shiftdebug .= 'Shift: ' . print_r( $shift, true ) . '<br>';
+						}
 					}
 
 					// --- maybe add shift display to the cell ---
@@ -285,6 +388,10 @@ foreach ( $hours as $hour ) {
 
 							// --- display empty div (for highlighting) ---
 							$cell .= '&nbsp;';
+							
+							// 2.3.2: set shift times for highlighting
+							$cell .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '"></span>';
+							$cell .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '"></span>';
 
 						} else {
 
@@ -363,31 +470,55 @@ foreach ( $hours as $hour ) {
 							// --- show time ---
 							if ( $atts['show_times'] ) {
 
-								// --- convert shift time data ---
-								$shift_start_time = strtotime( $weekdates[$shift['day']] . ' ' . $shift['start'] );
-								$shift_end_time = strtotime( $weekdates[$shift['day']] . ' ' . $shift['end'] );
-
 								// --- convert shift time for display ---
-								if ( '00:00 am' == $shift['start'] ) {
+								// 2.3.2: removed duplicate calculation of shift times
+								/* if ( '00:00 am' == $shift['start'] ) {
 									$shift['start'] = '12:00 am';
 								}
 								if ( '11:59:59 pm' == $shift['end'] ) {
 									$shift['end'] = '12:00 am';
-								}
-								if ( 24 == (int) $atts['time'] ) {
+								} */
+								
+								/* if ( 24 == (int) $atts['time'] ) {
 									$start = radio_station_convert_shift_time( $shift['start'], 24 );
-									$end = radio_station_convert_shift_time( $shift['end'], 24 );
-									$data_format = 'H:i';
+									// 2.3.2: display real end of split shift
+									if ( isset( $shift['split'] ) && $shift['split'] && isset( $shift['real_end'] ) ) {
+										$end = radio_station_convert_shift_time( $shift['real_end'], 24 );
+									} else {
+										$end = radio_station_convert_shift_time( $shift['end'], 24 );
+									}
 								} else {
-									$start = str_replace( array( 'am', 'pm'), array( ' ' . $am, ' ' . $pm ), $shift['start'] );
-									$end = str_replace( array( 'am', 'pm'), array( ' ' . $am, ' ' . $pm ), $shift['end'] );
-									$data_format = 'g:i a';
+									$start = str_replace( array( 'am', 'pm'), array( $am, $pm ), $shift['start'] );
+									// 2.3.2: display real end of split shift
+									if ( isset( $shift['split'] ) && $shift['split'] && isset( $shift['real_end'] ) ) {
+										$end = str_replace( array( 'am', 'pm'), array( $am, $pm ), $shift['real_end'] );
+									} else {
+										$end = str_replace( array( 'am', 'pm'), array( $am, $pm ), $shift['end'] );
+									}
+								} */
+								
+								// --- get start and end times ---
+								// 2.3.2: maybe use real start and end times
+								if ( $real_shift_start ) {
+									$start = radio_station_get_time( $start_data_format, $real_shift_start );
+								} else {
+									$start = radio_station_get_time( $start_data_format, $shift_start_time );
 								}
+								if ( $real_shift_end ) {
+									$end = radio_station_get_time( $end_data_format, $real_shift_end );
+								} else {
+									$end = radio_station_get_time( $end_data_format, $shift_end_time );
+								}
+								$start = radio_station_translate_time( $start );
+								$end = radio_station_translate_time( $end );
 
-								$show_time = '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $data_format ) . '">' . $start . '</span>';
+								// --- set show time output ---
+								$show_time = '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $start_data_format ) . '">' . esc_html( $start ) . '</span>';
 								$show_time .= '<span class="rs-sep"> ' . esc_html( __( 'to', 'radio-station' ) ) . ' </span>';
-								$show_time .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $data_format ) . '">' . $end . '</span>';
+								$show_time .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $end_data_format ) . '">' . esc_html( $end ) . '</span>';
 								$show_time = apply_filters( 'radio_station_schedule_show_time', $show_time, $show['id'], 'table' );
+
+								// --- add show time to cell ---
 								$cell .= '<div class="show-time" id="show-time-' . esc_attr( $tcount ) . '">' . $show_time . '</div>';
 								$cell .= '<div class="show-user-time" id="show-user-time-' . esc_attr( $tcount ) . '"></div>';
 								$tcount ++;
@@ -413,7 +544,9 @@ foreach ( $hours as $hour ) {
 								$show_file = get_post_meta( $show['id'], 'show_file', true );
 							}
 							$show_file = apply_filters( 'radio_station_schedule_show_file', $show_file, $show['id'], 'table' );
-							if ( $show_file && !empty( $show_file ) ) {
+							// 2.3.2: check disable download meta
+							$disable_download = get_post_meta( $show['id'], 'show_download', true );
+							if ( $show_file && !empty( $show_file ) && !$disable_download ) {
 								$cell .= '<div class="show-file">';
 								$cell .= '<a href="' . esc_url( $show_file ) . '">';
 								$cell .= esc_html( __( 'Audio File', 'radio-station' ) );
@@ -453,7 +586,6 @@ foreach ( $hours as $hour ) {
 							$showcontinued = false;
 						}
 					}
-
 				}
 			}
 
@@ -467,6 +599,9 @@ foreach ( $hours as $hour ) {
 			}
 			if ( $cellshifts > 0 ) {
 				$cellclasses[] = $cellshifts . '-shifts';
+			} else {
+				// 2.3.2: add no-shifts class
+				$cellclasses[] = 'no-shifts';
 			}
 			$cellclass = implode( ' ', $cellclasses );
 			$output .= '<td class="' . $cellclass . '">';
@@ -485,6 +620,6 @@ foreach ( $hours as $hour ) {
 
 $output .= '</table>';
 
-if ( isset( $_GET['shiftdebug'] ) && ( '1' == $_GET['shiftdebug'] ) ) {
-	$output .= $test;
+if ( isset( $_GET['rs-shift-debug'] ) && ( '1' == $_GET['rs-shift-debug'] ) ) {
+	$output .= $shiftdebug;
 }

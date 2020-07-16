@@ -5,9 +5,9 @@
 // ===========================
 //
 // --------------
-// Version: 1.1.0
+// Version: 1.1.2
 // --------------
-// * changelog at end of file! *
+// Note: Changelog and structure at end of file.
 //
 // ============
 // Loader Usage
@@ -110,10 +110,27 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 		public $sections = array();
 		public $scripts = array();
 
+		// 1.1.2: added menu added switch
+		// 1.1.2: added debug switch
+		public $menu_added = false;
+		public $debug = false;
+		
 		// -----------------
 		// Initialize Loader
 		// -----------------
 		public function __construct( $args ) {
+
+			// --- set debug switch ---
+			// 1.1.2: added debug switch check
+			$prefix = ''; 
+			if ( $args['settings'] ) {
+				$prefix = '-' . $args['settings'];
+			}
+			if ( isset( $_REQUEST[$prefix . 'debug'] ) ) {
+				if ( ( '1' == $_REQUEST[$prefix . 'debug'] ) || ( 'yes' == $_REQUEST[$prefix . 'debug'] ) ) {
+					$this->debug = true;
+				}
+			}
 
 			// --- set plugin options ---
 			// 1.0.6: added options filter
@@ -229,6 +246,15 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 			return $value;
 		}
+		
+		// ------------------
+		// Get Plugin Version
+		// ------------------
+		// 1.1.2: added get plugin version function
+		public function plugin_version() {
+			$args = $this->args;
+			return $args['version'];
+		}
 
 		// -----------------
 		// Set Pro Namespace
@@ -258,7 +284,10 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			}
 
 			// --- filter and store the plugin default settings ---
+			// 1.1.2: fix to apply options filter
+			$namespace = $this->namespace;
 			$options = $this->options;
+			$options = apply_filters( $namespace . '_options', $options );			
 			$defaults = array();
 			foreach ( $options as $key => $values ) {
 				// 1.0.9: set default to null if default value not set
@@ -268,7 +297,6 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					$defaults[$key] = null;
 				}
 			}
-			$namespace = $this->namespace;
 			$defaults = apply_filters( $namespace . '_default_settings', $defaults );
 			$this->defaults = $defaults;
 			if ( $dkey && isset( $defaults[$dkey] ) ) {
@@ -458,7 +486,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// --- get plugin options and default settings ---
 			// 1.0.9: allow filtering of plugin options (eg. for Pro/Add Ons)
 			$options = $this->options;
-			$options = apply_filters( $namespace . '_plugin_options', $options );
+			$options = apply_filters( $namespace . '_options', $options );
 			$defaults = $this->default_settings();
 
 			// --- maybe use custom method or function ---
@@ -539,7 +567,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						}
 					}
 
-					if ( isset( $_REQUEST['debug'] ) && ( 'yes' == $_REQUEST['debug'] ) ) {
+					if ( $this->debug ) {
 						echo 'Saving Setting Key ' . $key . ' (' . $postkey . ': ' . print_r( $posted, true ) . '<br>';
 						echo 'Type: ' . $type . ' - Valid Options ' . $key . ': ' . print_r( $valid, true ) . '<br>';
 					}
@@ -609,9 +637,13 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						$posted = array();
 						foreach ( $valid as $option => $label ) {
 							$optionkey = $args['settings'] . '_' . $key . '-' . $option;
-							if ( isset( $_POST[$optionkey] ) && ( 'yes' == $_POST[$optionkey] ) ) {
-								// 1.1.0: fixed to save only array of key values
-								$posted[] = $option;
+							if ( isset( $_POST[$optionkey] ) ) {
+								// 1.1.2: check for value if specified
+								if ( ( isset( $values['value'] ) && ( $values['value'] == $_POST[$optionkey] ) ) 
+								  || ( !isset( $values['value'] ) && ( 'yes' == $_POST[$optionkey] ) ) ) {
+									// 1.1.0: fixed to save only array of key values
+									$posted[] = $option;
+								}
 							}
 						}
 						$settings[$key] = $posted;
@@ -659,7 +691,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 					}
 
-					if ( isset( $_REQUEST['debug'] ) && ( 'yes' == $_REQUEST['debug'] ) ) {
+					if ( $this->debug ) {
 						echo 'New Settings for Key ' . $key . ': ';
 						if ( $newsettings ) {
 							echo '(to-validate) ' . print_r( $newsettings, true ) . '<br>';
@@ -694,7 +726,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 							}
 						}
 
-						if ( isset( $_REQUEST['debug'] ) && ( 'yes' == $_REQUEST['debug'] ) ) {
+						if ( $this->debug ) {
 							echo 'Valid Options for Key ' . $key . ': ' . print_r( $valid, true ) . '<br>';
 							echo 'Validated Settings for Key ' . $key . ': ' . print_r( $settings[$key], true ) . '<br>';
 						}
@@ -901,22 +933,25 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 		// Delete Settings
 		// ---------------
 		public function delete_settings() {
-			// TODO: check for plugin settings flag to delete settings data?
+		
+			// TODO: check for plugin settings flag to delete settings ?
 			// $delete_settings = $this->get_setting( 'delete_settings' );
 			// if ( $delete_settings ) {
 			//	$args = $this->args;
 			//	delete_option( $args['option'] );
 			// }
+			
+			// TODO: check for plugin settings flag to delete data?
 			// $delete_data = $this->get_setting( 'delete_data' );
 			// if ( $delete_data ) {
-			//	do_action( $this->namespace.'_delete_data' );
+			//	do_action( $this->namespace . '_delete_data' );
 			// }
 		}
 
 
-		// ===============
-		// --- Loading ---
-		// ===============
+		// ======================
+		// --- Plugin Loading ---
+		// ======================
 
 		// --------------------
 		// Load Plugin Settings
@@ -1042,9 +1077,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			}
 		}
 
-		// -------------
-		// Readme Viewer
-		// -------------
+		// ------------------
+		// Readme Viewer AJAX
+		// ------------------
 		public function readme_viewer() {
 
 			$args = $this->args;
@@ -1309,9 +1344,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 		}
 
 
-		// =============
-		// --- Admin ---
-		// =============
+		// ====================
+		// --- Plugin Admin ---
+		// ====================
 
 		// -----------------
 		// Add Settings Menu
@@ -1336,11 +1371,14 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// return true from filter function to not add a submenu item in admin Settings menu
 			// 1.0.8: change from function exists check
 			// 1.0.9: change to filter usage to check if menu is manually added
-			$menuadded = apply_filters( $args['namespace'] . '_admin_menu_added', false, $args );
+			$menu_added = apply_filters( $args['namespace'] . '_admin_menu_added', false, $args );
+			
+			// 1.1.1: record to admin menu added switch
+			$this->menu_added = $menu_added;
 
 			// --- maybe auto-add standalone options page ---
-			if ( !$menuadded ) {
-				// 1.0.8: check settingsmenu switch that disables automatic settings menu
+			if ( !$menu_added ) {
+				// 1.0.8: check settingsmenu switch that disables automatic settings menu adding
 				if ( !isset( $args['settingsmenu'] ) || ( false !== $args['settingsmenu'] ) ) {
 					add_options_page( $args['pagetitle'], $args['menutitle'], $args['capability'], $args['slug'], $args['namespace'] . '_settings_page' );
 				}
@@ -1349,7 +1387,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// 1.1.0: add admin notices boxer
 			add_action( 'all_admin_notices', array( $this, 'notice_boxer' ), 999 );
 		}
-
+		
 		// -----------------
 		// Plugin Page Links
 		// -----------------
@@ -1359,12 +1397,16 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			if ( plugin_basename( $args['file'] ) == $file ) {
 
 				// --- add settings link ---
-				$settings_url = add_query_arg( 'page', $args['slug'], admin_url( 'admin.php' ) );
+				// 1.1.1: fix to settings page link URL 
+				// (depending on whether top level menu or Settings submenu item)
+				$page = 'options-general.php';
+				if ( $this->menu_added ) {$page = 'admin.php';}
+				$settings_url = add_query_arg( 'page', $args['slug'], admin_url( $page ) );
 				$settings_link = "<a href='" . esc_url( $settings_url ) . "'>" . esc_html( __( 'Settings' ) ) . "</a>";
 				array_unshift( $links, $settings_link );
 
 				// --- maybe add Pro upgrade link ---
-				// TODO: check for correct upgrade/addon URLs
+				// TODO: check Freemius upgrade/addon URLs
 				// if ( isset( $args['hasplans'] && $args['hasplans'] ) {
 				//	// TODO: check if premium is already installed
 				//	$upgrade_url = add_query_arg( 'page', $args['slug'], admin_url( 'admin.php' ) );
@@ -1373,12 +1415,11 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				// }
 
 				// --- maybe add Addons link ---
-				//if ( isset($args['hasaddons'] && $args['hasaddons' ) {
+				// if ( isset($args['hasaddons'] && $args['hasaddons' ) {
 				//	$addons_url = add_query_arg( 'page', $args['slug'], admin_url( 'admin.php' ) );
 				//	$addons_link = "<a href='" . esc_url( $addons_url )."'>" . esc_html( __( 'Add Ons' ) ) . "</a>";
 				//	array_unshift( $links, $addons_link );
 				// }
-
 			}
 
 			return $links;
@@ -1463,22 +1504,19 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			$settings = $GLOBALS[$namespace];
 
 			// --- output debug values ---
-			if ( isset( $_REQUEST['debug'] ) ) {
-				if ( ( 'yes' == $_REQUEST['debug'] ) || ( '1' == $_REQUEST['debug'] ) ) {
+			if ( $this->debug ) {
+				echo "<br><b>Current Settings:</b><br>";
+				print_r( $settings );
+				echo "<br><br>";
 
-					echo "<br><b>Current Settings:</b><br>";
-					print_r( $settings );
-					echo "<br><br>";
+				echo "<br><b>Plugin Options:</b><br>";
+				print_r( $this->options );
+				echo "<br><br>";
 
-					echo "<br><b>Plugin Options:</b><br>";
-					print_r( $this->options );
-					echo "<br><br>";
-
-					if ( isset( $_POST ) ) {
-						echo "<br><b>Posted Values:</b><br>";
-						foreach ( $_POST as $key => $value ) {
-							echo esc_attr( $key ) . ': ' . print_r( $value, true ) . '<br>';
-						}
+				if ( isset( $_POST ) ) {
+					echo "<br><b>Posted Values:</b><br>";
+					foreach ( $_POST as $key => $value ) {
+						echo esc_attr( $key ) . ': ' . print_r( $value, true ) . '<br>';
 					}
 				}
 			}
@@ -1723,6 +1761,12 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			$args = $this->args;
 			$namespace = $this->namespace;
 			$options = $this->options;
+			
+			// --- get plugin options and default settings ---
+			// 1.1.2: fix for filtering of plugin options
+			$options = $this->options;
+			$options = apply_filters( $namespace . '_options', $options );
+		
 			$defaults = $this->default_settings();
 			$settings = $this->get_settings( false );
 
@@ -1812,10 +1856,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			wp_nonce_field( $args['slug'] . '_update_settings' );
 
 			// --- maybe set hidden debug input ---
-			if ( isset( $_REQUEST['debug'] ) ) {
-				if ( ( 'yes' == $_REQUEST['debug'] ) || ( '1' == $_REQUEST['debug'] ) ) {
-					echo "<input type='hidden' name='debug' value='yes'>";
-				}
+			if ( $this->debug ) {
+				echo "<input type='hidden' name='debug' value='yes'>";
 			}
 
 			// ---- open wrapbox ---
@@ -1949,9 +1991,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 		}
 
-		// ------------
+		// -----------
 		// Setting Row
-		// ------------
+		// -----------
 		// 1.0.9: added for automatic Settings table generation
 		public function setting_row( $option ) {
 
@@ -2356,9 +2398,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			return $row;
 		}
 
-		// ----------------
-		// Settings Scripts
-		// ----------------
+		// ---------------
+		// Setting Scripts
+		// ---------------
 		// 1.0.9: added settings page scripts
 		public function setting_scripts() {
 
@@ -2373,9 +2415,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			}
 		}
 
-		// ---------------
-		// Settings Styles
-		// ---------------
+		// --------------
+		// Setting Styles
+		// --------------
 		public function setting_styles() {
 
 			$styles = array();
@@ -2481,9 +2523,9 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 			}
 		}
 
-		// -------------------
-		// Get Loader Instance
-		// -------------------
+		// ---------------------
+		// Get Freemius Instance
+		// ---------------------
 		// 2.3.0: added function for getting Freemius class instance
 		if ( !function_exists( 'radio_station_freemius_instance' ) ) {
 			function radio_station_freemius_instance() {
@@ -2496,7 +2538,7 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 		// ---------------
 		// Get Plugin Data
 		// ---------------
-		// 2.3.0: added function for getting plugin data
+		// 1.1.1: added function for getting plugin data
 		if ( !function_exists( 'radio_station_plugin_data' ) ) {
 			function radio_station_plugin_data() {
 				$namespace = radio_station_get_radio_station_slug( __FUNCTION__ );
@@ -2505,6 +2547,34 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 				return $instance->plugin_data();
 			}
 		}
+
+		// ------------------
+		// Get Plugin Version
+		// ------------------
+		// 1.1.2: added function for getting plugin version
+		if ( !function_exists( 'radio_station_plugin_version' ) ) {
+			function radio_station_plugin_version() {
+				$namespace = radio_station_get_radio_station_slug( __FUNCTION__ );
+				$instance = $GLOBALS[$namespace . '_instance'];
+
+				return $instance->plugin_version();
+			}
+		}
+
+		// -----------------
+		// Set Pro Namespace
+		// -----------------
+		if ( !function_exists( 'radio_station_pro_namespace' ) ) {
+			function radio_station_pro_namespace( $pronamespace ) {
+				$namespace = radio_station_get_radio_station_slug( __FUNCTION__ );
+				$instance = $GLOBALS[$namespace . '_instance'];
+				$instance->pro_namespace( $pronamespace );
+			}
+		}
+
+		// ===============
+		// Plugin Settings
+		// ===============
 
 		// ------------
 		// Add Settings
@@ -2598,17 +2668,8 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 				$instance->delete_settings();
 			}
 		}
-
-		// -----------------
-		// Set Pro Namespace
-		// -----------------
-		if ( !function_exists( 'radio_station_pro_namespace' ) ) {
-			function radio_station_pro_namespace( $pronamespace ) {
-				$namespace = radio_station_get_radio_station_slug( __FUNCTION__ );
-				$instance = $GLOBALS[$namespace . '_instance'];
-				$instance->pro_namespace( $pronamespace );
-			}
-		}
+		
+		
 
 		// -----------
 		// Message Box
@@ -2676,8 +2737,58 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 
 
 // =========
+// STRUCTURE
+// =========
+//
+// === Loader Class ===
+// - Initialize Loader
+// - Setup Plugin
+// - Get Plugin Data
+// - Get Plugin Version
+// - Set Pro Namespace
+// === Plugin Settings ===
+// - Get Default Settings
+// - Add Settings
+// - Maybe Transfer Settings
+// - Get All Plugin Settings
+// - Get Plugin Setting
+// - Reset Plugin Settings
+// - Update Plugin Settings
+// - Validate Plugin Setting
+// === Plugin Loading ===
+// - Load Plugin Settings
+// - Add Actions
+// - Load Helper Libraries
+// - Maybe Load Thickbox
+// - Readme Viewer AJAX
+// === Freemius Loading ===
+// - Load Freemius
+// - Filter Freemius Connect
+// - Freemius Connect Message
+// - Connect Update Message
+// === Plugin Admin ===
+// - Add Settings Menu
+// - Plugin Page Links
+// - Message Box
+// - Notice Boxer
+// - Plugin Page Header
+// - Settings Page
+// - Settings Table
+// - Setting Row
+// - Settings Scripts
+// - Settings Styles
+// === Namespaced Functions ===
+
+
+// =========
 // CHANGELOG
 // =========
+
+// == 1.1.2 ==
+// - fix for filtering of plugin options
+// - fix for plugin page link URL
+// - added menu added and debug switches
+// - added get plugin version function
 
 // == 1.1.1 ==
 // - remove admin_url wrapper on Freemius first-path value
@@ -2749,3 +2860,10 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 
 // == 0.9.0 ==
 // - Development Version
+
+
+// -----------------
+// Development TODOs
+// -----------------
+// - check Freemius upgrade/addon URLs
+// - use sanitize text field on textarea ?

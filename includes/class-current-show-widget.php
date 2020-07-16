@@ -1,7 +1,7 @@
 <?php
 
-/* Sidebar Widget - DJ On Air
- * Displays the current on-air show/DJ
+/* Current Show Widget - (DJ On Air)
+ * Displays the current on-air Show / DJ
  * Since 2.1.1
  */
 
@@ -22,6 +22,7 @@ class DJ_Widget extends WP_Widget {
 	public function form( $instance ) {
 
 		$instance = wp_parse_args( (array) $instance, array( 'title' => '' ) );
+
 		$title = $instance['title'];
 		$display_djs = isset( $instance['show_desc'] ) ? $instance['display_djs'] : false;
 		$djavatar = isset( $instance['djavatar'] ) ? $instance['djavatar'] : false;
@@ -34,15 +35,29 @@ class DJ_Widget extends WP_Widget {
 		$show_desc = isset( $instance['show_desc'] ) ? $instance['show_desc'] : false;
 
 		// 2.2.4: added title position, avatar width and DJ link options
+		// 2.3.0: added countdown display option
+		// 2.3.2: added AJAX load option
 		$title_position = isset( $instance['title_position'] ) ? $instance['title_position'] : 'below';
 		$avatar_width = isset( $instance['avatar_width'] ) ? $instance['avatar_width'] : '';
 		$link_djs = isset( $instance['link_djs'] ) ? $instance['link_djs'] : '';
-		// 2.3.0: added countdown display option
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : false;
+		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : '';
 
 		// 2.3.0: convert template style code to strings
+		// 2.3.2: added AJAX load option field
 		$fields = '
 		<p>
+			<label for="' . esc_attr( $this->get_field_id( 'ajax' ) ) . '">
+				<select id="' .esc_attr( $this->get_field_id( 'ajax' ) ) . '" name="' . esc_attr( $this->get_field_name( 'ajax' ) ) . '">
+					<option value="" ' . selected( $ajax, '', false ) . '>' . esc_html( __( 'Default', 'radio-station' ) ) . '</option>
+					<option value="on" ' . selected( $ajax, 'on', false ) . '>' . esc_html( __( 'On', 'radio-station' ) ) . '</option>
+					<option value="off" ' . selected( $ajax, 'off', false ) . '>' . esc_html( __( 'Off', 'radio-station' ) ) . '</option>
+				</select>
+				' . esc_html( __( 'AJAX Load Widget?', 'radio-station' ) ) . '
+			</label>
+        </p>
+        
+        <p>
 			<label for="' . esc_attr( $this->get_field_id( 'title' ) ) . '">
 			' . esc_html( __( 'Title', 'radio-station' ) ) . ':
 				<input class="widefat" id="' . esc_attr( $this->get_field_id( 'title' ) ) . '" name="' . esc_attr( $this->get_field_name( 'title' ) ) . '" type="text" value="' . esc_attr( $title ) . '" />
@@ -160,7 +175,8 @@ class DJ_Widget extends WP_Widget {
 
 		// --- filter and output ---
 		// 2.3.0: added field filter for extra fields
-		$fields = apply_filters( 'radio_station_current_show_widget_fields', $fields, $instance );
+		// 2.3.2: fix for second and third filter arguments
+		$fields = apply_filters( 'radio_station_current_show_widget_fields', $fields, $this, $instance );
 		echo $fields;
 	}
 
@@ -168,13 +184,14 @@ class DJ_Widget extends WP_Widget {
 	public function update( $new_instance, $old_instance ) {
 
 		$instance = $old_instance;
+		
+		// 2.2.7: fix checkbox value saving
 		$instance['title'] = $new_instance['title'];
 		$instance['display_djs'] = isset( $new_instance['display_djs'] ) ? 1 : 0;
 		$instance['djavatar'] = isset( $new_instance['djavatar'] ) ? 1 : 0;
 		$instance['link'] = isset( $new_instance['link'] ) ? 1 : 0;
 		$instance['default'] = $new_instance['default'];
 		$instance['time'] = $new_instance['time'];
-		// 2.2.7: fix checkbox value saving
 		$instance['show_sched'] = isset( $new_instance['show_sched'] ) ? 1 : 0;
 		$instance['show_playlist'] = isset( $new_instance['show_playlist'] ) ? 1 : 0;
 		$instance['show_all_sched'] = isset( $new_instance['show_all_sched'] ) ? 1 : 0;
@@ -182,10 +199,12 @@ class DJ_Widget extends WP_Widget {
 
 		// 2.2.4: added title position and avatar width settings
 		// 2.3.0: added countdown display option
+		// 2.3.2: added ajax load option
 		$instance['title_position'] = $new_instance['title_position'];
 		$instance['avatar_width'] = $new_instance['avatar_width'];
 		$instance['link_djs'] = isset( $new_instance['link_djs'] ) ? 1 : 0;
 		$instance['countdown'] = isset( $new_instance['countdown'] ) ? 1 : 0;
+		$instance['ajax'] = isset( $new_instance['ajax'] ) ? $new_instance['ajax'] : 0;		
 
 		// 2.3.0: filter widget update instance
 		$instance = apply_filters( 'radio_station_current_show_widget_update', $instance, $new_instance, $old_instance );
@@ -203,7 +222,7 @@ class DJ_Widget extends WP_Widget {
 			$id = $radio_station_data['widgets']['current-show'] = 0;
 		} else {
 			$id = $radio_station_data['widgets']['current-show']++;
-		}
+		}		
 
 		// 2.3.0: filter widget_title whether empty or not
 		$title = empty( $instance['title'] ) ? '' : $instance['title'];
@@ -215,20 +234,25 @@ class DJ_Widget extends WP_Widget {
 		$time = empty( $instance['time'] ) ? '' : $instance['time'];
 		$show_sched = $instance['show_sched'];
 		$show_playlist = $instance['show_playlist'];
+		
+		// 2.3.2: fix old false values to use 0 for shortcodes
 		// keep the default settings for people updating from 1.6.2 or earlier
-		$show_all_sched = isset( $instance['show_all_sched'] ) ? $instance['show_all_sched'] : false;
+		$show_all_sched = isset( $instance['show_all_sched'] ) ? $instance['show_all_sched'] : 0;
 		// keep the default settings for people updating from 2.0.12 or earlier
-		$show_desc = isset( $instance['show_desc'] ) ? $instance['show_desc'] : false;
+		$show_desc = isset( $instance['show_desc'] ) ? $instance['show_desc'] : 0;
 
 		// 2.2.4: added title position, avatar width and DJ link settings
+		// 2.3.2: added AJAX load option
 		$position = empty( $instance['title_position'] ) ? 'bottom' : $instance['title_position'];
 		$width = empty( $instance['avatar_width'] ) ? '' : $instance['avatar_width'];
 		$link_djs = isset( $instance['link_djs'] ) ? $instance['link_djs'] : '';
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : 0;
 		$dynamic = isset( $instance['dynamic'] ) ? $instance['dynamic'] : 0;
+		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : 0;
 
 		// --- set shortcode attributes ---
 		// 2.3.0: map widget options to shortcode attributes
+		// 2.3.2: added AJAX load option
 		$atts = array(
 			// --- legacy widget options ---
 			'title'          => $title,
@@ -251,14 +275,20 @@ class DJ_Widget extends WP_Widget {
 			'id'             => $id,
 		);
 
+		// 2.3.2: only set AJAX attribute if overriding default
+		if ( in_array( $ajax, array( 'on', 'off' ) ) ) {
+			$atts['ajax'] = $ajax;
+		}
+
 		// --- before widget ---
 		// phpcs:ignore WordPress.Security.OutputNotEscaped
 		echo $args['before_widget'];
 
 		// --- open widget container ---
 		// 2.3.0: add unique id to widget
+		// 2.3.2: add class to widget
 		$id = 'current-show-widget-' . $id;
-		echo '<div id="' . esc_attr( $id ) . '" class="widget">';
+		echo '<div id="' . esc_attr( $id ) . '" class="current-show-wrap widget">';
 
 		// --- widget title ---
 		// phpcs:ignore WordPress.Security.OutputNotEscaped

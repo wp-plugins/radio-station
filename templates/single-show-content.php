@@ -37,7 +37,16 @@ $patreon_title = __( 'Become a Supporter for', 'radio-station' ) . ' ' . $show_t
 // $show_rss = get_post_meta( $post_id, 'show_rss', true );
 $show_rss = false; // TEMP
 
+// 2.3.2: added show download disabled check
+$show_download = true;
+$download = get_post_meta( $post_id, 'show_download', true );
+if ( 'on' == $download ) {
+	// --- on = disabled ---
+	$show_download = false;
+}
+
 // --- filter all show meta data ---
+// 2.3.2: added show download filter
 $show_title = apply_filters( 'radio_station_show_title', $show_title, $post_id );
 $header_id = apply_filters( 'radio_station_show_header', $header_id, $post_id );
 $avatar_id = apply_filters( 'radio_station_show_avatar', $avatar_id, $post_id );
@@ -49,6 +58,7 @@ $producers = apply_filters( 'radio_station_show_producers', $producers, $post_id
 $active = apply_filters( 'radio_station_show_active', $active, $post_id );
 $shifts = apply_filters( 'radio_station_show_shifts', $shifts, $post_id );
 $show_file = apply_filters( 'radio_station_show_file', $show_file, $post_id );
+$show_download = apply_filters( 'radio_station_show_download', $show_download, $post_id );
 $show_link = apply_filters( 'radio_station_show_link', $show_link, $post_id );
 $show_email = apply_filters( 'radio_station_show_email', $show_email, $post_id );
 $show_patreon = apply_filters( 'radio_station_show_patreon', $show_patreon, $post_id );
@@ -192,6 +202,7 @@ if ( ( $avatar_id || $thumbnail_id ) || ( count( $show_icons ) > 0 ) || ( $show_
 		// --- Show Player ---
 		// 2.3.0: embed latest broadcast audio player
 		if ( $show_file ) {
+		
 			$blocks['show_images'] .= '<div class="show-player">';
 			$shortcode = '[audio src="' . $show_file . '" preload="metadata"]';
 			$player_embed = do_shortcode( $shortcode );
@@ -200,12 +211,16 @@ if ( ( $avatar_id || $thumbnail_id ) || ( count( $show_icons ) > 0 ) || ( $show_
 			$blocks['show_images'] .= '</div>';
 
 			// --- Download Audio Icon ---
-			$title = __( 'Download Latest Broadcast', 'radio-station' );
-			$blocks['show_images'] .= '<div class="show-download">';
-			$blocks['show_images'] .= '<a href="' . esc_url( $show_file ) . '" title="' . esc_attr( $title ) . '">';
-			$blocks['show_images'] .= '<span style="color:#7DBB00;" class="dashicons dashicons-download"></span>';
-			$blocks['show_images'] .= '</a>';
-			$blocks['show_images'] .= '</div>';
+			// 2.3.2: check show download switch
+			if ( $show_download ) {
+				$title = __( 'Download Latest Broadcast', 'radio-station' );
+				$blocks['show_images'] .= '<div class="show-download">';
+				$blocks['show_images'] .= '<a href="' . esc_url( $show_file ) . '" title="' . esc_attr( $title ) . '">';
+				$blocks['show_images'] .= '<span style="color:#7DBB00;" class="dashicons dashicons-download"></span>';
+				$blocks['show_images'] .= '</a>';
+				$blocks['show_images'] .= '</div>';
+			}
+			
 			$blocks['show_images'] .= '</div>';
 		}
 
@@ -354,33 +369,28 @@ if ( !$active || !$shifts ) {
 } else {
 
 	// --- get timezone and offset ---
-	$timezone = radio_station_get_setting( 'timezone_location' );
-	if ( !$timezone || ( '' == $timezone ) ) {
-		// --- fallback to WordPress timezone ---
-		$timezone = get_option( 'timezone_string' );
-		if ( false !== strpos( $timezone, 'Etc/GMT' ) ) {
-			$timezone = '';
-		}
-		if ( '' == $timezone ) {
-			$offset = get_option( 'gmt_offset' );
-		}
-	}
-	if ( $timezone && ( '' != $timezone ) ) {
+	// 2.3.2: use get timezone function
+	$timezone = radio_station_get_timezone();
+	if ( strstr( $timezone, 'UTC' ) ) {
+		$offset = str_replace( 'UTC', '', $timezone );
+	} else {
 		$timezone_code = radio_station_get_timezone_code( $timezone );
 		$datetimezone = new DateTimeZone( $timezone );
 		$offset = $datetimezone->getOffset( new DateTime() );
 		$offset = round( $offset / 60 / 60 );
-	}
-	if ( strstr( (string) $offset, '.' ) ) {
-		if ( substr( $offset, - 2, 2 ) == '.5' ) {
-			$offset = str_replace( '.5', ':30', $offset );
-		} elseif ( substr( $offset, - 3, 3 ) == '.75' ) {
-			$offset = str_replace( '.75', ':45', $offset );
-		} elseif ( substr( $offset, - 3, 3 ) == '.25' ) {
-			$offset = str_replace( '.25', ':15', $offset );
+
+		if ( strstr( (string) $offset, '.' ) ) {
+			if ( substr( $offset, - 2, 2 ) == '.5' ) {
+				$offset = str_replace( '.5', ':30', $offset );
+			} elseif ( substr( $offset, - 3, 3 ) == '.75' ) {
+				$offset = str_replace( '.75', ':45', $offset );
+			} elseif ( substr( $offset, - 3, 3 ) == '.25' ) {
+				$offset = str_replace( '.25', ':15', $offset );
+			}
 		}
 	}
-	if ( 0 == $offset ) {
+	
+	if ( ( 0 == $offset ) || ( '' == $offset ) ) {
 		$utc_offset = '';
 	} elseif ( $offset > 0 ) {
 		$utc_offset = '+' . $offset;
@@ -395,7 +405,7 @@ if ( !$active || !$shifts ) {
 	} else {
 		$blocks['show_times'] .= esc_html( $timezone_code );
 		$blocks['show_times'] .= '<span class="show-offset">';
-		$blocks['show_times'] .= ' (' . esc_html( __( 'UTC', 'radio-station' ) ) . $utc_offset . ')';
+		$blocks['show_times'] .= ' [' . esc_html( __( 'UTC', 'radio-station' ) ) . $utc_offset . ']';
 		$blocks['show_times'] .= '</span>';
 	}
 
@@ -405,10 +415,19 @@ if ( !$active || !$shifts ) {
 	$blocks['show_times'] .= '<table class="show-times" cellpadding="0" cellspacing="0">';
 
 	$found_encore = false;
-	$am = radio_station_translate_meridiem( 'am' );
-	$pm = radio_station_translate_meridiem( 'pm' );
+
+	// --- get data format ---
+	// 2.3.2: set filterable time formats
+	if ( 24 == (int) $time_format ) {
+		$start_data_format = $end_data_format = 'H:i';
+	} else {
+		$start_data_format = $end_data_format = 'g:i a';
+	}
+	$start_data_format = apply_filters( 'radio_station_time_format_start', $start_data_format, 'show-template', $post_id );
+	$end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_format, 'show-template', $post_id );
+
 	$weekdays = radio_station_get_schedule_weekdays();
-	$current_time = strtotime( current_time( 'mysql' ) );
+	$now = radio_station_get_now();
 	foreach ( $weekdays as $day ) {
 		$show_times = array();
 		if ( $shifts && is_array( $shifts ) && ( count( $shifts ) > 0 ) ) {
@@ -416,28 +435,27 @@ if ( !$active || !$shifts ) {
 				if ( $day == $shift['day'] ) {
 
 					// --- convert shift info ---
+					// 2.3.2: replace strtotime with to_time for timezones
+					// 2.3.2: fix to convert to 24 hour format first
 					$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
 					$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
-					$shift_start_time = strtotime( $start );
-					$shift_end_time = strtotime( $end );
+					$start_time = radio_station_convert_shift_time( $start );
+					$end_time = radio_station_convert_shift_time( $end );
+					$shift_start_time = radio_station_to_time( $start_time );
+					$shift_end_time = radio_station_to_time( $end_time );
 					if ( $shift_end_time < $shift_start_time ) {
 						$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 					}
 
-					// --- maybe convert to 24 hour format ---
-					if ( 24 == (int) $time_format ) {
-						$start = radio_station_convert_shift_time( $start, 24 );
-						$end = radio_station_convert_shift_time( $end, 24 );
-						$data_format = 'H:i';
-					} else {
-						$start = str_replace( array( 'am', 'pm' ), array( $am, $pm ), $start );
-						$end = str_replace( array( 'am', 'pm' ), array( $am, $pm ), $end );
-						$data_format = 'g:i a';
-					}
+					// --- get shift time display ---
+					$start = radio_station_get_time( $start_data_format, $shift_start_time );
+					$end = radio_station_get_time( $end_data_format, $shift_end_time );
+					$start = radio_station_translate_time( $start );
+					$end = radio_station_translate_time( $end );				
 
 					// --- check if current shift ---
 					$classes = array( 'show-shift-time' );
-					if ( ( $current_time > $shift_start_time ) && ( $current_time < $shift_end_time ) ) {
+					if ( ( $now > $shift_start_time ) && ( $now < $shift_end_time ) ) {
 						$classes[] = 'current-shift';
 					}
 					$class = implode( ' ', $classes );
@@ -446,7 +464,7 @@ if ( !$active || !$shifts ) {
 					$show_time = '<div class="' . esc_attr( $class ) . '">';
 					$show_time .= '<span class="rs-time rs-start-time" data-format="' . esc_attr( $data_format ) . '">' . esc_html( $start ) . '</span>';
 					$show_time .= '<span class="rs-sep"> - </span>';
-					$show_time .= '<span class="rs-time rs-end-time" data-format="' . esc_attr( $data_format ) . '">' . esc_html( $end ) . '</span>';
+					$show_time .= '<span class="rs-time rs-end-time" data-format="' . esc_attr( $end_data_format ) . '">' . esc_html( $end ) . '</span>';
 					if ( isset( $shift['encore'] ) && ( 'on' == $shift['encore'] ) ) {
 						$found_encore = true;
 						$show_time .= '<span class="show-encore">*</span>';
