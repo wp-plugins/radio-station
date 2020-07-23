@@ -452,12 +452,12 @@ function radio_station_master_schedule_table_js() {
 	// 2.3.2: fix to currenthour substr
 	$js = "/* Initialize Table */
 	jQuery(document).ready(function() {
-		radio_table_responsive();
+		radio_table_responsive(false);
 		radio_times_highlight();
 		setTimeout(radio_times_highlight, 60000);
 	});
 	jQuery(window).resize(function () {
-		radio_resize_debounce(radio_table_responsive, 500, 'scheduletable');
+		radio_resize_debounce(function() {radio_table_responsive(false);}, 500, 'scheduletable');
 	});
 
 	/* Current Time Highlighting */
@@ -497,56 +497,53 @@ function radio_station_master_schedule_table_js() {
 	}
 
 	/* Make Table Responsive */
-	function radio_table_responsive() {
-		tablewidth = jQuery('#master-program-schedule').width();
-		daycolumns = Math.floor(tablewidth / 100) - 1;
-		if (daycolumns < 1) {daycolumns = 1;} else if (daycolumns > 7) {daycolumns = 7;}
+	function radio_table_responsive(leftright) {
+		
+		fallback = -1; selected = -1;
 		for (i = 0; i < 7; i++) {
+			if ((fallback < 0) && jQuery('.master-program-day.day-'+i).length) {fallback = i;}
 			if (jQuery('.master-program-day.day-'+i).hasClass('selected-day')) {selected = i;}
 		}
-		startcolumn = selected;
-		if ((selected + daycolumns) > 6) {startcolumn = 7 - daycolumns;}
+		if (selected < 0) {selected = fallback;}
 
-		columns = 0; firstcolumn = -1;
+		if (leftright == 'left') {selected--;} else if (leftright == 'right') {selected++;} 
+		if (selected < 0) {selected = 0;} else if (selected > 6) {selected = 6;}
+		jQuery('.master-program-day').removeClass('selected-day');
+		jQuery('.master-program-day.day-'+selected).addClass('selected-day');
+		if (radio.debug) {console.log('Selected Column: '+selected);}
+
+		totalwidth = jQuery('#master-program-hour-heading').width();
+		jQuery('.master-program-day, .show-info').removeClass('first-column').removeClass('last-column').hide();
+		jQuery('#master-program-schedule').css('width','100%');
+		tablewidth = jQuery('#master-program-schedule').width();
+		jQuery('#master-program-schedule').css('width','auto');
+		columns = 0; firstcolumn = -1; lastcolumn = 7; endtable = false;
 		for (i = 0; i < 7; i++) {
-			jQuery('.master-program-day.day-'+i).removeClass('first-column').removeClass('last-column');
-			if ( ((i + 1) > startcolumn) && (columns < daycolumns) ) {
-				jQuery('.master-program-day.day-'+i+', .show-info.day-'+i).show();
-				if (firstcolumn < 0) { 
+			if ( !endtable && ((i + 1) > selected) ) {
+				if (firstcolumn < 0) {
 					if (i > 0) {jQuery('.master-program-day.day-'+i).addClass('first-column');}
 					firstcolumn = 0;
+				} else if (i < 6) {jQuery('.master-program-day.day-'+i).addClass('last-column');}
+				jQuery('.master-program-day.day-'+i+', .show-info.day-'+i).show();
+				colwidth = jQuery('.master-program-day.day-'+i).width();
+				totalwidth = totalwidth + colwidth;
+				if (radio.debug) {console.log('('+colwidth+') : '+totalwidth+' / '+tablewidth);}
+				jQuery('.master-program-day.day-'+i).removeClass('last-column');
+				if (totalwidth > tablewidth) {
+					jQuery('.master-program-day.day-'+i+', .show-info.day-'+i).hide(); endtable = true;
+				} else {
+					cwidth = jQuery('.master-program-day.day-'+i).width();
+					totalwidth = totalwidth - (colwidth - cwidth); lastcolumn = i; columns++;
 				}
-				lastcolumn = i; columns++;
-			} else {
-				jQuery('.master-program-day.day-'+i+', .show-info.day-'+i).hide();
 			}
+
 		}
 		if (lastcolumn < 6) {jQuery('.master-program-day.day-'+lastcolumn).addClass('last-column');}
-
-		if (radio.debug) {
-			console.log('Day Columns:' +daycolumns);
-			console.log('Selected Column: '+selected);
-			console.log('Start Column: '+startcolumn);
-			console.log('Last Column: '+lastcolumn);
-		}
 	}
 	
 	/* Shift Day Left /  Right */
 	function radio_shift_day(leftright) {
-		tablewidth = jQuery('#master-program-schedule').width();
-		daycolumns = Math.floor(tablewidth / 100) - 1;
-		if (daycolumns < 1) {daycolumns = 1;} else if (daycolumns > 7) {daycolumns = 7;}
-		for (i = 0; i < 7; i++) {
-			if (jQuery('.master-program-day.day-'+i).hasClass('selected-day')) {selected = i;}
-		}
-		if ((selected + daycolumns) > 6) {selected = 7 - daycolumns;}
-		if (leftright == 'left') {selected--;} else if (leftright == 'right') {selected++;} 
-		for (i = 0; i < 7; i++) {
-			if (i == selected) {jQuery('.master-program-day.day-'+i).addClass('selected-day');}
-			else {jQuery('.master-program-day.day-'+i).removeClass('selected-day');}
-		}
-		radio_table_responsive();
-		return false;
+		radio_table_responsive(leftright); return false;
 	}";
 
 	// --- enqueue script inline ---
@@ -589,12 +586,12 @@ function radio_station_master_schedule_tabs_js() {
 	$js .= "/* Initialize Tabs */
 	jQuery(document).ready(function() {
 		radio.schedule_tabinit = false;
-		radio_tabs_responsive();
+		radio_tabs_responsive(false);
 		radio_show_highlight();
 		setTimeout(radio_show_highlight, 60000);
 	});
 	jQuery(window).resize(function () {
-		radio_resize_debounce(radio_tabs_responsive, 500, 'scheduletabs');
+		radio_resize_debounce(function() {radio_tabs_responsive(false);}, 500, 'scheduletabs');
 	});
 
 	/* Set Day Tab on Load */
@@ -643,81 +640,93 @@ function radio_station_master_schedule_tabs_js() {
 	}
 	
 	/* Make Tabs Responsive */
-	function radio_tabs_responsive() {
-	
-		jQuery('.master-schedule-tabs-selected').hide();
-		tabswidth = jQuery('#master-schedule-tabs').width();
-		daycolumns = Math.floor(tabswidth / 125);
-		if (daycolumns < 1) {daycolumns = 1;} else if (daycolumns > 7) {daycolumns = 7;}
-		fallback = false; selected = false;
+	function radio_tabs_responsive(leftright) {
+
+		fallback = -1; selected = -1;
 		for (i = 0; i < 7; i++) {
-			if (!fallback && jQuery('.master-schedule-tabs-day.day-'+i)) {fallback = i;}
+			if ((fallback < 0) && jQuery('.master-schedule-tabs-day.day-'+i).length) {fallback = i;}
 			if (jQuery('.master-schedule-tabs-day.day-'+i).hasClass('selected-day')) {selected = i;}
 		}
-		if (selected) {startcolumn = selected;} else {selected = startcolumn = fallback;}
-		if ((selected + daycolumns) > 6) {startcolumn = 7 - daycolumns;}
+		if (selected < 0) {selected = fallback;}
 
-		activeday = false; columns = 0; firstcolumn = -1;
-		for (i = 0; i < 7; i++) {
-			if (jQuery('.master-schedule-tabs-day.day-'+i).hasClass('active-day-tab')) {
-				activeday = i;
-			}
-		}
-		for (i = 0; i < 7; i++) {
-			jQuery('.master-schedule-tabs-day.day-'+i).removeClass('first-tab');
-			jQuery('.master-schedule-tabs-day.day-'+i).removeClass('last-tab');
-			if ( ((i + 1) > startcolumn) && (columns < daycolumns) ) {
-				jQuery('.master-schedule-tabs-day.day-'+i).show();
-				if (firstcolumn < 0) { 
-					firstcolumn = 0;
-					jQuery('.master-schedule-tabs-day.day-'+i).addClass('first-tab');
+		if (leftright == 'left') {selected--;} else if (leftright == 'right') {selected++;}
+		if (selected < 0) {selected = 0;} else if (selected > 6) {selected = 6;}
+		jQuery('.master-schedule-tabs-day').removeClass('selected-day');
+		jQuery('.master-schedule-tabs-day.day-'+selected).addClass('selected-day');
+
+		tabswidth = jQuery('#master-schedule-tabs').width();
+		totalwidth = 0; columns = 0; firstcolumn = -1; lastcolumn = 7; endtabs = false; 
+		jQuery('.master-schedule-tabs-day').removeClass('first-tab').removeClass('last-tab').hide();
+		if (!leftright || (leftright == 'left')) {
+			for (i = 0; i < 7; i++) {
+				if ( !endtabs && ((i + 1) > selected) ) {
+					if (firstcolumn < 0) {jQuery('.master-schedule-tabs-day.day-'+i).addClass('first-tab'); firstcolumn = 0;}
+					else if (i < 6) {jQuery('.master-schedule-tabs-day.day-'+i).addClass('last-tab');}
+					jQuery('.master-schedule-tabs-day.day-'+i).show();
+					tabwidth = jQuery('.master-schedule-tabs-day.day-'+i).width();
+					marginleft = parseInt(jQuery('.master-schedule-tabs-day.day-'+i).css('margin-left').replace('px',''));
+					marginright = parseInt(jQuery('.master-schedule-tabs-day.day-'+i).css('margin-right').replace('px',''));
+					totalwidth = totalwidth + tabwidth + marginleft + marginright;
+					if (radio.debug) {console.log(tabwidth+' - ('+marginleft+'/'+marginright+') - '+totalwidth+' / '+tabswidth);}
+					jQuery('.master-schedule-tabs-day.day-'+i).removeClass('last-tab');
+					if (totalwidth > tabswidth) {jQuery('.master-schedule-tabs-day.day-'+i).hide(); endtabs = true;}
+					else {
+						twidth = jQuery('.master-schedule-tabs-day.day-'+i).width();
+						totalwidth = totalwidth - (tabwidth - twidth); lastcolumn = i; columns++;
+					}
 				}
-				lastcolumn = i; columns++;
-			} else {
-				jQuery('.master-schedule-tabs-day.day-'+i).hide();
-			}
+			}		
+			if (lastcolumn < 6) {jQuery('.master-schedule-tabs-day.day-'+lastcolumn).addClass('last-tab');}
 		}
-
-		if (lastcolumn < 6) {
-			jQuery('.master-schedule-tabs-day.day-'+lastcolumn).addClass('last-tab');
-		}
-		if (radio.debug) {
-			console.log('Active Day: '+activeday);
-			console.log('Day Columns:'+daycolumns);
-			console.log('Start Column: '+startcolumn);
-			console.log('Selected Column: '+selected);
-			console.log('Last Column: '+lastcolumn);
+		if (leftright == 'right') {
+			for (i = 6; i > -1; i--) {
+				if ( !endtabs && ((i + 1) > selected) ) {
+					if (jQuery('.master-schedule-tabs-day').length) {
+						if (lastcolumn > 6) {jQuery('.master-schedule-tabs-day.day-'+i).addClass('last-tab'); lastcolumn = i;}
+						else if (i > 1) {jQuery('.master-schedule-tabs-day.day-'+i).addClass('first-tab');}
+						jQuery('.master-schedule-tabs-day.day-'+i).show();
+						tabwidth = jQuery('.master-schedule-tabs-day.day-'+i).width();
+						marginleft = parseInt(jQuery('.master-schedule-tabs-day.day-'+i).css('margin-left').replace('px',''));
+						marginright = parseInt(jQuery('.master-schedule-tabs-day.day-'+i).css('margin-right').replace('px',''));
+						totalwidth = totalwidth + tabwidth + marginleft + marginright;
+						if (radio.debug) {console.log(tabwidth+' - ('+marginleft+'/'+marginright+') - '+totalwidth+' / '+tabswidth);}
+						jQuery('.master-schedule-tabs-day.day-'+i).removeClass('first-tab');
+						if (totalwidth > tabswidth) {jQuery('.master-schedule-tabs-day.day-'+i).hide(); endtabs = true;}
+						else {
+							twidth = jQuery('.master-schedule-tabs-day.day-'+i).width();
+							totalwidth = totalwidth - (tabwidth - twidth); firstcolumn = i; columns++;
+						}						
+					}
+				}
+			}		
+			if (firstcolumn > 0) {jQuery('.master-schedule-tabs-day.day-'+firstcolumn).addClass('first-tab');}
 		}
 
 		/* display selected day message if outside view */
-		if ( activeday && ( (activeday > lastcolumn) || (activeday < startcolumn ) ) ) {
-			weekday = radio_get_weekday(activeday);
-			jQuery('#master-schedule-tabs-selected-'+weekday).show();
+		activeday = false; 
+		for (i = 0; i < 7; i++) {
+			if (jQuery('.master-schedule-tabs-day.day-'+i).length) {
+				if (jQuery('.master-schedule-tabs-day.day-'+i).hasClass('active-day-tab')) {activeday = i;}
+			}
+		}
+		jQuery('.master-schedule-tabs-selected').hide();
+		if ( activeday && ( (activeday > lastcolumn) || (activeday < firstcolumn ) ) ) {
+			jQuery('#master-schedule-tabs-selected-'+activeday).show();
 		}		
+
+		if (radio.debug) {
+			console.log('Active Day: '+activeday);
+			console.log('Selected: '+selected);
+			console.log('Fallback: '+fallback);
+			console.log('First Column: '+firstcolumn);
+			console.log('Last Column: '+lastcolumn);
+			console.log('Visible Columns: '+columns);
+		}
 	}
 	
 	/* Shift Day Left /  Right */
 	function radio_shift_tab(leftright) {
-		tabswidth = jQuery('#master-schedule-tabs').width();
-		daycolumns = Math.floor(tabswidth / 120);
-		if (daycolumns < 1) {daycolumns = 1;} else if (daycolumns > 7) {daycolumns = 7;}
-		for (i = 0; i < 7; i++) {
-			if (jQuery('.master-schedule-tabs-day.day-'+i).hasClass('selected-day')) {selected = i;}
-		}
-		if (radio.debug) {
-			console.log('Tabs Width: '+tabswidth+' - Day Columns: '+daycolumns);
-			console.log('Selected Day: '+selected);
-		}
-		if ((selected + daycolumns) > 6) {
-			selected = 7 - daycolumns;
-			if (radio.debug) {console.log('Adjusted Select: '+selected);}
-		}
-		if (leftright == 'left') {selected--;} else if (leftright == 'right') {selected++;} 
-		for (i = 0; i < 7; i++) {
-			if (i == selected) {jQuery('.master-schedule-tabs-day.day-'+i).addClass('selected-day');}
-			else {jQuery('.master-schedule-tabs-day.day-'+i).removeClass('selected-day');}
-		}
-		radio_tabs_responsive();
+		radio_tabs_responsive(leftright);
 		return false;
 	}";
 

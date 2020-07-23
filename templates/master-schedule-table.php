@@ -119,7 +119,7 @@ foreach ( $weekdays as $i => $weekday ) {
 		$classes = array( 'master-program-day', 'day-' . $i, strtolower( $weekday ), 'date-' . $weekdate );
 		if ( ( $now > $day_start_time ) && ( $now < $day_end_time ) ) {
 			$classes[] = 'current-day';
-			$classes[] = 'selected-day';
+			// $classes[] = 'selected-day';
 		}
 		$class = implode( ' ', $classes );
 

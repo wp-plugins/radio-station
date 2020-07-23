@@ -184,6 +184,9 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 == Changelog ==
 
+= 2.3.3 =
+* Improved: width responsiveness for table/tabbed Schedule views
+
 = 2.3.2 =
 * Update: Plugin Loader (1.1.2) with settings link fix
 * Improved: use plugin timezone setting for all times
