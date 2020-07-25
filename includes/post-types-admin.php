@@ -881,8 +881,12 @@ function radio_station_playlist_save_data( $post_id ) {
 	// --- make sure we have a post ID for AJAX save ---
 	// 2.3.2: added AJAX track saving checks
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+		// 2.3.3: added double check for AJAX action match
+		if ( !isset( $_REQUEST['action'] ) || ( 'radio_station_playlist_save_tracks' != $_REQUEST['action'] ) ) {
+			return;
+		}
 		if ( !isset( $_POST['playlist_id'] ) || ( '' == $_POST['playlist_id'] ) ) {
-			exit;
+			return;
 		}
 		$post_id = absint( $_POST['playlist_id'] );
 		$post = get_post( $post_id );
@@ -2445,8 +2449,12 @@ function radio_station_show_save_data( $post_id ) {
 	// --- make sure we have a post ID for AJAX save ---
 	// 2.3.2: added AJAX shift saving checks
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+		// 2.3.3: added double check for AJAX action match
+		if ( !isset( $_REQUEST['action'] ) || ( 'radio_station_show_save_shifts' != $_REQUEST['action'] ) ) {
+			return;
+		}
 		if ( !isset( $_POST['show_id'] ) || ( '' == $_POST['show_id'] ) ) {
-			exit;
+			return;
 		}
 		$post_id = absint( $_POST['show_id'] );
 		$post = get_post( $post_id );

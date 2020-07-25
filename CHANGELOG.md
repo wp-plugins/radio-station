@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2.3.3
 * Improved: width responsiveness for table/tabbed Schedule views
+* Fixed: AJAX call causing plugin conflicts via save post action
 
 ### 2.3.2
 * Update: Plugin Loader (1.1.2) with settings link fix

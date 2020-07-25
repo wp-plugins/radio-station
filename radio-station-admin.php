@@ -1445,8 +1445,9 @@ function radio_station_record_subscribe() {
 // AJAX Clear Notices
 // ------------------
 // (for manual use in development testing)
-add_action( 'wp_ajax_radio_station_clear_option', 'wp_ajax_radio_station_clear_option' );
-function wp_ajax_radio_station_clear_option() {
+// 2.3.3: fix to function prefix
+add_action( 'wp_ajax_radio_station_clear_option', 'radio_station_clear_plugin_options' );
+function radio_station_clear_plugin_options() {
 
 	if ( !current_user_can( 'manage_options' ) ) {return;}
 	
