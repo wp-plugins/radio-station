@@ -1657,6 +1657,52 @@ function radio_station_show_shifts_metabox() {
 		jQuery('#shifts-saving-message').show();
 		jQuery('#shift-save-form').submit();
 	}" . PHP_EOL;
+	
+	// --- check select change ---
+	// 2.3.3: added select change detection
+	$js .= "function radio_check_select(el) {
+		val = el.options[el.selectedIndex].value;
+		if (val == '') {jQuery('#'+el.id).addClass('incomplete');}
+		else {jQuery('#'+el.id).removeClass('incomplete');}
+		origid = el.id.replace('shift-','');
+		origval = jQuery('#'+origid).val();
+		if (val == origval) {jQuery('#'+el.id).removeClass('changed');}
+		else {jQuery('#'+el.id).addClass('changed');}
+		uid = origid.substr(0,8);
+		radio_check_shift(uid);
+	}" . PHP_EOL;
+
+	// --- check checkbox change ---
+	// 2.3.3: added checkbox change detection
+	$js .= "function radio_check_checkbox(el) {
+		val = el.checked ? 'on' : '';
+		origid = el.id.replace('shift-','');
+		origval = jQuery('#'+origid).val();
+		if (val == origval) {jQuery('#'+el.id).removeClass('changed');}
+		else {jQuery('#'+el.id).addClass('changed');}
+		uid = origid.substr(0,8);
+		radio_check_shift(uid);
+	}" . PHP_EOL;
+
+	// --- check shift change ---
+	// 2.3.3: added shift change detection
+	$js .= "function radio_check_shift(id) {
+		var shiftchanged = false;
+		jQuery('#shift-'+id).find('select,input').each(function() {
+			if ( (jQuery(this).attr('id').indexOf('shift-') == 0) && (jQuery(this).hasClass('changed')) ) {
+				shiftchanged = true;
+			}		
+		});
+		if (shiftchanged) {jQuery('#shift-'+id).addClass('changed');}
+		else {jQuery('#shift-'+id).removeClass('changed');}
+		radio_check_shifts();
+	}" . PHP_EOL;
+
+	$js .= "function radio_check_shifts() {
+		if (jQuery('.show-shift.changed').length) {
+			window.onbeforeunload = function() {return true;}
+		} else {window.onbeforeunload = null;}
+	}" . PHP_EOL;
 
 	// --- add new shift ---
 	// 2.3.2: separate function for onclick
@@ -1676,18 +1722,18 @@ function radio_station_show_shifts_metabox() {
 
 	// --- remove shift ----
 	// 2.3.2: separate function for onclick
-	$js .= "function radio_shift_remove(id) {
+	// 2.3.3: fix to jQuery targeting for new shifts
+	$js .= "function radio_shift_remove(el) {
 		agree = confirm('" . esc_js( $confirm_remove ) . "');
 		if (!agree) {return false;}
-		console.log(id); console.log(jQuery(id));
-		console.log(jQuery(id).closest('.shift-wrapper'));
-		jQuery(id).closest('.shift-wrapper').remove();
+		shiftid = el.id.replace('shift-','').replace('-remove','');
+		jQuery('#'+el.id).closest('.shift-wrapper').remove();
 	}" . PHP_EOL;
 
 	// --- duplicate shift ---
 	// 2.3.2: separate function for onclick
-	$js .= "function radio_shift_duplicate(id) {
-		shiftid = jQuery(id).attr('id').replace('shift-','');
+	$js .= "function radio_shift_duplicate(el) {
+		shiftid = el.id.replace('shift-','').replace('-duplicate','');
 		values = {};
 		values.day = jQuery('#shift-'+shiftid+'-day').val();
 		values.start_hour = jQuery('#shift-'+shiftid+'-start-hour').val();
@@ -1705,14 +1751,14 @@ function radio_station_show_shifts_metabox() {
 	// --- add shift function ---
 	// 2.3.2: added missing shift wrapper class
 	// 2.3.2: set new count based on new shift children
-	$js .= "/* Add Show Shift */
-		function radio_shift_add(values) {
+	// 2.3.3: add input IDs so new shifts can be duplicated
+	$js .= "function radio_shift_add(values) {
 			var count = jQuery('#new-shifts').children().length + 1;
-			console.log(count);
-			output = '<div class=\"shift_wrapper\"><ul class=\"show-shift\">';
+			output = '<div id=\"shift-wrapper-new' + count + '\" class=\"shift-wrapper\">';
+			output += '<ul id=\"shift-' + count + '\" class=\"show-shift new-shift\">';
 				output += '<li class=\"first-item\">';
 					output += '" . esc_js( __( 'Day', 'radio-station' ) ) . ": ';
-					output += '<select name=\"show_sched[new-' + count + '][day]\" id=\"shift-new-' + count +'-day\">';";
+					output += '<select id=\"shift-new' + count + '-day\" name=\"show_sched[new-' + count + '][day]\" id=\"shift-new-' + count +'-day\">';";
 
 	// - shift day -
 	// 2.3.0: simplify by looping days and add translation
@@ -1726,7 +1772,7 @@ function radio_station_show_shifts_metabox() {
 
 			output += '<li>';
 				output += '" . esc_js( __( 'Start Time', 'radio-station' ) ) . ": ';
-				output += '<select name=\"show_sched[new-' + count + '][start_hour]\" id=\"shift-new-' + count + '-start-hour\" style=\"min-width:35px;\">';";
+				output += '<select id=\"shift-new' + count + '-start-min\" name=\"show_sched[new-' + count + '][start_hour]\" id=\"shift-new-' + count + '-start-hour\" style=\"min-width:35px;\">';";
 
 	// - start hour -
 	foreach ( $hours as $hour ) {
@@ -1735,7 +1781,8 @@ function radio_station_show_shifts_metabox() {
 			output += '>" . esc_js( $hour ) . "</option>';";
 	}
 		$js .= "output += '</select> ';
-				output += '<select name=\"show_sched[new-' + count + '][start_min]\" id=\"shift-new-' + count + '-start-min\" style=\"min-width:35px;\">';";
+				output += '<select id=\"shift-new' + count + '-start-hour\" name=\"show_sched[new-' + count + '][start_min]\" id=\"shift-new-' + count + '-start-min\" style=\"min-width:35px;\">';
+				output += '<option value=\"00\">00</option><option value=\"15\">15</option><option value=\"30\">30</option><option value=\"45\">45</option>';";
 
 	// - start minute -
 	foreach ( $mins as $min ) {
@@ -1746,7 +1793,7 @@ function radio_station_show_shifts_metabox() {
 	
 	// - start meridian -
 	$js .= "output += '</select>';
-			output += '<select name=\"show_sched[new-' + count + '][start_meridian]\" id=\"shift-new-' + count + '-start-meridian\" style=\"min-width:35px;\">';
+			output += '<select id=\"shift-new' + count + '-start-meridian\" name=\"show_sched[new-' + count + '][start_meridian]\" id=\"shift-new-' + count + '-start-meridian\" style=\"min-width:35px;\">';
 				output += '<option value=\"am\"';
 				if (values.start_meridian == '" . esc_js( $am ) . "') {output += ' selected=\"selected\"';}
 				output += '>" . esc_js( $am ) . "</option>';
@@ -1758,7 +1805,7 @@ function radio_station_show_shifts_metabox() {
 
 	$js .= "output += '<li>';
 			output += '" . esc_js( __( 'End Time', 'radio-station' ) ) . ": ';
-			output += '<select name=\"show_sched[new-' + count + '][end_hour]\" id=\"shift-new-' + count + '-end-hour\" style=\"min-width:35px;\">';";
+			output += '<select id=\"shift-new' + count + '-end-hour\" name=\"show_sched[new-' + count + '][end_hour]\" id=\"shift-new-' + count + '-end-hour\" style=\"min-width:35px;\">';";
 
 	// - end hour -
 	foreach ( $hours as $hour ) {
@@ -1770,7 +1817,8 @@ function radio_station_show_shifts_metabox() {
 				
 				
 	// - end min -
-	$js .= "output += '<select name=\"show_sched[new-' + count + '][end_min]\" id=\"shift-new-' + count + '-end-min\" style=\"min-width:35px;\">';";
+	$js .= "output += '<select id=\"shift-new' + count + '-end-min\" name=\"show_sched[new-' + count + '][end_min]\" id=\"shift-new-' + count + '-end-min\" style=\"min-width:35px;\">';
+			output += '<option value=\"00\">00</option><option value=\"15\">15</option><option value=\"30\">30</option><option value=\"45\">45</option>';";
 	foreach ( $mins as $min ) {
 		$js .= "output += '<option value=\"" . esc_js( $min ) . "\"';
 				if (values.end_min == '" . esc_js( $min ) . "') {output += ' selected=\"selected\"';}
@@ -1779,7 +1827,7 @@ function radio_station_show_shifts_metabox() {
 	$js .= "output += '</select> ';";
 
 	// - end meridian -
-	$js .= "output += '<select name=\"show_sched[new-' + count + '][end_meridian]\" id=\"shift-new-' + count + '-end-meridian\" style=\"min-width:35px;\">';
+	$js .= "output += '<select id=\"shift-new' + count + '-end-meridian\" name=\"show_sched[new-' + count + '][end_meridian]\" id=\"shift-new-' + count + '-end-meridian\" style=\"min-width:35px;\">';
 				output += '<option value=\"am\"';
 				if (values.end_meridian == '" . esc_js( $am ) . "') {output += ' selected=\"selected\"';}
 				output += '>" . esc_js( $am ) . "</option>';
@@ -1791,26 +1839,26 @@ function radio_station_show_shifts_metabox() {
 
 	// - encore -
 	$js .= "output += '<li>';
-			output += '<input type=\"checkbox\" value=\"on\" name=\"show_sched[new-' + count + '][encore]\" id=\"shift-new-' + count + '-encore\"';
+			output += '<input id=\"shift-new' + count + '-disabled\" type=\"checkbox\" value=\"on\" name=\"show_sched[new-' + count + '][encore]\" id=\"shift-new-' + count + '-encore\"';
 			if (values.encore == 'on') {output += ' checked=\"checked\"';}
 			output += '> " . esc_js( __( 'Encore', 'radio-station' ) ) . "';
 		output += '</li>';";
 
 	// - disabled shift -
 	$js .= "output += '<li>';
-			output += '<input type=\"checkbox\" value=\"yes\" name=\"show_sched[new-' + count + '][disabled]\" id=\"shift-new-' + count + '-disabled\"';
+			output += '<input id=\"shift-new' + count + '-disabled\" type=\"checkbox\" value=\"yes\" name=\"show_sched[new-' + count + '][disabled]\" id=\"shift-new-' + count + '-disabled\"';
 			if (values.disabled != '') {output += ' checked=\"checked\"';}
 			output += '> " . esc_js( __( 'Disabled', 'radio-station' ) ) . "';
 		output += '</li>';";
 
 	// - duplicate shift -
 	$js .= "output += '<li>';
-			output += '<span class=\"shift-duplicate dashicons dashicons-admin-page\"  id=\"shift-' + count + '\" title=\"" . esc_js( __( 'Duplicate Shift', 'radio-station' ) ) . "\" onclick=\"radio_shift_duplicate(this);\"></span>';
+			output += '<span id=\"shift-new' + count + '-duplicate\" class=\"shift-duplicate dashicons dashicons-admin-page\" title=\"" . esc_js( __( 'Duplicate Shift', 'radio-station' ) ) . "\" onclick=\"radio_shift_duplicate(this);\"></span>';
 		output += '</li>';";
 
 	// - remove shift -
 	$js .= "output += '<li class=\"last-item\">';
-			output += '<span class=\"shift-remove dashicons dashicons-no\" title=\"" . esc_js( __( 'Remove Shift', 'radio-station' ) ) . "\" onclick=\"radio_shift_remove(this);\"></span>';
+			output += '<span id=\"shift-new' + count + '-remove\" class=\"shift-remove dashicons dashicons-no\" title=\"" . esc_js( __( 'Remove Shift', 'radio-station' ) ) . "\" onclick=\"radio_shift_remove(this);\"></span>';
 		output += '</li>';";
 
 	// --- append new shift list item ---
@@ -1818,20 +1866,23 @@ function radio_station_show_shifts_metabox() {
 		jQuery('#new-shifts').append(output);
 		return false;
 	}";
-
+	
 	// --- enqueue inline script ---
 	// 2.3.0: enqueue instead of echoing
 	wp_add_inline_script( 'radio-station-admin', $js );
 
 	// --- shift display styles ---
 	// 2.3.2: added dashed border to new shift
-	echo '<style>#new-shifts .show-shift {border: 2px dashed green;}
-	.show-shift {list-style: none; margin-bottom: 10px;	border: 2px solid green;}
+	echo '<style>#new-shifts .show-shift {border: 2px dashed green; background-color: #FFFFDD;}
+	.show-shift {list-style: none; margin-bottom: 10px;	border: 2px solid green; background-color: #EEFFEE;}
+	.show-shift select.changed, .show-shift input[checkbox].changed {background-color: #FFFFCC;}
+	.show-shift select option.original {font-weight: bold;}
 	.show-shift li {display: inline-block; vertical-align: middle;
 		margin-left: 20px; margin-top: 10px; margin-bottom: 10px;}
 	.show-shift li.first-item {margin-left: 10px;}
 	.show-shift li.last-item {margin-right: 10px;}        
-	.show-shift.disabled {border: 2px dashed orange;}        
+	.show-shift.changed, .show-shift.changed.disabled {background-color: #FFEEDD;}
+	.show-shift.disabled {border: 2px dashed orange; background-color: #FFDDDD;}
 	.show-shift.conflicts {outline: 2px solid red;}        
 	.show-shift.disabled.conflicts {border: 2px dashed red;	outline: none;}        
 	.show-shift select.incomplete {border: 2px solid orange;}
@@ -1965,8 +2016,8 @@ function radio_station_show_shifts_table( $post_id ) {
 			}
 			$classlist = implode( " ", $classes );
 
-			$list .= '<div class="shift-wrapper">';
-			$list .= '<ul class="' . esc_attr( $classlist ) . '">';
+			$list .= '<div id="shift-wrapper-' . esc_attr( $unique_id ) . '" class="shift-wrapper">';
+			$list .= '<ul id="shift-' . esc_attr( $unique_id ) . '" class="' . esc_attr( $classlist ) . '">';
 
 			// --- shift day selection ---
 			$list .= '<li class="first-item">';
@@ -1976,7 +2027,7 @@ function radio_station_show_shifts_table( $post_id ) {
 			if ( '' == $shift['day'] ) {
 				$class = 'incomplete';
 			}
-			$list .= '<select class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][day]" id="shift-' . esc_attr( $unique_id ) . '-day">';
+			$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-day" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][day]" onchange="radio_check_select(this);">';
 			// 2.3.0: simplify by looping days
 			foreach ( $days as $day ) {
 				// 2.3.0: add weekday translation to display
@@ -1984,6 +2035,7 @@ function radio_station_show_shifts_table( $post_id ) {
 				$list .= esc_html( radio_station_translate_weekday( $day ) ) . '</option>';
 			}
 			$list .= '</select>';
+			$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-day" value="' . esc_attr( $shift['day'] ) . '">';
 			$list .= '</li>';
 
 			// --- shift start time ---
@@ -1995,29 +2047,52 @@ function radio_station_show_shifts_table( $post_id ) {
 			if ( '' == $shift['start_hour'] ) {
 				$class = 'incomplete';
 			}
-			$list .= '<select class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][start_hour]" id="shift-' . esc_attr( $unique_id ) . '-start-hour" style="min-width:35px;">';
+			$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-start-hour" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][start_hour]" onchange="radio_check_select(this);" style="min-width:35px;">';
 			foreach ( $hours as $hour ) {
-				$list .= '<option value="' . esc_attr( $hour ) . '" ' . selected( $hour, $shift['start_hour'], false ) . '>' . esc_html( $hour ) . '</option>';
+				$class = '';
+				if ( $hour == $shift['start_hour'] ) {
+					$class = 'original';
+				}
+				$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $hour ) . '" ' . selected( $hour, $shift['start_hour'], false ) . '>' . esc_html( $hour ) . '</option>';
 			}
 			$list .= '</select>';
+			$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-start-hour" value="' . esc_attr( $shift['start_hour'] ) . '">';
 
 			// --- start minute selection ---
-			$list .= '<select name="show_sched[' . esc_attr( $unique_id ) . '][start_min]" id="shift-' . esc_attr( $unique_id ) . '-start-min" style="min-width:35px;">';
+			$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-start-min" name="show_sched[' . esc_attr( $unique_id ) . '][start_min]" onchange="radio_check_select(this);" style="min-width:35px;">';
 			$list .= '<option value=""></option>';
+			$list .= '<option value="00">00</option>';
+			$list .= '<option value="15">15</option>';
+			$list .= '<option value="30">30</option>';
+			$list .= '<option value="45">45</option>';
 			foreach ( $mins as $min ) {
-				$list .= '<option value="' . esc_attr( $min ) . '" ' . selected( $min, $shift['start_min'], false ) . '>' . esc_html( $min ) . '</option>';
+				$class = '';
+				if ( $min == $shift['start_min'] ) {
+					$class = 'original';
+				}
+				$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $min ) . '" ' . selected( $min, $shift['start_min'], false ) . '>' . esc_html( $min ) . '</option>';
 			}
 			$list .= '</select>';
+			$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-start-min" value="' . esc_attr( $shift['start_min'] ) . '">';
 
 			// --- start meridiem selection ---
 			$class = '';
 			if ( '' == $shift['start_meridian'] ) {
 				$class = 'incomplete';
 			}
-			$list .= '<select class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][start_meridian]" id="shift-' . esc_attr( $unique_id ) . '-start-meridian" style="min-width:35px;">';
-			$list .= '<option value="am" ' . selected( $shift['start_meridian'], 'am', false ) . '>' . esc_html( $am ) . '</option>';
-			$list .= '<option value="pm" ' . selected( $shift['start_meridian'], 'pm', false ) . '>' . esc_html( $pm ) . '</option>';
+			$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-start-meridian" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][start_meridian]" onchange="radio_check_select(this);" style="min-width:35px;">';
+			$class = '';
+			if ( 'am' == $shift['start_meridian'] ) {
+				$class = 'original';
+			}
+			$list .= '<option class="' . esc_attr( $class ) . '" value="am" ' . selected( $shift['start_meridian'], 'am', false ) . '>' . esc_html( $am ) . '</option>';
+			$class = '';
+			if ( 'pm' == $shift['start_meridian'] ) {
+				$class = 'original';
+			}
+			$list .= '<option class="' . esc_attr( $class ) . '" value="pm" ' . selected( $shift['start_meridian'], 'pm', false ) . '>' . esc_html( $pm ) . '</option>';
 			$list .= '</select>';
+			$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-start-meridian" value="' . esc_attr( $shift['start_meridian'] ) . '">';
 			$list .= '</li>';
 
 			// --- shift end time ---
@@ -2029,57 +2104,83 @@ function radio_station_show_shifts_table( $post_id ) {
 			if ( '' == $shift['end_hour'] ) {
 				$class = 'incomplete';
 			}
-			$list .= '<select class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][end_hour]" id="shift-' . esc_attr( $unique_id ) . '-end-hour" style="min-width:35px;">';
+			$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-end-hour" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][end_hour]" onchange="radio_check_select(this);" style="min-width:35px;">';
 			foreach ( $hours as $hour ) {
-				$list .= '<option value="' . esc_attr( $hour ) . '" ' . selected( $shift['end_hour'], $hour, false ) . '>' . esc_html( $hour ) . '</option>';
+				$class = '';
+				if ( $hour == $shift['end_hour'] ) {
+					$class = 'original';
+				}
+				$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $hour ) . '" ' . selected( $shift['end_hour'], $hour, false ) . '>' . esc_html( $hour ) . '</option>';
 			}
 			$list .= '</select>';
+			$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-end-hour" value="' . esc_attr( $shift['end_hour'] ) . '">';
 
 			// --- end minute selection ---
-			$list .= '<select name="show_sched[' . esc_attr( $unique_id ) . '][end_min]" id="shift-' . esc_attr( $unique_id ) . '-end-min" style="min-width:35px;">';
+			$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-end-min" name="show_sched[' . esc_attr( $unique_id ) . '][end_min]" onchange="radio_check_select(this);" style="min-width:35px;">';
+			$list .= '<option value=""></option>';
+			$list .= '<option value="00">00</option>';
+			$list .= '<option value="15">15</option>';
+			$list .= '<option value="30">30</option>';
+			$list .= '<option value="45">45</option>';
 			foreach ( $mins as $min ) {
-				$list .= '<option value="' . esc_attr( $min ) . '" ' . selected( $shift['end_min'], $min, false ) . '>' . esc_html( $min ) . '</option>';
+				$class = '';
+				if ( $min == $shift['end_min'] ) {
+					$class = 'original';
+				}
+				$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $min ) . '" ' . selected( $shift['end_min'], $min, false ) . '>' . esc_html( $min ) . '</option>';
 			}
 			$list .= '</select>';
+			$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-end-min" value="' . esc_attr( $shift['end_min'] ) . '">';
 
 			// --- end meridiem selection ---
 			$class = '';
 			if ( '' == $shift['end_meridian'] ) {
 				$class = 'incomplete';
 			}
-			$list .= '<select class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][end_meridian]" id="shift-' . esc_attr( $unique_id ) . '-end-meridian" style="min-width:35px;">';
-			$list .= '<option value="am" ' . selected( $shift['end_meridian'], 'am', false ) . '>' . esc_html( $am ) . '</option>';
-			$list .= '<option value="pm" ' . selected( $shift['end_meridian'], 'pm', false ) . '>' . esc_html( $pm ) . '</option>';
+			$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-end-meridian" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][end_meridian]" onchange="radio_check_select(this);" style="min-width:35px;">';
+			$class = '';
+			if ( 'am' == $shift['end_meridian'] ) {
+				$class = 'original';
+			}
+			$list .= '<option class="' . esc_attr( $class ) . '" value="am" ' . selected( $shift['end_meridian'], 'am', false ) . '>' . esc_html( $am ) . '</option>';
+			$class = '';
+			if ( 'pm' == $shift['end_meridian'] ) {
+				$class = 'original';
+			}
+			$list .= '<option class="' . esc_attr( $class ) . '" value="pm" ' . selected( $shift['end_meridian'], 'pm', false ) . '>' . esc_html( $pm ) . '</option>';
 			$list .= '</select>';
+			$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-end-meridian" value="' . esc_attr( $shift['end_meridian'] ) . '">';
 			$list .= '</li>';
 
 			// --- encore presentation ---
 			if ( !isset( $shift['encore'] ) ) {$shift['encore'] = '';}
 			$list .= '<li>';
-			$list .= '<input type="checkbox" value="on" name="show_sched[' . esc_attr( $unique_id ) . '][encore]" id="shift-' . esc_attr( $unique_id ) . '-encore"' . checked( $shift['encore'], 'on', false ) . '>';
+			$list .= '<input id="' . esc_attr( $unique_id ) . '-encore" type="checkbox" value="on" name="show_sched[' . esc_attr( $unique_id ) . '][encore]" id="shift-' . esc_attr( $unique_id ) . '-encore"' . checked( $shift['encore'], 'on', false ) . ' onchange="radio_check_checkbox(this);">';
 			$list .= esc_html( __( 'Encore', 'radio-station' ) );
+			$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-encore" value="' . esc_attr( $shift['encore'] ) . '">';
 			$list .= '</li>';
 
 			// --- shift disabled ---
 			// 2.3.0: added disabled checkbox to shift row
 			if ( !isset( $shift['disabled'] ) ) {$shift['disabled'] = '';}
 			$list .= '<li>';
-			$list .= '<input type="checkbox" value="yes" name="show_sched[' . esc_attr( $unique_id ) . '][disabled]" id="shift-' . esc_attr( $unique_id ) . '-disabled"' . checked( $shift['disabled'], 'yes', false ) . '>';
+			$list .= '<input id="' . esc_attr( $unique_id ) . '-disabled" type="checkbox" value="yes" name="show_sched[' . esc_attr( $unique_id ) . '][disabled]" id="shift-' . esc_attr( $unique_id ) . '-disabled"' . checked( $shift['disabled'], 'yes', false ) . ' onchange="radio_check_checkbox(this);">';
 			$list .= esc_html( __( 'Disabled', 'radio-station' ) );
+			$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-disabled" value="' . esc_attr( $shift['disabled'] ) . '">';
 			$list .= '</li>';
 
 			// --- duplicate shift icon ---
 			// 2.3.0: added duplicate shift icon
 			$list .= '<li>';
 			$title = __( 'Duplicate Shift', 'radio-station' );
-			$list .= '<span class="shift-duplicate dashicons dashicons-admin-page" title="' . esc_attr( $title ) . '" id="shift-' . esc_attr( $unique_id ) . '" onclick="radio_shift_duplicate(this);"></span>';
+			$list .= '<span id="shift-' . esc_attr( $unique_id ) . '-duplicate" class="shift-duplicate dashicons dashicons-admin-page" title="' . esc_attr( $title ) . '" onclick="radio_shift_duplicate(this);"></span>';
 			$list .= '</li>';
 
 			// --- remove shift icon ---
 			// 2.3.0: change remove button to icon
 			$list .= '<li class="last-item">';
 			$title = __( 'Remove Shift', 'radio-station' );
-			$list .= '<span class="shift-remove dashicons dashicons-no" title="' . esc_attr( $title ) . '" onclick="radio_shift_remove(this);"></span>';
+			$list .= '<span id="shift-' . esc_attr( $unique_id ) . '-remove" class="shift-remove dashicons dashicons-no" title="' . esc_attr( $title ) . '" onclick="radio_shift_remove(this);"></span>';
 			// $list .= '<span class="shify-remove button button-secondary" style="cursor: pointer;">';
 			// $list .= esc_html( __( 'Remove', 'radio-station' ) );
 			$list .= '</span>';
