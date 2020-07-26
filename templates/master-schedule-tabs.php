@@ -111,8 +111,8 @@ foreach ( $weekdays as $i => $weekday ) {
 		$weekdate = $weekdates[$weekday];
 		$classes = array( 'master-schedule-tabs-day', 'day-' . $i );
 		if ( $weekdate == $date ) {
+			// $classes[] = 'selected-day';
 			$classes[] = 'current-day';
-			$classes[] = 'selected-day';
 			$classes[] = 'active-day-tab';
 		}
 		$classlist  = implode( ' ', $classes );
@@ -150,15 +150,16 @@ foreach ( $weekdays as $i => $weekday ) {
 		// 2.2.7: separate headings from panels for tab view
 		$classes = array( 'master-schedule-tabs-panel' );
 		if ( $weekdate == $date ) {
-			$classes[] = 'selected-day';
+			// $classes[] = 'selected-day';
 			$classes[] = 'active-day-panel';
 		}
 		$classlist = implode( ' ', $classes );
 		$panels .= '<ul id="master-schedule-tabs-day-' . esc_attr( strtolower( $weekday ) ) . '" class="' . esc_attr( $classlist ) . '">';
 
 		// 2.3.2: added extra current day display
+		// 2.3.3: use numeric day index for ID instead of weekday name
 		$display_day = radio_station_translate_weekday( $weekday, false );
-		$panels .= '<div class="master-schedule-tabs-selected" id="master-schedule-tabs-selected-' . esc_attr( strtolower( $weekday ) ) . '">';
+		$panels .= '<div class="master-schedule-tabs-selected" id="master-schedule-tabs-selected-' . esc_attr( $i ) . '">';
 		$panels .= __( 'Viewing', 'radio-station' ) . ': ' . esc_html( $display_day ) . '</div>';
 
 		// --- get shifts for this day ---

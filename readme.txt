@@ -184,6 +184,15 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 == Changelog ==
 
+= 2.3.3 =
+* Improved: width responsiveness for table/tabbed Schedule views
+* Improved: show shifts interface background colors
+* Added: navigate away from page on shift change check
+* Removed: current show transients (intermittant unreliability)
+* Fixed: AJAX call causing plugin conflicts via save_post action
+* Fixed: calculation of Upcoming Shows near end of the week
+* Fixed: remove and duplicate actions on new shifts
+
 = 2.3.2 =
 * Update: Plugin Loader (1.1.2) with settings link fix
 * Improved: use plugin timezone setting for all times
@@ -570,7 +579,14 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 == Upgrade Notice ==
 
-= 2.3.1 =
+= 2.3.3 =
+* Important Bugfix Update
+* Fix to conflict with plugins using AJAX save_post calls
+* Improved accuracy for responsive table/tab Schedule views
+* Added colour improvements to Show Shift interface
+* Fix to calculate Current Show (transient no longer used)
+
+= 2.3.2 =
 * Improved Times, AJAX Loading and Bugfix Update 
 * https://netmix.com/radio-station-2-3-2-release/
 * Radio Clock Widget and Widget AJAX Loading

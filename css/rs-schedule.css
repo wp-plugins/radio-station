@@ -60,6 +60,7 @@
 	text-align: center;
 	vertical-align: top;
 	padding: 0.5em 0;
+	min-width: 80px;
 }
 
 #master-program-schedule th.master-program-hour {
@@ -141,6 +142,11 @@
 	display: grid;
 	min-height: 50px;
 	height: 100%;
+}
+
+#master-program-schedule .show-title, #master-program-schedule .show-image, #master-program-schedule .show-desc {
+    max-width: 120px;
+    margin: 0 auto;
 }
 
 #master-program-schedule .show-info.overflow {
