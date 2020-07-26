@@ -2,7 +2,7 @@
 
 /**
  * @package Radio Station
- * @version 2.3.2
+ * @version 2.3.3
  */
 /*
 
@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.3.2.4
+Version: 2.3.3
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -712,7 +712,7 @@ $options = array(
 		'tab'     => 'widgets',
 		'section' => 'loading',
 	),
-	
+
 	// --- Dynamic Reloading ---
 	'dynamic_reload' => array(
 		'type'    => 'checkbox',
@@ -955,7 +955,7 @@ function radio_station_enqueue_scripts() {
 	// --- enqueue plugin script ---
 	// 2.3.0: added jquery dependency for inline script fragments
 	radio_station_enqueue_script( 'radio-station', array( 'jquery' ), true );
-	
+
 	// -- enqueue javascript timezone script ---
 	// $suffix = '.min';
 	// if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
@@ -977,14 +977,14 @@ function radio_station_enqueue_script( $scriptkey, $deps = array(), $infooter = 
 	$template = radio_station_get_template( 'both', $filename, 'js' );
 	if ( $template ) {
 
-		// 2.3.2: use plugin version for releases 
+		// 2.3.2: use plugin version for releases
 		$plugin_version = radio_station_plugin_version();
 		if ( 5 == strlen( $plugin_version ) ) {
 			$version = $plugin_version;
 		} else {
 			$version = filemtime( $template['file'] );
 		}
-		
+
 		$url = $template['url'];
 
 		// --- enqueue script ---
@@ -1045,7 +1045,7 @@ function radio_station_localize_script() {
 	// --- set AJAX URL ---
 	// 2.3.2: add admin AJAX URL
 	$js .= "radio.ajax_url = '" . esc_url( admin_url( 'admin-ajax.php' ) ) . "';" . PHP_EOL;
-	
+
 	// --- clock time format ---
 	$clock_format = radio_station_get_setting( 'clock_time_format' );
 	$js .= "radio.clock_format = '" . esc_js( $clock_format ) . "';" . PHP_EOL;
@@ -1064,7 +1064,7 @@ function radio_station_localize_script() {
 	// --- radio timezone ---
 	// 2.3.2: added get timezone function
 	$timezone = radio_station_get_timezone();
-	
+
 	// if ( isset( $offset ) ) {
 	if ( stristr( $timezone, 'UTC' ) ) {
 
@@ -1105,13 +1105,13 @@ function radio_station_localize_script() {
 		$js .= "radio.timezone.utczone = false; ";
 
 	}
-	
+
 	if ( defined( 'RADIO_STATION_USE_SERVER_TIMES' ) && RADIO_STATION_USE_SERVER_TIMES ) {
 		$js .= "radio.timezone.adjusted = false; ";
 	} else {
 		$js .= "radio.timezone.adjusted = true; ";
 	}
-		
+
 	// --- set user timezone offset ---
 	// (and convert offset minutes to seconds)
 	$js .= "radio.timezone.useroffset = (new Date()).getTimezoneOffset() * 60;" . PHP_EOL;
@@ -1180,7 +1180,7 @@ function radio_station_localize_script() {
 // 2.3.2: added settings submenu page redirection fix
 add_action( 'init', 'radio_station_settings_page_redirect' );
 function radio_station_settings_page_redirect() {
-	
+
 	// --- bug out if not admin page ---
 	if ( !is_admin() ) {
 		return;
@@ -1193,8 +1193,8 @@ function radio_station_settings_page_redirect() {
 
 	// --- check if link is for options-general.php ---
 	if ( strstr( $_SERVER['REQUEST_URI'], '/options-general.php' ) ) {
-	
-		// --- redirect to plugin settings page (admin.php) ---	
+
+		// --- redirect to plugin settings page (admin.php) ---
 		$url = add_query_arg( 'page', 'radio-station', admin_url( 'admin.php' ) );
 		wp_redirect( $url );
 		exit;
@@ -1800,13 +1800,13 @@ function radio_station_add_show_links( $content ) {
 
 	// --- filter to allow related post types ---
 	$post_types = apply_filters( 'radio_station_show_related_post_types', array( 'post' ) );
-	
+
 	if ( in_array( $post->post_type, $post_types ) ) {
 
 		// --- link show posts ---
 		$related_show = get_post_meta( $post->ID, 'post_showblog_id', true );
 		if ( $related_show ) {
-			$positions = array( 'after' );	
+			$positions = array( 'after' );
 			$positions = apply_filters( 'radio_station_link_to_show_positions', $positions, $post->post_type );
 			if ( $positions && is_array( $positions ) && ( count( $positions ) > 0 ) ) {
 				if ( in_array( 'before', $positions ) || in_array( 'after', $positions ) ) {
@@ -1840,16 +1840,16 @@ function radio_station_add_show_links( $content ) {
 					$content = $before . $content . $after;
 				}
 			}
-		
+
 			// --- adjacent post links debug test ---
 			if ( RADIO_STATION_DEBUG ) {
 				$content .= "Previous Link: " . get_previous_post_link() . "<br>";
 				$content .= "Next Link: " . get_next_post_link() . "<br>";
 			}
 		}
-		
-	} 
-	
+
+	}
+
 	return $content;
 }
 
@@ -1862,7 +1862,7 @@ add_filter( 'previous_post_link', 'radio_station_get_show_post_link', 11, 5 );
 function radio_station_get_show_post_link( $output, $format, $link, $adjacent_post, $adjacent ) {
 
 	global $post;
-	
+
 	// --- filter to allow disabling ---
 	$link_show_posts = apply_filters( 'radio_station_link_show_posts', true, $post );
 	if ( !$link_show_posts ) {
@@ -1874,7 +1874,7 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 	if ( !in_array( $post->post_type, $post_types ) ) {
 		return $output;
 	}
-	
+
 	// --- get related show ---
 	$related_show = get_post_meta( $post->ID,  'post_showblog_id', true );
 	if ( !$related_show ) {
@@ -1893,7 +1893,7 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 		),
 		'order_by'	=> 'post_date',
 	);
-	
+
 	// --- setup previous or next post ---
 	$post_type_object = get_post_type_object( $post->post_type );
 	if ( 'previous' == $adjacent ) {
@@ -1923,7 +1923,7 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 				$found_current_post = true;
 			}
 		}
-				
+
 		if ( $adjacent_post ) {
 
 			// --- adjacent post title ---
