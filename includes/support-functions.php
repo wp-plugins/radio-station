@@ -1294,17 +1294,18 @@ function radio_station_get_current_schedule( $time = false ) {
 						}
 						$shift['day'] = $day;
 						$current_show = $shift;
-						$expires = $shift_end_time - $now - 1;
-						// - cache for one hour max -
+						
+						// 2.3.2: set temporary transient if time is specified
+						// 2.3.3: remove current show transient
+						/* $expires = $shift_end_time - $now - 1;
 						if ( $expires > 3600 ) {
 							$expires = 3600;
-						} 
-						// 2.3.2: set temporary transient if time is specified
+						} 						
 						if ( !$time ) {
 							set_transient( 'radio_station_current_show', $current_show, $expires );
 						} else {
 							set_transient( 'radio_station_current_show_' . $time, $current_show, $expires );
-						}
+						} */
 
 					} elseif ( $now > $shift_end_time ) {
 					
@@ -1419,34 +1420,10 @@ function radio_station_get_current_schedule( $time = false ) {
 		}
 
 		// --- pass calculated shifts with limit of 1 ---
-		// 2.3.2: added time argument
-		$next_shows = radio_station_get_next_shows( 1, $show_shifts, $time );
-		
+		// 2.3.2: added time argument to next shows retrieval
 		// 2.3.2: set next show transient within next shows function
-		/* if ( count( $next_shows ) > 0 ) {
+		$next_shows = radio_station_get_next_shows( 1, $show_shifts, $time );
 
-			// 2.3.2: replace strtotime with to_time for timezones
-			// 2.3.2: fix to convert to 24 hour format first
-			$next_show = $next_shows[0];
-			$next_show_start = radio_station_convert_shift_time( $next_show['start'] );
-			$next_show_end = radio_station_convert_shift_time( $next_show['end'] );
-			$shift_start_time = radio_station_to_time( $weekdates[$next_show['day']] . ' ' . $next_show_start );
-			$shift_end_time = radio_station_to_time( $weekdates[$next_show['day']] . ' ' . $next_show_end );
-			
-			// 2.3.2: adjust for midnight -
-			if ( $shift_end_time < $shift_start_time ) {
-				$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
-			}
-			
-			$next_expires = $shift_end_time - $now - 1;
-
-			// 2.3.2: set temporary transient if time is specified
-			if ( !$time ) {
-				set_transient( 'radio_station_next_show', $next_show, $next_expires );
-			} else {
-				set_transient( 'radio_station_next_show_' . $time, $next_show, $next_expires );
-			}
-		} */
 	}
 
 	// TODO: handle possible edge case where current show or next show is split
@@ -1495,24 +1472,69 @@ function radio_station_get_current_show( $time = false ) {
 	$current_show = false;
 
 	// --- get cached current show value ---
+	// 2.3.3: remove current show transient
+	
+	// --- get all show shifts ---
 	if ( !$time ) {
-		$current_show = get_transient( 'radio_station_current_show' );
+		$show_shifts = radio_station_get_current_schedule();
 	} else {
-		$current_show = get_transient( 'radio_station_current_show_' . $time );
+		$show_shifts = radio_station_get_current_schedule( $time );
+	}
+		
+	// --- get current time ---	
+	if ( $time ) {
+		$now = $time;
+	} else {
+		$now = radio_station_get_now();
 	}
 
-	// --- if not set it has expired so recheck schedule ---
-	// 2.3.2: fix for trailing space in transient name string
-	if ( !$current_show ) {
+	// --- get schedule for time ---
+	$today = radio_station_get_time( 'w', $now );
+	$weekdays = radio_station_get_schedule_weekdays( $today );
+	$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 	
-		if ( !$time ) {
-			$schedule = radio_station_get_current_schedule();
-			$current_show = get_transient( 'radio_station_current_show' );
-		} else {
-			$schedule = radio_station_get_current_schedule( $time );
-			$current_show = get_transient( 'radio_station_current_show_' . $time );
+	// --- loop shifts to get current show ---
+	$current_split = false;
+	foreach ( $weekdays as $day ) {
+		if ( isset( $show_shifts[$day] ) ) {
+			$shifts = $show_shifts[$day];
+			foreach ( $shifts as $start => $shift ) {
+
+				// --- get this shift start and end times ---
+				$shift_start = radio_station_convert_shift_time( $shift['start'] );
+				$shift_end = radio_station_convert_shift_time( $shift['end'] );
+				$shift_start_time = radio_station_to_time( $weekdates[$day] . ' ' . $shift_start );
+				$shift_end_time = radio_station_to_time( $weekdates[$day] . ' ' . $shift_end );
+				
+				if ( RADIO_STATION_DEBUG ) {
+					echo '<span style="display:none;">';
+					echo 'Current? ' . $now . ' - ' . $shift_start_time . ' - ' . $shift_end_time . PHP_EOL;
+					echo print_r( $shift, true ) . PHP_EOL;
+				}
+				
+				// --- set current show ---
+				// 2.3.3: get current show directly amd remove transient
+				if ( ( $now > $shift_start_time ) && ( $now < $shift_end_time ) ) {
+					if ( RADIO_STATION_DEBUG ) {
+						echo '^^^ Current ^^^' . PHP_EOL;
+					}
+					// --- recombine possible split shift to set current show ---
+					$current_show = $shift;
+					if ( isset( $current_show['split'] ) && $current_show['split'] ) {
+						if ( isset( $current_show['real_start'] ) ) {
+							$current_show['start'] = $current_show['real_start'];
+						} elseif ( isset( $current_show['real_end'] ) ) {
+							$current_show['end'] = $current_show['real_end'];
+						}						
+					}
+				}
+				
+				if ( RADIO_STATION_DEBUG ) {
+					echo '</span>' . PHP_EOL;
+				}
+			}
 		}
-	}
+	}	
 
 	// --- filter and return ---
 	// 2.3.2: added time argument to filter
@@ -1584,17 +1606,20 @@ function radio_station_get_next_shows( $limit = 3, $show_shifts = false, $time =
 	
 	// 2.3.2: use get time function with timezone
 	// 2.3.2: fix to pass week day start as numerical (w)
-	$today = radio_station_get_time( 'w', $now );
+	// 2.3.3: revert to passing week day start as day (l)
+	$today = radio_station_get_time( 'l', $now );
 	$weekdays = radio_station_get_schedule_weekdays( $today );
 	$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
-	
+
 	if ( RADIO_STATION_DEBUG ) {
-		echo '<span style="display: none;">';
-		echo "***" . $today . "***";
+		echo '<span style="display:none;">';
+		echo "Next Shows from " . $today . PHP_EOL;
 		print_r( $weekdays );
+		print_r( $weekdates );
 		echo '</span>';
 	}
 
+	// --- loop shifts to find next shows ---
 	$current_split = false;
 	foreach ( $weekdays as $day ) {
 		if ( isset( $show_shifts[$day] ) ) {
@@ -1611,34 +1636,14 @@ function radio_station_get_next_shows( $limit = 3, $show_shifts = false, $time =
 				
 				if ( RADIO_STATION_DEBUG ) {
 					echo '<span style="display:none;">';
-					echo $now . ' - ' . $shift_start_time . ' - ' . $shift_end_time . PHP_EOL;
+					echo 'Next? ' . $now . ' - ' . $shift_start_time . ' - ' . $shift_end_time . PHP_EOL;
 					echo print_r( $shift, true ) . PHP_EOL;
+					echo '</span>' . PHP_EOL;
 				}
 
 				// --- set current show ---
-				// 2.3.2: 
-				if ( ( $now > $shift_start_time ) && ( $now < $shift_end_time ) ) {
-					if ( !isset( $current_show ) ) {
-						// --- recombine possible split shift to set current show ---
-						$current_show = $shift;
-						if ( isset( $current_show['split'] ) && $current_show['split'] ) {
-							if ( isset( $current_show['real_start'] ) ) {
-								$current_show['start'] = $current_show['real_start'];
-							} elseif ( isset( $current_show['real_end'] ) ) {
-								$current_show['end'] = $current_show['real_end'];
-							}						
-						}
-						$expires = $shift_end_time - $now - 1;
-						if ( $expires > 3600 ) {
-							$expires = 3600;
-						} 
-						if ( !$time ) {
-							set_transient( 'radio_station_current_show', $current_show, $expires );
-						} else {
-							set_transient( 'radio_station_current_show_' . $time, $current_show, $expires );
-						}
-					}
-				}
+				// 2.3.2: set current show transient
+				// 2.3.3: remove current show transient
 
 				// --- check if show is upcoming ---
 				if ( $now < $shift_start_time ) {
@@ -1693,10 +1698,6 @@ function radio_station_get_next_shows( $limit = 3, $show_shifts = false, $time =
 							return $next_shows;
 						}
 					}
-				}
-				
-				if ( RADIO_STATION_DEBUG ) {
-					echo '</span>';
 				}
 			}
 		}

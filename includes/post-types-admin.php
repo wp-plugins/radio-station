@@ -966,8 +966,9 @@ function radio_station_playlist_save_data( $post_id ) {
 			// 2.3.0: maybe clear cached data to be safe
 			if ( $changed ) {
 				delete_transient( 'radio_station_current_schedule' );
-				delete_transient( 'radio_station_current_show' );
 				delete_transient( 'radio_station_next_show' );
+				// 2.3.3: remove current show transient
+				// delete_transient( 'radio_station_current_show' );
 				do_action( 'radio_station_clear_data', 'show_meta', $show );
 			}
 		}
@@ -1221,8 +1222,9 @@ function radio_station_post_save_data( $post_id ) {
 		// 2.3.0: clear cached data to be safe
 		if ( $changed ) {
 			delete_transient( 'radio_station_current_schedule' );
-			delete_transient( 'radio_station_current_show' );
 			delete_transient( 'radio_station_next_show' );
+			// 2.3.3: remove current show transient
+			// delete_transient( 'radio_station_current_show' );
 			do_action( 'radio_station_clear_data', 'show_meta', $show );
 		}
 	}
@@ -2872,8 +2874,9 @@ function radio_station_show_save_data( $post_id ) {
 	// 2.3.0: added to clear transients if any meta has changed
 	if ( $show_meta_changed || $show_shifts_changed ) {
 		delete_transient( 'radio_station_current_schedule' );
-		delete_transient( 'radio_station_current_show' );
 		delete_transient( 'radio_station_next_show' );
+		// 2.3.3: remove current show transient
+		// delete_transient( 'radio_station_current_show' );
 		do_action( 'radio_station_clear_data', 'show', $post_id );
 		do_action( 'radio_station_clear_data', 'show_meta', $post_id );
 		
@@ -3455,8 +3458,9 @@ function radio_station_override_save_data( $post_id ) {
 
 		// --- clear cached schedule data if changed ---
 		delete_transient( 'radio_station_current_schedule' );
-		delete_transient( 'radio_station_current_show' );
 		delete_transient( 'radio_station_next_show' );
+		// 2.3.3: remove current show transient
+		// delete_transient( 'radio_station_current_show' );
 		
 		// --- set last updated schedule time ---
 		// 2.3.2: added for data API use

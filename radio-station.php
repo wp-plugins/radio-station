@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.3.2.3
+Version: 2.3.2.4
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -2380,8 +2380,9 @@ function radio_station_clear_transients() {
 		// 2.3.2: do not clear on AJAX calls
 		if ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) {
 			delete_transient( 'radio_station_current_schedule' );
-			delete_transient( 'radio_station_current_show' );
 			delete_transient( 'radio_station_next_show' );
+			// 2.3.3: remove current show transient
+			// delete_transient( 'radio_station_current_show' );
 		}
 	}
 }

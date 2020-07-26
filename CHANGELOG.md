@@ -11,7 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Improved: width responsiveness for table/tabbed Schedule views
 * Improved: show shifts interface background colors
 * Added: navigate away from page on shift change check
+* Removed: current show transients (intermittant unreliability)
 * Fixed: AJAX call causing plugin conflicts via save_post action
+* Fixed: calculation of Upcoming Shows near end of the week
 * Fixed: remove and duplicate actions on new shifts
 
 ### 2.3.2

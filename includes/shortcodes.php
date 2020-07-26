@@ -1702,6 +1702,7 @@ function radio_station_current_show_shortcode( $atts ) {
 // AJAX Current Show Loader
 // ------------------------
 // 2.3.2: added AJAX current show loader
+// 2.3.3: remove current show transient
 add_action( 'wp_ajax_radio_station_current_show', 'radio_station_current_show' );
 add_action( 'wp_ajax_nopriv_radio_station_current_show', 'radio_station_current_show' );
 function radio_station_current_show() {
@@ -1709,34 +1710,10 @@ function radio_station_current_show() {
 	// --- sanitize shortcode attributes ---
 	$atts = radio_station_sanitize_shortcode_values( 'current-show' );
 
-	if ( RADIO_STATION_DEBUG ) {
-		echo "Current Show Transient 1: " . PHP_EOL;
-		if ( !isset( $atts['for_time'] ) || !$atts['for_time'] ) {
-			print_r( get_transient( 'radio_station_current_show' ) );
-		} else {
-			print_r( get_transient( 'radio_station_current_show_' . $atts['for_time'] ) );
-		}
-	}
-
-	// if ( !isset( $atts['for_time'] ) || !$atts['for_time'] ) {
-	//	delete_transient( 'radio_station_current_show' );
-	// } else {
-	//	delete_transient( 'radio_station_current_show_' . $atts['for_time'] );
-	// }
-
 	// --- output widget contents ---
 	echo '<div id="widget-contents">';
 	echo radio_station_current_show_shortcode( $atts );
 	echo '</div>';
-
-	if ( RADIO_STATION_DEBUG ) {
-		echo "Current Show Transient 2: " . PHP_EOL;
-		if ( !isset( $atts['for_time'] ) || !$atts['for_time'] ) {
-			print_r( get_transient( 'radio_station_current_show' ) );
-		} else {
-			print_r( get_transient( 'radio_station_current_show_' . $atts['for_time'] ) );
-		}
-	}
 
 	$js = '';
 	if ( isset( $atts['instance'] ) ) {
