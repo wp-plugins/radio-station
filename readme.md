@@ -188,6 +188,21 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 ## Upgrade Notices
 
+#### 2.3.1.1
+
+* Included: Missed including Hot Fix in 2.3.3. Please upgrade to take all 2.3.3 fixes.
+
+= 2.3.3
+* Update: Plugin Loader (1.1.3) with non-strict select match fix
+* Improved: width responsiveness for table/tabbed Schedule views
+* Improved: show shifts interface background colors
+* Added: navigate away from page on shift change check
+* Added: default time format option to Widgets
+* Removed: current show transients (intermittant unreliability)
+* Fixed: AJAX call causing plugin conflicts via save_post action
+* Fixed: calculation of Upcoming Shows near end of the week
+* Fixed: remove and duplicate actions on new shifts
+
 #### 2.3.0
 * Major Update including many new features, enhancements and fixes!
 * https://netmix.com/radio-station-2-3-0-release/

@@ -184,6 +184,9 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 == Changelog ==
 
+= 2.3.3.1 =
+* Included: Missed adding hot fix to 2.3.3 release
+
 = 2.3.3 =
 * Update: Plugin Loader (1.1.3) with non-strict select match fix
 * Improved: width responsiveness for table/tabbed Schedule views
@@ -580,6 +583,8 @@ You may translate the plugin into another language. Please visit our [WordPress 
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.3.3.1 = Included: Missed including Hot Fix in 2.3.3. Please upgrade to take all 2.3.3 fixes.
 
 = 2.3.3 =
 * Important Bugfix Update
