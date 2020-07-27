@@ -8,9 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### 2.3.3
+* Update: Plugin Loader (1.1.3) with non-strict select match fix
 * Improved: width responsiveness for table/tabbed Schedule views
 * Improved: show shifts interface background colors
 * Added: navigate away from page on shift change check
+* Added: default time format option to Widgets
 * Removed: current show transients (intermittant unreliability)
 * Fixed: AJAX call causing plugin conflicts via save_post action
 * Fixed: calculation of Upcoming Shows near end of the week

@@ -23,12 +23,13 @@ class DJ_Widget extends WP_Widget {
 
 		$instance = wp_parse_args( (array) $instance, array( 'title' => '' ) );
 
+		// 2.3.3: set time format default to plugin setting
 		$title = $instance['title'];
 		$display_djs = isset( $instance['show_desc'] ) ? $instance['display_djs'] : false;
 		$djavatar = isset( $instance['djavatar'] ) ? $instance['djavatar'] : false;
 		$default = isset( $instance['default'] ) ? $instance['default'] : __( 'No Show scheduled for this time.', 'radio-station' );
 		$link = isset( $instance['link'] ) ? $instance['link'] : false;
-		$time = isset( $instance['time'] ) ? $instance['time'] : 12;
+		$time = isset( $instance['time'] ) ? $instance['time'] : '';
 		$show_sched = isset( $instance['show_sched'] ) ? $instance['show_sched'] : false;
 		$show_playlist = isset( $instance['show_playlist'] ) ? $instance['show_playlist'] : false;
 		$show_all_sched = isset( $instance['show_all_sched'] ) ? $instance['show_all_sched'] : false;
@@ -158,6 +159,7 @@ class DJ_Widget extends WP_Widget {
 		<p>
 			<label for="' . esc_attr( $this->get_field_id( 'time' ) ) . '">' . esc_html( __( 'Time Format', 'radio-station' ) ) . ':<br />
 				<select id="' . esc_attr( $this->get_field_id( 'time' ) ) . '" name="' . esc_attr( $this->get_field_name( 'time' ) ) . '">
+					<option value="" ' . selected( $time, '', false ) . '>' . esc_html( __( 'Default', 'radio-station' ) ) . '</option>
 					<option value="12" ' . selected( $time, 12, false ) . '>' . esc_html( __( '12 Hour', 'radio-station' ) ) . '</option>
 					<option value="24" ' . selected( $time, 24, false ) . '>' . esc_html( __( '24 Hour', 'radio-station' ) ) . '</option>
 				</select>
