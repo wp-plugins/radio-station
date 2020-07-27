@@ -92,10 +92,10 @@ function radio_station_master_schedule( $atts ) {
 		if ( ( 'tabs' == $atts['view'] ) || in_array( 'tabs', $views ) ) {
 			// 2.3.2: add show descriptions default for tabbed view
 			// 2.3.2: add display_ and display_date attributes
+			// 2.3.3: revert show description default for tabbed view
 			$defaults['show_image'] = 1;
 			$defaults['show_hosts'] = 1;
 			$defaults['show_genres'] = 1;
-			$defaults['show_desc'] = 1;
 			$defaults['display_day'] = 'full';
 			$defaults['display_date'] = false;
 		} elseif ( ( 'list' == $atts['view'] ) || in_array( 'list', $views ) ) {
@@ -539,6 +539,7 @@ function radio_station_master_schedule_table_js() {
 
 		}
 		if (lastcolumn < 6) {jQuery('.master-program-day.day-'+lastcolumn).addClass('last-column');}
+		jQuery('#master-program-schedule').css('width','100%');
 	}
 	
 	/* Shift Day Left /  Right */
@@ -654,7 +655,9 @@ function radio_station_master_schedule_tabs_js() {
 		jQuery('.master-schedule-tabs-day').removeClass('selected-day');
 		jQuery('.master-schedule-tabs-day.day-'+selected).addClass('selected-day');
 
+		jQuery('#master-schedule-tabs').css('width','100%');
 		tabswidth = jQuery('#master-schedule-tabs').width();
+		jQuery('#master-schedule-tabs').css('width','auto');
 		totalwidth = 0; columns = 0; firstcolumn = -1; lastcolumn = 7; endtabs = false; 
 		jQuery('.master-schedule-tabs-day').removeClass('first-tab').removeClass('last-tab').hide();
 		if (!leftright || (leftright == 'left')) {
@@ -701,6 +704,7 @@ function radio_station_master_schedule_tabs_js() {
 			}		
 			if (firstcolumn > 0) {jQuery('.master-schedule-tabs-day.day-'+firstcolumn).addClass('first-tab');}
 		}
+		jQuery('#master-schedule-tabs').css('width','100%');
 
 		/* display selected day message if outside view */
 		activeday = false; 

@@ -23,13 +23,14 @@ class DJ_Upcoming_Widget extends WP_Widget {
 
 		$instance = wp_parse_args( (array) $instance, array( 'title' => '' ) );
 		
+		// 2.3.3: set time format default to empty (plugin setting)
 		$title = $instance['title'];
 		$display_djs = isset( $instance['display_djs'] ) ? $instance['display_djs'] : false;
 		$djavatar = isset( $instance['djavatar'] ) ? $instance['djavatar'] : false;
 		$default = isset( $instance['default'] ) ? $instance['default'] : '';
 		$link = isset( $instance['link'] ) ? $instance['link'] : false;
 		$limit = isset( $instance['limit'] ) ? $instance['limit'] : 1;
-		$time = isset( $instance['time'] ) ? $instance['time'] : 12;
+		$time = isset( $instance['time'] ) ? $instance['time'] : '';
 		$show_sched = isset( $instance['show_sched'] ) ? $instance['show_sched'] : false;
 
 		// 2.2.4: added title position, avatar width and DJ link options
@@ -142,6 +143,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		<p>
 			<label for="' . esc_attr( $this->get_field_id( 'time' ) ) . '">' . esc_html( __( 'Time Format', 'radio-station' ) ) . ':<br />
 				<select id="' . esc_attr( $this->get_field_id( 'time' ) ) . '" name="' . esc_attr( $this->get_field_name( 'time' ) ) . '">
+					<option value="" ' . selected( $time, '', false ) . '>' . esc_html( __( 'Default', 'radio-station' ) ) . '</option>
 					<option value="12" ' . selected( $time, 12, false ) . '>' . esc_html( __( '12 Hour', 'radio-station' ) ) . '</option>
 					<option value="24" ' . selected( $time, 24, false ) . '>' . esc_html( __( '24 Hour', 'radio-station' ) ) . '</option>
 				</select>
