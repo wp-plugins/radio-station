@@ -146,7 +146,14 @@ function radio_station_clock_shortcode( $atts = array() ) {
 		$instance = $radio_station_data['clock_instance'] = 0;
 	}
 
-	$clock_format = radio_station_get_setting( 'clock_format' );
+	// 2.3.3: use plugin setting if time format attribute is empty
+	if ( isset( $atts['time'] ) && ( '' == $atts['time'] ) ) {
+		unset( $atts['time'] );
+	}
+
+	// --- merge default attributes ---
+	// 2.3.3: fix to incorrect setting key (clock_format)
+	$clock_format = radio_station_get_setting( 'clock_time_format' );
 	$defaults = array(
 		'time'    => $clock_format,
 		'seconds' => 1,
@@ -1213,6 +1220,11 @@ function radio_station_current_show_shortcode( $atts ) {
 	$ajax = ( 'yes' == $ajax ) ? 'on' : 'off';
 	$dynamic = apply_filters( 'radio_station_current_show_dynamic', 0, $atts );
 
+	// 2.3.3: use plugin setting if time format attribute is empty
+	if ( isset( $atts['time'] ) && ( '' == $atts['time'] ) ) {
+		unset( $atts['time'] );
+	}
+
 	// --- get shortcode attributes ---
 	// 2.3.0: set default default_name text
 	// 2.3.0: set default time format to plugin setting
@@ -1766,6 +1778,11 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 	$ajax = radio_station_get_setting( 'ajax_widgets' );
 	$ajax = ( 'yes' == $ajax ) ? 'on' : 'off';
 	$dynamic = apply_filters( 'radio_station_upcoming_shows_dynamic', 0, $atts );
+
+	// 2.3.3: use plugin setting if time format attribute is empty
+	if ( isset( $atts['time'] ) && ( '' == $atts['time'] ) ) {
+		unset( $atts['time'] );
+	}
 
 	// 2.3.0: set default time format to plugin setting
 	// 2.3.2: added AJAX load attribute

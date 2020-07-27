@@ -1883,7 +1883,7 @@ function radio_station_show_shifts_metabox() {
 		margin-left: 20px; margin-top: 10px; margin-bottom: 10px;}
 	.show-shift li.first-item {margin-left: 10px;}
 	.show-shift li.last-item {margin-right: 10px;}        
-	.show-shift.changed, .show-shift.changed.disabled {background-color: #FFEEDD;}
+	.show-shift.changed, .show-shift.changed.disabled {background-color: #FFEECC;}
 	.show-shift.disabled {border: 2px dashed orange; background-color: #FFDDDD;}
 	.show-shift.conflicts {outline: 2px solid red;}        
 	.show-shift.disabled.conflicts {border: 2px dashed red;	outline: none;}        
