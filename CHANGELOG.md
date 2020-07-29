@@ -7,6 +7,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### 2.3.3.2
+* Update: Freemius SDK (2.4.0)
+* Update: Plugin Loader (1.1.4) with weird isset glitch fix
+* Fixed: Current Show for Shows ending at midnight
+* Fixed: incorrect AJAX Widget plugin setting value
+* Fixed: use pageload data for schedules before transients
+
 ### 2.3.3
 * Update: Plugin Loader (1.1.3) with non-strict select match fix
 * Improved: width responsiveness for table/tabbed Schedule views

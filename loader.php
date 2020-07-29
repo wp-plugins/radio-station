@@ -124,7 +124,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// 1.1.2: added debug switch check
 			$prefix = ''; 
 			if ( $args['settings'] ) {
-				$prefix = '-' . $args['settings'];
+				// 1.1.4: fix to debug prefix key
+				$prefix = $args['settings'] . '-';
 			}
 			if ( isset( $_REQUEST[$prefix . 'debug'] ) ) {
 				if ( ( '1' == $_REQUEST[$prefix . 'debug'] ) || ( 'yes' == $_REQUEST[$prefix . 'debug'] ) ) {
@@ -381,11 +382,14 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			}
 
 			// --- get plugin setting ---
-			if ( isset( $settings[$key] ) ) {
+			// 1.1.4: fix for weird isset failing glitch
+			// if ( isset( $settings[$key] ) ) {
+			if ( array_key_exists( $key, $settings ) ) {
 				$value = $settings[$key];
 			} else {
 				$defaults = $this->default_settings();
-				if ( isset( $defaults[$key] ) ) {
+				// 1.1.4: fix for weird isset failing glitch
+				if ( array_key_exists( $key, $defaults ) ) {
 					$value = $defaults[$key];
 				} else {
 					$value = null;
@@ -694,9 +698,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					if ( $this->debug ) {
 						echo 'New Settings for Key ' . $key . ': ';
 						if ( $newsettings ) {
-							echo '(to-validate) ' . print_r( $newsettings, true ) . '<br>';
+							echo '(to-validate) ' . var_dump( $newsettings, true ) . '<br>';
 						} else {
-							echo '(validated) ' . print_r( $settings[$key], true ) . '<br>';
+							echo '(validated) ' . var_dump( $settings[$key], true ) . '<br>';
 						}
 					}
 
@@ -2783,6 +2787,9 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // =========
 // CHANGELOG
 // =========
+
+// == 1.1.4 ==
+// - fix for weird get_settings glitch bug (isset failing?!)
 
 // == 1.1.3 ==
 // - remove strict value checking on select input

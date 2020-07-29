@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.3.3
+Version: 2.3.3.2
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -703,11 +703,12 @@ $options = array(
 	// === Widgets ===
 
 	// --- AJAX Loading ---
+	// 2.3.3: fix to value of value key
 	'ajax_widgets' => array(
 		'type'    => 'checkbox',
 		'label'   => __( 'AJAX Load Widgets?', 'radio-station' ),
 		'default' => 'yes',
-		'value'   => '',
+		'value'   => 'yes',
 		'helper'  => __( 'Defaults plugin widgets to AJAX loading. Can also be set on individual widgets.', 'radio-station' ),
 		'tab'     => 'widgets',
 		'section' => 'loading',
@@ -929,17 +930,27 @@ function radio_station_check_version() {
 	}
 }
 
+// -----------------
+// Plugin Activation
+// -----------------
+// (run on plugin activation, and thus also after a plugin update) 
+// 2.2.8: fix for mismatched flag function name
+register_activation_hook( __FILE__, 'radio_station_plugin_activation' );
+function radio_station_plugin_activation() {
+	// --- flag to flush rewrite rules ---
+	// 2.2.3: added this for custom post types rewrite flushing
+	add_option( 'radio_station_flush_rewrite_rules', true );
+	
+	// --- clear schedule transients ---
+	// 2.3.3: added clear transients on (re)activation
+	delete_transient( 'radio_station_current_schedule' );
+	delete_transient( 'radio_station_next_show' );
+}
+
 // -------------------
 // Flush Rewrite Rules
 // -------------------
-// (on plugin activation / deactivation)
-// 2.2.3: added this for custom post types rewrite flushing
-// 2.2.8: fix for mismatched flag function name
-register_activation_hook( __FILE__, 'radio_station_flush_rewrite_flag' );
 register_deactivation_hook( __FILE__, 'flush_rewrite_rules' );
-function radio_station_flush_rewrite_flag() {
-	add_option( 'radio_station_flush_rewrite_rules', true );
-}
 
 // ----------------------
 // Enqueue Plugin Scripts
