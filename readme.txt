@@ -184,8 +184,12 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 == Changelog ==
 
-= 2.3.3.1 =
-* Included: Missed adding hot fix to 2.3.3 release
+= 2.3.3.2 =
+* Update: Freemius SDK (2.4.0)
+* Update: Plugin Loader (1.1.4) with weird isset glitch fix
+* Fixed: Current Show for Shows ending at midnight
+* Fixed: incorrect AJAX Widget plugin setting value
+* Fixed: use pageload data for schedules before transients
 
 = 2.3.3 =
 * Update: Plugin Loader (1.1.3) with non-strict select match fix
@@ -583,8 +587,6 @@ You may translate the plugin into another language. Please visit our [WordPress 
 * Initial release
 
 == Upgrade Notice ==
-
-= 2.3.3.1 = Included: Missed including Hot Fix in 2.3.3. Please upgrade to take all 2.3.3 fixes.
 
 = 2.3.3 =
 * Important Bugfix Update

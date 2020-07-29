@@ -1216,8 +1216,10 @@ function radio_station_current_show_shortcode( $atts ) {
 	$output = '';
 
 	// 2.3.2: get default AJAX load settings
-	$ajax = radio_station_get_setting( 'ajax_widgets' );
-	$ajax = ( 'yes' == $ajax ) ? 'on' : 'off';
+	$ajax = radio_station_get_setting( 'ajax_widgets', false );
+	$ajax =  ( 'yes' == $ajax ) ? 'on' : 'off';
+
+	// --- apply filters for dynamic reload value ---
 	$dynamic = apply_filters( 'radio_station_current_show_dynamic', 0, $atts );
 
 	// 2.3.3: use plugin setting if time format attribute is empty
