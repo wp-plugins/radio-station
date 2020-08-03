@@ -184,6 +184,8 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 == Changelog ==
 
+= 2.3.3.3 = Minor Bug Fix to Upcoming Shows Widget; display showtimes when show starts before midnight and ends after midnight
+
 = 2.3.3.2 =
 * Update: Freemius SDK (2.4.0)
 * Update: Plugin Loader (1.1.4) with weird isset glitch fix
