@@ -1274,6 +1274,29 @@ function radio_station_current_show_shortcode( $atts ) {
 		do_action( 'radio_station_countdown_enqueue' );
 	}
 
+	// 2.3.3: add current time override for manual testing
+	if ( isset( $_GET['date'] ) && isset( $_GET['time'] ) ) {
+		$date = trim( $_GET['date'] );
+		$time = trim( $_GET['time'] );
+		if ( isset( $_GET['month'] ) ) {
+			$month = absint( trim( $_GET['month'] ) );
+		} else {
+			$month = radio_station_get_time( 'm' );
+		}
+		if ( isset( $_GET['year'] ) ) {
+			$year = absint( trim( $_GET['year'] ) );
+		} else {
+			$year = radio_station_get_time( 'Y' );
+		}
+		if ( strstr( $time, ':' ) && ( $month > 0 ) && ( $month < 13 ) ) {
+			$parts = explode( ':', $time );
+			$time = absint( $parts[0] ) . ':' . absint( $parts[1] );
+			$for_time = radio_station_to_time( $year . '-' . $month . '-' . $date . ' ' . $time );
+			$atts['for_time'] = $for_time;
+			echo "<script>console.log('Override Current Time: " . $for_time . "');</script>";
+		}
+	}
+
 	// --- maybe do AJAX load ---
 	// 2.3.2 added widget AJAX loading
 	$atts['ajax'] = apply_filters( 'radio_station_widgets_ajax_override', $atts['ajax'], 'current-show', $atts['widget'] );
@@ -1433,28 +1456,47 @@ function radio_station_current_show_shortcode( $atts ) {
 
 			// --- get weekdates ---
 			// 2.3.0: use dates for reliability
-			$now = radio_station_get_now();
-			$weekdays = radio_station_get_schedule_weekdays();
+			if ( $atts['for_time'] ) {
+				$now = $atts['for_time'];
+			} else {
+				$now = radio_station_get_now();
+			}
+			$today = radio_station_get_time( 'l', $now );
+			$yesterday = radio_station_get_previous_day( $today );
+			$weekdays = radio_station_get_schedule_weekdays( $yesterday );
 			$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 
 			foreach ( $shifts as $i => $shift ) {
+
+				// --- set shift start and end ---
+				if ( isset( $shift['real_start'] ) ) {
+					$start = $shift['real_start'];
+				} elseif ( isset( $shift['start'] ) ) {
+					$start = $shift['start'];
+				} else {
+					$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
+				}
+				if ( isset( $shift['real_end'] ) ) {
+					$end = $shift['real_end'];
+				} elseif ( isset( $shift['end'] ) ) {
+					$end = $shift['end'];
+				} else {
+					$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
+				}
 
 				// --- convert shift info ---
 				// 2.2.2: translate weekday for display
 				// 2.3.0: use dates for reliability
 				// 2.3.2: replace strtotime with to_time for timezones
-				// 2.3.2: fix to conver to 24 hour format first
-				$weekdate = $weekdates[$shift['day']];
-				if ( isset( $shift['start'] ) ) {
-					$start = $shift['start'];
-					$end = $shift['end'];
-				} else {
-					$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
-					$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
-				}
+				// 2.3.2: fix to conver to 24 hour format first				
 				$start_time = radio_station_convert_shift_time( $start );
 				$end_time = radio_station_convert_shift_time( $end );
-				$shift_start_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $start_time );
+				if ( isset( $shift['real_start'] ) ) {
+					$prevday = radio_station_get_previous_day( $shift['day'] );
+					$shift_start_time = radio_station_to_time( $weekdates[$prevday] . ' ' . $start_time );
+				} else {
+					$shift_start_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $start_time );
+				}
 				$shift_end_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $end_time );
 				if ( $shift_start_time > $shift_end_time ) {
 					$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
@@ -1467,6 +1509,12 @@ function radio_station_current_show_shortcode( $atts ) {
 				$end = radio_station_get_time( $end_data_format, $shift_end_time );
 				$start = radio_station_translate_time( $start );
 				$end = radio_station_translate_time( $end );
+
+				if ( RADIO_STATION_DEBUG ) {
+					echo '<span style="display:none;">';
+					
+					echo '</span>';
+				}
 
 				// --- set shift classes ---
 				$classes = array( 'current-show-shifts', 'on-air-dj-sched' );
@@ -1632,7 +1680,7 @@ function radio_station_current_show_shortcode( $atts ) {
 			} else {
 				$excerpt = "<!-- Trimmed Excerpt -->";
 				$excerpt .= "<!-- Post ID: " . $show_post->ID . " -->";
-				$excerpt .= "<!-- Post Content: " . $show_post->post_content . " -->";
+				// $excerpt .= "<!-- Post Content: " . $show_post->post_content . " -->";
 				$excerpt .= radio_station_trim_excerpt( $show_post->post_content, $length, $more, $permalink );
 			}
 
@@ -1723,6 +1771,9 @@ function radio_station_current_show() {
 
 	// --- sanitize shortcode attributes ---
 	$atts = radio_station_sanitize_shortcode_values( 'current-show' );
+	if ( RADIO_STATION_DEBUG ) {
+		print_r( $atts );
+	}
 
 	// --- output widget contents ---
 	echo '<div id="widget-contents">';
@@ -1828,6 +1879,29 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 	// 2.3.2: enqueue countdown script earlier
 	if ( $atts['countdown'] ) {
 		do_action( 'radio_station_countdown_enqueue' );
+	}
+
+	// 2.3.3: added current time override for manual testing
+	if ( isset( $_GET['date'] ) && isset( $_GET['time'] ) ) {
+		$date = trim( $_GET['date'] );
+		$time = trim( $_GET['time'] );
+		if ( isset( $_GET['month'] ) ) {
+			$month = absint( trim( $_GET['month'] ) );
+		} else {
+			$month = radio_station_get_time( 'm' );
+		}
+		if ( isset( $_GET['year'] ) ) {
+			$year = absint( trim( $_GET['year'] ) );
+		} else {
+			$year = radio_station_get_time( 'Y' );
+		}
+		if ( strstr( $time, ':' ) && ( $month > 0 ) && ( $month < 13 ) ) {
+			$parts = explode( ':', $time );
+			$time = absint( $parts[0] ) . ':' . absint( $parts[1] );
+			$for_time = radio_station_to_time( $year . '-' . $month . '-' . $date . ' ' . $time );
+			$atts['for_time'] = $for_time;
+			echo "<script>console.log('Override Current Time: " . $for_time . "');</script>";
+		}
 	}
 
 	// --- maybe do AJAX load ---
@@ -1939,6 +2013,18 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 		$start_data_format = apply_filters( 'radio_station_time_format_start', $start_data_format, 'upcoming-shows', $atts );
 		$end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_format, 'upcoming-shows', $atts );
 
+		// --- convert dates ---
+		// 2.3.0: use weekdates for reliability
+		if ( $atts['for_time'] ) {
+			$now = $atts['for_time'];
+		} else {
+			$now = radio_station_get_now();
+		}
+		$today = radio_station_get_time( 'l', $now );
+		$yesterday = radio_station_get_previous_day( $today );
+		$weekdays = radio_station_get_schedule_weekdays( $yesterday );
+		$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
+
 		// --- loop upcoming shows ---
 		foreach ( $shows as $i => $shift ) {
 
@@ -1968,16 +2054,21 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 					$shift_display .= "<span style='display:none;'>Upcoming Shift: " . print_r( $shift, true ) . "</span>";
 				}
 
-				// --- display fix for split shifts ---
-				if ( isset( $shift['split'] ) && $shift['split'] ) {
-					$shift['end'] = $shift['real_end'];
+				// --- set shift start and end ---
+				if ( isset( $shift['real_start'] ) ) {
+					$start = $shift['real_start'];
+				} elseif ( isset( $shift['start'] ) ) {
+					$start = $shift['start'];
+				} else {
+					$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
+				}				
+				if ( isset( $shift['real_end'] ) ) {
+					$end = $shift['real_end'];
+				} elseif ( isset( $shift['end'] ) ) {
+					$end = $shift['end'];
+				} else {
+					$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
 				}
-
-				// --- convert dates ---
-				// 2.3.0: use weekdates for reliability
-				$now = radio_station_get_now();
-				$weekdays = radio_station_get_schedule_weekdays();
-				$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 
 				// --- convert shift info ---
 				// 2.2.2: fix to weekday value to be translated
@@ -1985,10 +2076,15 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 				// 2.3.2: use exact shift date in time calculations
 				// 2.3.2: fix to convert to 24 hour format first
 				// $display_day = radio_station_translate_weekday( $shift['day'] );
-				$shift_start = radio_station_convert_shift_time( $shift['start'] );
-				$shift_end = radio_station_convert_shift_time( $shift['end'] );
-				$shift_start_time = radio_station_to_time( $shift['date'] . ' ' . $shift_start );
-				$shift_end_time = radio_station_to_time( $shift['date'] . ' ' . $shift_end );
+				$shift_start = radio_station_convert_shift_time( $start );
+				$shift_end = radio_station_convert_shift_time( $end );
+				if ( isset( $shift['real_start'] ) ) {
+					$prevday = radio_station_get_previous_day( $shift['day'] );
+					$shift_start_time = radio_station_to_time( $weekdates[$prevday] . ' ' . $shift_start );
+				} else {
+					$shift_start_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $shift_start );
+				}
+				$shift_end_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $shift_end );
 				if ( $shift_end_time < $shift_start_time ) {
 					$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 				}
@@ -2191,12 +2287,9 @@ function radio_station_upcoming_shows() {
 
 	// --- sanitize shortcode attributes ---
 	$atts = radio_station_sanitize_shortcode_values( 'upcoming-shows' );
-
-	// if ( !isset( $atts['for_time'] ) || !$atts['for_time'] ) {
-	//	delete_transient( 'radio_station_next_shows' );
-	// } else {
-	// 	delete_transient( 'radio_station_next_shows_' . $atts['for_time'] );
-	// }
+	if ( RADIO_STATION_DEBUG ) {
+		print_r( $atts );
+	}
 	
 	// --- output widget contents ---
 	echo '<div id="widget-contents">';
@@ -2278,6 +2371,29 @@ function radio_station_current_playlist_shortcode( $atts ) {
 	// 2.3.2: enqueue countdown script earlier
 	if ( $atts['countdown'] ) {
 		do_action( 'radio_station_countdown_enqueue' );
+	}
+
+	// 2.3.3: added current time override for manual testing
+	if ( isset( $_GET['date'] ) && isset( $_GET['time'] ) ) {
+		$date = trim( $_GET['date'] );
+		$time = trim( $_GET['time'] );
+		if ( isset( $_GET['month'] ) ) {
+			$month = absint( trim( $_GET['month'] ) );
+		} else {
+			$month = radio_station_get_time( 'm' );
+		}
+		if ( isset( $_GET['year'] ) ) {
+			$year = absint( trim( $_GET['year'] ) );
+		} else {
+			$year = radio_station_get_time( 'Y' );
+		}
+		if ( strstr( $time, ':' ) && ( $month > 0 ) && ( $month < 13 ) ) {
+			$parts = explode( ':', $time );
+			$time = absint( $parts[0] ) . ':' . absint( $parts[1] );
+			$for_time = radio_station_to_time( $year . '-' . $month . '-' . $date . ' ' . $time );
+			$atts['for_time'] = $for_time;
+			echo "<script>console.log('Override Current Time: " . $for_time . "');</script>";
+		}
 	}
 
 	// --- maybe do AJAX load ---
@@ -2420,23 +2536,60 @@ function radio_station_current_playlist_shortcode( $atts ) {
 
 			// 2.3.1: added check for playlist shifts value
 			if ( isset( $playlist['shifts'] ) && is_array( $playlist['shifts'] ) && ( count( $playlist['shifts'] ) > 0 ) ) {
+
+				// --- convert dates ---
+				// 2.3.0: use weekdates for reliability
+				if ( $atts['for_time'] ) {
+					$now = $atts['for_time'];
+				} else {
+					$now = radio_station_get_now();
+				}
+				$today = radio_station_get_time( 'l', $now );
+				$yesterday = radio_station_get_previous_day( $today );
+				$weekdays = radio_station_get_schedule_weekdays( $yesterday );
+				$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
+
+				// --- loop shifts ---
 				foreach ( $playlist['shifts'] as $shift ) {
+
+					// --- set shift start and end ---
+					if ( isset( $shift['real_start'] ) ) {
+						$start = $shift['real_start'];
+					} elseif ( isset( $shift['start'] ) ) {
+						$start = $shift['start'];
+					} else {
+						$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
+					}
+					if ( isset( $shift['real_end'] ) ) {
+						$end = $shift['real_end'];
+					} elseif ( isset( $shift['end'] ) ) {
+						$end = $shift['end'];
+					} else {
+						$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
+					}
 
 					// --- convert shift info ---
 					// 2.3.2: replace strtotime with to_time for timezones
 					// 2.3.2: fix to convert to 24 hour format first
-					$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
-					$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
 					$start_time = radio_station_convert_shift_time( $start );
 					$end_time = radio_station_convert_shift_time( $end );
-					$shift_start_time = radio_station_to_time( $start_time );
-					$shift_end_time = radio_station_to_time( $end_time );
+					if ( isset( $shift['real_start'] ) ) {
+						$prevday = radio_station_get_previous_day( $shift['day'] );
+						$shift_start_time = radio_station_to_time( $weekdates[$prevday] . ' ' . $start_time );
+					} else {
+						$shift_start_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $start_time );
+					}
+					$shift_end_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $end_time );
 					if ( $start > $end ) {
 						$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 					}
 
 					// --- check currently playing show time ---
-					$now = radio_station_get_now();
+					if ( $atts['for_time'] ) {
+						$now = $atts['for_time'];
+					} else {
+						$now = radio_station_get_now();
+					}
 					if ( ( $now > $shift_start_time ) && ( $now < $shift_end_time ) ) {
 
 						// --- hidden input for playlist end time ---

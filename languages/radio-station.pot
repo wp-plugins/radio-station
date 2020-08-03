@@ -483,7 +483,7 @@ msgid "We recommend using WordPress Posts to add new posts and assign them to yo
 msgstr ""
 
 #: includes/post-types-admin.php:1455
-msgid "You can then assign them to a relevent Post Category for display on your site also."
+msgid "You can then assign them to a relevant Post Category for display on your site also."
 msgstr ""
 
 #: includes/post-types-admin.php:1476

@@ -188,18 +188,32 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 ## Upgrade Notices
 
-#### 2.3.3.2
-* Update: Freemius SDK (2.4.0)
-* Update: Plugin Loader (1.1.4) with weird isset glitch fix
-* Fixed: Current Show for Shows ending at midnight
-* Fixed: incorrect AJAX Widget plugin setting value
-* Fixed: use pageload data for schedules before transients
+#### 2.3.3.3
+* Current and Upcoming Shows Widget Fix
 
-#### 2.3.3.1
+#### 2.3.3.2
+* Minor Bugfix Update
+
+#### 2.3.3 =
+* Important Bugfix Update
 * Fix to conflict with plugins using AJAX save_post calls
 * Improved accuracy for responsive table/tab Schedule views
-* Added color improvements to Show Shift interface
+* Added colour improvements to Show Shift interface
 * Fix to calculate Current Show (transient no longer used)
+
+#### 2.3.2 =
+* Improved Times, AJAX Loading and Bugfix Update 
+* https://netmix.com/radio-station-2-3-2-release/
+* Radio Clock Widget and Widget AJAX Loading
+* AJAX Saving of Show Shifts and Playlist Tracks
+* Automated current Show schedule highlighting
+* Improved timezones, overrides, shift checking and more
+
+#### 2.3.1 =
+* Bugfix Update and Announcing New Netmix Station Directory!
+* https://netmix.com/announcing-new-netmix-directory/
+* Including minor fixes to major update release
+* Option to ping Netmix Directory on show updates
 
 #### 2.3.0
 * Major Update including many new features, enhancements and fixes!

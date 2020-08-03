@@ -594,6 +594,7 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 == Upgrade Notice ==
 
+<<<<<<< HEAD
 = 2.3.3.2 =
 * Update: Freemius SDK (2.4.0)
 * Update: Plugin Loader (1.1.4) with weird isset glitch fix
@@ -606,6 +607,13 @@ You may translate the plugin into another language. Please visit our [WordPress 
 * Improved accuracy for responsive table/tab Schedule views
 * Added color improvements to Show Shift interface
 * Fix to calculate Current Show (transient no longer used)
+=======
+= 2.3.3.3 =
+* Current and Upcoming Shows Widget Fix
+
+= 2.3.3.2 =
+* Minor Bugfix Update
+>>>>>>> release/2.3.3.3
 
 = 2.3.3 =
 * Important Bugfix Update
