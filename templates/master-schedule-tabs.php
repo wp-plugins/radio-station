@@ -414,9 +414,10 @@ foreach ( $weekdays as $i => $weekday ) {
 				// --- show audio file ---
 				if ( $atts['show_file'] ) {
 					// 2.3.0: filter audio file by show and context
+					// 2.3.2: check show download disable meta
+					// 2.3.3: fix to incorrect filter name
 					$show_file = get_post_meta( $show['id'], 'show_file', true );
-					$show_file = apply_filters( 'radio_station_schedule_show_link', $show_file, $show['id'], 'tabs' );
-					// 2.3.2: check show download meta
+					$show_file = apply_filters( 'radio_station_schedule_show_file', $show_file, $show['id'], 'tabs' );
 					$disable_download = get_post_meta( $show['id'], 'show_download', true );				
 					if ( $show_file && !empty( $show_file ) && !$disable_download ) {
 						$panels .= '<div class="show-file">';

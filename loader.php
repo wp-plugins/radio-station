@@ -5,7 +5,7 @@
 // ===========================
 //
 // --------------
-// Version: 1.1.3
+// Version: 1.1.4
 // --------------
 // Note: Changelog and structure at end of file.
 //

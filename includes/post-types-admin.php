@@ -2262,7 +2262,7 @@ function radio_station_show_helper_box() {
 	echo ' ' . esc_html( __( "It is not recommended to include your past show content or archives in this area, as it will affect the Show page layout your visitors see.", 'radio-station' ) );
 	echo esc_html( __( "It may also impact SEO, as archived content won't have their own pages and thus their own SEO and Social meta rules.", 'radio-station' ) ) . "<br>";
 	echo esc_html( __( "We recommend using WordPress Posts to add new posts and assign them to your Show(s) using the Related Show metabox on the Post Edit screen so they display on the Show page.", 'radio-station' ) );
-	echo ' ' . esc_html( __( "You can then assign them to a relevent Post Category for display on your site also.", 'radio-station' ) );
+	echo ' ' . esc_html( __( "You can then assign them to a relevant Post Category for display on your site also.", 'radio-station' ) );
 	echo '</p>';
 
 	// TODO: upgrade to Pro for upcoming Show Episodes blurb
