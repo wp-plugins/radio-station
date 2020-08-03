@@ -184,6 +184,9 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 == Changelog ==
 
+= 2.3.3.3 =
+* Fixed: improved Current Show and Upcoming Shows calculations
+
 = 2.3.3.2 =
 * Update: Freemius SDK (2.4.0)
 * Update: Plugin Loader (1.1.4) with weird isset glitch fix
@@ -587,6 +590,12 @@ You may translate the plugin into another language. Please visit our [WordPress 
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.3.3.3 =
+* Current and Upcoming Shows Widget Fix
+
+= 2.3.3.2 =
+* Minor Bugfix Update
 
 = 2.3.3 =
 * Important Bugfix Update
