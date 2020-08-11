@@ -184,7 +184,9 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 == Changelog ==
 
-= 2.3.3.3 = Minor Bug Fix to Upcoming Shows Widget; display showtimes when show starts before midnight and ends after midnight
+= 2.3.3.3 =
+* Fixed: improved Current Show and Upcoming Shows calculations
+* (Display showtimes when show starts before and ends after midnight)
 
 = 2.3.3.2 =
 * Update: Freemius SDK (2.4.0)
@@ -192,12 +194,6 @@ You may translate the plugin into another language. Please visit our [WordPress 
 * Fixed: Current Show for Shows ending at midnight
 * Fixed: incorrect AJAX Widget plugin setting value
 * Fixed: use pageload data for schedules before transients
-
-= 2.3.3.1 =
-* Fix to conflict with plugins using AJAX save_post calls
-* Improved accuracy for responsive table/tab Schedule views
-* Added color improvements to Show Shift interface
-* Fix to calculate Current Show (transient no longer used)
 
 = 2.3.3 =
 * Update: Plugin Loader (1.1.3) with non-strict select match fix
@@ -596,26 +592,11 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 == Upgrade Notice ==
 
-<<<<<<< HEAD
-= 2.3.3.2 =
-* Update: Freemius SDK (2.4.0)
-* Update: Plugin Loader (1.1.4) with weird isset glitch fix
-* Fixed: Current Show for Shows ending at midnight
-* Fixed: incorrect AJAX Widget plugin setting value
-* Fixed: use pageload data for schedules before transients
-
-= 2.3.3.1 =
-* Fix to conflict with plugins using AJAX save_post calls
-* Improved accuracy for responsive table/tab Schedule views
-* Added color improvements to Show Shift interface
-* Fix to calculate Current Show (transient no longer used)
-=======
 = 2.3.3.3 =
 * Current and Upcoming Shows Widget Fix
 
 = 2.3.3.2 =
 * Minor Bugfix Update
->>>>>>> release/2.3.3.3
 
 = 2.3.3 =
 * Important Bugfix Update
