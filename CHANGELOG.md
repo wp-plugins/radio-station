@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2.3.3.3
 * Fixed: improved Current Show and Upcoming Shows calculations
+* (Display showtimes when show starts before and ends after midnight)
 
 ### 2.3.3.2
 * Update: Freemius SDK (2.4.0)
