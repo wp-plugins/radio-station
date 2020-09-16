@@ -18,7 +18,7 @@
 // * Language Archive Shortcode
 // === Show Related Shortcodes ===
 // - Show List Shortcode Abstract
-// - Show Posts List Shortcode
+// - Show Posts Archive Shortcode
 // - Show Playlists List Shortcode
 // - Show Lists Pagination Javascript
 // === Widget Shortcodes ===
@@ -1117,9 +1117,9 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 	return $list;
 }
 
-// -------------------------
+// ----------------------------
 // Show Posts Archive Shortcode
-// -------------------------
+// ----------------------------
 // requires: show shortcode attribute, eg. [show-posts-list show="1"]
 add_shortcode( 'show-posts-archive', 'radio_station_show_posts_archive' );
 add_shortcode( 'show-post-archive', 'radio_station_show_posts_archive' );

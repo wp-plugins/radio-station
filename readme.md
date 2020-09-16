@@ -194,9 +194,6 @@ You may translate the plugin into another language. Please visit our [WordPress 
 #### 2.3.3.2
 * Minor Bugfix Update
 
-#### 2.3.3.1
-* Minor Bugfix Update
-
 #### 2.3.3 =
 * Important Bugfix Update
 * Fix to conflict with plugins using AJAX save_post calls

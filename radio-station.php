@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.3.3.3
+Version: 2.3.3.4
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -1236,12 +1236,12 @@ function radio_station_get_template( $type, $template, $paths = false ) {
 			if ( isset( $radio_station_data['style-dirs'] ) ) {
 				$dirs = $radio_station_data['style-dirs'];
 			}
-			$paths = array( 'css', 'styles' );
+			$paths = array( 'css', 'styles', '' );
 		} elseif ( 'js' == $paths ) {
 			if ( isset( $radio_station_data['script-dirs'] ) ) {
 				$dirs = $radio_station_data['script-dirs'];
 			}
-			$paths = array( 'js', 'scripts' );
+			$paths = array( 'js', 'scripts', '' );
 		}
 	}
 
@@ -1287,8 +1287,9 @@ function radio_station_get_template( $type, $template, $paths = false ) {
 	// --- loop directory hierarchy to find first template ---
 	foreach ( $dirs as $dir ) {
 
-		$template_path = $dir['path'] . '/' . $template;
-		$template_url = $dir['urlpath'] . '/' . $template;
+		// 2.3.4: use trailingslashit to account for empty paths
+		$template_path = trailingslashit( $dir['path'] ) . $template;
+		$template_url = trailingslashit( $dir['urlpath'] ) . $template;
 
 		if ( file_exists( $template_path ) ) {
 			if ( 'file' == (string) $type ) {
@@ -1872,89 +1873,134 @@ add_filter( 'next_post_link', 'radio_station_get_show_post_link', 11, 5 );
 add_filter( 'previous_post_link', 'radio_station_get_show_post_link', 11, 5 );
 function radio_station_get_show_post_link( $output, $format, $link, $adjacent_post, $adjacent ) {
 
-	global $post;
-	
-	// --- filter to allow disabling ---
-	$link_show_posts = apply_filters( 'radio_station_link_show_posts', true, $post );
-	if ( !$link_show_posts ) {
-		return $output;
-	}
+	global $radio_station_data, $post;
 
-	// --- filter to allow related post types ---
-	$post_types = apply_filters( 'radio_station_show_related_post_types', array( 'post' ) );
-	if ( !in_array( $post->post_type, $post_types ) ) {
-		return $output;
-	}
-	
-	// --- get related show ---
-	$related_show = get_post_meta( $post->ID,  'post_showblog_id', true );
-	if ( !$related_show ) {
-		return $output;
-	}
-
-	// --- get adjacent post query ---
-	$args = array(
-		'post_type'	=> $post->post_type,
-		'meta_query'	=> array(
-			array(
-				'key'		=> 'post_showblog_id',
-				'value'		=> $related_show,
-				'compare'	=> '=',
-			),
-		),
-		'order_by'	=> 'post_date',
-	);
-	
-	// --- setup previous or next post ---
-	$post_type_object = get_post_type_object( $post->post_type );
-	if ( 'previous' == $adjacent ) {
-		$rel = 'prev';
-		$args['order'] = 'DESC';
-		$title = __( 'Previous Show', 'radio-station' ) . ' ' . $post_type_object->labels->singular_name;
-		$show_posts = get_posts( $args );
-	} elseif ( 'next' == $adjacent ) {
-		$rel = 'next';
-		$args['order'] = 'ASC';
-		$title = __( 'Next Show', 'radio-station' ) . ' ' . $post_type_object->labels->singular_name;
-		$show_posts = get_posts( $args );
-	}
-
-	// --- loop posts to get adjacent post ---
-	$found_current_post = $adjacent_post = false;
-	if ( $show_posts && is_array( $show_posts ) && ( count( $show_posts ) > 0 ) ) {
-		foreach ( $show_posts as $show_post ) {
-			if ( $found_current_post ) {
-				$related_id = get_post_meta( $show_post->ID, 'post_showblog_id', true );
-				if ( $related_id == $related_show ) {
-					$adjacent_post = $show_post;
-					break;
+	// --- filter next and previous Show links ---
+	// 2.3.4: add filtering for adjacent show links
+	$post_types = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG );
+	if ( in_array( $post->post_type, $post_types ) ) {
+		if ( RADIO_STATION_OVERRIDE_SLUG == $post->post_type ) {
+			// TODO: get next/previous for override time/date	
+		} else {
+			$shifts = get_post_meta( $post->id, 'show_sched', true );
+			if ( $shifts && is_array( $shifts ) ) {
+				if ( count( $shifts ) < 1 ) {
+					// TODO: get the most recent show shift ?
+				}
+				if ( 1 == count( $shifts ) ) {
+					$shift = $shifts[0];
+					$shift_start = $shift['day'] . ' ' . $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
+					$time = radio_station_get_time( ( $shift_start + 1 ) );
+					if ( 'next' == $adjacent ) {
+						$rel = 'next';
+						$show = radio_station_get_next_show( $time );
+					} elseif ( 'previous' == $adjacent ) {
+						$rel = 'prev';
+						$show = radio_station_get_previous_show( $time );
+					}
+				} else {
+					// TODO: method for multiple shifts ?
+					return $output;
 				}
 			}
-			if ( $show_post->ID == $post->ID ) {
-				$found_current_post = true;
-			}
 		}
-				
-		if ( $adjacent_post ) {
-
-			// --- adjacent post title ---
-			$post_title = $adjacent_post->post_title;
-			if ( empty( $adjacent_post->post_title ) ) {
-				$post_title = $title;
-			}
-			$post_title = apply_filters( 'the_title', $post_title, $adjacent_post->ID );
-
-			// --- adjacent post link ---
-			// (from get_adjacent_post_link)
+		
+		// --- generate adjacent post link ---
+		if ( isset( $show ) ) {
+			$adjacent_post = get_post( $show['id'] );
 			$date = mysql2date( get_option( 'date_format' ), $adjacent_post->post_date );
 			$string = '<a href="' . esc_url( get_permalink( $adjacent_post ) ) . '" rel="' . esc_attr( $rel ) . '" title="' . $title . '">';
 			$inlink = str_replace( '%title', $post_title, $link );
 			$inlink = str_replace( '%date', $date, $inlink );
 			$inlink = $string . $inlink . '</a>';
 			$output = str_replace( '%link', $inlink, $format );
-
 		}
 
+		return $output;
+	}
+
+	// --- filter to allow related post types ---
+	$show_post_types = apply_filters( 'radio_station_show_related_post_types', array( 'post' ) );
+	if ( in_array( $post->post_type, $show_post_types ) ) {
+
+		// --- filter to allow disabling ---
+		$link_show_posts = apply_filters( 'radio_station_link_show_posts', true, $post );
+		if ( !$link_show_posts ) {
+			return $output;
+		}
+	
+		// --- get related show ---
+		$related_show = get_post_meta( $post->ID,  'post_showblog_id', true );
+		if ( !$related_show ) {
+			return $output;
+		}
+
+		// --- get adjacent post query ---
+		$args = array(
+			'post_type'	=> $post->post_type,
+			'meta_query'	=> array(
+				array(
+					'key'		=> 'post_showblog_id',
+					'value'		=> $related_show,
+					'compare'	=> '=',
+				),
+			),
+			'order_by'	=> 'post_date',
+		);
+
+		// --- setup previous or next post ---
+		$post_type_object = get_post_type_object( $post->post_type );
+		if ( 'previous' == $adjacent ) {
+			$rel = 'prev';
+			$args['order'] = 'DESC';
+			$title = __( 'Previous Show', 'radio-station' ) . ' ' . $post_type_object->labels->singular_name;
+			$show_posts = get_posts( $args );
+		} elseif ( 'next' == $adjacent ) {
+			$rel = 'next';
+			$args['order'] = 'ASC';
+			$title = __( 'Next Show', 'radio-station' ) . ' ' . $post_type_object->labels->singular_name;
+			$show_posts = get_posts( $args );
+		}
+
+		// --- loop posts to get adjacent post ---
+		$found_current_post = $adjacent_post = false;
+		if ( $show_posts && is_array( $show_posts ) && ( count( $show_posts ) > 0 ) ) {
+			foreach ( $show_posts as $show_post ) {
+				if ( $found_current_post ) {
+					$related_id = get_post_meta( $show_post->ID, 'post_showblog_id', true );
+					// 2.3.3.4: handle possible multiple show post values
+					if ( ( is_array( $related_id ) && in_array( $related_show, $related_id ) )
+					  || ( !is_array( $related_id ) && ( $related_id == $related_show ) ) ) {
+						$adjacent_post = $show_post;
+						break;
+					}
+				}
+				if ( $show_post->ID == $post->ID ) {
+					$found_current_post = true;
+				}
+			}
+
+			if ( $adjacent_post ) {
+
+				// --- adjacent post title ---
+				$post_title = $adjacent_post->post_title;
+				if ( empty( $adjacent_post->post_title ) ) {
+					$post_title = $title;
+				}
+				$post_title = apply_filters( 'the_title', $post_title, $adjacent_post->ID );
+
+				// --- adjacent post link ---
+				// (from get_adjacent_post_link)
+				$date = mysql2date( get_option( 'date_format' ), $adjacent_post->post_date );
+				$string = '<a href="' . esc_url( get_permalink( $adjacent_post ) ) . '" rel="' . esc_attr( $rel ) . '" title="' . $title . '">';
+				$inlink = str_replace( '%title', $post_title, $link );
+				$inlink = str_replace( '%date', $date, $inlink );
+				$inlink = $string . $inlink . '</a>';
+				$output = str_replace( '%link', $inlink, $format );
+
+			}
+
+		}
 	}
 
 	return $output;
