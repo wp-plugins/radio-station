@@ -33,7 +33,6 @@ $show_file = get_post_meta( $post_id, 'show_file', true );
 $show_link = get_post_meta( $post_id, 'show_link', true );
 $show_email = get_post_meta( $post_id, 'show_email', true );
 $show_patreon = get_post_meta( $post_id, 'show_patreon', true );
-$patreon_title = __( 'Become a Supporter for', 'radio-station' ) . ' ' . $show_title;
 // $show_rss = get_post_meta( $post_id, 'show_rss', true );
 $show_rss = false; // TEMP
 
@@ -62,7 +61,6 @@ $show_download = apply_filters( 'radio_station_show_download', $show_download, $
 $show_link = apply_filters( 'radio_station_show_link', $show_link, $post_id );
 $show_email = apply_filters( 'radio_station_show_email', $show_email, $post_id );
 $show_patreon = apply_filters( 'radio_station_show_patreon', $show_patreon, $post_id );
-$patreon_title = apply_filters( 'radio_station_show_patreon_title', $patreon_title, $post_id );
 $show_rss = apply_filters( 'radio_station_show_rss', $show_rss, $post_id );
 
 // --- create show icon display early ---
@@ -70,37 +68,43 @@ $show_rss = apply_filters( 'radio_station_show_rss', $show_rss, $post_id );
 $show_icons = array();
 
 // --- show home link icon ---
+// 2.3.3.4: added filter for title attribute
 if ( $show_link ) {
-	$title = esc_attr( __( 'Show Website', 'radio-station' ) );
+	$title = __( 'Show Website', 'radio-station' );
+	$title = apply_filters( 'radio_station_show_website_title', $title, $post_id );
 	$icon = '<span style="color:#A44B73;" class="dashicons dashicons-admin-links"></span>';
 	$icon = apply_filters( 'radio_station_show_home_icon', $icon, $post_id );
 	$show_icons['home'] = '<div class="show-icon show-website">';
-	$show_icons['home'] .= '<a href="' . esc_url( $show_link ) . '" title="' . $title . '" target="_blank">';
+	$show_icons['home'] .= '<a href="' . esc_url( $show_link ) . '" title="' . esc_attr( $title ) . '" target="_blank">';
 	$show_icons['home'] .= $icon;
 	$show_icons['home'] .= '</a>';
 	$show_icons['home'] .= '</div>';
 }
 
 // --- email DJ / host icon ---
+// 2.3.3.4: added filter for title attribute
 if ( $show_email ) {
-	$title = esc_attr( __( 'Email Show Host', 'radio-station' ) );
+	$title = __( 'Email Show Host', 'radio-station' );
+	$title = apply_filters( 'radio_station_show_email_title', $title, $post_id );
 	$icon = '<span style="color:#0086CC;" class="dashicons dashicons-email"></span>';
 	$icon = apply_filters( 'radio_station_show_email_icon', $icon, $post_id );
 	$show_icons['email'] = '<div class="show-icon show-email">';
-	$show_icons['email'] .= '<a href="mailto:' . sanitize_email( $show_email ) . '" title="' . $title . '">';
+	$show_icons['email'] .= '<a href="mailto:' . sanitize_email( $show_email ) . '" title="' . esc_attr( $title ) . '">';
 	$show_icons['email'] .= $icon;
 	$show_icons['email'] .= '</a>';
 	$show_icons['email'] .= '</div>';
 }
 
 // --- show RSS feed icon ---
+// 2.3.3.4: added filter for title attribute
 if ( $show_rss ) {
 	$feed_url = radio_station_get_show_rss_url( $post_id );
-	$title = esc_attr( __( 'Show RSS Feed', 'radio-station' ) );
+	$title =  __( 'Show RSS Feed', 'radio-station' );
+	$title = apply_filters( 'radio_station_show_rss_title', $title, $post_id );
 	$icon = '<span style="color:#FF6E01;" class="dashicons dashicons-rss"></span>';
 	$icon = apply_filters( 'radio_station_show_rss_icon', $icon, $post_id );
 	$show_icons['rss'] = '<div class="show-icon show-rss">';
-	$show_icons['rss'] .= '<a href="' . esc_url( $feed_url ) . '" title="' . $title . '">';
+	$show_icons['rss'] .= '<a href="' . esc_url( $feed_url ) . '" title="' . esc_attr( $title ) . '">';
 	$show_icons['rss'] .= $icon;
 	$show_icons['rss'] .= '</a>';
 	$show_icons['rss'] .= '</div>';
@@ -192,7 +196,9 @@ if ( ( $avatar_id || $thumbnail_id ) || ( count( $show_icons ) > 0 ) || ( $show_
 		$show_patreon_button = '';
 		if ( $show_patreon ) {
 			$show_patreon_button .= '<div class="show-patreon">';
-			$show_patreon_button .= radio_station_patreon_button( $show_patreon, $patreon_title );
+			$title = __( 'Become a Supporter for', 'radio-station' ) . ' ' . $show_title;
+			$title = apply_filters( 'radio_station_show_patreon_title', $title, $post_id );
+			$show_patreon_button .= radio_station_patreon_button( $show_patreon, $title );
 			$show_patreon_button .= '</div>';
 		}
 		// 2.3.1: added filter for patreon button
@@ -201,9 +207,15 @@ if ( ( $avatar_id || $thumbnail_id ) || ( count( $show_icons ) > 0 ) || ( $show_
 
 		// --- Show Player ---
 		// 2.3.0: embed latest broadcast audio player
+		// 2.3.3.4: add filter for optional title above Show Player (default empty)
+		// 2.3.3.4: add filter for title text on Show Download link icon
 		if ( $show_file ) {
 		
 			$blocks['show_images'] .= '<div class="show-player">';
+			$label = apply_filters( 'radio_station_show_player_label', '', $post_id );
+			if ( $label && ( '' != $label ) ) {
+				$blocks['show_images'] .= '<span class="show-player-label">' . esc_html( $label ) . '</span><br>';
+			}
 			$shortcode = '[audio src="' . $show_file . '" preload="metadata"]';
 			$player_embed = do_shortcode( $shortcode );
 			$blocks['show_images'] .= '<div class="show-embed">';
@@ -214,6 +226,7 @@ if ( ( $avatar_id || $thumbnail_id ) || ( count( $show_icons ) > 0 ) || ( $show_
 			// 2.3.2: check show download switch
 			if ( $show_download ) {
 				$title = __( 'Download Latest Broadcast', 'radio-station' );
+				$title = apply_filters( 'radio_station_show_download_title', $title, $post_id );
 				$blocks['show_images'] .= '<div class="show-download">';
 				$blocks['show_images'] .= '<a href="' . esc_url( $show_file ) . '" title="' . esc_attr( $title ) . '">';
 				$blocks['show_images'] .= '<span style="color:#7DBB00;" class="dashicons dashicons-download"></span>';
@@ -233,12 +246,20 @@ if ( ( $avatar_id || $thumbnail_id ) || ( count( $show_icons ) > 0 ) || ( $show_
 if ( $hosts || $producers || $genres || $languages ) {
 
 	// --- show meta title ---
-	$blocks['show_meta'] = '<h4>' . esc_html( __( 'Show Info', 'radio-station' ) ) . '</h4>';
+	// 2.3.3.4: added filter for show info label
+	// 2.3.3.4: added class to show info label tag
+	$label = __( 'Show Info', 'radio-station' );
+	$label = apply_filters( 'radio_station_show_info_label', $label, $post_id );
+	$blocks['show_meta'] = '<h4 class="show-info-label">' . esc_html( $label ) . '</h4>';
 
 	// --- Show DJs / Hosts ---
-	if ( $hosts ) {
+	// 2.3.3.4: added filter for hosted by label
+	// 2.3.3.4: replace bold title tag with span and class
+	if ( $hosts ) {	
 		$blocks['show_meta'] .= '<div class="show-djs show-hosts">';
-		$blocks['show_meta'] .= '<b>' . esc_html( __( 'Hosted by', 'radio-station' ) ) . '</b>: ';
+		$label = __( 'Hosted by', 'radio-station' );
+		$label = apply_filters( 'radio_station_show_hosts_label', $label, $post_id );
+		$blocks['show_meta'] .= '<span class="show-hosts-label">' . esc_html( $label ) . '</span>: ';
 		$count = 0;
 		$host_count = count( $hosts );
 		foreach ( $hosts as $host ) {
@@ -267,9 +288,13 @@ if ( $hosts || $producers || $genres || $languages ) {
 
 	// --- Show Producers ---
 	// 2.3.0: added assigned producer display
+	// 2.3.3.4: added filter for produced by label
+	// 2.3.3.4: replace bold title tag with span and class
 	if ( $producers ) {
 		$blocks['show_meta'] .= '<div class="show-producers">';
-		$blocks['show_meta'] .= '<b>' . esc_html( __( 'Produced by', 'radio-station' ) ) . '</b>: ';
+		$label = __( 'Produced by', 'radio-station' );
+		$label = apply_filters( 'radio_station_show_producers_label', $label, $post_id );
+		$blocks['show_meta'] .= '<span class="show-producers-label">' . esc_html( $label ) . '</span>: ';
 		$count = 0;
 		$producer_count = count( $producers );
 		foreach ( $producers as $producer ) {
@@ -298,6 +323,8 @@ if ( $hosts || $producers || $genres || $languages ) {
 
 	// --- Show Genre(s) ---
 	// 2.3.0: only display if genre assigned
+	// 2.3.3.4: added filter for genres label
+	// 2.3.3.4: replace bold title tag with span and class
 	if ( $genres ) {
 		$tax_object = get_taxonomy( RADIO_STATION_GENRES_SLUG );
 		if ( count( $genres ) == 1 ) {
@@ -305,8 +332,9 @@ if ( $hosts || $producers || $genres || $languages ) {
 		} else {
 			$label = $tax_object->labels->name;
 		}
+		$label = apply_filters( 'radio_station_show_genres_label', $label, $post_id );
 		$blocks['show_meta'] .= '<div class="show-genres">';
-		$blocks['show_meta'] .= '<b>' . esc_html( $label ) . '</b>: ';
+		$blocks['show_meta'] .= '<span class="show-genres-label">' . esc_html( $label ) . '</span>: ';
 		$genre_links = array();
 		foreach ( $genres as $genre ) {
 			$genre_link = get_term_link( $genre );
@@ -318,6 +346,8 @@ if ( $hosts || $producers || $genres || $languages ) {
 
 	// --- Show Language(s) ---
 	// 2.3.0: only display if language is assigned
+	// 2.3.3.4: added filter for languages label
+	// 2.3.3.4: replace bold title tag with span and class
 	if ( $languages ) {
 		$tax_object = get_taxonomy( RADIO_STATION_LANGUAGES_SLUG );
 		if ( count( $languages ) == 1 ) {
@@ -325,9 +355,9 @@ if ( $hosts || $producers || $genres || $languages ) {
 		} else {
 			$label = $tax_object->labels->name;
 		}
-
+		$label = apply_filters( 'radio_station_show_languages_label', $label, $post_id );
 		$blocks['show_meta'] .= '<div class="show-languages">';
-		$blocks['show_meta'] .= '<b>' . esc_html( $label ) . '</b>: ';
+		$blocks['show_meta'] .= '<span class="show-languages-label">' . esc_html( $label ) . '</span>: ';
 		$language_links = array();
 		foreach ( $languages as $language ) {
 			$lang_label = $language->name;
@@ -359,12 +389,16 @@ if ( $shifts && is_array( $shifts ) && ( count( $shifts ) > 0 ) ) {
 }
 
 // --- show times title ---
-$blocks['show_times'] = '<h4>' . esc_html( __( 'Show Times', 'radio-station' ) ) . '</h4>';
+$label = __( 'Show Times', 'radio-station' );
+$label = apply_filters( 'radio_station_show_times_label', $label, $post_id );
+$blocks['show_times'] = '<h4>' . esc_html( $label ) . '</h4>';
 
 // --- check if show is active and has shifts ---
 if ( !$active || !$shifts ) {
 
-	$blocks['show_times'] .= esc_html( __( 'Not Currently Scheduled.', 'radio-station' ) );
+	$label = __( 'Not Currently Scheduled.', 'radio-station' );
+	$label = apply_filters( 'radio_station_show_no_shifts_label', $label, $post_id );
+	$blocks['show_times'] .= esc_html( $label );
 
 } else {
 
@@ -399,7 +433,10 @@ if ( !$active || !$shifts ) {
 	}
 
 	// --- display timezone ---
-	$blocks['show_times'] .= '<b>' . esc_html( __( 'Timezone', 'radio-station' ) ) . '</b>: ';
+	// 2.3.3.4: added filter for timezone label
+	$label = __( 'Timezone', 'radio-station' );
+	$label = apply_filters( 'radio_station_show_timezone_label', $label, $post_id );
+	$blocks['show_times'] .= '<span class="show-timezone-label">' . esc_html( $label ) . '</span>: ';
 	if ( !isset( $timezone_code ) ) {
 		$blocks['show_times'] .= esc_html( __( 'UTC', 'radio-station' ) ) . $utc_offset;
 	} else {
@@ -461,8 +498,9 @@ if ( !$active || !$shifts ) {
 					$class = implode( ' ', $classes );
 
 					// --- set show time output ---
+					// 2.3.4: fix to start data_format attribute
 					$show_time = '<div class="' . esc_attr( $class ) . '">';
-					$show_time .= '<span class="rs-time rs-start-time" data-format="' . esc_attr( $data_format ) . '">' . esc_html( $start ) . '</span>';
+					$show_time .= '<span class="rs-time rs-start-time" data-format="' . esc_attr( $start_data_format ) . '">' . esc_html( $start ) . '</span>';
 					$show_time .= '<span class="rs-sep"> - </span>';
 					$show_time .= '<span class="rs-time rs-end-time" data-format="' . esc_attr( $end_data_format ) . '">' . esc_html( $end ) . '</span>';
 					if ( isset( $shift['encore'] ) && ( 'on' == $shift['encore'] ) ) {
@@ -491,11 +529,14 @@ if ( !$active || !$shifts ) {
 	}
 
 	// --- * encore note ---
+	// 2.3.3.4: added filter for encore label
 	if ( $found_encore ) {
 		$blocks['show_times'] .= '<tr><td></td><td>';
 		$blocks['show_times'] .= '<span class="show-encore">*</span> ';
 		$blocks['show_times'] .= '<span class="show-encore-label">';
-		$blocks['show_times'] .= esc_html( __( 'Encore Presentation', 'radio-station' ) );
+		$label = __( 'Encore Presentation', 'radio-station' );
+		$label = apply_filters( 'radio_station_show_encore_label', $label, $post_id );
+		$blocks['show_times'] .= esc_html( $label );
 		$blocks['show_times'] .= '</span>';
 		$blocks['show_times'] .= '</td></tr>';
 	}
@@ -504,12 +545,17 @@ if ( !$active || !$shifts ) {
 }
 
 // --- maybe add link to full schedule page ---
+// 2.3.3.4: added filters for schedule link title and anchor
 $schedule_page = radio_station_get_setting( 'schedule_page' );
 if ( $schedule_page && !empty( $schedule_page ) ) {
 	$schedule_link = get_permalink( $schedule_page );
 	$blocks['show_times'] .= '<div class="show-schedule-link">';
-	$blocks['show_times'] .= '<a href="' . esc_url( $schedule_link ) . '" title="' . esc_attr( __( 'Go to Full Station Schedule Page', 'radio-station' ) ) . '">';
-	$blocks['show_times'] .= '&larr; ' . esc_html( __( 'Full Station Schedule', 'radio-station' ) ) . '</a>';
+	$title = __( 'Go to Full Station Schedule Page', 'radio-station' );
+	$title = apply_filters( 'radio_station_show_schedule_link_title', $title, $post_id );
+	$blocks['show_times'] .= '<a href="' . esc_url( $schedule_link ) . '" title="' . esc_attr( $title ) . '">';
+	$label = __( 'Full Station Schedule', 'radio-station' );
+	$label = apply_filters( 'radio_station_show_schedule_link_anchor', $label, $post_id );
+	$blocks['show_times'] .= '&larr; ' . esc_html( $label ) . '</a>';
 	$blocks['show_times'] .= '</div>';
 }
 
@@ -529,8 +575,12 @@ if ( strlen( trim( $content ) ) > 0 ) {
 	$show_description = '<div class="show-desc-content">' . $content . '</div>';
 	$show_description .= '<div id="show-more-overlay"></div>';
 	$show_desc_buttons = '<div id="show-desc-buttons">';
-	$show_desc_buttons .= '	<input type="button" id="show-desc-more" onclick="radio_show_desc(\'more\');" value="' . esc_html( __( 'Show More', 'radio-station' ) ) . '">';
-	$show_desc_buttons .= '	<input type="button" id="show-desc-less" onclick="radio_show_desc(\'less\');" value="' . esc_html( __( 'Show Less', 'radio-station' ) ) . '">';
+	$label = __( 'Show More', 'radio-station' );
+	$label = apply_filters( 'radio_station_show_more_label', $label, $post_id );
+	$show_desc_buttons .= '	<input type="button" id="show-desc-more" onclick="radio_show_desc(\'more\');" value="' . esc_html( $label ) . '">';
+	$label = __( 'Show Less', 'radio-station' );
+	$label = apply_filters( 'radio_station_show_less_label', $label, $post_id );
+	$show_desc_buttons .= '	<input type="button" id="show-desc-less" onclick="radio_show_desc(\'less\');" value="' . esc_html( $label ) . '">';
 	$show_desc_buttons .= '	<input type="hidden" id="show-desc-state" value="">';
 	$show_desc_buttons .= '</div>';
 }
@@ -541,12 +591,17 @@ $sections = array();
 if ( ( strlen( trim( $content ) ) > 0 ) || $show_posts || $show_playlists || $show_episodes ) {
 
 	// --- About Show Tab (Post Content) ---
+	// 2.3.3.4: added filter for show description label and anchor
 	$i = 0;
 	if ( $show_description ) {
 
 		$sections['about']['heading'] = '<a name="show-description"></a>';
-		$sections['about']['heading'] .= '<h3 id="show-section-about">' . esc_html( __( 'About the Show', 'radio-station' ) ) . '</h3>';
-		$sections['about']['anchor'] = __( 'About', 'radio-station' );
+		$label = __( 'About the Show', 'radio-station' );
+		$label = apply_filters( 'radio_station_show_description_label', $label, $post_id );
+		$sections['about']['heading'] .= '<h3 id="show-section-about">' . esc_html( $label ) . '</h3>';
+		$anchor = __( 'About', 'radio-station' );
+		$anchor = apply_filters( 'radio_station_show_description_anchor', $anchor, $post_id );
+		$sections['about']['anchor'] = $anchor;
 
 		$sections['about']['content'] = '<div id="show-about" class="show-tab tab-active"><br>';
 		$sections['about']['content'] .= '<div id="show-description" class="show-description">';
@@ -558,11 +613,16 @@ if ( ( strlen( trim( $content ) ) > 0 ) || $show_posts || $show_playlists || $sh
 	}
 
 	// --- Show Episodes Tab ---
+	// 2.3.3.4: added filter for show epiodes label and anchor
 	if ( $show_episodes ) {
 
 		$sections['episodes']['heading'] = '<a name="show-episodes"></a>';
-		$sections['episodes']['heading'] .= '<h3 id="show-section-episodes">' . esc_html( __( 'Show Episodes', 'radio-station' ) ) . '</h3>';
-		$sections['episodes']['anchor'] = __( 'Episodes', 'radio-station' );
+		$label = __( 'Show Episodes', 'radio-station' );
+		$label = apply_filters( 'radio_station_show_episodes_label', $label, $post_id );
+		$sections['episodes']['heading'] .= '<h3 id="show-section-episodes">' . esc_html( $label ) . '</h3>';
+		$anchor = __( 'Episodes', 'radio-station' );
+		$anchor = apply_filters( 'radio_station_show_episodes_anchor', $anchor, $post_id );
+		$sections['episodes']['anchor'] = $anchor;
 
 		$sections['episodes']['content'] = '<div id="show-episodes" class="show-section-content"><br>';
 		$radio_station_data['show-episodes'] = $show_posts;
@@ -574,11 +634,16 @@ if ( ( strlen( trim( $content ) ) > 0 ) || $show_posts || $show_playlists || $sh
 	}
 
 	// --- Show Blog Posts Tab ---
+	// 2.3.3.4: added filter for show posts label and anchor
 	if ( $show_posts ) {
 
 		$sections['posts']['heading'] = '<a name="show-posts"></a>';
-		$sections['posts']['heading'] .= '<h3 id="show-section-posts">' . esc_html( __( 'Show Posts', 'radio-station' ) ) . '</h3>';
-		$sections['posts']['anchor'] = __( 'Posts', 'radio-station' );
+		$label = __( 'Show Posts', 'radio-station' );
+		$label = apply_filters( 'radio_station_show_posts_label', $label, $post_id );
+		$sections['posts']['heading'] .= '<h3 id="show-section-posts">' . esc_html( $label ) . '</h3>';
+		$anchor = __( 'Posts', 'radio-station' );
+		$anchor = apply_filters( 'radio_station_show_posts_anchor', $anchor, $post_id );
+		$sections['posts']['anchor'] = $anchor;
 
 		$sections['posts']['content'] = '<div id="show-posts" class="show-section-content"><br>';
 		$radio_station_data['show-posts'] = $show_posts;
@@ -590,11 +655,16 @@ if ( ( strlen( trim( $content ) ) > 0 ) || $show_posts || $show_playlists || $sh
 	}
 
 	// --- Show Playlists Tab ---
+	// 2.3.3.4: added filter for show playlists label and anchor
 	if ( $show_playlists ) {
 
 		$sections['playlists']['heading'] = '<a name="show-playlists">';
-		$sections['playlists']['heading'] .= '<h3 id="show-section-playlists">' . esc_html( __( 'Show Playlists', 'radio-station' ) ) . '</h3>';
-		$sections['playlists']['anchor'] = __( 'Playlists', 'radio-station' );
+		$label = __( 'Show Playlists', 'radio-station' );
+		$label = apply_filters( 'radio_station-show_playlists_label', $label, $post_id );
+		$sections['playlists']['heading'] .= '<h3 id="show-section-playlists">' . esc_html( $label ) . '</h3>';
+		$anchor = __( 'Playlists', 'radio-station' );
+		$anchor = apply_filters( 'radio_station_show_playlists_anchor', $anchor, $post_id );
+		$sections['playlists']['anchor'] = $anchor;
 
 		$sections['playlists']['content'] = '<div id="show-playlists" class="show-section-content"><br>';
 		$radio_station_data['show-playlists'] = $show_playlists;
@@ -605,7 +675,7 @@ if ( ( strlen( trim( $content ) ) > 0 ) || $show_posts || $show_playlists || $sh
 		$i ++;
 	}
 }
-$sections = apply_filters( 'radio_station_show_page_sections', $sections, $post_id );
+$sections = apply_filters( 'radio_station_show_page_sections', $sections, $post_id, $post_id );
 
 
 // ---------------
@@ -647,9 +717,10 @@ $class = implode( ' ', $classes );
 		}
 
 		// --- Show Info Blocks ---
+		// 2.3.3.4: add show-info element ID to div tag
 		?>
 
-	    <div class="show-info">
+	    <div id="show-info" class="show-info">
 
 			<?php
 
@@ -692,17 +763,19 @@ $class = implode( ' ', $classes );
 
 			// --- Display Latest Show Posts ---
 			if ( $show_latest ) {
-			?>
+			 	$label = __( 'Latest Show Posts', 'radio-station' );
+			 	$label = apply_filters( 'radio_station_show_latest_posts_label', $label, $post_id );
+				?>
 
 				<div id="show-latest">
 					<div class="show-latest-title">
-						<b><?php echo esc_html( __( 'Latest Show Posts', 'radio-station' ) ); ?></b>
+						<span class="show-latest-label"><?php echo esc_html( $label ); ?></span>
 					</div>
 					<?php
-					$radio_station_data['show-latests'] = $show_latest;
-					$shortcode = '[show-latest-archive thumbnails="0" pagination="0" content="none"]';
-					$shortcode = apply_filters( 'radio_station_show_page_latest_shortcode', $shortcode, $post_id );
-					echo wp_kses_post( do_shortcode( $shortcode ) );
+						$radio_station_data['show-latests'] = $show_latest;
+						$shortcode = '[show-latest-archive thumbnails="0" pagination="0" content="none"]';
+						$shortcode = apply_filters( 'radio_station_show_page_latest_shortcode', $shortcode, $post_id );
+						echo do_shortcode( $shortcode );
 					?>
 				</div>
 
@@ -747,7 +820,7 @@ $class = implode( ' ', $classes );
 								if ( ( $i + 1 ) < count( $sections ) ) {
 									echo '<div class="show-tab-spacer">&nbsp;</div>';
 								}
-								$i ++;
+								$i++;
 							}
 						}
 						?>

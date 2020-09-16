@@ -7,6 +7,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### 2.3.3.4
+* Improved: auto-match show description to info height on Show pages
+* Improved: allow multiple Related Show selection for single post
+* Improved: ability to assign Post to relate to multiple Shows
+* Added: Related Show Post List column and Quick Edit field
+* Added: Related Show selection Bulk Edit Action for Post List
+* Added: filters for label texts and title attributes on Show Page
+* Added: filter for label text above Show Player (default empty)
+
 ### 2.3.3.3
 * Fixed: improved Current Show and Upcoming Shows calculations
 * (Display showtimes when show starts before and ends after midnight)

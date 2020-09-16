@@ -1363,6 +1363,7 @@ function radio_station_mailchimp_form() {
 
 	// --- bug out if already subscribed ---
 	// 2.3.0: added to hide for existing subscribers
+	// note: there is a typo in this option not worth fixing
 	$subscribed = get_option( 'radio_station_subcribed' );
 	if ( $subscribed && is_array( $subscribed ) && in_array( $user_email, $subscribed ) ) {
 		return;
@@ -1452,6 +1453,7 @@ function radio_station_clear_plugin_options() {
 	if ( !current_user_can( 'manage_options' ) ) {return;}
 	
 	if ( isset( $_GET['option'] ) && ( 'subscribed' == $_GET['option'] ) ) {
+		// note: there is a typo in this option not worth fixing
 		delete_option( 'radio_station_subcribed' );
 	}
 	if ( isset( $_GET['option'] ) && ( 'notices' == $_GET['option'] ) ) {

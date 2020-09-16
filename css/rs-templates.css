@@ -43,6 +43,16 @@
 	margin-bottom: 20px;
 }
 
+#show-content .show-info .show-player-label,
+#show-content .show-info .show-hosts-label,
+#show-content .show-info .show-producers-label,
+#show-content .show-info .show-genres-label,
+#show-content .show-info .show-languages-label,
+#show-content .show-info .show-timezone-label,
+#show-content .show-info .show-latest-label {
+	font-weight: bold;
+}
+
 #show-content .show-info .show-avatar {
 	display: inline-block;
 	vertical-align: top;
@@ -93,13 +103,13 @@
 
 #show-content .show-icons .show-icon {
 	display: inline-block;
-	margin-right: 10px;
+	margin-right: 24px;
 	margin-bottom: 10px;
 }
 
 #show-content .show-icons .show-icon span, 
 #show-content .show-download span {
-	font-size: 28px;
+	font-size: 32px;
 }
 
 #show-content .show-icon a {
@@ -159,7 +169,8 @@
 
 #show-content .show-description.expanded,
 #show-content .show-description.narrow.expanded {
-	max-height: none;
+	max-height: none !important;
+	overflow: visible;
 }
 
 #show-content #show-desc-buttons {
@@ -188,10 +199,6 @@
 	display: none;
 }
 
-#show-content .show-description.expanded {
-	max-height: none;
-	overflow: visible;
-}
 
 /* Show Tabs */
 /* --------- */
