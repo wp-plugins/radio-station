@@ -40,6 +40,19 @@ function radio_show_responsive() {
         if (showcontent.offsetWidth < 500) {showcontent.classList.add('narrow');}
         else {showcontent.classList.remove('narrow');}
     }
+    
+    /* Maybe Match Heights for Info and Description */
+	if (document.getElementById('show-content').className.indexOf('top-blocks') < 0) {
+		info = document.getElementById('show-info');
+		desc = document.getElementById('show-description');
+		about = document.getElementById('show-section-about');
+		if (info && desc) {
+			descheight = info.offsetHeight - 30;
+			if (about) {descheight = descheight - about.offsetHeight;}
+			if (descheight < desc.style.minHeight) {desc.style.maxHeight = 'none';}
+			else {desc.style.maxHeight = descheight+'px';}
+		}
+	}
 
     /* Maybe Display Show More Button */
     descstate = document.getElementById('show-desc-state');

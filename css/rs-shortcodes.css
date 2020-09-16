@@ -148,7 +148,7 @@
 /* Widget/Shortcode Styles */
 /* ----------------------- */
 
-.current-show-list, .current-show-list li, .upcoming-shows-list, .upcoming-shows-list li {
+ul.current-show-list, ul.current-show-list li, ul.upcoming-shows-list, ul.upcoming-shows-list li {
     list-style: none;
 }
 

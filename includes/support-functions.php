@@ -18,6 +18,7 @@
 // - Get Override Metadata
 // - Get Current Schedule
 // - Get Current Show
+// - Get Previous Show
 // - Get Next Show
 // - Get Next Shows
 // - Get Blog Posts for Show
@@ -691,20 +692,49 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array() ) {
 		}
 	}
 
-	// --- get episodes with associated show ID ---
+	// --- get records with associated show ID ---
+
 	global $wpdb;
-	$query = "SELECT post_id FROM " . $wpdb->prefix . "postmeta"
-	         . " WHERE meta_key = '" . $metakey . "' AND meta_value = %d";
-	$query = $wpdb->prepare( $query, $show_id );
-	$post_metas = $wpdb->get_results( $query, ARRAY_A );
-	if ( !$post_metas || !is_array( $post_metas ) || ( count( $post_metas ) < 1 ) ) {
-		return false;
+	if ( 'posts' == $datatype ) {
+
+		// 2.3.3.4: handle possible multiple show post values
+		$query = "SELECT post_id,meta_value FROM " . $wpdb->prefix . "postmeta"
+				. " WHERE meta_key = '" . $metakey . "' AND meta_value LIKE '%" . $show_id . "%'";
+		$results = $wpdb->get_results( $query, ARRAY_A );
+		// echo "Results: "; print_r( $results );
+		if ( !$results || !is_array( $results ) || ( count( $results ) < 1 ) ) {
+			return false;
+		}
+
+		// --- get/check post IDs in post meta ---
+		$post_ids = array();
+		foreach ( $results as $result ) {
+			// TODO: check raw result is serialized or array ?
+			$show_ids = maybe_unserialize( $result['meta_value'] );
+			if ( $show_id == $result['meta_value'] || in_array( $show_id, $show_ids ) ) {
+				$post_ids[] = $result['post_id'];
+			}
+		}
+		// echo "Post IDs: "; print_r( $post_ids );
+	} else {
+		$query = "SELECT post_id FROM " . $wpdb->prefix . "postmeta"
+		         . " WHERE meta_key = '" . $metakey . "' AND meta_value = %d";
+		$query = $wpdb->prepare( $query, $show_id );
+		$post_metas = $wpdb->get_results( $query, ARRAY_A );
+		if ( !$post_metas || !is_array( $post_metas ) || ( count( $post_metas ) < 1 ) ) {
+			return false;
+		}
+	
+		// --- get post IDs from post meta ---
+		$post_ids = array();
+		foreach ( $post_metas as $post_meta ) {
+			$post_ids[] = $post_meta['post_id'];
+		}
 	}
 
-	// --- get post IDs from post meta ---
-	$post_ids = array();
-	foreach ( $post_metas as $post_meta ) {
-		$post_ids[] = $post_meta['post_id'];
+	// --- check for post IDs ---
+	if ( count( $post_ids ) < 1 ) {
+		return false;
 	}
 
 	// --- get posts from post IDs ---
@@ -1246,7 +1276,7 @@ function radio_station_get_current_schedule( $time = false ) {
 		}
 
 		// --- loop all shifts to add show data ---
-		$set_prev_shift = $prev_shift_end = false;
+		$prev_shift = $set_prev_shift = $prev_shift_end = false;
 		foreach ( $show_shifts as $day => $shifts ) {	
 			// 2.3.1: added check for shift count
 			if ( count( $shifts ) > 0 ) {
@@ -1304,11 +1334,23 @@ function radio_station_get_current_schedule( $time = false ) {
 							$shift['day'] = $day;
 							$current_show = $shift;
 
-							// 2.3.3: set current show global
+							// 2.3.3: set current show to global data
+							// 2.3.4: set previous show shift to global and transient
 							if ( !$time ) {
+								$expires = $shift_end_time - $now - 1;
 								$radio_station_data['current_show'] = $current_show;
+								if ( $prev_shift ) {
+									$prev_show = apply_filters( 'radio_station_previous_show', $prev_shift, $time );
+									$radio_station_data['previous_show'] = $prev_show;
+									set_transient( 'radio_station_previous_show', $prev_show, $expires );
+								}
 							} else {
 								$radio_station_data['current_show_' . $time ] = $current_show;
+								if ( $prev_shift ) {
+									$prev_show = apply_filters( 'radio_station_previous_show', $prev_shift, $time );
+									$radio_station_data['previous_show_' . $time] = $prev_show;
+									set_transient( 'radio_station_previous_show_' . $time, $prev_show, $expires );
+								}									
 							}
 							$expires = $shift_end_time - $now - 1;
 							if ( $expires > 3600 ) {
@@ -1316,7 +1358,7 @@ function radio_station_get_current_schedule( $time = false ) {
 							}
 							
 							// 2.3.2: set temporary transient if time is specified
-							// 2.3.3: remove current show transient
+							// 2.3.3: remove current show transient (being unreliable)
 							/* if ( !$time ) {
 								set_transient( 'radio_station_current_show', $current_show, $expires );
 							} else {
@@ -1387,6 +1429,9 @@ function radio_station_get_current_schedule( $time = false ) {
 					if ( $set_prev_shift ) {
 						$prev_shift_end = $shift_end_time;
 					}
+
+					// 2.3.4: set previous shift value
+					$prev_shift = $shift;
 
 				}
 			}
@@ -1493,15 +1538,11 @@ function radio_station_get_current_show( $time = false ) {
 	// --- get cached current show value ---
 	// 2.3.3: remove current show transient
 	// 2.3.3: check for existing global data first
-	/* if ( !$time ) {
-		if ( isset( $radio_station_data['current_show'] ) ) {
-			return $radio_station_data['current_show'];
-		}
-	} else {
-		if ( isset( $radio_station_data['current_show_' . $time] ) ) {
-			return $radio_station_data['current_show_' . $time];
-		}
-	} */
+	if ( !$time && isset( $radio_station_data['current_show'] ) ) {
+		return $radio_station_data['current_show'];
+	} elseif ( isset( $radio_station_data['current_show_' . $time] ) ) {
+		return $radio_station_data['current_show_' . $time];
+	}
 
 	// --- get all show shifts ---
 	if ( !$time ) {
@@ -1534,7 +1575,7 @@ function radio_station_get_current_show( $time = false ) {
 	}
 
 	// --- loop shifts to get current show ---
-	$current_split = false;
+	$current_split = $prev_show = false;
 	foreach ( $weekdays as $day ) {
 		if ( isset( $show_shifts[$day] ) ) {
 			$shifts = $show_shifts[$day];
@@ -1564,6 +1605,20 @@ function radio_station_get_current_show( $time = false ) {
 					}
 					// --- recombine possible split shift to set current show ---
 					$current_show = $shift;
+					
+					// 2.3.4: also set previous shift data
+					if ( $prev_shift ) {
+						$expires = $shift_end_time - $now - 1;
+						$previous_show = apply_filters( 'radio_station_previous_show', $prev_shift, $time );
+						if ( !$time ) {
+							$radio_station_data['previous_show'] = $previous_show;
+							set_transient( 'radio_station_previous_show', $previous_show, $expires );
+						} else {
+							$radio_station_data['previous_show_' . $time] = $previous_show;
+							set_transient( 'radio_station_previous_show_' . $time, $previous_show, $expires );
+						}
+					}
+
 					/* if ( isset( $current_show['split'] ) && $current_show['split'] ) {
 						if ( isset( $current_show['real_start'] ) ) {
 							// 2.3.3: second shift half so set to previous day and date
@@ -1579,16 +1634,69 @@ function radio_station_get_current_show( $time = false ) {
 				if ( RADIO_STATION_DEBUG ) {
 					echo '</span>' . PHP_EOL;
 				}
+				
+				// 2.3.4: store previous shift
+				$prev_shift = $shift;
 			}
 		}
 	}
 
-	// --- filter and return ---
+	// --- filter current show ---
 	// 2.3.2: added time argument to filter
 	$current_show = apply_filters( 'radio_station_current_show', $current_show, $time );
-	$radio_station_data['current_show'] = $current_show;
+
+	// --- set to global data ---
+	if ( !$time ) {
+		$radio_station_data['current_show'] = $current_show;
+	} else {
+		$radio_station_data['current_show_' . $time] = $current_show;
+	}
 
 	return $current_show;
+}
+
+// -----------------
+// Get Previous Show
+// -----------------
+// 2.3.3: added get previous show function
+function radio_station_get_previous_show( $time = false ) {
+
+	global $radio_station_data;
+
+	$prev_show = false;
+
+	// --- get cached current show value ---
+	if ( !$time ) {
+		if ( isset ( $radio_station_data['previous_show'] ) ) {
+			$prev_show = $radio_station_data['previous_show'];
+		} else {
+			$prev_show = get_transient( 'radio_station_previous_show' );
+		}
+	} else {
+		if ( isset ( $radio_station_data['previous_show_' . $time] ) ) {
+			$prev_show = $radio_station_data['previous_show_' . $time];
+		} else {
+			$prev_show = get_transient( 'radio_station_previous_show_' . $time );
+		}
+	}
+
+	// --- if not set it has expired so recheck schedule ---
+	if ( !$prev_show ) {
+		if ( !$time ) {
+			$schedule = radio_station_get_current_schedule();
+			if ( isset( $radio_station_data['previous_show'] ) ) {
+				$prev_show = $radio_station_data['previous_show'];
+			}
+		} else {
+			$schedule = radio_station_get_current_schedule( $time );
+			if ( isset( $radio_station_data['previous_show_' . $time] ) ) {
+				$prev_show = $radio_station_data['previous_show_' . $time];
+			}
+		}
+	}
+
+	// note: already filtered when set
+	return $prev_show;
 }
 
 // -------------
@@ -1635,9 +1743,9 @@ function radio_station_get_next_show( $time = false ) {
 			}
 		}
 
-		// --- filter and return ---
 		// 2.3.2: added time argument to filter
-		$next_show = apply_filters( 'radio_station_next_show', $next_show, $time );
+		// 2.3.4: moved filter to where data is set so only applied once
+		// $next_show = apply_filters( 'radio_station_next_show', $next_show, $time );
 	}
 
 	return $next_show;
@@ -1746,10 +1854,13 @@ function radio_station_get_next_shows( $limit = 3, $show_shifts = false, $time =
 
 						// --- maybe set next show transient ---
 						// 2.3.3: also set global data key
+						// 2.3.4: moved next show filter here (before setting data)
 						if ( !isset( $next_show ) ) {
 							$next_show = $shift;
 							$next_expires = $shift_end_time - $now - 1;
-							if ( !$time ) {
+							
+							$next_show = apply_filters( 'radio_station_next_show', $next_show, $time );
+							if ( !$time ) {								
 								$radio_station_data['next_show'] = $next_show;
 								set_transient( 'radio_station_next_show', $next_show, $next_expires );
 							} else {
@@ -4064,6 +4175,26 @@ function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
 	// --- sanitize values by key type ---
 	$atts = radio_station_sanitize_values( $_REQUEST, $keys );
 	return $atts;
+}
+
+// --------------------------
+// Delete Prefixed Transients
+// --------------------------
+// 2.3.4: added helper for clearing transient data
+function radio_station_delete_transients_with_prefix( $prefix ) {
+	global $wpdb;
+
+	$prefix = $wpdb->esc_like( '_transient_' . $prefix );
+	$sql = "SELECT `option_name` FROM $wpdb->options WHERE `option_name` LIKE '%s'";
+	$results = $wpdb->get_results( $wpdb->prepare( $sql, $prefix . '%' ), ARRAY_A );
+	if ( !$results || !is_array( $results ) || ( count( $results ) < 1 ) ) {
+		return;
+	}
+
+	foreach ( $results as $option ) {
+		$key = ltrim( $option['option_name'], '_transient_' );
+		delete_transient( $key );
+	}	
 }
 
 

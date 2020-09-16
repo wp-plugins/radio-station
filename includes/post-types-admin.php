@@ -22,10 +22,20 @@
 // - Add Playlist List Columns
 // - Playlist List Column Data
 // - Playlist List Column Styles
-// === Shows ===
+// === Posts ===
 // - Add Related Show Metabox
 // - Related Show Metabox
 // - Update Related Show
+// - Related Show Quick Edit Select Input
+// - Add Related Show Post List Column
+// - Related Show Post List Column Data
+// - Related Show Quick Edit Script
+// - Add Bulk Edit Posts Action
+// - Bulk Edit Posts Script
+// - Bulk Edit Posts Handler
+// - Bulk Edit Posts Notice
+// - Related Show Post List Styles
+// === Shows ===
 // - Add Show Info Metabox
 // - Show Info Metabox
 // - Add Assign Hosts to Show Metabox
@@ -964,11 +974,18 @@ function radio_station_playlist_save_data( $post_id ) {
 			}
 
 			// 2.3.0: maybe clear cached data to be safe
+			// 2.3.3: remove current show transient
+			// 2.3.4: add previous show transient
 			if ( $changed ) {
 				delete_transient( 'radio_station_current_schedule' );
 				delete_transient( 'radio_station_next_show' );
-				// 2.3.3: remove current show transient
-				// delete_transient( 'radio_station_current_show' );
+				delete_transient( 'radio_station_previous_show' );
+
+				// 2.3.4: delete all prefixed transients (for times)
+				radio_station_delete_transients_with_prefix( 'radio_station_current_schedule' );
+				radio_station_delete_transients_with_prefix( 'radio_station_next_show' );
+				radio_station_delete_transients_with_prefix( 'radio_station_previous_show' );
+
 				do_action( 'radio_station_clear_data', 'show_meta', $show );
 			}
 		}
@@ -1114,7 +1131,7 @@ function radio_station_playlist_column_styles() {
 
 
 // -------------
-// === Shows ===
+// === Posts ===
 // -------------
 
 // ------------------------
@@ -1155,20 +1172,34 @@ function radio_station_post_show_metabox() {
 		'orderby'     => 'post_title',
 		'order'       => 'ASC',
 		'post_type'   => RADIO_STATION_SHOW_SLUG,
-		'post_status' => 'publish',
+		'post_status' => 'publish', // ???
 	);
 	$shows = get_posts( $args );
-	$current = get_post_meta( $post->ID, 'post_showblog_id', true );
+	$selected = get_post_meta( $post->ID, 'post_showblog_id', true );
+	// 2.3.3.4: convert existing selection to array
+	if ( !$selected ) {
+		$selected = array();
+	} elseif ( !is_array( $selected ) ) {
+		$selected = array( $selected );
+	}
 
 	echo '<div id="meta_inner">';
 
 	if ( count( $shows ) > 0 ) {
 		// --- select related show input ---
-		echo '<select name="post_showblog_id">';
-		echo '<option value=""></option>';
+		// 2.2.3.4: allow for multiple selections
+		echo '<select multiple="multiple" name="post_showblog_id[]">';
+		echo '<option value="">' . esc_html( __( 'Select Show(s)', 'radio-station') ) . '</option>';
+
 		// --- loop shows for selection options ---
+		// 2.3.3.4: check for multiple selections
 		foreach ( $shows as $show ) {
-			echo '<option value="' . esc_attr( $show->ID ) . '" ' . selected( $show->ID, $current, false ) . '>' . esc_html( $show->post_title ) . '</option>';
+			echo '<option value="' . esc_attr( $show->ID ) . '"';
+			// ' ' . selected( $show->ID, $current, false );
+			if ( in_array( $show->ID, $selected ) ) {
+				echo ' selected="selected"';
+			}
+			echo '>' . esc_html( $show->post_title ) . '</option>';
 		}
 		echo '</select>';
 	} else {
@@ -1202,7 +1233,7 @@ function radio_station_post_save_data( $post_id ) {
 		// --- get the related show ID ---
 		$changed = false;
 		$prev_show = get_post_meta( $post_id, 'post_showblog_id', true );
-		$show = trim( $_POST['post_showblog_id'] );
+		$show = $_POST['post_showblog_id'];
 
 		if ( empty( $show ) ) {
 			// --- remove show from post ---
@@ -1212,24 +1243,296 @@ function radio_station_post_save_data( $post_id ) {
 			}
 		} else {
 			// --- sanitize to numeric before updating ---
-			$show = absint( $show );
-			if ( ( $show > 0 ) && ( $show != $prev_show ) ) {
+			// 2.3.3.4: maybe sanitize multiple array values
+			if ( is_array( $show ) ) {
+				foreach ( $show as $i => $s ) {
+					if ( '' == $s ) {
+						unset( $show[$i] );
+					} else {
+						$show[$i] = absint( trim( $s ) );
+					}					
+				}
+			} else {
+				$show = absint( trim( $show ) );
+			}
+			if ( ( $show != -1 ) && ( $show != $prev_show ) ) {
 				update_post_meta( $post_id, 'post_showblog_id', $show );
 				$changed = true;
 			}
 		}
 
 		// 2.3.0: clear cached data to be safe
+		// 2.3.3: remove current show transient
+		// 2.3.4: add previous show transient
 		if ( $changed ) {
 			delete_transient( 'radio_station_current_schedule' );
 			delete_transient( 'radio_station_next_show' );
-			// 2.3.3: remove current show transient
-			// delete_transient( 'radio_station_current_show' );
+			delete_transient( 'radio_station_previous_show' );
+
+			// 2.3.4: delete all prefixed transients (for times)
+			radio_station_delete_transients_with_prefix( 'radio_station_current_schedule' );
+			radio_station_delete_transients_with_prefix( 'radio_station_next_show' );
+			radio_station_delete_transients_with_prefix( 'radio_station_previous_show' );
+
 			do_action( 'radio_station_clear_data', 'show_meta', $show );
 		}
 	}
 
 }
+
+// ------------------------------------
+// Related Show Quick Edit Select Input
+// ------------------------------------
+// 2.3.3.4: added Related Show field to Post List Quick Edit
+add_action( 'quick_edit_custom_box', 'radio_station_quick_edit_post', 10, 2 );
+function radio_station_quick_edit_post( $column_name, $post_type ) {
+
+	$args = array(
+		'numberposts' => - 1,
+		'offset'      => 0,
+		'orderby'     => 'post_title',
+		'order'       => 'ASC',
+		'post_type'   => RADIO_STATION_SHOW_SLUG,
+		'post_status' => 'publish', // ???
+	);
+	$shows = get_posts( $args );
+
+	echo '<fieldset class="inline-edit-col-right related-show-field">';
+		echo '<div class="inline-edit-col column-' . esc_attr( $column_name ) . '">';
+			wp_nonce_field( 'radio-station', 'post_show_nonce' );
+			echo '<label class="inline-edit-group">';
+				echo '<span class="title">' . esc_html( __( 'Related Show(s)', 'radio-station' ) ) . '</span>';
+				if ( count( $shows ) > 0 ) {
+					echo '<select multiple="multiple" name="post_showblog_id[]" class="select-show">';
+					// echo '<option value="">' . esc_html( __( 'Select Show(s)...', 'radio-station' ) ) . '</option>';
+					foreach ( $shows as $show ) {
+						echo '<option value="' . esc_attr( $show->ID ) . '">' . esc_html( $show->post_title ) . '</option>';
+					}
+					echo '</select>';
+				} else {
+					// --- no shows message ---
+					echo esc_html( __( 'No Shows to Select.', 'radio-station' ) );
+				}
+			echo '</label>';
+		echo '</div>';
+	echo '</fieldset>';
+}
+
+// ---------------------------------
+// Add Related Show Post List Column
+// ---------------------------------
+// 2.3.3.4: added Related Show Column to Post List
+add_filter( 'manage_edit-post_columns', 'radio_station_post_columns', 6 );
+function radio_station_post_columns( $columns ) {
+	$columns['show'] = esc_attr( __( 'Show(s)', 'radio-station' ) );
+	return $columns;
+}
+
+// ----------------------------------
+// Related Show Post List Column Data
+// ----------------------------------
+// 2.3.3.4: added Related Show Column to Post List
+add_action( 'manage_post_posts_custom_column', 'radio_station_post_column_data', 5, 2 );
+function radio_station_post_column_data( $column, $post_id ) {
+	if ( 'show' == $column ) {
+		$data = '';
+		$show_ids = array();
+		$show_id = get_post_meta( $post_id, 'post_showblog_id', true );		
+		if ( $show_id ) {
+			if ( is_array( $show_id ) ) {
+				$show_ids = $show_id;
+				$data = implode( ',', $show_id );
+			} else {
+				$show_ids = array( $show_id );
+				$data = $show_id;
+			}
+		}
+		if ( count( $show_ids ) > 0 ) {
+			foreach ( $show_ids as $show_id ) {
+				$show = get_post( trim( $show_id ) );
+				if ( $show ) {
+					echo '<a href="' . get_edit_post_link( $show_id ) . '" title="' . esc_attr( __( 'Edit Show', 'radio-station' ) ) . ' ' . $show_id . '">';
+						echo esc_html( $show->post_title ) . '<br>';
+					echo '</a>';
+				}
+			}
+		}
+		echo '<span class="show-ids" style="display:none;">' . $data . '</span>';
+	}
+}
+
+// ------------------------------
+// Related Show Quick Edit Script
+// ------------------------------
+// 2.3.3.4: added Related Show Quick Edit value population script
+// ref: https://codex.wordpress.org/Plugin_API/Action_Reference/quick_edit_custom_box
+add_action( 'admin_enqueue_scripts', 'radio_station_posts_quick_edit_script' );
+function radio_station_posts_quick_edit_script( $hook ) {
+
+	if ( 'edit.php' != $hook ) {
+		return;
+	}
+
+	if ( !isset( $_GET['post_type'] ) || ( 'post' == $_GET['post_type'] ) ) {
+		$js = "(function($) {	
+			var \$wp_inline_edit = inlineEditPost.edit;
+			inlineEditPost.edit = function( id ) {
+				\$wp_inline_edit.apply(this, arguments);
+				var post_id = 0;
+				if (typeof(id) == 'object') {post_id = parseInt(this.getId(id));}
+				if (post_id > 0) {
+					var show_ids = \$('#post-'+post_id+' .column-show .show-ids').text();
+					if (show_ids != '') {
+						if (show_ids.indexOf(',') > -1) {ids = show_ids.split(',');}
+						else {ids = new Array(); ids[0] = show_ids;}
+						for (i = 0; i < ids.length; i++) {
+							var thisshowid = ids[i];							
+							\$('#edit-'+post_id+' .select-show option').each(function() {
+								if (\$(this).val() == thisshowid) {\$(this).attr('selected','selected');}
+							});
+						}
+					}
+				}
+			};		
+		})(jQuery);";
+
+		wp_add_inline_script( 'radio-station-admin', $js );
+	}
+}
+
+
+// --------------------------
+// Add Bulk Edit Posts Action
+// --------------------------
+// 2.3.3.4: add action to Bulk Edit list
+// ref: https://dream-encode.com/wordpress-custom-bulk-actions/
+add_filter( 'bulk_actions-edit-post', 'radio_station_show_posts_bulk_edit_action' );
+function radio_station_show_posts_bulk_edit_action( $bulk_actions ) {
+	$bulk_actions['related_show'] = __( 'Set Related Show(s)', 'radio-station' );
+	return $bulk_actions;
+}
+
+// ----------------------
+// Bulk Edit Posts Script
+// ----------------------
+// 2.3.3.4: add script for Bulk Edit action
+add_action( 'admin_enqueue_scripts', 'radio_station_show_posts_bulk_edit_script' );
+function radio_station_show_posts_bulk_edit_script( $hook ) {
+
+	if ( 'edit.php' != $hook ) {
+		return;
+	}
+
+	if ( !isset( $_GET['post_type'] ) || ( 'post' == $_GET['post_type'] ) ) {
+		$js = "\$(document).ready(function() {
+			$('#bulk-action-selector-top, #bulk-action-selector-bottom').on('change', function(e) {
+				if ( \$(this).val() == 'related_show' ) {
+					/* clone the Quick Edit fieldset to after bulk action selector */
+					\$('.related-show-field').first().clone().insertAfter(\$(this));
+				} else {
+					\$(this).find('.related-show-field').remove();
+				}
+			}); 
+		});";
+
+		wp_add_inline_script( 'radio-station-admin', $js );
+	}
+}
+
+// -----------------------
+// Bulk Edit Posts Handler
+// -----------------------
+// 2.3.3.4: add handler for bulk edit action
+add_filter( 'handle_bulk_actions-edit-post', 'radio_station_posts_bulk_edit_handler', 10, 3 );
+function radio_station_posts_bulk_edit_handler( $redirect_to, $action, $post_ids ) {
+	if ( 'related_show' !== $action ) {
+		return $redirect_to;
+	} else if ( !isset($_REQUEST['post_showblog_id'] ) || ( '' == $_REQUEST['post_showblog_id'] ) ) {
+		return $redirect_to;
+	}
+
+	$show_ids = $_REQUEST['post_showblog_id'];
+	$updated_post_ids = $failed_post_ids = array();
+	foreach ( $post_ids as $post_id ) {
+		$post = get_post( $post_id );
+		if ( $post ) {
+			update_post_meta( $post_id, 'post_showblog_id', $show_ids );
+			$updated_post_ids[] = $post_id;
+		} else {
+			$failed_post_ids[] = $post_id;
+		}
+  	}
+
+	if ( count( $updated_post_ids ) > 0 ) {
+		$redirect_to = add_query_arg( 'radio_station_related_show_updated', count( $updated_post_ids ), $redirect_to );
+	}
+	if ( count( $failed_post_ids ) > 0 ) {
+		$redirect_to = add_query_arg( 'radio_station_related_show_failed', count( $failed_post_ids ), $redirect_to );
+	}
+
+	return $redirect_to;
+}
+
+// ----------------------
+// Bulk Edit Posts Notice
+// ----------------------
+// 2.3.3.4: add notice for bulk edit result
+add_action( 'admin_notices', 'radio_station_posts_bulk_edit_notice' );
+function radio_station_posts_bulk_edit_notice() {
+	$updated = $failed = false;
+  	if ( isset( $_REQUEST['radio_station_related_show_updated'] ) ) {
+    	$updated_ = intval( $_REQUEST['radio_station_related_show_updated'] );
+    }
+    if ( isset( $_REQUEST['radio_station_related_show_failed'] ) ) {
+    	$failed = intval( $_REQUEST['radio_station_related_show_failed'] );
+	}
+	if ( $updated || $failed ) {
+
+    	echo '<div id="message" class="' . ( $updated_products_count > 0 ? 'updated' : 'error' ) . '">';
+
+		if ( $updated > 0 ) {
+			// --- number of posts updated message ---
+			echo '<p>';
+				$message = __( 'Updated Related Shows for %d Posts.', 'radio_station' );
+				$message = sprintf( $message, $updated );
+				echo esc_html( $message );
+			echo '</p>';
+		}
+		if ( $failed > 0 ) {
+			// --- number of posts failed messsage ---
+			echo '<p>';
+				$message = __( 'Failed to Update Related Shows for %d Posts.', 'radio-station' );
+				$message = sprintf( $message, $failed );
+				esc_html( $message );
+			echo '</p>';
+		}
+
+		echo '</div>';
+  	}
+}
+
+// -----------------------------
+// Related Show Post List Styles
+// -----------------------------
+// 2.3.3.4: added Related Show Post List styles
+add_action( 'admin_footer', 'radio_station_posts_list_styles' );
+function radio_station_posts_list_styles() {
+	$currentscreen = get_current_screen();
+	if ( 'edit-post' !== $currentscreen->id ) {
+		return;
+	}
+	
+	// --- post list styles ---
+	echo "<style>.wp-list-table .posts .oclumn-show {max-width: 100px;}
+	.inline-edit-col .select-show {min-width: 200px; min-height: 100px;}
+	.bulkactions .column-show .title {display: none;}
+	</style>";
+}
+
+
+// -------------
+// === Shows ===
+// -------------
 
 // ---------------------
 // Add Show Info Metabox
@@ -2872,11 +3175,17 @@ function radio_station_show_save_data( $post_id ) {
 
 	// --- maybe clear transient data ---
 	// 2.3.0: added to clear transients if any meta has changed
+	// 2.3.3: remove current show transient
 	if ( $show_meta_changed || $show_shifts_changed ) {
 		delete_transient( 'radio_station_current_schedule' );
 		delete_transient( 'radio_station_next_show' );
-		// 2.3.3: remove current show transient
-		// delete_transient( 'radio_station_current_show' );
+		delete_transient( 'radio_station_previous_show' );
+
+		// 2.3.4: delete all prefixed transients (for times)
+		radio_station_delete_transients_with_prefix( 'radio_station_current_schedule' );
+		radio_station_delete_transients_with_prefix( 'radio_station_next_show' );
+		radio_station_delete_transients_with_prefix( 'radio_station_previous_show' );
+
 		do_action( 'radio_station_clear_data', 'show', $post_id );
 		do_action( 'radio_station_clear_data', 'show_meta', $post_id );
 		
@@ -3305,8 +3614,14 @@ function radio_station_schedule_override_metabox() {
 		echo '<option value="' . esc_attr( $i ) . '" ' . selected( $override['start_hour'], $i, false ) . '>' . esc_html( $i ) . '</option>';
 	}
 	echo '</select>';
+
+	// 2.3.4: add common start minutes to top of options
 	echo '<select name="show_sched[start_min]" style="min-width:35px;">';
 	echo '<option value=""></option>';
+	echo '<option value="00">00</option>';
+	echo '<option value="15">15</option>';
+	echo '<option value="30">30</option>';
+	echo '<option value="45">45</option>';
 	for ( $i = 0; $i < 60; $i ++ ) {
 		$min = $i;
 		if ( $i < 10 ) {
@@ -3322,6 +3637,7 @@ function radio_station_schedule_override_metabox() {
 	echo '</select>';
 	echo '</li>';
 
+	// 2.3.4: add common end minutes to top of options
 	echo '<li style="display:inline-block; margin-left:20px;">';
 	echo esc_html( __( 'End Time', 'radio-station' ) ) . ':';
 	echo '<select name="show_sched[end_hour]" style="min-width:35px;">';
@@ -3332,6 +3648,10 @@ function radio_station_schedule_override_metabox() {
 	echo '</select>';
 	echo '<select name="show_sched[end_min]" style="min-width:35px;">';
 	echo '<option value=""></option>';
+	echo '<option value="00">00</option>';
+	echo '<option value="15">15</option>';
+	echo '<option value="30">30</option>';
+	echo '<option value="45">45</option>';
 	for ( $i = 0; $i < 60; $i ++ ) {
 		$min = $i;
 		if ( $i < 10 ) {
@@ -3457,10 +3777,16 @@ function radio_station_override_save_data( $post_id ) {
 		update_post_meta( $post_id, 'show_override_sched', $current_sched );
 
 		// --- clear cached schedule data if changed ---
+		// 2.3.3: remove current show transient
+		// 2.3.4: add previous show transient
 		delete_transient( 'radio_station_current_schedule' );
 		delete_transient( 'radio_station_next_show' );
-		// 2.3.3: remove current show transient
-		// delete_transient( 'radio_station_current_show' );
+		delete_transient( 'radio_station_previous_show' );
+		
+		// 2.3.4: delete all prefixed transients (for times)
+		radio_station_delete_transients_with_prefix( 'radio_station_current_schedule' );
+		radio_station_delete_transients_with_prefix( 'radio_station_next_show' );
+		radio_station_delete_transients_with_prefix( 'radio_station_previous_show' );
 		
 		// --- set last updated schedule time ---
 		// 2.3.2: added for data API use
@@ -3716,7 +4042,7 @@ function radio_station_override_date_filter( $post_type, $which ) {
 	// --- month override selector ---
 	echo '<label for="filter-by-override-date" class="screen-reader-text">' . esc_html( __( 'Filter by override date', 'radio-station' ) ) . '</label>';
 	echo '<select name="month" id="filter-by-override-date">';
-	echo '<option value="0" ' . selected( $m, 0, false ) . '>' . esc_html( __( 'All override dates', 'radio-station' ) ) . '</option>';
+	echo '<option value="0" ' . selected( $m, 0, false ) . '>' . esc_html( __( 'All Override Months', 'radio-station' ) ) . '</option>';
 	if ( count( $months ) > 0 ) {
 		foreach ( $months as $key => $data ) {
 			$label = $wp_locale->get_month( $data['month'] ) . ' ' . $data['year'];
@@ -3727,6 +4053,30 @@ function radio_station_override_date_filter( $post_type, $which ) {
 
 }
 
+// -------------------------------
+// Add Schedule Past Future Filter
+// -------------------------------
+// 2.3.3: added past future filter prototype code
+add_action( 'restrict_manage_posts', 'radio_station_override_past_future_filter', 10, 2 );
+function radio_station_override_past_future_filter( $post_type, $which ) {
+
+	if ( RADIO_STATION_OVERRIDE_SLUG !== $post_type ) {
+		return;
+	}
+
+	// --- set past future selection / default ---
+	$pastfuture = isset( $_GET['pastfuture'] ) ? $_GET['pastfuture'] : '';
+	$pastfuture = apply_filters( 'radio_station_overrides_past_future_default', $pastfuture );
+
+	// --- past / future override selector ---
+	echo '<label for="filter-by-past-future" class="screen-reader-text">' . esc_html( __( 'Past and Future', 'radio-station' ) ) . '</label>';
+	echo '<select name="pastfuture" id="filter-by-past-future">';
+	echo '<option value="" ' . selected( $pastfuture, 0, false ) . '>' . esc_html( __( 'Past and Future', 'radio-station' ) ) . '</option>';
+	echo '<option value="past"' . selected( $pastfuture, 'past', false ) . '>' . esc_html( __( 'Past Overrides', 'radio-station' ) ) . '</option>';
+	echo '<option value="future"' . selected( $pastfuture, 'future', false ) . '>' . esc_html( __( 'Future Overrides', 'radio-station' ) ) . '</option>';
+ 	echo '</select>';
+
+}
 
 // -----------------------------------
 // === Post Type List Query Filter ===
@@ -3798,14 +4148,6 @@ function radio_station_columns_query_filter( $query ) {
 				}
 			}
 
-			// --- set the meta query for filtering ---
-			// this is not working?! but does not need to as using orderby fixes it
-			// $meta_query = array(
-			//	'key'       => 'show_shift_time',
-			//	'compare'   => 'EXISTS',
-			// );
-			// $query->set( 'meta_query', $meta_query );
-
 			// --- order by show time start ---
 			// only need to set the orderby query and exists check is automatically done!
 			$query->set( 'orderby', 'meta_value' );
@@ -3848,7 +4190,6 @@ function radio_station_columns_query_filter( $query ) {
 			// --- apply override year/month filtering ---
 			if ( isset( $_GET['month'] ) && ( '0' != $_GET['month'] ) ) {
 				$yearmonth = $_GET['month'];
-				// TODO: adjust for timezone..?
 				$start_date = date( $yearmonth . '01' );
 				$end_date = date( $yearmonth . 't' );
 				$meta_query = array(
@@ -3857,6 +4198,36 @@ function radio_station_columns_query_filter( $query ) {
 					'compare' => 'BETWEEN',
 					'type'    => 'DATE',
 				);
+				$query->set( 'meta_query', $meta_query );
+			}
+
+			// --- meta query for past / future overrides filter ---
+			// 2.3.3: added past future query prototype code
+			$valid = array( 'past', 'future' );
+			if ( isset( $_GET['pastfuture'] ) && in_array( $_GET['pastfuture'], $valid ) ) {
+				$pastfuture = $_GET['pastfuture'];
+				if ( 'past' == $pastfuture ) {
+					$compare = '<';
+				} elseif ( 'future' == $pastfuture ) {
+					$compare = '>=';
+				}
+				$date = date( 'Y-m-d', time() );
+				$pastfuture_query = array(
+					'key'		=> 'show_override_date',
+					'value'		=> $date,
+					'compare'	=> $compare,
+					'type'		=> 'DATE',
+				);
+				if ( isset( $meta_query ) ) {
+					$combined_query = array(
+						'relation'	=> 'AND',
+						$meta_query,
+						$pastfuture_query,
+					);
+					$meta_query = $combined_query;
+				} else {
+					$meta_query = $pastfuture_query;
+				}
 				$query->set( 'meta_query', $meta_query );
 			}
 
