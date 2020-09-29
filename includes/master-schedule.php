@@ -450,6 +450,7 @@ function radio_station_master_schedule_table_js() {
 
 	// 2.3.2: added current show highlighting cycle
 	// 2.3.2: fix to currenthour substr
+	// 2.3.3.5: change selected day and arrow logic (to single day shifting)
 	$js = "/* Initialize Table */
 	jQuery(document).ready(function() {
 		radio_table_responsive(false);
@@ -499,17 +500,33 @@ function radio_station_master_schedule_table_js() {
 	/* Make Table Responsive */
 	function radio_table_responsive(leftright) {
 		
-		fallback = -1; selected = -1;
-		for (i = 0; i < 7; i++) {
-			if ((fallback < 0) && jQuery('.master-program-day.day-'+i).length) {fallback = i;}
-			if (jQuery('.master-program-day.day-'+i).hasClass('selected-day')) {selected = i;}
+		fallback = -1; selected = -1; foundtab = false;
+		if (!leftright || (leftright == 'left')) {
+			if (jQuery('.master-program-day.first-column').length) {
+				start = jQuery('.master-program-day.first-column');
+			} else {start = jQuery('.master-program-day').first(); fallback = 0;}
+			classes = start.attr('class').split(' ');
+		} else if (leftright == 'right') {
+			if (jQuery('.master-program-day.last-column').length) {
+				end = jQuery('.master-program-day.last-column');
+			} else {end = jQuery('.master-program-day').last(); fallback = 6;}
+			classes = end.attr('class').split(' ');
+		}
+		for (i = 0; i < classes.length; i++) {
+			if (classes[i].indexOf('day-') === 0) {selected = parseInt(classes[i].replace('day-',''));}
 		}
 		if (selected < 0) {selected = fallback;}
+		if (radio.debug) {console.log('Current Column: '+selected);}
 
 		if (leftright == 'left') {selected--;} else if (leftright == 'right') {selected++;} 
 		if (selected < 0) {selected = 0;} else if (selected > 6) {selected = 6;}
-		jQuery('.master-program-day').removeClass('selected-day');
-		jQuery('.master-program-day.day-'+selected).addClass('selected-day');
+		if (!jQuery('.master-program-day.day-'+selected).length) {
+			while (!foundtab) {
+				if (leftright == 'left') {selected--;} else if (leftright == 'right') {selected++;}
+				if (jQuery('.master-program-day.day-'+selected).length) {foundtab = true;}
+				if ((selected < 0) || (selected > 6)) {selected = fallback; foundtab = true;}
+			}
+		}
 		if (radio.debug) {console.log('Selected Column: '+selected);}
 
 		totalwidth = jQuery('#master-program-hour-heading').width();
@@ -518,27 +535,47 @@ function radio_station_master_schedule_table_js() {
 		tablewidth = jQuery('#master-program-schedule').width();
 		jQuery('#master-program-schedule').css('width','auto');
 		columns = 0; firstcolumn = -1; lastcolumn = 7; endtable = false;
-		for (i = 0; i < 7; i++) {
-			if ( !endtable && ((i + 1) > selected) ) {
-				if (firstcolumn < 0) {
-					if (i > 0) {jQuery('.master-program-day.day-'+i).addClass('first-column');}
-					firstcolumn = 0;
-				} else if (i < 6) {jQuery('.master-program-day.day-'+i).addClass('last-column');}
+		for (i = selected; i < 7; i++) {
+			if (!endtable && (jQuery('.master-program-day.day-'+i).length)) {
+				if ((i > 0) && (i == selected)) {jQuery('.master-program-day.day-'+i).addClass('first-column'); firstcolumn = i;}
+				else if (i < 6) {jQuery('.master-program-day.day-'+i).addClass('last-column');}
 				jQuery('.master-program-day.day-'+i+', .show-info.day-'+i).show();
 				colwidth = jQuery('.master-program-day.day-'+i).width();
 				totalwidth = totalwidth + colwidth;
 				if (radio.debug) {console.log('('+colwidth+') : '+totalwidth+' / '+tablewidth);}
 				jQuery('.master-program-day.day-'+i).removeClass('last-column');
 				if (totalwidth > tablewidth) {
+					if (radio.debug) {console.log('Hiding Column '+i);}
 					jQuery('.master-program-day.day-'+i+', .show-info.day-'+i).hide(); endtable = true;
 				} else {
-					cwidth = jQuery('.master-program-day.day-'+i).width();
-					totalwidth = totalwidth - (colwidth - cwidth); lastcolumn = i; columns++;
+					jQuery('.master-program-day.day-'+i).removeClass('last-column');
+					totalwidth = totalwidth - colwidth + jQuery('.master-program-day.day-'+i).width();
+					lastcolumn = i; columns++;
 				}
 			}
 
 		}
 		if (lastcolumn < 6) {jQuery('.master-program-day.day-'+lastcolumn).addClass('last-column');}
+
+		if (leftright == 'right') {
+			for (i = (selected - 1); i > -1; i--) {
+				if (!endtable && (jQuery('.master-program-day.day-'+i).length)) {
+					jQuery('.master-program-day.day-'+i+', .show-info.day-'+i).show();
+					colwidth = jQuery('.master-program-day.day-'+i).width();
+					totalwidth = totalwidth + colwidth;
+					if (radio.debug) {console.log('('+colwidth+') : '+totalwidth+' / '+tablewidth);}
+					if (totalwidth > tablewidth) {
+						if (radio.debug) {console.log('Hiding Column '+i);}
+						jQuery('.master-program-day.day-'+i+', .show-info.day-'+i).hide(); endtable = true;
+					} else {
+						jQuery('.master-program-day').removeClass('first-column');
+						jQuery('.master-program-day.day-'+i).addClass('first-column');
+						if (radio.debug) {console.log('Showing Tab '+i);}
+						columns++;
+					}						
+				}
+			}		
+		}
 		jQuery('#master-program-schedule').css('width','100%');
 	}
 	
@@ -584,6 +621,7 @@ function radio_station_master_schedule_tabs_js() {
 	// --- tabbed view responsiveness ---
 	// 2.3.0: added for tabbed responsiveness
 	// 2.3.2: display selected day message if outside view
+	// 2.3.3.5: change selected day and arrow logic (to single day shifting)
 	$js .= "/* Initialize Tabs */
 	jQuery(document).ready(function() {
 		radio.schedule_tabinit = false;
@@ -643,66 +681,82 @@ function radio_station_master_schedule_tabs_js() {
 	/* Make Tabs Responsive */
 	function radio_tabs_responsive(leftright) {
 
-		fallback = -1; selected = -1;
-		for (i = 0; i < 7; i++) {
-			if ((fallback < 0) && jQuery('.master-schedule-tabs-day.day-'+i).length) {fallback = i;}
-			if (jQuery('.master-schedule-tabs-day.day-'+i).hasClass('selected-day')) {selected = i;}
+		fallback = -1; selected = -1; foundtab = false;
+		if (!leftright || (leftright == 'left')) {
+			if (jQuery('.master-schedule-tabs-day.first-tab').length) {
+				start = jQuery('.master-schedule-tabs-day.first-tab');
+			} else {start = jQuery('.master-schedule-tabs-day').first(); fallback = 0;}
+			classes = start.attr('class').split(' ');
+		} else if (leftright == 'right') {
+			if (jQuery('.master-schedule-tabs-day.last-tab').length) {
+				end = jQuery('.master-schedule-tabs-day.last-tab');
+			} else {end = jQuery('.master-schedule-tabs-day').last(); fallback = 6;}
+			classes = end.attr('class').split(' ');
+		}
+		for (i = 0; i < classes.length; i++) {
+			if (classes[i].indexOf('day-') === 0) {selected = parseInt(classes[i].replace('day-',''));}
 		}
 		if (selected < 0) {selected = fallback;}
-
+		if (radio.debug) {console.log('Current Tab: '+selected);}
+		
 		if (leftright == 'left') {selected--;} else if (leftright == 'right') {selected++;}
 		if (selected < 0) {selected = 0;} else if (selected > 6) {selected = 6;}
-		jQuery('.master-schedule-tabs-day').removeClass('selected-day');
-		jQuery('.master-schedule-tabs-day.day-'+selected).addClass('selected-day');
+		if (!jQuery('.master-schedule-tabs-day.day-'+selected).length) {
+			while (!foundtab) {
+				if (leftright == 'left') {selected--;} else if (leftright == 'right') {selected++;}
+				if (jQuery('.master-schedule-tabs-day.day-'+selected).length) {foundtab = true;}
+				if ((selected < 0) || (selected > 6)) {selected = fallback; foundtab = true;}
+			}
+		}
+		if (radio.debug) {console.log('Selected Tab: '+selected);}
 
 		jQuery('#master-schedule-tabs').css('width','100%');
 		tabswidth = jQuery('#master-schedule-tabs').width();
 		jQuery('#master-schedule-tabs').css('width','auto');
-		totalwidth = 0; columns = 0; firstcolumn = -1; lastcolumn = 7; endtabs = false; 
 		jQuery('.master-schedule-tabs-day').removeClass('first-tab').removeClass('last-tab').hide();
-		if (!leftright || (leftright == 'left')) {
-			for (i = 0; i < 7; i++) {
-				if ( !endtabs && ((i + 1) > selected) ) {
-					if (firstcolumn < 0) {jQuery('.master-schedule-tabs-day.day-'+i).addClass('first-tab'); firstcolumn = 0;}
-					else if (i < 6) {jQuery('.master-schedule-tabs-day.day-'+i).addClass('last-tab');}
-					jQuery('.master-schedule-tabs-day.day-'+i).show();
-					tabwidth = jQuery('.master-schedule-tabs-day.day-'+i).width();
-					marginleft = parseInt(jQuery('.master-schedule-tabs-day.day-'+i).css('margin-left').replace('px',''));
-					marginright = parseInt(jQuery('.master-schedule-tabs-day.day-'+i).css('margin-right').replace('px',''));
-					totalwidth = totalwidth + tabwidth + marginleft + marginright;
-					if (radio.debug) {console.log(tabwidth+' - ('+marginleft+'/'+marginright+') - '+totalwidth+' / '+tabswidth);}
+		
+		totalwidth = 0; tabs = 0; firsttab = -1; lasttab = 7; endtabs = false; 
+		for (i = selected; i < 7; i++) {
+			if (!endtabs && (jQuery('.master-schedule-tabs-day.day-'+i).length)) {
+				if ((i > 0) && (i == selected)) {jQuery('.master-schedule-tabs-day.day-'+i).addClass('first-tab'); firsttab = i;}
+				else if (i < 6) {jQuery('.master-schedule-tabs-day.day-'+i).addClass('last-tab');}
+				tabwidth = jQuery('.master-schedule-tabs-day.day-'+i).show().width();
+				mleft = parseInt(jQuery('.master-schedule-tabs-day.day-'+i).css('margin-left').replace('px',''));
+				mright = parseInt(jQuery('.master-schedule-tabs-day.day-'+i).css('margin-right').replace('px',''));
+				totalwidth = totalwidth + tabwidth + mleft + mright;
+				if (radio.debug) {console.log(tabwidth+' - ('+mleft+'/'+mright+') - '+totalwidth+' / '+tabswidth);}
+				if (totalwidth > tabswidth) {
+					if (radio.debug) {console.log('Hiding Tab '+i);}
+					jQuery('.master-schedule-tabs-day.day-'+i).hide(); endtabs = true;
+				} else {
 					jQuery('.master-schedule-tabs-day.day-'+i).removeClass('last-tab');
-					if (totalwidth > tabswidth) {jQuery('.master-schedule-tabs-day.day-'+i).hide(); endtabs = true;}
-					else {
-						twidth = jQuery('.master-schedule-tabs-day.day-'+i).width();
-						totalwidth = totalwidth - (tabwidth - twidth); lastcolumn = i; columns++;
-					}
+					totalwidth = totalwidth - tabwidth + jQuery('.master-schedule-tabs-day.day-'+i).width();
+					if (radio.debug) {console.log('Showing Tab '+i);}
+					lasttab = i; tabs++;
 				}
-			}		
-			if (lastcolumn < 6) {jQuery('.master-schedule-tabs-day.day-'+lastcolumn).addClass('last-tab');}
-		}
+			}
+		}		
+		if (lasttab < 6) {jQuery('.master-schedule-tabs-day.day-'+lasttab).addClass('last-tab');}
+
 		if (leftright == 'right') {
-			for (i = 6; i > -1; i--) {
-				if ( !endtabs && ((i + 1) > selected) ) {
-					if (jQuery('.master-schedule-tabs-day').length) {
-						if (lastcolumn > 6) {jQuery('.master-schedule-tabs-day.day-'+i).addClass('last-tab'); lastcolumn = i;}
-						else if (i > 1) {jQuery('.master-schedule-tabs-day.day-'+i).addClass('first-tab');}
-						jQuery('.master-schedule-tabs-day.day-'+i).show();
-						tabwidth = jQuery('.master-schedule-tabs-day.day-'+i).width();
-						marginleft = parseInt(jQuery('.master-schedule-tabs-day.day-'+i).css('margin-left').replace('px',''));
-						marginright = parseInt(jQuery('.master-schedule-tabs-day.day-'+i).css('margin-right').replace('px',''));
-						totalwidth = totalwidth + tabwidth + marginleft + marginright;
-						if (radio.debug) {console.log(tabwidth+' - ('+marginleft+'/'+marginright+') - '+totalwidth+' / '+tabswidth);}
-						jQuery('.master-schedule-tabs-day.day-'+i).removeClass('first-tab');
-						if (totalwidth > tabswidth) {jQuery('.master-schedule-tabs-day.day-'+i).hide(); endtabs = true;}
-						else {
-							twidth = jQuery('.master-schedule-tabs-day.day-'+i).width();
-							totalwidth = totalwidth - (tabwidth - twidth); firstcolumn = i; columns++;
-						}						
-					}
+			for (i = (selected - 1); i > -1; i--) {
+				if (!endtabs && (jQuery('.master-schedule-tabs-day.day-'+i).length)) {
+					tabwidth = jQuery('.master-schedule-tabs-day.day-'+i).show().width();
+					mleft = parseInt(jQuery('.master-schedule-tabs-day.day-'+i).css('margin-left').replace('px',''));
+					mright = parseInt(jQuery('.master-schedule-tabs-day.day-'+i).css('margin-right').replace('px',''));
+					totalwidth = totalwidth + tabwidth + mleft + mright;
+					if (radio.debug) {console.log(tabwidth+' - ('+mleft+'/'+mright+') - '+totalwidth+' / '+tabswidth);}
+					if (totalwidth > tabswidth) {
+						if (radio.debug) {console.log('Hiding Tab '+i);}
+						jQuery('.master-schedule-tabs-day.day-'+i).hide(); endtabs = true;
+					} else {
+						jQuery('.master-schedule-tabs-day').removeClass('first-tab');
+						jQuery('.master-schedule-tabs-day.day-'+i).addClass('first-tab');
+						if (radio.debug) {console.log('Showing Tab '+i);}
+						tabs++;
+					}						
 				}
 			}		
-			if (firstcolumn > 0) {jQuery('.master-schedule-tabs-day.day-'+firstcolumn).addClass('first-tab');}
 		}
 		jQuery('#master-schedule-tabs').css('width','100%');
 
@@ -714,7 +768,7 @@ function radio_station_master_schedule_tabs_js() {
 			}
 		}
 		jQuery('.master-schedule-tabs-selected').hide();
-		if ( activeday && ( (activeday > lastcolumn) || (activeday < firstcolumn ) ) ) {
+		if ( activeday && ( (activeday > lasttab) || (activeday < firsttab ) ) ) {
 			jQuery('#master-schedule-tabs-selected-'+activeday).show();
 		}		
 
@@ -722,9 +776,9 @@ function radio_station_master_schedule_tabs_js() {
 			console.log('Active Day: '+activeday);
 			console.log('Selected: '+selected);
 			console.log('Fallback: '+fallback);
-			console.log('First Column: '+firstcolumn);
-			console.log('Last Column: '+lastcolumn);
-			console.log('Visible Columns: '+columns);
+			console.log('First Tab: '+firsttab);
+			console.log('Last Tab: '+lasttab);
+			console.log('Visible Tabs: '+tabs);
 		}
 	}
 	

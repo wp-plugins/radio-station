@@ -37,7 +37,7 @@ The following attributes are available for the shortcode:
 * *show_encore* : Whether to display 'encore airing' for a show shift. 0 or 1. Default 1.
 * *show_file* : Whether to add a link to the latest audio file. 0 or 1. Default 0.
 * *days* : Display for single day or multiple days (string or 0-6, comma separated.) Default all.
-* *start_day* : day of the week to start schedule (string or 0-6.) Default WordPress setting.
+* *start_day* : day of the week to start schedule (string or 0-6, or 'today') Default WordPress setting.
 * *display_day* : Full or short day heading ('full' or 'short') Default short for Table, full for Tabs/List.
 * *display_date* : Date format for date subheading. 0 for none. Default 'jS' for Table/List, 0 for Tabs.
 * *display_month* : Full or short month subheading ('full', 'short') Default 'short'.

@@ -297,6 +297,7 @@
     border-bottom: 0;
 }
 
+#master-schedule-tabs .master-schedule-tabs-day.start-tab,
 #master-schedule-tabs .master-schedule-tabs-day.first-tab {
 	margin-left: 0;
 }

@@ -26,12 +26,15 @@ $end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_for
 if ( isset( $atts['start_day'] ) && $atts['start_day'] ) {
 	$weekdays = radio_station_get_schedule_weekdays( $atts['start_day'] );
 } else {
+	// 2.3.3.5: add filter for changing start day (to accept 'today')
+	$start_day = apply_filters( 'radio_station_schedule_start_day', false, 'list' );
 	$weekdays = radio_station_get_schedule_weekdays();
 }
 $weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 
 // --- filter show avatar size ---
-$avatar_size = apply_filters( 'radio_station_schedule_show_avatar_size', 'thumbnail', 'tabs' );
+// 2.3.3.5: fix to incorrect context value (tabs)
+$avatar_size = apply_filters( 'radio_station_schedule_show_avatar_size', 'thumbnail', 'list' );
 
 // --- filter excerpt length and more ---
 if ( $atts['show_desc'] ) {
@@ -262,7 +265,8 @@ foreach ( $weekdays as $weekday ) {
 						}
 					}
 
-					$hosts = apply_filters( 'radio_station_schedule_show_hosts', $hosts, $show['id'], 'tabs' );
+					// 2.3.3.5: fix to incorrect context value (tabs)
+					$hosts = apply_filters( 'radio_station_schedule_show_hosts', $hosts, $show['id'], 'list' );
 					if ( $hosts ) {
 						$output .= '<div class="show-dj-names show-host-names">';
 						$output .= $hosts;
