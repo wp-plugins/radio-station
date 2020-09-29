@@ -27,7 +27,9 @@ $end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_for
 if ( isset( $atts['start_day'] ) && $atts['start_day'] ) {
 	$weekdays = radio_station_get_schedule_weekdays( $atts['start_day'] );
 } else {
-	$weekdays = radio_station_get_schedule_weekdays();
+	// 2.3.3.5: add filter for changing start day (to accept 'today')
+	$start_day = apply_filters( 'radio_station_schedule_start_day', false, 'table' );
+	$weekdays = radio_station_get_schedule_weekdays( $start_day );
 }
 $weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 

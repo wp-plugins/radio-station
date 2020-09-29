@@ -184,6 +184,11 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 == Changelog ==
 
+= 2.3.3.5 =
+* Fixed: day left/right shifting on Schedule table/tab mobile views
+* Added: past/today/future filter for Schedule Override List 
+* Added: filter for Schedule display start day (and to accept today)
+
 = 2.3.3.4 =
 * Improved: auto-match show description to info height on Show pages
 * Improved: allow multiple Related Show selection for single post

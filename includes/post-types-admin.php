@@ -1287,6 +1287,11 @@ function radio_station_post_save_data( $post_id ) {
 add_action( 'quick_edit_custom_box', 'radio_station_quick_edit_post', 10, 2 );
 function radio_station_quick_edit_post( $column_name, $post_type ) {
 
+	// 2.3.3.5: added fix for post type context
+	if ( $post_type != 'post' ) {
+		return;
+	}
+
 	$args = array(
 		'numberposts' => - 1,
 		'offset'      => 0,
@@ -4028,8 +4033,7 @@ function radio_station_override_date_filter( $post_type, $which ) {
 			$datetime = radio_station_to_time( $override );
 			$month = radio_station_get_time( 'm', $datetime );
 			$year = radio_station_get_time( 'Y', $datetime );
-			$months[$year . $month]['year'] = $year;
-			$months[$year . $month]['month'] = $month;
+			$months[$year . '-' . $month] = array( 'year' => $year, 'month' => $month );
 		}
 	} else {
 		return;
@@ -4069,10 +4073,12 @@ function radio_station_override_past_future_filter( $post_type, $which ) {
 	$pastfuture = apply_filters( 'radio_station_overrides_past_future_default', $pastfuture );
 
 	// --- past / future override selector ---
+	// 2.3.3.5: added option for today filtering
 	echo '<label for="filter-by-past-future" class="screen-reader-text">' . esc_html( __( 'Past and Future', 'radio-station' ) ) . '</label>';
 	echo '<select name="pastfuture" id="filter-by-past-future">';
-	echo '<option value="" ' . selected( $pastfuture, 0, false ) . '>' . esc_html( __( 'Past and Future', 'radio-station' ) ) . '</option>';
+	echo '<option value="" ' . selected( $pastfuture, 0, false ) . '>' . esc_html( __( 'All Overrides', 'radio-station' ) ) . '</option>';
 	echo '<option value="past"' . selected( $pastfuture, 'past', false ) . '>' . esc_html( __( 'Past Overrides', 'radio-station' ) ) . '</option>';
+	echo '<option value="today"' . selected( $pastfuture, 'today', false ) . '>' . esc_html( __( 'Overrides Today', 'radio-station' ) ) . '</option>';
 	echo '<option value="future"' . selected( $pastfuture, 'future', false ) . '>' . esc_html( __( 'Future Overrides', 'radio-station' ) ) . '</option>';
  	echo '</select>';
 
@@ -4167,8 +4173,10 @@ function radio_station_columns_query_filter( $query ) {
 			// need to loop and sync a separate meta key to enable orderby sorting
 			// (not really efficient but at least it makes it possible!)
 			// ...but could be improved by checking against postmeta table
+			// 2.3.3.5: use wpdb prepare method on query
 			global $wpdb;
-			$overridequery = "SELECT ID FROM " . $wpdb->posts . " WHERE post_type = '" . RADIO_STATION_OVERRIDE_SLUG . "'";
+			$overridequery = "SELECT ID FROM " . $wpdb->posts . " WHERE post_type = %s";
+			$overridequery = $wpdb->prepare( $overridequery, RADIO_STATION_OVERRIDE_SLUG );
 			$results = $wpdb->get_results( $overridequery, ARRAY_A );
 			if ( $results && ( count( $results ) > 0 ) ) {
 				foreach ( $results as $result ) {
@@ -4190,8 +4198,8 @@ function radio_station_columns_query_filter( $query ) {
 			// --- apply override year/month filtering ---
 			if ( isset( $_GET['month'] ) && ( '0' != $_GET['month'] ) ) {
 				$yearmonth = $_GET['month'];
-				$start_date = date( $yearmonth . '01' );
-				$end_date = date( $yearmonth . 't' );
+				$start_date = date( $yearmonth . '-01' );
+				$end_date = date( $yearmonth . '-t' );
 				$meta_query = array(
 					'key'     => 'show_override_date',
 					'value'   => array( $start_date, $end_date ),
@@ -4203,18 +4211,28 @@ function radio_station_columns_query_filter( $query ) {
 
 			// --- meta query for past / future overrides filter ---
 			// 2.3.3: added past future query prototype code
-			$valid = array( 'past', 'future' );
+			// 2.3.3.5: added option for today selection
+			$valid = array( 'past', 'today', 'future' );
 			if ( isset( $_GET['pastfuture'] ) && in_array( $_GET['pastfuture'], $valid ) ) {
-				$pastfuture = $_GET['pastfuture'];
-				if ( 'past' == $pastfuture ) {
-					$compare = '<';
-				} elseif ( 'future' == $pastfuture ) {
-					$compare = '>=';
-				}
+				
 				$date = date( 'Y-m-d', time() );
+				$yesterday = date( 'Y-m-d', time() - ( 24 * 60 * 60 ) );
+				$tomorrow = date( 'Y-m-d', time() + ( 24 * 60 * 60 ) );
+				$pastfuture = $_GET['pastfuture'];
+				if ( 'today' == $pastfuture ) {
+					$compare = 'BETWEEN';
+					$value = array( $yesterday, $tomorrow );
+				} elseif ( 'past' == $pastfuture ) {
+					$compare = '<';
+					$value = $date;
+				} elseif ( 'future' == $pastfuture ) {
+					$compare = '>';
+					$value = $date;
+				}
+				
 				$pastfuture_query = array(
 					'key'		=> 'show_override_date',
-					'value'		=> $date,
+					'value'		=> $value,
 					'compare'	=> $compare,
 					'type'		=> 'DATE',
 				);

@@ -28,7 +28,9 @@ $end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_for
 if ( isset( $atts['start_day'] ) && $atts['start_day'] ) {
 	$weekdays = radio_station_get_schedule_weekdays( $atts['start_day'] );
 } else {
-	$weekdays = radio_station_get_schedule_weekdays();
+	// 2.3.3.5: add filter for changing start day (to accept 'today')
+	$start_day = apply_filters( 'radio_station_schedule_start_day', false, 'tabs' );
+	$weekdays = radio_station_get_schedule_weekdays( $start_day );
 }
 $weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 
@@ -46,6 +48,7 @@ $output .= '<ul id="master-schedule-tabs">';
 
 $panels = '';
 $tcount = 0;
+$start_tab = false;
 // 2.3.0: loop weekdays instead of legacy master list
 foreach ( $weekdays as $i => $weekday ) {
 
@@ -110,6 +113,11 @@ foreach ( $weekdays as $i => $weekday ) {
 		// --- set tab classes ---	
 		$weekdate = $weekdates[$weekday];
 		$classes = array( 'master-schedule-tabs-day', 'day-' . $i );
+		// 2.3.3.5: add extra class for starting tab
+		if ( !$start_tab ) {
+			$classes[] = 'start-tab';
+			$start_tab = true;
+		}
 		if ( $weekdate == $date ) {
 			// $classes[] = 'selected-day';
 			$classes[] = 'current-day';
