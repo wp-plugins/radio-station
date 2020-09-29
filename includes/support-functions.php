@@ -3457,8 +3457,12 @@ function radio_station_get_schedule_weekdays( $weekstart = false ) {
 		'Saturday',
 	);
 	
-	// 2.3.2: accept string format for weekstart
+	// 2.3.2: also accept string format for weekstart
 	if ( is_string( $weekstart ) ) {
+		// 2.3.3.5: accept today as valid week start
+		if ( 'today' == $weekstart ) {
+			$today = radio_station_get_time( 'day' );
+		}
 		foreach ( $weekdays as $i => $weekday ) {
 			if ( strtolower( $weekday ) == strtolower( $weekstart ) ) {
 				$weekstart = $i;
