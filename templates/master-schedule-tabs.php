@@ -5,7 +5,6 @@
  */
 
 // --- get all the required info ---
-$schedule = radio_station_get_current_schedule();
 $hours = radio_station_get_hours();
 $now = radio_station_get_now();
 $date = radio_station_get_time( 'date', $now );
@@ -25,13 +24,20 @@ $end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_for
 
 // --- get schedule days and dates ---
 // 2.3.2: allow for start day attibute
+// 2.3.3.5: use the start_day value for getting the current schedule
 if ( isset( $atts['start_day'] ) && $atts['start_day'] ) {
-	$weekdays = radio_station_get_schedule_weekdays( $atts['start_day'] );
+	$start_day = $atts['start_day'];
+	$schedule = radio_station_get_current_schedule( $now , $start_day );
 } else {
 	// 2.3.3.5: add filter for changing start day (to accept 'today')
 	$start_day = apply_filters( 'radio_station_schedule_start_day', false, 'tabs' );
-	$weekdays = radio_station_get_schedule_weekdays( $start_day );
+	if ( $start_day ) {
+		$schedule = radio_station_get_current_schedule( $now , $start_day );
+	} else {
+		$schedule = radio_station_get_current_schedule();
+	}
 }
+$weekdays = radio_station_get_schedule_weekdays( $start_day );
 $weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 
 // --- filter show avatar size ---
@@ -94,7 +100,12 @@ foreach ( $weekdays as $i => $weekday ) {
 		// 2.3.2: add attribute for date subheading format (see PHP date() format)
 		// $subheading = date( 'jS M', strtotime( $weekdate ) );
 		if ( $atts['display_date'] ) {
-			$date_subheading = radio_station_get_time( $atts['display_date'], $day_start_time );
+			// 2.3.3.5: allow for attribute to be set to 1 for default display
+			if ( '1' == $atts['display_date'] ) {
+				$date_subheading = radio_station_get_time( 'jS', $day_start_time );
+			} else {
+				$date_subheading = radio_station_get_time( $atts['display_date'], $day_start_time );
+			}
 		} else {
 			$date_subheading = radio_station_get_time( 'j', $day_start_time );
 		}
@@ -110,7 +121,7 @@ foreach ( $weekdays as $i => $weekday ) {
 			$date_subheading .= ' ' . radio_station_translate_month( $month, true );
 		}
 
-		// --- set tab classes ---	
+		// --- set tab classes ---
 		$weekdate = $weekdates[$weekday];
 		$classes = array( 'master-schedule-tabs-day', 'day-' . $i );
 		// 2.3.3.5: add extra class for starting tab
@@ -133,7 +144,7 @@ foreach ( $weekdays as $i => $weekday ) {
 		$output .= '<div class="shift-left-arrow">';
 		$output .= '<a href="javacript:void(0);" onclick="return radio_shift_tab(\'left\');" title="' . esc_attr( __( 'Previous Day', 'radio-station' ) ) . '">' . $arrows['left'] . '</a>';
 		$output .= '</div>';
-		
+
 		// 2.3.2: added optional display_date attribute and subheading
 		$output .= '<div class="master-schedule-tabs-headings">';
 		$output .= '<div class="master-schedule-tabs-day-name"';
@@ -145,7 +156,7 @@ foreach ( $weekdays as $i => $weekday ) {
 			$output .= '<div class="master-schedule-tabs-date">' . esc_html( $date_subheading ) . '</div>';
 		}
 		$output .= '</div>';
-		
+
 		$output .= '<div class="shift-right-arrow">';
 		$output .= '<a href="javacript:void(0);" onclick="return radio_shift_tab(\'right\');" title="' . esc_attr( __( 'Next Day', 'radio-station' ) ) . '">' . $arrows['right'] . '</a>';
 		$output .= '</div>';
@@ -256,8 +267,8 @@ foreach ( $weekdays as $i => $weekday ) {
 				}
 				if ( $j == count( $shifts ) ) {
 					$classes[] = 'last-show';
-				}				
-				
+				}
+
 				// 2.3.2: check for now playing shift
 				if ( ( $now >= $shift_start_time ) && ( $now < $shift_end_time ) ) {
 					$classes[] = 'nowplaying';
@@ -396,7 +407,7 @@ foreach ( $weekdays as $i => $weekday ) {
 					$tcount ++;
 
 				} else {
-				
+
 					// 2.3.2: added for now playing check
 					$panels .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="H:i"></span>';
 					$panels .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="H:i"></span>';
@@ -426,7 +437,7 @@ foreach ( $weekdays as $i => $weekday ) {
 					// 2.3.3: fix to incorrect filter name
 					$show_file = get_post_meta( $show['id'], 'show_file', true );
 					$show_file = apply_filters( 'radio_station_schedule_show_file', $show_file, $show['id'], 'tabs' );
-					$disable_download = get_post_meta( $show['id'], 'show_download', true );				
+					$disable_download = get_post_meta( $show['id'], 'show_download', true );
 					if ( $show_file && !empty( $show_file ) && !$disable_download ) {
 						$panels .= '<div class="show-file">';
 						$panels .= '<a href="' . esc_url( $show_file ) . '">';

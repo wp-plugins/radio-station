@@ -185,9 +185,11 @@ You may translate the plugin into another language. Please visit our [WordPress 
 == Changelog ==
 
 = 2.3.3.5 =
+* Fixed: use schedule based on start_day if specified for Schedule view
 * Fixed: day left/right shifting on Schedule table/tab mobile views
 * Added: past/today/future filter for Schedule Override List 
 * Added: filter for Schedule display start day (and to accept today)
+* Added: current playlist (if any) to Broadcast Data endpoint
 
 = 2.3.3.4 =
 * Improved: auto-match show description to info height on Show pages

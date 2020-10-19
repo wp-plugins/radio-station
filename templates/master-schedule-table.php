@@ -4,7 +4,6 @@
  */
 
 // --- get all the required info ---
-$schedule = radio_station_get_current_schedule();
 $hours = radio_station_get_hours();
 $now = radio_station_get_now();
 $date = radio_station_get_time( 'date', $now );
@@ -24,13 +23,20 @@ $end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_for
 
 // --- get schedule days and dates ---
 // 2.3.2: allow for start day attibute
+// 2.3.3.5: use the start_day value for getting the current schedule
 if ( isset( $atts['start_day'] ) && $atts['start_day'] ) {
-	$weekdays = radio_station_get_schedule_weekdays( $atts['start_day'] );
+	$start_day = $atts['start_day'];
+	$schedule = radio_station_get_current_schedule( $now, $start_day );
 } else {
 	// 2.3.3.5: add filter for changing start day (to accept 'today')
 	$start_day = apply_filters( 'radio_station_schedule_start_day', false, 'table' );
-	$weekdays = radio_station_get_schedule_weekdays( $start_day );
+	if ( $start_day ) {
+		$schedule = radio_station_get_current_schedule( $now , $start_day );
+	} else {
+		$schedule = radio_station_get_current_schedule();
+	}
 }
+$weekdays = radio_station_get_schedule_weekdays( $start_day );
 $weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 
 // --- filter avatar size ---
@@ -77,7 +83,7 @@ foreach ( $weekdays as $i => $weekday ) {
 	}
 
 	if ( !$skip_day ) {
-	
+
 		// --- set day column heading ---
 		// 2.3.2: added check for short/long day display attribute
 		if ( !in_array( $atts['display_day'], array( 'short', 'full', 'long' ) ) ) {
@@ -96,7 +102,7 @@ foreach ( $weekdays as $i => $weekday ) {
 		$weekdate = $weekdates[$weekday];
 		$day_start_time = radio_station_to_time( $weekdate . ' 00:00:00' );
 		$day_end_time = $day_start_time + ( 24 * 60 * 60 );
-		
+
 		// 2.3.2: add attribute for date subheading format (see PHP date() format)
 		// $subheading = date( 'jS M', strtotime( $weekdate ) );
 		if ( $atts['display_date'] ) {
@@ -151,10 +157,10 @@ foreach ( $weekdays as $i => $weekday ) {
 		// 2.3.2: add day start and end time date
 		$output .= '<span class="rs-time rs-start-time" data="' . esc_attr( $day_start_time ) . '"></span>';
 		$output .= '<span class="rs-time rs-end-time" data="' . esc_attr( $day_end_time ) . '"></span>';
-		
+
 		$output .= '</th>';
-		
-	} 
+
+	}
 }
 $output .= '</tr>';
 
@@ -201,7 +207,7 @@ foreach ( $hours as $hour ) {
 		$output .= 'Hour End' . $hour_end . '(' . date( 'H:i', $hour_end ) . ')<br>';
 		$output .= '</span>';
 	}
-	
+
 	$output .= '<div class="master-program-server-hour rs-time" data="' . esc_attr( $raw_hour ) . '" data-format="' . esc_attr( $hour_data_format ) . '">';
 	$output .= esc_html( $hour_display );
 	$output .= '</div>';
@@ -303,7 +309,7 @@ foreach ( $hours as $hour ) {
 						}
 						$display = $showcontinued = true;
 						$cellshifts ++;
-					} elseif ( ( $shift_start_time == $hour_start ) 
+					} elseif ( ( $shift_start_time == $hour_start )
 						|| ( ( $shift_start_time > $hour_start ) && ( $shift_start_time < $next_hour_start ) ) ) {
 						// - start display of shift -
 						$started = $shift['started'] = true;
@@ -390,7 +396,7 @@ foreach ( $hours as $hour ) {
 
 							// --- display empty div (for highlighting) ---
 							$cell .= '&nbsp;';
-							
+
 							// 2.3.2: set shift times for highlighting
 							$cell .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '"></span>';
 							$cell .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '"></span>';
@@ -408,7 +414,7 @@ foreach ( $hours as $hour ) {
 							// --- show logo / thumbnail ---
 							// 2.3.0: filter show avatar via show ID and context
 							$show_avatar = false;
-							if ( $atts['show_image'] ) {							
+							if ( $atts['show_image'] ) {
 								$show_avatar = radio_station_get_show_avatar( $show['id'], $avatar_size );
 							}
 							$show_avatar = apply_filters( 'radio_station_schedule_show_avatar', $show_avatar, $show['id'], 'table' );
@@ -480,7 +486,7 @@ foreach ( $hours as $hour ) {
 								if ( '11:59:59 pm' == $shift['end'] ) {
 									$shift['end'] = '12:00 am';
 								} */
-								
+
 								/* if ( 24 == (int) $atts['time'] ) {
 									$start = radio_station_convert_shift_time( $shift['start'], 24 );
 									// 2.3.2: display real end of split shift
@@ -498,7 +504,7 @@ foreach ( $hours as $hour ) {
 										$end = str_replace( array( 'am', 'pm'), array( $am, $pm ), $shift['end'] );
 									}
 								} */
-								
+
 								// --- get start and end times ---
 								// 2.3.2: maybe use real start and end times
 								if ( $real_shift_start ) {
