@@ -4,7 +4,6 @@
  */
 
 // --- get all the required info ---
-$schedule = radio_station_get_current_schedule();
 $hours = radio_station_get_hours();
 $now = radio_station_get_now();
 $date = radio_station_get_time( 'date', $now );
@@ -23,13 +22,20 @@ $end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_for
 
 // --- get schedule days and dates ---
 // 2.3.2: allow for start day attibute
+// 2.3.3.5: use the start_day value for getting the current schedule
 if ( isset( $atts['start_day'] ) && $atts['start_day'] ) {
-	$weekdays = radio_station_get_schedule_weekdays( $atts['start_day'] );
+	$start_day = $atts['start_day'];
+	$schedule = radio_station_get_current_schedule( $now , $start_day );
 } else {
 	// 2.3.3.5: add filter for changing start day (to accept 'today')
 	$start_day = apply_filters( 'radio_station_schedule_start_day', false, 'list' );
-	$weekdays = radio_station_get_schedule_weekdays();
+	if ( $start_day ) {
+		$schedule = radio_station_get_current_schedule( $now , $start_day );
+	} else {
+		$schedule = radio_station_get_current_schedule();
+	}
 }
+$weekdays = radio_station_get_schedule_weekdays( $start_day );
 $weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 
 // --- filter show avatar size ---
@@ -69,7 +75,7 @@ foreach ( $weekdays as $weekday ) {
 			$skip_day = true;
 		}
 	}
-	
+
 	if ( !$skip_day ) {
 
 		// 2.3.2: move up time calculations for optional date display
@@ -105,12 +111,12 @@ foreach ( $weekdays as $weekday ) {
 			$date_subheading .= ' ' . radio_station_translate_month( $month, true );
 		}
 
-		// 2.3.2: add classes 
+		// 2.3.2: add classes
 		$classes = array( 'master-list-day' );
 		$weekdate = $weekdates[$weekday];
 		if ( $weekdate == $date ) {
 			$classes[] = 'current-day';
-		}		
+		}
 		$classlist = implode( ' ', $classes );
 
 		// 2.2.2: use translate function for weekday string
@@ -125,7 +131,7 @@ foreach ( $weekdays as $weekday ) {
 		if ( $atts['display_date'] ) {
 			$output .= ' <span class="master-list-day-date">' . esc_html( $date_subheading ) . '</span>';
 		}
-		
+
 		// 2.3.2: add output of day start and end times
 		// 2.3.2: replace strtotime with to_time for timezones
 		$output .= '<span class="rs-time rs-start-time" data="' . esc_attr( $day_start_time ) . '"></span>';
@@ -302,7 +308,7 @@ foreach ( $weekdays as $weekday ) {
 							$end = str_replace( array( 'am', 'pm'), array( ' ' . $am, ' ' . $pm ), $shift['end'] );
 						}
 					} */
-					
+
 					// --- get start and end times ---
 					// 2.3.2: maybe use real start and end times
 					if ( $real_shift_start ) {

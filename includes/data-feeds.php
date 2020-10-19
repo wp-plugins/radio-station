@@ -108,7 +108,7 @@ function radio_station_add_feed_query_vars( $query_vars ) {
 	    	$query_vars[] = $var;
 	    }
     }
-    
+
     return $query_vars;
 }
 
@@ -134,7 +134,7 @@ function radio_station_get_station_data() {
 	// $stream_format = radio_station_get_stream_format();
 	// $fallback_url = radio_station_get_fallback_url();
 	// $fallback_format = radio_station_get_fallback_format();
-	
+
 	$station_url = radio_station_get_station_url();
 	$schedule_url = radio_station_get_schedule_url();
 	$language = radio_station_get_language();
@@ -142,7 +142,7 @@ function radio_station_get_station_data() {
 	// 2.3.2: use get date function with timezone
 	$now = radio_station_get_now();
 	$date_time = radio_station_get_time( 'datetime', $now );
-	
+
 	// 2.3.2: get schedule last updated time
 	$updated = get_option( 'radio_station_schedule_updated' );
 	if ( !$updated ) {
@@ -190,21 +190,28 @@ function radio_station_get_broadcast_data() {
 	// print_r( $current_show );
 	$current_show = radio_station_convert_show_shift( $current_show );
 	// print_r( $current_show );
-	
+
 	// --- get next show ---
 	$next_show = radio_station_get_next_show();
 	// print_r( $next_show );
 	$next_show = radio_station_convert_show_shift( $next_show );
 	// print_r( $next_show );
 
-	// TODO: maybe get now playing playlist ?
-	// $current_playlist = radio_station_current_playlist();
+	// 2.3.3.5: just in case transients are the same
+	if ( $current_show == $next_show ) {
+		$now = radio_station_get_time();
+		$next_show = radio_station_get_next_show( $now );
+		$next_show = radio_station_convert_show_shift( $next_show );
+	}
+
+	// 2.3.3.5: added current playlist to broadcast data
+	$current_playlist = radio_station_get_current_playlist();
 
 	// --- return broadcast info ---
 	$broadcast = array(
-		'current_show' => $current_show,
-		'next_show'    => $next_show,
-		// 'current_playlist' => $current_playlist,
+		'current_show'     => $current_show,
+		'next_show'        => $next_show,
+		'current_playlist' => $current_playlist,
 	);
 	$broadcast = apply_filters( 'radio_station_broadcast_data', $broadcast );
 
@@ -546,7 +553,7 @@ function radio_station_route_broadcast( $request ) {
 		echo "Broadcast: " . print_r( $broadcast_data, true );
 	}
 
-	// --- set broadcast output ---	
+	// --- set broadcast output ---
 	$broadcast = array( 'broadcast' => $broadcast_data );
 	$broadcast = radio_station_add_station_data( $broadcast );
 	$broadcast['endpoints'] = radio_station_get_route_urls();
@@ -572,9 +579,9 @@ function radio_station_route_schedule( $request ) {
 	$weekdays = array();
 	$weekday = $singular = $multiple = false;
 	if ( isset( $_GET['weekday'] ) ) {
-	
+
 		$weekday = $_GET['weekday'];
-	
+
 		if ( strstr( $_GET['weekday'], ',' ) ) {
 			$multiple = true;
 			$weekdays = explode( ',', $weekday );
@@ -872,7 +879,7 @@ function radio_station_add_feeds() {
 	  || !array_key_exists( $feedrule, $rewrite_rules ) ) {
 		flush_rewrite_rules( false );
 	}
-	
+
 }
 
 // -------------
@@ -926,7 +933,7 @@ function radio_station_feed_radio( $comment_feed, $feed_name ) {
 	$radio = array( 'success' => true );
 	$radio['namespace'] = $base;
 	$radio['endpoints'] = radio_station_get_feed_urls();
-	
+
 	// --- reflect route format used in REST API ---
 	$routes = array();
 	foreach ( $radio['endpoints'] as $endpoint => $url ) {
@@ -1001,7 +1008,7 @@ function radio_station_feed_broadcast( $comment_feed, $feed_name ) {
 	if ( RADIO_STATION_DEBUG ) {
 		echo "Broadcast: " . print_r( $broadcast, true );
 	}
-	
+
 	$broadcast = array( 'broadcast', $broadcast );
 	$broadcast = radio_station_add_station_data( $broadcast );
 	$broadcast['endpoints'] = radio_station_get_feed_urls();
@@ -1035,9 +1042,9 @@ function radio_station_feed_schedule( $comment_feed, $feed_name ) {
 	$weekdays = array();
 	$weekday = $singular = $multiple = false;
 	if ( isset( $_GET['weekday'] ) ) {
-	
+
 		$weekday = $_GET['weekday'];
-	
+
 		if ( strstr( $_GET['weekday'], ',' ) ) {
 			$multiple = true;
 			$weekdays = explode( ',', $weekday );
@@ -1313,7 +1320,7 @@ function radio_station_format_xml( $data ) {
 // --------------------
 // TODO: fix unworking array to XML conversion?
 function radio_station_array_to_xml( SimpleXMLElement $object, $data ) {
-	
+
 	foreach ( $data as $key => $value ) {
 		if ( is_array( $value ) ) {
 			$newobject = $object->addChild( $key );
