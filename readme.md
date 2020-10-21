@@ -188,6 +188,12 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 ## Upgrade Notices
 
+#### 2.3.3.5
+* Ability to assign Post to relate to multiple Shows
+* Added Admin Filtering, Bulk Edit and Quick Edit interfaces
+* Fixes for Schedule display left/right shifting on mobiles
+* Fixes for starting Schedule display on different day
+
 #### 2.3.3.3
 * Current and Upcoming Shows Widget Fix
 
