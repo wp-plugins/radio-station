@@ -713,7 +713,7 @@ $options = array(
 		'tab'     => 'widgets',
 		'section' => 'loading',
 	),
-	
+
 	// --- Dynamic Reloading ---
 	'dynamic_reload' => array(
 		'type'    => 'checkbox',
@@ -933,14 +933,14 @@ function radio_station_check_version() {
 // -----------------
 // Plugin Activation
 // -----------------
-// (run on plugin activation, and thus also after a plugin update) 
+// (run on plugin activation, and thus also after a plugin update)
 // 2.2.8: fix for mismatched flag function name
 register_activation_hook( __FILE__, 'radio_station_plugin_activation' );
 function radio_station_plugin_activation() {
 	// --- flag to flush rewrite rules ---
 	// 2.2.3: added this for custom post types rewrite flushing
 	add_option( 'radio_station_flush_rewrite_rules', true );
-	
+
 	// --- clear schedule transients ---
 	// 2.3.3: added clear transients on (re)activation
 	delete_transient( 'radio_station_current_schedule' );
@@ -966,7 +966,7 @@ function radio_station_enqueue_scripts() {
 	// --- enqueue plugin script ---
 	// 2.3.0: added jquery dependency for inline script fragments
 	radio_station_enqueue_script( 'radio-station', array( 'jquery' ), true );
-	
+
 	// -- enqueue javascript timezone script ---
 	// $suffix = '.min';
 	// if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
@@ -988,14 +988,14 @@ function radio_station_enqueue_script( $scriptkey, $deps = array(), $infooter = 
 	$template = radio_station_get_template( 'both', $filename, 'js' );
 	if ( $template ) {
 
-		// 2.3.2: use plugin version for releases 
+		// 2.3.2: use plugin version for releases
 		$plugin_version = radio_station_plugin_version();
 		if ( 5 == strlen( $plugin_version ) ) {
 			$version = $plugin_version;
 		} else {
 			$version = filemtime( $template['file'] );
 		}
-		
+
 		$url = $template['url'];
 
 		// --- enqueue script ---
@@ -1056,7 +1056,7 @@ function radio_station_localize_script() {
 	// --- set AJAX URL ---
 	// 2.3.2: add admin AJAX URL
 	$js .= "radio.ajax_url = '" . esc_url( admin_url( 'admin-ajax.php' ) ) . "';" . PHP_EOL;
-	
+
 	// --- clock time format ---
 	$clock_format = radio_station_get_setting( 'clock_time_format' );
 	$js .= "radio.clock_format = '" . esc_js( $clock_format ) . "';" . PHP_EOL;
@@ -1075,7 +1075,7 @@ function radio_station_localize_script() {
 	// --- radio timezone ---
 	// 2.3.2: added get timezone function
 	$timezone = radio_station_get_timezone();
-	
+
 	// if ( isset( $offset ) ) {
 	if ( stristr( $timezone, 'UTC' ) ) {
 
@@ -1116,13 +1116,13 @@ function radio_station_localize_script() {
 		$js .= "radio.timezone.utczone = false; ";
 
 	}
-	
+
 	if ( defined( 'RADIO_STATION_USE_SERVER_TIMES' ) && RADIO_STATION_USE_SERVER_TIMES ) {
 		$js .= "radio.timezone.adjusted = false; ";
 	} else {
 		$js .= "radio.timezone.adjusted = true; ";
 	}
-		
+
 	// --- set user timezone offset ---
 	// (and convert offset minutes to seconds)
 	$js .= "radio.timezone.useroffset = (new Date()).getTimezoneOffset() * 60;" . PHP_EOL;
@@ -1191,7 +1191,7 @@ function radio_station_localize_script() {
 // 2.3.2: added settings submenu page redirection fix
 add_action( 'init', 'radio_station_settings_page_redirect' );
 function radio_station_settings_page_redirect() {
-	
+
 	// --- bug out if not admin page ---
 	if ( !is_admin() ) {
 		return;
@@ -1204,8 +1204,8 @@ function radio_station_settings_page_redirect() {
 
 	// --- check if link is for options-general.php ---
 	if ( strstr( $_SERVER['REQUEST_URI'], '/options-general.php' ) ) {
-	
-		// --- redirect to plugin settings page (admin.php) ---	
+
+		// --- redirect to plugin settings page (admin.php) ---
 		$url = add_query_arg( 'page', 'radio-station', admin_url( 'admin.php' ) );
 		wp_redirect( $url );
 		exit;
@@ -1812,13 +1812,13 @@ function radio_station_add_show_links( $content ) {
 
 	// --- filter to allow related post types ---
 	$post_types = apply_filters( 'radio_station_show_related_post_types', array( 'post' ) );
-	
+
 	if ( in_array( $post->post_type, $post_types ) ) {
 
 		// --- link show posts ---
 		$related_show = get_post_meta( $post->ID, 'post_showblog_id', true );
 		if ( $related_show ) {
-			$positions = array( 'after' );	
+			$positions = array( 'after' );
 			$positions = apply_filters( 'radio_station_link_to_show_positions', $positions, $post->post_type );
 			if ( $positions && is_array( $positions ) && ( count( $positions ) > 0 ) ) {
 				if ( in_array( 'before', $positions ) || in_array( 'after', $positions ) ) {
@@ -1852,16 +1852,16 @@ function radio_station_add_show_links( $content ) {
 					$content = $before . $content . $after;
 				}
 			}
-		
+
 			// --- adjacent post links debug test ---
 			if ( RADIO_STATION_DEBUG ) {
 				$content .= "Previous Link: " . get_previous_post_link() . "<br>";
 				$content .= "Next Link: " . get_next_post_link() . "<br>";
 			}
 		}
-		
-	} 
-	
+
+	}
+
 	return $content;
 }
 
@@ -1880,7 +1880,7 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 	$post_types = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG );
 	if ( in_array( $post->post_type, $post_types ) ) {
 		if ( RADIO_STATION_OVERRIDE_SLUG == $post->post_type ) {
-			// TODO: get next/previous for override time/date	
+			// TODO: get next/previous for override time/date
 		} else {
 			$shifts = get_post_meta( $post->id, 'show_sched', true );
 			if ( $shifts && is_array( $shifts ) ) {
@@ -1904,7 +1904,7 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 				}
 			}
 		}
-		
+
 		// --- generate adjacent post link ---
 		if ( isset( $show ) ) {
 			$adjacent_post = get_post( $show['id'] );
@@ -1928,7 +1928,7 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 		if ( !$link_show_posts ) {
 			return $output;
 		}
-	
+
 		// --- get related show ---
 		$related_show = get_post_meta( $post->ID,  'post_showblog_id', true );
 		if ( !$related_show ) {
@@ -2128,7 +2128,13 @@ function radio_station_set_roles() {
 	if ( !is_array( $role_caps ) ) {
 		$role_caps = array();
 	}
-	$producer_caps = array( 'edit_producers', 'edit_published_producers', 'delete_producers', 'read_producers', 'publish_producers' );
+	$producer_caps = array(
+		'edit_producers',
+		'edit_published_producers',
+		'delete_producers',
+		'read_producers',
+		'publish_producers',
+	);
 	foreach ( $producer_caps as $cap ) {
 		if ( !array_key_exists( $cap, $role_caps ) || !$role_caps[$cap] ) {
 			$wp_roles->add_cap( 'producer', $cap, true );
@@ -2317,23 +2323,38 @@ function radio_station_set_roles() {
 // maybe Revoke Edit Show Capability
 // ---------------------------------
 // (revoke ability to edit show if user is not assigned to it)
-add_filter( 'user_has_cap', 'radio_station_revoke_show_edit_cap', 10, 3 );
-function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args ) {
+add_filter( 'user_has_cap', 'radio_station_revoke_show_edit_cap', 10, 4 );
+function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args, $user ) {
 
 	global $post, $wp_roles;
 
+	// --- get the current user ---
+	// 2.3.3.6: get user object from fourth argument instead
+	// $user = wp_get_current_user();
+
 	// --- check if super admin ---
 	// ? fix to not revoke edit caps from super admin ?
-	// (not implemented, causing connection reset error)
+	// (not implemented, as causing a connection reset error)
 	// if ( function_exists( 'is_super_admin' ) && is_super_admin() ) {
 	//	return $allcaps;
 	// }
 
-	// --- get the current user ---
-	$user = wp_get_current_user();
+	// --- debug passed capability arguments ---
+	if ( isset( $_REQUEST['cap-debug'] ) && ( '1' == $_REQUEST['cap-debug'] ) ) {
+		echo '<span style="display:none;">Cap Args: ' . print_r( $args, true ) . '</span>';
+	}
 
-	// --- get roles with publish shows capability ---
-	$edit_show_roles = array( 'administrator' );
+	// --- check for editor
+	// 2.3.3.6: check editor roles first separately
+	$editor_roles = array( 'administrator', 'editor', 'show-editor' );
+	foreach ( $editor_roles as $role ) {
+		if ( in_array( $role, $user->roles ) ) {
+			return $allcaps;
+		}
+	}
+
+	// --- get roles with edit shows capability ---
+	$edit_show_roles = array();
 	if ( isset( $wp_roles->roles ) && is_array( $wp_roles->roles ) ) {
 		foreach ( $wp_roles->roles as $name => $role ) {
 			// 2.3.0: fix to skip roles with no capabilities assigned
@@ -2349,8 +2370,6 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args ) {
 			}
 		}
 	}
-
-	// --- check if current user has any of these roles ---
 	// 2.2.8: remove strict in_array checking
 	$found = false;
 	foreach ( $edit_show_roles as $role ) {
@@ -2359,7 +2378,9 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args ) {
 		}
 	}
 
-	if ( !$found ) {
+	// --- maybe revoked edit show capability for post ---
+	// 2.3.3.6: fix to incorrect logic for removing edit show capability
+	if ( $found ) {
 
 		// --- limit this to published shows ---
 		// 2.3.0: added object and property_exists check to be safe

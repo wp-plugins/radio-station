@@ -1601,7 +1601,7 @@ function radio_station_get_current_show( $time = false ) {
 				}
 
 				// --- set current show ---
-				// 2.3.3: get current show directly amd remove transient
+				// 2.3.3: get current show directly and remove transient
 				if ( ( $now > $shift_start_time ) && ( $now < $shift_end_time ) ) {
 					if ( RADIO_STATION_DEBUG ) {
 						echo '^^^ Current ^^^' . PHP_EOL;
@@ -3996,11 +3996,13 @@ function radio_station_get_language_options( $include_wp_default = false ) {
 				$languages[$lang] = $translation['native_name'];
 			}
 		}
+		// set_transient( 'radio-station-language-options', $languages, 24 * 60 * 60 );
 	}
 
 	// --- maybe include WordPress default language ---
 	if ( $include_wp_default ) {
-		$wp_language = array( '', __( 'WordPress Setting', 'radio-station' ) );
+		// 2.3.3.6: fix to array for WordPress language setting
+		$wp_language = array( '' => __( 'WordPress Setting', 'radio-station' ) );
 		$languages = array_merge( $wp_language, $languages );
 	}
 
@@ -4020,12 +4022,16 @@ function radio_station_get_language( $lang = false ) {
 	if ( !$lang ) {
 		$main = true;
 		$lang = radio_station_get_setting( 'radio_language' );
-		if ( !$lang || ( '' == $lang ) ) {
+		// 2.3.3.6: add fallback for value of 1 due to language options bug
+		if ( !$lang || ( '' == $lang ) || ( '0' == $lang ) || ( '1' == $lang ) ) {
 			$lang = get_option( 'WPLANG' );
 			if ( !$lang ) {
 				$lang = 'en_US';
 			}
 		}
+	}
+	if ( isset( $_REQUEST['lang-debug'] ) && ( '1' == $_REQUEST['lang-debug'] ) ) {
+		echo PHP_EOL . "LANG: " . print_r( $lang, true ) . PHP_EOL;
 	}
 
 	// --- get the specified language term ---
@@ -4063,6 +4069,9 @@ function radio_station_get_language( $lang = false ) {
 		} else {
 			$language = false;
 		}
+	}
+	if ( isset( $_REQUEST['lang-debug'] ) && ( '1' == $_REQUEST['lang-debug'] ) ) {
+		echo PHP_EOL . "LANGUAGE: " . print_r( $language, true ) . PHP_EOL;
 	}
 
 	return $language;

@@ -184,6 +184,11 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 == Changelog ==
 
+= 2.3.3.6 =
+* Fixed: Edit permissions checks for Related to Show post assignments
+* Fixed: Main Language option value for WordPress Setting
+* Fixed: make Date on Tab clickable on Tabbed Schedule View
+
 = 2.3.3.5 =
 * Fixed: use schedule based on start_day if specified for Schedule view
 * Fixed: day left/right shifting on Schedule table/tab mobile views

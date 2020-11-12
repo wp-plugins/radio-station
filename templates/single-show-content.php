@@ -62,6 +62,7 @@ $show_link = apply_filters( 'radio_station_show_link', $show_link, $post_id );
 $show_email = apply_filters( 'radio_station_show_email', $show_email, $post_id );
 $show_patreon = apply_filters( 'radio_station_show_patreon', $show_patreon, $post_id );
 $show_rss = apply_filters( 'radio_station_show_rss', $show_rss, $post_id );
+$social_icons = apply_filters( 'radio_station_show_social_icons', false, $post_id );
 
 // --- create show icon display early ---
 // 2.3.0: converted show links to icons
@@ -181,7 +182,8 @@ if ( ( $avatar_id || $thumbnail_id ) || ( count( $show_icons ) > 0 ) || ( $show_
 	}
 
 	// --- show controls ---
-	if ( ( count( $show_icons ) > 0 ) || ( $show_file ) ) {
+	// 2.3.3.6: modify check to include social icons or patreon only
+	if ( ( count( $show_icons ) > 0 ) || $social_icons || $show_patreon || $show_file ) {
 
 		$blocks['show_images'] .= '<div class="show-controls">';
 
@@ -190,6 +192,16 @@ if ( ( $avatar_id || $thumbnail_id ) || ( count( $show_icons ) > 0 ) || ( $show_
 			$blocks['show_images'] .= '<div class="show-icons">';
 			$blocks['show_images'] .= implode( "\n", $show_icons );
 			$blocks['show_images'] .= '</div>';
+		}
+		// --- Social Icons ---
+		// 2.3.3.6: added filter for social icon display output
+		if ( $social_icons ) {
+			$social_icons = apply_filters( 'radio_station_show_social_icons_display', '' );
+			if ( '' != $social_icons ) {
+				$blocks['show_images'] .= '<div class="social-icons">';
+				$blocks['show_images'] .= $social_icons;
+				$blocks['show_images'] .= '</div>';
+			}
 		}
 
 		// --- Show Patreon Button ---
@@ -210,7 +222,7 @@ if ( ( $avatar_id || $thumbnail_id ) || ( count( $show_icons ) > 0 ) || ( $show_
 		// 2.3.3.4: add filter for optional title above Show Player (default empty)
 		// 2.3.3.4: add filter for title text on Show Download link icon
 		if ( $show_file ) {
-		
+
 			$blocks['show_images'] .= '<div class="show-player">';
 			$label = apply_filters( 'radio_station_show_player_label', '', $post_id );
 			if ( $label && ( '' != $label ) ) {
@@ -233,7 +245,7 @@ if ( ( $avatar_id || $thumbnail_id ) || ( count( $show_icons ) > 0 ) || ( $show_
 				$blocks['show_images'] .= '</a>';
 				$blocks['show_images'] .= '</div>';
 			}
-			
+
 			$blocks['show_images'] .= '</div>';
 		}
 
@@ -255,7 +267,7 @@ if ( $hosts || $producers || $genres || $languages ) {
 	// --- Show DJs / Hosts ---
 	// 2.3.3.4: added filter for hosted by label
 	// 2.3.3.4: replace bold title tag with span and class
-	if ( $hosts ) {	
+	if ( $hosts ) {
 		$blocks['show_meta'] .= '<div class="show-djs show-hosts">';
 		$label = __( 'Hosted by', 'radio-station' );
 		$label = apply_filters( 'radio_station_show_hosts_label', $label, $post_id );
@@ -423,7 +435,7 @@ if ( !$active || !$shifts ) {
 			}
 		}
 	}
-	
+
 	if ( ( 0 == $offset ) || ( '' == $offset ) ) {
 		$utc_offset = '';
 	} elseif ( $offset > 0 ) {
@@ -488,7 +500,7 @@ if ( !$active || !$shifts ) {
 					$start = radio_station_get_time( $start_data_format, $shift_start_time );
 					$end = radio_station_get_time( $end_data_format, $shift_end_time );
 					$start = radio_station_translate_time( $start );
-					$end = radio_station_translate_time( $end );				
+					$end = radio_station_translate_time( $end );
 
 					// --- check if current shift ---
 					$classes = array( 'show-shift-time' );
@@ -906,6 +918,6 @@ if ( 'tabbed' == 'section_layout' ) {
 				radio_show_tab('about');}
 			}
 		}
-	}, 500);";	
+	}, 500);";
 	wp_add_inline_script( 'radio-station-show-page', $js );
 }
