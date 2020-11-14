@@ -5,7 +5,7 @@
 // ===========================
 //
 // --------------
-// Version: 1.1.4
+// Version: 1.1.5
 // --------------
 // Note: Changelog and structure at end of file.
 //
@@ -114,7 +114,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 		// 1.1.2: added debug switch
 		public $menu_added = false;
 		public $debug = false;
-		
+
 		// -----------------
 		// Initialize Loader
 		// -----------------
@@ -122,7 +122,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 			// --- set debug switch ---
 			// 1.1.2: added debug switch check
-			$prefix = ''; 
+			$prefix = '';
 			if ( $args['settings'] ) {
 				// 1.1.4: fix to debug prefix key
 				$prefix = $args['settings'] . '-';
@@ -247,7 +247,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 			return $value;
 		}
-		
+
 		// ------------------
 		// Get Plugin Version
 		// ------------------
@@ -288,7 +288,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// 1.1.2: fix to apply options filter
 			$namespace = $this->namespace;
 			$options = $this->options;
-			$options = apply_filters( $namespace . '_options', $options );			
+			$options = apply_filters( $namespace . '_options', $options );
 			$defaults = array();
 			foreach ( $options as $key => $values ) {
 				// 1.0.9: set default to null if default value not set
@@ -313,7 +313,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 		public function add_settings() {
 
 			// --- add the default plugin settings ---
-			$args = $this->args; 
+			$args = $this->args;
 			$defaults = $this->default_settings();
 			$added = add_option( $args['option'], $defaults );
 
@@ -323,7 +323,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				foreach ( $defaults as $key => $value ) {
 					$GLOBALS[$namespace][$key] = $value;
 				}
-				
+
 				// --- record first installed version ---
 				// 1.1.0: added record for tracking first install version
 				add_option( $args['option'] . '_first_install', $args['version'] );
@@ -572,7 +572,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					}
 
 					if ( $this->debug ) {
-						echo 'Saving Setting Key ' . $key . ' (' . $postkey . ': ' . print_r( $posted, true ) . '<br>';
+						echo 'Saving Setting Key ' . $key . ' (' . $postkey . '): ' . print_r( $posted, true ) . '<br>';
 						echo 'Type: ' . $type . ' - Valid Options ' . $key . ': ' . print_r( $valid, true ) . '<br>';
 					}
 
@@ -643,7 +643,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 							$optionkey = $args['settings'] . '_' . $key . '-' . $option;
 							if ( isset( $_POST[$optionkey] ) ) {
 								// 1.1.2: check for value if specified
-								if ( ( isset( $values['value'] ) && ( $values['value'] == $_POST[$optionkey] ) ) 
+								if ( ( isset( $values['value'] ) && ( $values['value'] == $_POST[$optionkey] ) )
 								  || ( !isset( $values['value'] ) && ( 'yes' == $_POST[$optionkey] ) ) ) {
 									// 1.1.0: fixed to save only array of key values
 									$posted[] = $option;
@@ -656,7 +656,6 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 						// -- comma separated values ---
 						// 1.0.4: added comma separated values option
-						$values = array();
 						if ( strstr( $posted, ',' ) ) {
 							$posted = explode( ',', $posted );
 						} else {
@@ -698,9 +697,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					if ( $this->debug ) {
 						echo 'New Settings for Key ' . $key . ': ';
 						if ( $newsettings ) {
-							echo '(to-validate) ' . var_dump( $newsettings, true ) . '<br>';
+							echo '(to-validate) ' . print_r( $newsettings, true ) . '<br>';
 						} else {
-							echo '(validated) ' . var_dump( $settings[$key], true ) . '<br>';
+							echo '(validated) ' . print_r( $settings[$key], true ) . '<br>';
 						}
 					}
 
@@ -723,10 +722,22 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 								$settings[$key] = $newsettings;
 							}
 						} else {
+
 							// --- validate single setting ---
-							$newsetting = $this->validate_setting( $newsettings, $valid, $validate_args );
-							if ( $newsetting ) {
-								$settings[$key] = $newsetting;
+							if ( 'csv' == $type ) {
+								// 1.1.5: fix to validate each of multiple CSV values
+								$values = explode( ',', $newsettings );
+								$newvalues = array();
+								foreach ( $values as $value ) {
+									$newvalues[] = $this->validate_setting( $value, $valid, $validate_args );
+								}
+								$newsettings = implode( ',', $newvalues );
+								$settings[$key] = $newsettings;
+							} else {
+								$newsetting = $this->validate_setting( $newsettings, $valid, $validate_args );
+								if ( $newsetting ) {
+									$settings[$key] = $newsetting;
+								}
 							}
 						}
 
@@ -798,6 +809,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 		// -----------------------
 		// Validate Plugin Setting
 		// -----------------------
+		// 1.1.5: plural options now use extra validation
 		public function validate_setting( $posted, $valid, $args ) {
 
 			// --- allow for clearing of a field ---
@@ -828,7 +840,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 				// --- number (numeric text) ---
 				// note: step key is only used for controls, not for validation
-				// 1.0.9: cast to integer not absolute integer
+				// 1.0.9: cast to integer - not absolute integer
 				// TODO: validate step value match ?
 				$posted = floatval( trim( $posted ) );
 				if ( isset( $args['min'] ) && ( $posted < $args['min'] ) ) {
@@ -863,7 +875,6 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				if ( !filter_var( $url, FILTER_VALIDATE_URL ) ) {
 					$posted = '';
 				}
-
 				return $posted;
 
 			} elseif ( in_array( $valid, array( 'EMAIL', 'EMAILS' ) ) ) {
@@ -876,12 +887,37 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				} else {
 					$posted = '';
 				}
-
 				return $posted;
 
-			} elseif ( in_array( $valid, array( 'USERNAME', 'USERNAMES' ) ) ) {
+			} elseif ( in_array( $valid, array( 'USEREMAIL', 'USEREMAILS' ) ) ) {
+
+				// --- email address with user validation ---
+				// 1.1.5: added option for validated user emails
+				$email = sanitize_email( trim( $posted ) );
+				if ( !$email ) {
+					return '';
+				}
+				$user = get_user_by( 'email', $email );
+				if ( $user ) {
+					$posted = $username;
+				} else {
+					$posted = '';
+				}
+				return $posted;
+
+			} elseif ( 'USERNAME' == $valid ) {
 
 				// --- username ---
+				$username = sanitize_user( trim( $posted ) );
+				if ( !$username ) {
+					return '';
+				}
+				return $username;
+
+			} elseif ( 'USERNAMES' == $valid ) {
+
+				// --- username with check for existing user ---
+				// 1.1.5: separated check from singular
 				$username = sanitize_user( trim( $posted ) );
 				if ( !$username ) {
 					return '';
@@ -892,12 +928,20 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				} else {
 					$posted = '';
 				}
-
 				return $posted;
 
-			} elseif ( in_array( $valid, array( 'USERID', 'USERIDS' ) ) ) {
+			} elseif ( 'USERID' == $valid ) {
 
 				// --- user ID ---
+				$userid = intval( trim( $posted ) );
+				if ( 0 === $userid ) {
+					return '';
+				}
+
+			} elseif ( 'USERIDS' == $valid ) {
+
+				// --- user ID with check for existing user ---
+				// 1.1.5: separated check from singular
 				$userid = intval( trim( $posted ) );
 				if ( 0 === $userid ) {
 					return '';
@@ -918,7 +962,15 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 				return $posted;
 
-			} elseif ( in_array( $valid, array( 'PAGEID', 'PAGEIDS', 'POSTID', 'POSTIDS' ) ) ) {
+			} elseif ( in_array( $valid, array( 'PAGEID', 'POSTID' ) ) ) {
+
+				$posted = intval( trim( $posted ) );
+				if ( 0 === $posted ) {
+					return '';
+				}
+				return $posted;
+
+			} elseif ( in_array( $valid, array( 'PAGEIDS', 'POSTIDS' ) ) ) {
 
 				$posted = intval( trim( $posted ) );
 				if ( 0 === $posted ) {
@@ -937,14 +989,14 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 		// Delete Settings
 		// ---------------
 		public function delete_settings() {
-		
+
 			// TODO: check for plugin settings flag to delete settings ?
 			// $delete_settings = $this->get_setting( 'delete_settings' );
 			// if ( $delete_settings ) {
 			//	$args = $this->args;
 			//	delete_option( $args['option'] );
 			// }
-			
+
 			// TODO: check for plugin settings flag to delete data?
 			// $delete_data = $this->get_setting( 'delete_data' );
 			// if ( $delete_data ) {
@@ -1376,7 +1428,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// 1.0.8: change from function exists check
 			// 1.0.9: change to filter usage to check if menu is manually added
 			$menu_added = apply_filters( $args['namespace'] . '_admin_menu_added', false, $args );
-			
+
 			// 1.1.1: record to admin menu added switch
 			$this->menu_added = $menu_added;
 
@@ -1391,7 +1443,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// 1.1.0: add admin notices boxer
 			add_action( 'all_admin_notices', array( $this, 'notice_boxer' ), 999 );
 		}
-		
+
 		// -----------------
 		// Plugin Page Links
 		// -----------------
@@ -1401,7 +1453,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			if ( plugin_basename( $args['file'] ) == $file ) {
 
 				// --- add settings link ---
-				// 1.1.1: fix to settings page link URL 
+				// 1.1.1: fix to settings page link URL
 				// (depending on whether top level menu or Settings submenu item)
 				$page = 'options-general.php';
 				if ( $this->menu_added ) {$page = 'admin.php';}
@@ -1483,9 +1535,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				} else {
 					document.getElementById('admin-notices-wrap').style.display = '';
 					document.getElementById('admin-notices-arrow').innerHTML= '&#9662;';
-				} 
+				}
 			} ";
-			
+
 			// --- modified from /wp-admin/js/common.js to move notices ---
 			echo "jQuery(document).ready(function() {
 				setTimeout(function() {
@@ -1765,12 +1817,12 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			$args = $this->args;
 			$namespace = $this->namespace;
 			$options = $this->options;
-			
+
 			// --- get plugin options and default settings ---
 			// 1.1.2: fix for filtering of plugin options
 			$options = $this->options;
 			$options = apply_filters( $namespace . '_options', $options );
-		
+
 			$defaults = $this->default_settings();
 			$settings = $this->get_settings( false );
 
@@ -2672,8 +2724,8 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 				$instance->delete_settings();
 			}
 		}
-		
-		
+
+
 
 		// -----------
 		// Message Box
@@ -2787,6 +2839,9 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // =========
 // CHANGELOG
 // =========
+
+// == 1.1.5 ==
+// - fix to validate multiple CSV values
 
 // == 1.1.4 ==
 // - fix for debug prefix key dash
