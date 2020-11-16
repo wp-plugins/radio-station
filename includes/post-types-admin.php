@@ -2143,10 +2143,22 @@ function radio_station_show_shifts_metabox() {
 		radio_check_shifts();
 	}" . PHP_EOL;
 
+	// 2.3.3.6: store possible existing onbeforeunload function
+	// (to help prevent conflicts with other plugins using this event)
+	$js .= "var storedonbeforeunload = null; var onbeforeunloadset = false;" . PHP_EOL;
 	$js .= "function radio_check_shifts() {
 		if (jQuery('.show-shift.changed').length) {
-			window.onbeforeunload = function() {return true;}
-		} else {window.onbeforeunload = null;}
+			if (!onbeforeunloadset) {
+				storedonbeforeunload = window.onbeforeunload;
+				window.onbeforeunload = function() {return true;}
+				onbeforeunloadset = true;
+			}
+		} else {
+			if (onbeforeunloadset) {
+				window.onbeforeunload = storedonbeforeunload;
+				onbeforeunloadset = false;
+			}
+		}
 	}" . PHP_EOL;
 
 	// --- add new shift ---
@@ -3371,14 +3383,22 @@ function radio_station_show_save_data( $post_id ) {
 			if ( $table['conflicts'] ) {
 				radio_station_shifts_conflict_message();
 			}
+
 			// phpcs:ignore WordPress.Security.OutputNotEscaped
 			echo $table['list'];
+
 			echo '<div id="updated-div"></div>';
 			echo '</div>';
 
 			// --- refresh show shifts list ---
 			echo "<script>showslist = parent.document.getElementById('shifts-list');
 			showslist.innerHTML = document.getElementById('shifts-list').innerHTML;</script>";
+
+			// 2.3.3.6: clear changes may not have been saved window reload message
+			echo "<script>if (parent.window.onbeforeunloadset) {
+				parent.window.onbeforeunload = parent.storedonbeforeunload;
+				parent.window.onbeforeunloadset = false;
+			}</script>";
 
 			// --- alert on conflicts ---
 			if ( $table['conflicts'] ) {

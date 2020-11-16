@@ -2579,26 +2579,35 @@ function radio_station_check_shift( $show_id, $shift, $context = 'all' ) {
 				if ( $check_shift ) {
 
 					if ( RADIO_STATION_DEBUG ) {
-						echo "with Shift for Show " . $day_shift['show'] . ": ";
+						echo "...with Shift for Show " . $day_shift['show'] . ": ";
 						echo $day_shift['day'] . " - " . $day_shift['date'] . " - " . $day_shift['start'] . " (" . $day_shift_start_time . ")";
 						echo " to " . $day_shift['end'] . " (" . $day_shift_end_time . ")" . PHP_EOL;
 					}
 
 					// 2.3.2: improved shift checking logic
-					// [overlap] if the new shift starts before existing shift but end after existing shift starts
-					// [external] or starts before but ends after the existing shift end time
-					// [equal] or new shift starts at the same time as the existing shift
-					// [internal] or if the new shift starts after existing shift and ends before it ends
-					// [overlap] of the new shift starts after the existing shift but before it ends
-					// ...then there is a shift overlap conflict
-					if ( ( ( $shift_start_time < $day_shift_start_time ) && ( $shift_end_time > $day_shift_start_time ) )
-						 || ( ( $shift_start_time < $day_shift_start_time ) && ( $shift_end_time > $day_shift_end_time ) )
-					     || ( $shift_start_time == $day_shift_start_time )
-					     || ( ( $shift_start_time > $day_shift_start_time ) && ( $shift_end_time < $day_shift_end_time ) )
-					     || ( ( $shift_start_time > $day_shift_start_time ) && ( $shift_start_time < $day_shift_end_time ) ) ) {
+					// 2.3.3.6: separated logic for conflict match code
+					$conflict = false;
+					if ( ( $shift_start_time < $day_shift_start_time ) && ( $shift_end_time > $day_shift_start_time ) ) {
+						// if the new shift starts before existing shift but ends after existing shift starts
+						$conflict = 'start overlap';
+					} elseif ( ( $shift_start_time < $day_shift_start_time ) && ( $shift_end_time > $day_shift_end_time ) ) {
+						// ...or starts before but ends after the existing shift end time
+						$conflict = 'blockout overlap';
+					} elseif ( ( $shift_start_time == $day_shift_start_time ) ) {
+						// ...or new shift starts at the same time as the existing shift
+						$conflict = 'equal start time';
+					} elseif ( ( $shift_start_time > $day_shift_start_time ) && ( $shift_end_time < $day_shift_end_time ) ) {
+						// ...or if the new shift starts after existing shift and ends before it ends
+						$conflict = 'internal overlap';
+					} elseif ( ( $shift_start_time > $day_shift_start_time ) && ( $shift_start_time < $day_shift_end_time ) ) {
+						// ...or the new shift starts after the existing shift but before it ends
+						$conflict = 'end overlap';
+					}
+					if ( $conflict ) {
+						// --- if there is a shift overlap conflict ---
 						$conflicts[] = $day_shift;
 						if ( RADIO_STATION_DEBUG ) {
-							echo "^^^ CONFLICT ^^^" . PHP_EOL;
+							echo '^^^ CONFLICT ( ' . $conflict . ' ) ^^^' . PHP_EOL;
 						}
 					}
 				}
@@ -2616,7 +2625,7 @@ function radio_station_check_shift( $show_id, $shift, $context = 'all' ) {
 		$first_shift_end_time = radio_station_to_time( $first_shift['date'] . ' ' . $shift_end ) + ( 7 * 24 * 60 * 60 );
 
 		if ( RADIO_STATION_DEBUG ) {
-			echo "with First Shift for Show " . $first_shift['show'] . ": ";
+			echo "...with First Shift for Show " . $first_shift['show'] . ": ";
 			echo $first_shift['day'] . " - " . $first_shift['date'] . " - " . $first_shift['start'] . " (" . $first_shift_start_time . ")";
 			echo " to " . $first_shift['end'] . " (" . $first_shift_end_time . ")" . PHP_EOL;
 		}
@@ -2637,26 +2646,43 @@ function radio_station_check_shift( $show_id, $shift, $context = 'all' ) {
 	// (for date based schedule overflow rechecking)
 	if ( isset( $day_shift ) ) {
 
-		// --- check for new shift overlap using next week ---
-		$shift_start_time = $shift_start_time + ( 7 * 24 * 60 * 60 );
-		$shift_end_time = $shift_end_time + ( 7 * 24 * 60 * 60 );
+		// 2.3.3.6: added check to not last check shift against itself
+		if ( ( $day_shift['show'] != $show_id )
+		  || ( $day_shift['day'] != $shift['day'] )
+		  || ( $day_shift['start'] != $shift['start'] )
+		  || ( $day_shift['end'] != $shift['end'] ) ) {
 
-		if ( RADIO_STATION_DEBUG ) {
-			echo "with Last Shift (using next week):" . PHP_EOL;
-			echo radio_station_get_time( 'date', $shift_start_time ) . " - " . $shift['start'] . " (" . $shift_start_time . ")";
-			echo " to " . $shift['end'] . " (" . $shift_end_time . ")" . PHP_EOL;
-			echo $day_shift['day'] . " - " . $day_shift['date'] . " - " . $day_shift['start'] . " (" . $day_shift_start_time . ")";
-			echo " to " . $day_shift['end'] . " (" . $day_shift_end_time . ")" . PHP_EOL;
-		}
+			// --- check for new shift overlap using next week ---
+			$shift_start_time = $shift_start_time + ( 7 * 24 * 60 * 60 );
+			$shift_end_time = $shift_end_time + ( 7 * 24 * 60 * 60 );
 
-		if ( ( ( $shift_start_time < $day_shift_start_time ) && ( $shift_end_time > $day_shift_start_time ) )
-			 || ( ( $shift_start_time < $day_shift_start_time ) && ( $shift_end_time > $day_shift_end_time ) )
-			 || ( $shift_start_time == $day_shift_start_time )
-			 || ( ( $shift_start_time > $day_shift_start_time ) && ( $shift_end_time < $day_shift_end_time ) )
-			 || ( ( $shift_start_time > $day_shift_start_time ) && ( $shift_start_time < $day_shift_end_time ) ) ) {
- 			$conflicts[] = $day_shift;
 			if ( RADIO_STATION_DEBUG ) {
-				echo "^^^ CONFLICT ^^^" . PHP_EOL;
+				echo "...with Last Shift (using next week):" . PHP_EOL;
+				// echo radio_station_get_time( 'date', $shift_start_time ) . " - " . $shift['start'] . " (" . $shift_start_time . ")";
+				// echo " to " . $shift['end'] . " (" . $shift_end_time . ")" . PHP_EOL;
+				echo $day_shift['day'] . " - " . radio_station_get_time( 'date', $day_shift_start_time );
+				echo " - " . $day_shift['start'] . " (" . $day_shift_start_time . ")";
+				echo " to " . $day_shift['end'] . " (" . $day_shift_end_time . ")" . PHP_EOL;
+			}
+
+			// 2.3.3.6: separated logic for conflict match code
+			$conflict = false;
+			if ( ( $shift_start_time < $day_shift_start_time ) && ( $shift_end_time > $day_shift_start_time ) ) {
+				$conflict = 'start overlap';
+			} elseif ( ( $shift_start_time < $day_shift_start_time ) && ( $shift_end_time > $day_shift_end_time ) ) {
+				$conflict = 'blockout overlap';
+			} elseif ( $shift_start_time == $day_shift_start_time ) {
+				$conflict = 'equal start time';
+			} elseif ( ( $shift_start_time > $day_shift_start_time ) && ( $shift_end_time < $day_shift_end_time ) ) {
+				$conflict = 'internal overlap';
+			} elseif ( ( $shift_start_time > $day_shift_start_time ) && ( $shift_start_time < $day_shift_end_time ) ) {
+				$conflict = 'end overlap';
+			}
+			if ( $conflict ) {
+				$conflicts[] = $day_shift;
+				if ( RADIO_STATION_DEBUG ) {
+					echo '^^^ CONFLICT ( ' . $conflict . ') ^^^' . PHP_EOL;
+				}
 			}
 		}
 	}
