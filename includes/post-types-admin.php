@@ -1187,6 +1187,14 @@ function radio_station_post_show_metabox() {
 	} elseif ( !is_array( $selected ) ) {
 		$selected = array( $selected );
 	}
+	// 2.3.3.6: remove possible saved zero value
+	if ( count( $selected ) > 0 ) {
+		foreach ( $selected as $i => $selected ) {
+			if ( 0 == $selected ) {
+				unset( $selected[$i] );
+			}
+		}
+	}
 
 	echo '<div id="meta_inner">';
 
@@ -1283,7 +1291,8 @@ function radio_station_post_save_data( $post_id ) {
 			}
 			foreach ( $show_ids as $i => $show_id ) {
 				$show_id = absint( trim( $show_id ) );
-				if ( $show_id > -1 ) {
+				// 2.3.3.6: check show ID value is above zero not -1
+				if ( $show_id > 0 ) {
 				// 2.3.3.6: check edit Show capability before adding
 					$post = get_post( $show_id );
 					if ( $post && current_user_can( 'edit_shows' ) && !in_array( $show_id, $new_show_ids ) ) {
@@ -1411,10 +1420,16 @@ function radio_station_post_column_data( $column, $post_id ) {
 		$show_ids = $disabled = array();
 		$show_id = get_post_meta( $post_id, 'post_showblog_id', true );
 		if ( $show_id ) {
+			// 2.3.3.6: add check to ignore possible saved zero value
 			if ( is_array( $show_id ) ) {
 				$show_ids = $show_id;
+				foreach ( $show_ids as $i => $show_id ) {
+					if ( 0 == $show_id ) {
+						unset( $show_ids[$i] );
+					}
+				}
 				$data = implode( ',', $show_id );
-			} else {
+			} elseif ( $show_id > 0 ) {
 				$show_ids = array( $show_id );
 				$data = $show_id;
 			}
@@ -1563,9 +1578,12 @@ function radio_station_posts_bulk_edit_handler( $redirect_to, $action, $post_ids
 	$posted_show_ids = array();
 	if ( count( $show_ids ) > 0 ) {
 		foreach ( $show_ids as $show_id ) {
-			$post = get_post( $show_id );
-			if ( current_user_can( 'edit_shows' ) ) {
-				$posted_show_ids[] = $show_id;
+			// 2.3.3.6: added check to ignore zero values
+			if ( 0 != $show_id ) {
+				$post = get_post( $show_id );
+				if ( current_user_can( 'edit_shows' ) ) {
+					$posted_show_ids[] = $show_id;
+				}
 			}
 		}
 	}
@@ -1581,9 +1599,12 @@ function radio_station_posts_bulk_edit_handler( $redirect_to, $action, $post_ids
 			$current_ids = get_post_meta( $post_id, 'post_showblog_id', true );
 			if ( $current_ids && is_array( $current_ids ) && ( count( $current_ids ) > 0 ) ) {
 				foreach ( $current_ids as $i => $current_id ) {
-					$post = get_post( $current_id );
-					if ( !current_user_can( 'edit_shows' ) ) {
-						$existing_show_ids[] = $current_id;
+					// 2.3.3.6: added check to ignore possible zero values
+					if ( 0 != $current_id ) {
+						$post = get_post( $current_id );
+						if ( !current_user_can( 'edit_shows' ) ) {
+							$existing_show_ids[] = $current_id;
+						}
 					}
 				}
 			}

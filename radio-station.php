@@ -1819,12 +1819,17 @@ function radio_station_add_show_links( $content ) {
 
 		// --- link show posts ---
 		$related_shows = get_post_meta( $post->ID, 'post_showblog_id', true );
-		if ( $related_shows ) {
-
-			// 2.3.3.6: convert string value if not multiple
-			if ( !is_array( $related_shows ) ) {
-				$related_shows = array( $related_shows );
+		// 2.3.3.6: convert string value if not multiple
+		if ( $related_shows && !is_array( $related_shows ) ) {
+			$related_shows = array( $related_shows );
+		}
+		// 2.3.3.6: remove possible zero values
+		foreach ( $related_shows as $i => $related_show ) {
+			if ( 0 == $related_show ) {
+				unset( $related_shows[$i] );
 			}
+		}
+		if ( $related_shows && is_array( $related_shows ) && ( count( $related_shows ) > 0 ) ) {
 
 			$positions = array( 'after' );
 			$positions = apply_filters( 'radio_station_link_to_show_positions', $positions, $post->post_type, $post );
@@ -2032,6 +2037,15 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 			$related_shows = $related_show;
 		} else {
 			$related_shows = array( $related_show );
+		}
+		// 2.3.3.6: remove possible saved zero value
+		foreach ( $related_shows as $i => $related_show ) {
+			if ( 0 == $related_show ) {
+				unset( $related_shows[$i] );
+			}
+		}
+		if ( 0 == count( $related_shows ) ) {
+			return $output;
 		}
 		if ( RADIO_STATION_DEBUG ) {
 			echo '<span style="display:none;">Related Shows A: ' . print_r( $related_shows, true ) . '</span>';
