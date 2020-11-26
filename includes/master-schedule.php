@@ -121,10 +121,16 @@ function radio_station_master_schedule( $atts ) {
 		$atts['clock'] = 0;
 	}
 
+	// 2.3.3.6: set new line for easier debug viewing
+	$newline = '';
+	if ( RADIO_STATION_DEBUG ) {
+		$newline = "\n";
+	}
+
 	// --- table for selector and clock  ---
 	// 2.3.0: moved out from templates to apply to all views
 	// 2.3.2: moved shortcode calls inside and added filters
-	$output .= '<div id="master-schedule-controls-wrapper">';
+	$output .= '<div id="master-schedule-controls-wrapper">' . $newline;
 
 		$controls = array();
 
@@ -132,26 +138,26 @@ function radio_station_master_schedule( $atts ) {
 		if ( $atts['clock'] ) {
 
 			// --- radio clock ---
-			$controls['clock'] = '<div id="master-schedule-clock-wrapper">';
+			$controls['clock'] = '<div id="master-schedule-clock-wrapper">' . $newline;
 			$clock_atts = apply_filters( 'radio_station_schedule_clock', array(), $atts );
 			$controls['clock'] .= radio_station_clock_shortcode( $clock_atts );
-			$controls['clock'] .= '</div>';
+			$controls['clock'] .= PHP_EOL . '</div>' . $newline;
 
 		} elseif ( $atts['timezone'] ) {
 
 			// --- radio timezone ---
-			$controls['timezone'] = '<div id="master-schedule-timezone-wrapper">';
+			$controls['timezone'] = '<div id="master-schedule-timezone-wrapper">' . $newline;
 			$timezone_atts = apply_filters( 'radio_station_schedule_clock', array(), $atts );
 			$controls['timezone'] .= radio_station_timezone_shortcode( $timezone_atts );
-			$controls['timezone'] .= '</div>';
+			$controls['timezone'] .= PHP_EOL . '</div>' . $newline;
 
 		}
 
 		// --- genre selector ---
 		if ( $atts['selector'] ) {
-			$controls['selector'] = '<div id="master-schedule-selector-wrapper">';
+			$controls['selector'] = '<div id="master-schedule-selector-wrapper">' . $newline;
 			$controls['selector'] .= radio_station_master_schedule_selector();
-			$controls['selector'] .= '</div>';
+			$controls['selector'] .= PHP_EOL . '</div>' . $newline;
 		}
 
 		// 2.3.1: add filters for control order
@@ -170,7 +176,7 @@ function radio_station_master_schedule( $atts ) {
 			}
 		}
 
-	$output .= '<br></div><br>';
+	$output .= '<br></div><br>' . $newline;
 
 	// --- schedule display override ---
 	// 2.3.1: add full schedule override filter

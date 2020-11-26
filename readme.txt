@@ -194,6 +194,7 @@ You may translate the plugin into another language. Please visit our [WordPress 
 * Fixed: do not conflict check Shift against itself for last shift check
 * Fixed: link back to Show posts for related Show posts (allow multiple)
 * Fixed: filter next/previous post link for (multiple) related Show posts
+* Fixed: automatic pages conflict where themes filter the_content early
 
 = 2.3.3.5 =
 * Fixed: use schedule based on start_day if specified for Schedule view

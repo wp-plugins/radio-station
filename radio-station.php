@@ -1310,10 +1310,12 @@ function radio_station_get_template( $type, $template, $paths = false ) {
 // ------------------------------
 // 2.3.0: standalone filter for automatic page content
 // 2.3.1: re-add filter so the_content can be processed multuple times
-add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-function radio_station_automatic_pages_content( $content ) {
+// 2.3.3.6: set automatic content early and clear existing content
+add_filter( 'the_content', 'radio_station_automatic_pages_content_set', 1 );
+function radio_station_automatic_pages_content_set( $content ) {
 
-	// global $radio_station_data;
+	global $radio_station_data;
+
 	// if ( isset( $radio_station_data['doing_excerpt'] ) && $radio_station_data['doing_excerpt'] ) {
 	//	return $content;
 	// }
@@ -1334,11 +1336,6 @@ function radio_station_automatic_pages_content( $content ) {
 					}
 				}
 				$shortcode = '[master-schedule' . $atts_string . ']';
-				remove_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				$content = do_shortcode( $shortcode );
-				// 2.3.1: re-add filter so the_content may be processed multuple times
-				add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				return $content;
 			}
 		}
 	}
@@ -1361,11 +1358,6 @@ function radio_station_automatic_pages_content( $content ) {
 					}
 				}
 				$shortcode = '[shows-archive' . $atts_string . ']';
-				remove_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				$content = do_shortcode( $shortcode );
-				// 2.3.1: re-add filter so the_content may be processed multuple times
-				add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				return $content;
 			}
 		}
 	}
@@ -1388,11 +1380,6 @@ function radio_station_automatic_pages_content( $content ) {
 					}
 				}
 				$shortcode = '[overrides-archive' . $atts_string . ']';
-				remove_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				$content = do_shortcode( $shortcode );
-				// 2.3.1: re-add filter so the_content may be processed multuple times
-				add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				return $content;
 			}
 		}
 	}
@@ -1415,11 +1402,6 @@ function radio_station_automatic_pages_content( $content ) {
 					}
 				}
 				$shortcode = '[playlists-archive' . $atts_string . ']';
-				remove_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				$content = do_shortcode( $shortcode );
-				// 2.3.1: re-add filter so the_content may be processed multuple times
-				add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				return $content;
 			}
 		}
 	}
@@ -1442,17 +1424,38 @@ function radio_station_automatic_pages_content( $content ) {
 					}
 				}
 				$shortcode = '[genres-archive' . $atts_string. ']';
-				remove_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				$content = do_shortcode( $shortcode );
-				// 2.3.1: re-add filter so the_content may be processed multuple times
-				add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				return $content;
 			}
 		}
 	}
 
+	// 2.3.3.6: moved out to reduce repetitive code
+	if ( isset( $shortcode ) ) {
+		remove_filter( 'the_content', 'radio_station_automatic_pages_content_set', 1 );
+		remove_filter( 'the_content', 'radio_station_automatic_pages_content_get', 11 );
+		$radio_station_data['automatic_content'] = do_shortcode( $shortcode );
+		// 2.3.1: re-add filter so the_content may be processed multuple times
+		add_filter( 'the_content', 'radio_station_automatic_pages_content_set', 1 );
+		add_filter( 'the_content', 'radio_station_automatic_pages_content_get', 11 );
+		// 2.3.3.6: clear existing content to allow for interim filters
+		$content = '';
+	}
+
 	return $content;
 }
+
+// ----------------------------------
+// Automatic Pages Content Set Filter
+// ----------------------------------
+// 2.3.3.6: append existing automatic page content to allow for interim filters
+add_filter( 'the_content', 'radio_station_automatic_pages_content_get', 11 );
+function radio_station_automatic_pages_content_get( $content ) {
+	global $radio_station_data;
+	if ( isset( $radio_station_data['automatic_content'] ) ) {
+		$content .= $radio_station_data['automatic_content'];
+	}
+	return $content;
+}
+
 
 // ------------------------------
 // Single Content Template Filter
