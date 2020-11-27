@@ -252,6 +252,7 @@ foreach ( $hours as $hour ) {
 				$shifts = array();
 			}
 			$nextday = radio_station_get_next_day( $weekday );
+			$prevday = radio_station_get_previous_day( $weekday );
 
 			// --- get weekdates ---
 			$weekdate = $weekdates[$weekday];
@@ -266,6 +267,8 @@ foreach ( $hours as $hour ) {
 
 			// --- loop the shifts for this day ---
 			foreach ( $shifts as $shift ) {
+
+				$split_id = false;
 
 				if ( !isset( $shift['finished'] ) || !$shift['finished'] ) {
 
@@ -293,9 +296,11 @@ foreach ( $hours as $hour ) {
 						if ( isset( $shift['real_start'] ) ) {
 							$real_shift_start = radio_station_convert_shift_time( $shift['real_start'] );
 							$real_shift_start = radio_station_to_time( $weekdate . ' ' . $real_shift_start ) - ( 24 * 60 * 60 );
+							$split_id = strtolower( $prevday . '-' . $weekday );
 						} elseif ( isset( $shift['real_end'] ) ) {
 							$real_shift_end = radio_station_convert_shift_time( $shift['real_end'] );
 							$real_shift_end = radio_station_to_time( $weekdate . ' ' . $real_shift_end ) + ( 24 * 60 * 60 );
+							$split_id = strtolower( $weekday . '-' . $nextday );
 						}
 					}
 
@@ -381,6 +386,10 @@ foreach ( $hours as $hour ) {
 							foreach ( $show['genres'] as $genre ) {
 								$divclasses[] = sanitize_title_with_dashes( $genre );
 							}
+						}
+						if ( $split_id ) {
+							$divclasses[] = 'overnight';
+							$divclasses[] = 'split-' . $split_id;
 						}
 						$divclass = implode( ' ', $divclasses );
 
@@ -627,5 +636,5 @@ foreach ( $hours as $hour ) {
 $output .= '</table>' . $newline;
 
 if ( isset( $_GET['rs-shift-debug'] ) && ( '1' == $_GET['rs-shift-debug'] ) ) {
-	$output .= $shiftdebug;
+	$output .= '<br><b>Shift Debug Info:</b><br>' . $shiftdebug . '<br>';
 }

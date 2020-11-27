@@ -457,6 +457,7 @@ function radio_station_master_schedule_table_js() {
 	// 2.3.2: added current show highlighting cycle
 	// 2.3.2: fix to currenthour substr
 	// 2.3.3.5: change selected day and arrow logic (to single day shifting)
+	// 2.3.3.6: also highlight split shift via matching shift class
 	$js = "/* Initialize Table */
 	jQuery(document).ready(function() {
 		radio_table_responsive(false);
@@ -475,10 +476,9 @@ function radio_station_master_schedule_table_js() {
 		if (radio.timezone.adjusted) {radio.offset_time = radio.current_time;}
 		jQuery('.master-program-day').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
-			if (start < radio.offset_time) {
-				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
-				if (end > radio.offset_time) {jQuery(this).addClass('current-day');}
-				else {jQuery(this).removeClass('current-day');}
+			end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
+			if ( (start < radio.offset_time) && (end > radio.offset_time) ) {
+				jQuery(this).addClass('current-day');
 			} else {jQuery(this).removeClass('current-day');}
 		});
 		jQuery('.master-program-hour').each(function() {
@@ -490,16 +490,23 @@ function radio_station_master_schedule_table_js() {
 			if (hour == currenthour) {jQuery(this).addClass('current-hour');}
 			else {jQuery(this).removeClass('current-hour');}
 		});
+		var radio_active_shift = false;
 		jQuery('.master-show-entry').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
-			if (radio.debug) {console.log(start);}
-			if (start < radio.offset_time) {
-				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
-				if (end > radio.offset_time) {
-					jQuery(this).addClass('nowplaying');
-					if (radio.debug) {console.log('^^^^^^^');}
-				} else {jQuery(this).removeClass('nowplaying');}
+			end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
+			if (radio.debug) {console.log(start+' - '+end);}
+			if ( (start < radio.offset_time) && (end > radio.offset_time) ) {
+				jQuery(this).addClass('nowplaying');
+				if (radio.debug) {console.log('^ Now Playing ^');}
+				/* also highlight split shift via matching shift class */
+				if (jQuery(this).hasClass('overnight')) {
+					classes = jQuery(this).attr('class').split(/\s+/);
+					for (i = 0; i < classes.length; i++) {
+						if (classes[i].substr(0,6) == 'split-') {radio_active_shift = classes[i];}
+					}
+				}
 			} else {jQuery(this).removeClass('nowplaying');}
+			if (radio_active_shift) {jQuery('.'+radio_active_shift).addClass('nowplaying');}
 		});
 	}
 
@@ -630,6 +637,7 @@ function radio_station_master_schedule_tabs_js() {
 	// 2.3.0: added for tabbed responsiveness
 	// 2.3.2: display selected day message if outside view
 	// 2.3.3.5: change selected day and arrow logic (to single day shifting)
+	// 2.3.3.6: also highlight split shift via matching shift class
 	$js .= "/* Initialize Tabs */
 	jQuery(document).ready(function() {
 		radio.schedule_tabinit = false;
@@ -664,26 +672,32 @@ function radio_station_master_schedule_tabs_js() {
 		if (radio.timezone.adjusted) {radio.offset_time = radio.current_time;}
 		jQuery('.master-schedule-tabs-day').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
-			if (start < radio.offset_time) {
-				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
-				if (end > radio.offset_time) {
-					jQuery(this).addClass('current-day');
-					day = jQuery(this).attr('id').replace('master-schedule-tabs-header-', '');
-					radio_set_active_tab(day);
-				} else {jQuery(this).removeClass('current-day');}
+			end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
+			if ( (start < radio.offset_time) && (end > radio.offset_time) ) {
+				jQuery(this).addClass('current-day');
+				day = jQuery(this).attr('id').replace('master-schedule-tabs-header-', '');
+				radio_set_active_tab(day);
 			} else {jQuery(this).removeClass('current-day');}
 		});
 		radio_set_active_tab(false); /* fallback */
+		var radio_active_split = false;
 		jQuery('.master-schedule-tabs-show').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
-			if (radio.debug) {console.log(start);}
-			if (start < radio.offset_time) {
-				if (radio.debug) {console.log('^^^^^^^');}
-				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
-				if (end > radio.offset_time) {jQuery(this).addClass('nowplaying');}
-				else {jQuery(this).removeClass('nowplaying');}
+			end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
+			if (radio.debug) {console.log(start+' - '+end);}
+			if ( (start < radio.offset_time) && (end > radio.offset_time) ) {
+				if (radio.debug) {console.log('^ Now Playing ^');}
+				jQuery(this).addClass('nowplaying');
+				/* also highlight split shift via matching shift class */
+				if (jQuery(this).hasClass('overnight')) {
+					classes = jQuery(this).attr('class').split(/\s+/);
+					for (i = 0; i < classes.length; i++) {
+						if (classes[i].substr(0,6) == 'split-') {radio_active_split = classes[i];}
+					}
+				}
 			} else {jQuery(this).removeClass('nowplaying');}
 		});
+		if (radio_active_split) {jQuery('.'+radio_active_split).addClass('nowplaying');}
 	}
 
 	/* Make Tabs Responsive */
@@ -808,6 +822,7 @@ function radio_station_master_schedule_tabs_js() {
 function radio_station_master_schedule_list_js() {
 
 	// --- list view javascript ---
+	// 2.3.3.6: also highlight split shift via matching shift class
 	$js = "/* Initialize List */
 	jQuery(document).ready(function() {
 		radio_list_highlight();
@@ -820,20 +835,28 @@ function radio_station_master_schedule_list_js() {
 		if (radio.timezone.adjusted) {radio.offset_time = radio.current_time;}
 		jQuery('.master-list-day').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').first().attr('data'));
-			if (start < radio.offset_time) {
-				end = parseInt(jQuery(this).find('.rs-end-time').first().attr('data'));
-				if (end > radio.offset_time) {jQuery(this).addClass('current-day');}
-				else {jQuery(this).removeClass('current-day');}
+			end = parseInt(jQuery(this).find('.rs-end-time').first().attr('data'));
+			if ( (start < radio.offset_time) && (end > radio.offset_time) ) {
+				jQuery(this).addClass('current-day');
 			} else {jQuery(this).removeClass('current-day');}
 		});
+		var radio_active_list;
 		jQuery('.master-list-day-item').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
-			if (start < radio.offset_time) {
-				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
-				if (end > radio.offset_time) {jQuery(this).addClass('nowplaying');}
-				else {jQuery(this).removeClass('nowplaying');}
+			end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
+			if ( (start < radio.offset_time) && (end > radio.offset_time) ) {
+				if (radio.debug) {console.log('^ Now Playing ^');}
+				jQuery(this).addClass('nowplaying');
+				/* also highlight split shift via matching shift class */
+				if (jQuery(this).hasClass('overnight')) {
+					classes = jQuery(this).attr('class').split(/\s+/);
+					for (i = 0; i < classes.length; i++) {
+						if (classes[i].substr(0,6) == 'split-') {radio_active_list = classes[i];}
+					}
+				}
 			} else {jQuery(this).removeClass('nowplaying');}
 		});
+		if (radio_active_list) {jQuery('.'+radio_active_list).addClass('nowplaying');}
 	}";
 
 	// --- enqueue script inline ---

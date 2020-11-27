@@ -79,6 +79,10 @@ foreach ( $weekdays as $i => $weekday ) {
 
 	if ( !$skip_day ) {
 
+		// 2.3.3.6: set next and previous day for split shift IDs
+		$nextday = radio_station_get_next_day( $weekday );
+		$prevday = radio_station_get_previous_day( $weekday );
+
 		// 2.3.2: set day start and end times
 		// 2.3.2: replace strtotime with to_time for timezones
 		$day_start_time = radio_station_to_time( $weekdates[$weekday] . ' 00:00' );
@@ -198,6 +202,7 @@ foreach ( $weekdays as $i => $weekday ) {
 
 				$j++;
 				$show = $shift['show'];
+				$split_id = false;
 
 				$show_link = false;
 				if ( $atts['show_link'] ) {
@@ -236,9 +241,11 @@ foreach ( $weekdays as $i => $weekday ) {
 					if ( isset( $shift['real_start'] ) ) {
 						$real_shift_start = radio_station_convert_shift_time( $shift['real_start'] );
 						$real_shift_start = radio_station_to_time( $weekdate . ' ' . $real_shift_start ) - ( 24 * 60 * 60 );
+						$split_id = strtolower( $prevday . '-' . $weekday );
 					} elseif ( isset( $shift['real_end'] ) ) {
 						$real_shift_end = radio_station_convert_shift_time( $shift['real_end'] );
 						$real_shift_end = radio_station_to_time( $weekdate . ' ' . $real_shift_end ) + ( 24 * 60 * 60 );
+						$split_id = strtolower( $weekday . '-' . $nextday );
 					}
 				}
 
@@ -266,10 +273,14 @@ foreach ( $weekdays as $i => $weekday ) {
 				if ( $j == count( $shifts ) ) {
 					$classes[] = 'last-show';
 				}
-
 				// 2.3.2: check for now playing shift
 				if ( ( $now >= $shift_start_time ) && ( $now < $shift_end_time ) ) {
 					$classes[] = 'nowplaying';
+				}
+				// 2.3.3.6: add overnight split ID for highlighting
+				if ( $split_id ) {
+					$classes[] = 'overnight';
+					$classes[] = 'split-' . $split_id;
 				}
 
 				// --- open list item ---
@@ -507,5 +518,5 @@ $output .= $panels;
 $output .= '</div>' . $newline;
 
 if ( isset( $_GET['rs-shift-debug'] ) && ( '1' == $_GET['rs-shift-debug'] ) ) {
-	$output .= $shiftdebug;
+	$output .= '<br><b>Shift Debug Info:</b><br>' . $shiftdebug . '<br>';
 }
