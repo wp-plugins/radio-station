@@ -9,8 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2.3.3.6
 * Update: Freemius SDK (2.4.1)
-* Update: Plugin Loader (1.1.5) with CSV validation fix
+* Update: Plugin Loader (1.1.6) with phone number and CSV validation
+* Added: Station phone number setting with default display option
+* Added: Schedule classes for Shows before and after current Show
 * Improved: current Show highlighting on Schedule for overnight shifts
+* Improved: info section reordering filters on single Show template
 * Fixed: Edit permissions checks for Related to Show post assignments
 * Fixed: Main Language option value for WordPress Setting
 * Fixed: make Date on Tab clickable on Tabbed Schedule View

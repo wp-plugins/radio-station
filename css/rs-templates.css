@@ -80,6 +80,15 @@
 	margin-top: 5px;
 }
 
+#show-content .show-icon span:hover, #show-content .show-download span:hover {
+	opacity: 0.8;
+	text-decoration: none;
+}
+
+#show-content .show-icon .show-download a, #show-content .show-icon .show-download a:visited {
+	text-decoration: none;
+}
+
 #show-content .show-embed .mejs-container {
 	border-radius: 15px;
 	overflow: hidden;

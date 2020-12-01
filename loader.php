@@ -5,7 +5,7 @@
 // ===========================
 //
 // --------------
-// Version: 1.1.5
+// Version: 1.1.6
 // --------------
 // Note: Changelog and structure at end of file.
 //
@@ -721,6 +721,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 							} else {
 								$settings[$key] = $newsettings;
 							}
+
 						} else {
 
 							// --- validate single setting ---
@@ -863,6 +864,25 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					return $posted;
 				}
 
+			} elseif ( 'PHONE' == $valid ) {
+
+				// --- phone number characters only ---
+				$posted = trim( $posted );
+				// $checkposted = preg_match( '/^[0-9+\(\)#\.\s\-]+$/', $posted );
+				// if ( $checkposted ) {
+				//	return $posted;
+				// }
+				if ( strlen( $posted ) > 0 ) {
+					$posted = str_split( $posted, 1 );
+					$posted = preg_filter( '/^[0-9+\(\)#\.\s\-]+$/', '$0', $posted );
+					if ( count( $posted ) > 0 ) {
+						$posted = implode( '', $posted );
+						return $posted;
+					} else {
+						return '';
+					}
+				}
+
 			} elseif ( in_array( $valid, array( 'URL', 'URLS' ) ) ) {
 
 				// --- URL address ---
@@ -982,6 +1002,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				}
 			}
 
+			// TODO: return validation error ?
 			return false;
 		}
 
@@ -2839,6 +2860,9 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // =========
 // CHANGELOG
 // =========
+
+// == 1.1.6 ==
+// - added phone number character validation
 
 // == 1.1.5 ==
 // - fix to validate multiple CSV values

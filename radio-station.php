@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.3.3.5
+Version: 2.3.3.6
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -47,6 +47,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // - Enqueue Plugin Stylesheet
 // - Localize Time Strings
 // === Template Filters ===
+// - Get Template
+// - Station Phone Number Filter
 // - Automatic Pages Content Filter
 // - Single Content Template Filter
 // - Show Content Template Filter
@@ -218,6 +220,31 @@ $options = array(
 		'tab'     => 'general',
 		'section' => 'broadcast',
 	),
+
+	// --- Station Phone Number ---
+	// 2.3.3.6: added station phone number option
+	'station_phone'		=> array(
+		'type'    => 'text',
+		'options' => 'PHONE',
+		'label'   => __( 'Station Phone', 'radio-station' ),
+		'default' => '',
+		'helper'  => __( 'Main call in phone number for the Station (for requests etc.)', 'radio-station' ),
+		'tab'     => 'general',
+		'section' => 'broadcast',
+	),
+
+	// --- Phone for Shows ---
+	// 2.3.3.6: added default to station phone option
+	'shows_phone'		=> array(
+		'type'    => 'checkbox',
+		'default' => '',
+		'value'   => 'yes',
+		'label'   => __( 'Show Phone Display', 'radio-station' ),
+		'helper'  => __( 'Display Station phone number on Shows where a Show phone number is not set.', 'radio-station' ),
+		'tab'     => 'general',
+		'section' => 'broadcast',
+	),
+
 
 	// === Times ===
 
@@ -1213,9 +1240,9 @@ function radio_station_settings_page_redirect() {
 }
 
 
-// -----------------
-// === Templates ===
-// -----------------
+// ------------------------
+// === Template Filters ===
+// ------------------------
 
 // ------------
 // Get Template
@@ -1302,6 +1329,23 @@ function radio_station_get_template( $type, $template, $paths = false ) {
 		}
 	}
 
+	return false;
+}
+
+// ---------------------------
+// Station Phone Number Filter
+// ---------------------------
+// 2.3.3.6: added to return station phone for all Shows (if not set for Show)
+add_filter( 'radio_station_show_phone', 'radio_station_phone_number', 10, 2 );
+function radio_station_phone_number( $phone, $post_id ) {
+	if ( $phone ) {
+		return $phone;
+	}
+	$shows_phone = radio_station_get_setting( 'shows_phone' );
+	if ( 'yes' == $shows_phone ) {
+		$phone = radio_station_get_setting( 'station_phone' );
+		return $phone;
+	}
 	return false;
 }
 
