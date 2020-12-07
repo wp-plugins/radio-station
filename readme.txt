@@ -624,6 +624,13 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 == Upgrade Notice ==
 
+= 2.3.3.6 =
+* Updated Freemius SDK and Plugin Loader libraries
+* Added Station phone number setting with default display option
+* Added Schedule classes for Shows before and after current Show
+* Multiple Related Show Post assignment edit and link fixes
+* Bugfixes for permissions, main language and shift checker
+
 = 2.3.3.5 =
 * Ability to assign Post to relate to multiple Shows
 * Added Admin Filtering, Bulk Edit and Quick Edit interfaces
