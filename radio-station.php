@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.3.3.5
+Version: 2.3.3.6
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -47,6 +47,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // - Enqueue Plugin Stylesheet
 // - Localize Time Strings
 // === Template Filters ===
+// - Get Template
+// - Station Phone Number Filter
 // - Automatic Pages Content Filter
 // - Single Content Template Filter
 // - Show Content Template Filter
@@ -218,6 +220,31 @@ $options = array(
 		'tab'     => 'general',
 		'section' => 'broadcast',
 	),
+
+	// --- Station Phone Number ---
+	// 2.3.3.6: added station phone number option
+	'station_phone'		=> array(
+		'type'    => 'text',
+		'options' => 'PHONE',
+		'label'   => __( 'Station Phone', 'radio-station' ),
+		'default' => '',
+		'helper'  => __( 'Main call in phone number for the Station (for requests etc.)', 'radio-station' ),
+		'tab'     => 'general',
+		'section' => 'broadcast',
+	),
+
+	// --- Phone for Shows ---
+	// 2.3.3.6: added default to station phone option
+	'shows_phone'		=> array(
+		'type'    => 'checkbox',
+		'default' => '',
+		'value'   => 'yes',
+		'label'   => __( 'Show Phone Display', 'radio-station' ),
+		'helper'  => __( 'Display Station phone number on Shows where a Show phone number is not set.', 'radio-station' ),
+		'tab'     => 'general',
+		'section' => 'broadcast',
+	),
+
 
 	// === Times ===
 
@@ -713,7 +740,7 @@ $options = array(
 		'tab'     => 'widgets',
 		'section' => 'loading',
 	),
-	
+
 	// --- Dynamic Reloading ---
 	'dynamic_reload' => array(
 		'type'    => 'checkbox',
@@ -933,14 +960,14 @@ function radio_station_check_version() {
 // -----------------
 // Plugin Activation
 // -----------------
-// (run on plugin activation, and thus also after a plugin update) 
+// (run on plugin activation, and thus also after a plugin update)
 // 2.2.8: fix for mismatched flag function name
 register_activation_hook( __FILE__, 'radio_station_plugin_activation' );
 function radio_station_plugin_activation() {
 	// --- flag to flush rewrite rules ---
 	// 2.2.3: added this for custom post types rewrite flushing
 	add_option( 'radio_station_flush_rewrite_rules', true );
-	
+
 	// --- clear schedule transients ---
 	// 2.3.3: added clear transients on (re)activation
 	delete_transient( 'radio_station_current_schedule' );
@@ -966,7 +993,7 @@ function radio_station_enqueue_scripts() {
 	// --- enqueue plugin script ---
 	// 2.3.0: added jquery dependency for inline script fragments
 	radio_station_enqueue_script( 'radio-station', array( 'jquery' ), true );
-	
+
 	// -- enqueue javascript timezone script ---
 	// $suffix = '.min';
 	// if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
@@ -988,14 +1015,14 @@ function radio_station_enqueue_script( $scriptkey, $deps = array(), $infooter = 
 	$template = radio_station_get_template( 'both', $filename, 'js' );
 	if ( $template ) {
 
-		// 2.3.2: use plugin version for releases 
+		// 2.3.2: use plugin version for releases
 		$plugin_version = radio_station_plugin_version();
 		if ( 5 == strlen( $plugin_version ) ) {
 			$version = $plugin_version;
 		} else {
 			$version = filemtime( $template['file'] );
 		}
-		
+
 		$url = $template['url'];
 
 		// --- enqueue script ---
@@ -1056,7 +1083,7 @@ function radio_station_localize_script() {
 	// --- set AJAX URL ---
 	// 2.3.2: add admin AJAX URL
 	$js .= "radio.ajax_url = '" . esc_url( admin_url( 'admin-ajax.php' ) ) . "';" . PHP_EOL;
-	
+
 	// --- clock time format ---
 	$clock_format = radio_station_get_setting( 'clock_time_format' );
 	$js .= "radio.clock_format = '" . esc_js( $clock_format ) . "';" . PHP_EOL;
@@ -1075,7 +1102,7 @@ function radio_station_localize_script() {
 	// --- radio timezone ---
 	// 2.3.2: added get timezone function
 	$timezone = radio_station_get_timezone();
-	
+
 	// if ( isset( $offset ) ) {
 	if ( stristr( $timezone, 'UTC' ) ) {
 
@@ -1116,13 +1143,13 @@ function radio_station_localize_script() {
 		$js .= "radio.timezone.utczone = false; ";
 
 	}
-	
+
 	if ( defined( 'RADIO_STATION_USE_SERVER_TIMES' ) && RADIO_STATION_USE_SERVER_TIMES ) {
 		$js .= "radio.timezone.adjusted = false; ";
 	} else {
 		$js .= "radio.timezone.adjusted = true; ";
 	}
-		
+
 	// --- set user timezone offset ---
 	// (and convert offset minutes to seconds)
 	$js .= "radio.timezone.useroffset = (new Date()).getTimezoneOffset() * 60;" . PHP_EOL;
@@ -1191,7 +1218,7 @@ function radio_station_localize_script() {
 // 2.3.2: added settings submenu page redirection fix
 add_action( 'init', 'radio_station_settings_page_redirect' );
 function radio_station_settings_page_redirect() {
-	
+
 	// --- bug out if not admin page ---
 	if ( !is_admin() ) {
 		return;
@@ -1204,8 +1231,8 @@ function radio_station_settings_page_redirect() {
 
 	// --- check if link is for options-general.php ---
 	if ( strstr( $_SERVER['REQUEST_URI'], '/options-general.php' ) ) {
-	
-		// --- redirect to plugin settings page (admin.php) ---	
+
+		// --- redirect to plugin settings page (admin.php) ---
 		$url = add_query_arg( 'page', 'radio-station', admin_url( 'admin.php' ) );
 		wp_redirect( $url );
 		exit;
@@ -1213,9 +1240,9 @@ function radio_station_settings_page_redirect() {
 }
 
 
-// -----------------
-// === Templates ===
-// -----------------
+// ------------------------
+// === Template Filters ===
+// ------------------------
 
 // ------------
 // Get Template
@@ -1305,15 +1332,34 @@ function radio_station_get_template( $type, $template, $paths = false ) {
 	return false;
 }
 
+// ---------------------------
+// Station Phone Number Filter
+// ---------------------------
+// 2.3.3.6: added to return station phone for all Shows (if not set for Show)
+add_filter( 'radio_station_show_phone', 'radio_station_phone_number', 10, 2 );
+function radio_station_phone_number( $phone, $post_id ) {
+	if ( $phone ) {
+		return $phone;
+	}
+	$shows_phone = radio_station_get_setting( 'shows_phone' );
+	if ( 'yes' == $shows_phone ) {
+		$phone = radio_station_get_setting( 'station_phone' );
+		return $phone;
+	}
+	return false;
+}
+
 // ------------------------------
 // Automatic Pages Content Filter
 // ------------------------------
 // 2.3.0: standalone filter for automatic page content
 // 2.3.1: re-add filter so the_content can be processed multuple times
-add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-function radio_station_automatic_pages_content( $content ) {
+// 2.3.3.6: set automatic content early and clear existing content
+add_filter( 'the_content', 'radio_station_automatic_pages_content_set', 1 );
+function radio_station_automatic_pages_content_set( $content ) {
 
-	// global $radio_station_data;
+	global $radio_station_data;
+
 	// if ( isset( $radio_station_data['doing_excerpt'] ) && $radio_station_data['doing_excerpt'] ) {
 	//	return $content;
 	// }
@@ -1334,11 +1380,6 @@ function radio_station_automatic_pages_content( $content ) {
 					}
 				}
 				$shortcode = '[master-schedule' . $atts_string . ']';
-				remove_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				$content = do_shortcode( $shortcode );
-				// 2.3.1: re-add filter so the_content may be processed multuple times
-				add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				return $content;
 			}
 		}
 	}
@@ -1361,11 +1402,6 @@ function radio_station_automatic_pages_content( $content ) {
 					}
 				}
 				$shortcode = '[shows-archive' . $atts_string . ']';
-				remove_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				$content = do_shortcode( $shortcode );
-				// 2.3.1: re-add filter so the_content may be processed multuple times
-				add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				return $content;
 			}
 		}
 	}
@@ -1388,11 +1424,6 @@ function radio_station_automatic_pages_content( $content ) {
 					}
 				}
 				$shortcode = '[overrides-archive' . $atts_string . ']';
-				remove_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				$content = do_shortcode( $shortcode );
-				// 2.3.1: re-add filter so the_content may be processed multuple times
-				add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				return $content;
 			}
 		}
 	}
@@ -1415,11 +1446,6 @@ function radio_station_automatic_pages_content( $content ) {
 					}
 				}
 				$shortcode = '[playlists-archive' . $atts_string . ']';
-				remove_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				$content = do_shortcode( $shortcode );
-				// 2.3.1: re-add filter so the_content may be processed multuple times
-				add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				return $content;
 			}
 		}
 	}
@@ -1442,17 +1468,38 @@ function radio_station_automatic_pages_content( $content ) {
 					}
 				}
 				$shortcode = '[genres-archive' . $atts_string. ']';
-				remove_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				$content = do_shortcode( $shortcode );
-				// 2.3.1: re-add filter so the_content may be processed multuple times
-				add_filter( 'the_content', 'radio_station_automatic_pages_content', 11 );
-				return $content;
 			}
 		}
 	}
 
+	// 2.3.3.6: moved out to reduce repetitive code
+	if ( isset( $shortcode ) ) {
+		remove_filter( 'the_content', 'radio_station_automatic_pages_content_set', 1 );
+		remove_filter( 'the_content', 'radio_station_automatic_pages_content_get', 11 );
+		$radio_station_data['automatic_content'] = do_shortcode( $shortcode );
+		// 2.3.1: re-add filter so the_content may be processed multuple times
+		add_filter( 'the_content', 'radio_station_automatic_pages_content_set', 1 );
+		add_filter( 'the_content', 'radio_station_automatic_pages_content_get', 11 );
+		// 2.3.3.6: clear existing content to allow for interim filters
+		$content = '';
+	}
+
 	return $content;
 }
+
+// ----------------------------------
+// Automatic Pages Content Set Filter
+// ----------------------------------
+// 2.3.3.6: append existing automatic page content to allow for interim filters
+add_filter( 'the_content', 'radio_station_automatic_pages_content_get', 11 );
+function radio_station_automatic_pages_content_get( $content ) {
+	global $radio_station_data;
+	if ( isset( $radio_station_data['automatic_content'] ) ) {
+		$content .= $radio_station_data['automatic_content'];
+	}
+	return $content;
+}
+
 
 // ------------------------------
 // Single Content Template Filter
@@ -1803,6 +1850,7 @@ function radio_station_post_type_archive_template( $archive_template, $type, $te
 // Add Links to Back to Show
 // -------------------------
 // 2.3.0: add links to show from show posts and playlists
+// 2.3.3.6: allow for multiple related show post assignments
 add_filter( 'the_content', 'radio_station_add_show_links', 20 );
 function radio_station_add_show_links( $content ) {
 
@@ -1811,57 +1859,84 @@ function radio_station_add_show_links( $content ) {
 	// note: playlists are linked via single-playlist-content.php template
 
 	// --- filter to allow related post types ---
-	$post_types = apply_filters( 'radio_station_show_related_post_types', array( 'post' ) );
-	
+	$post_types = array( 'post' );
+	$post_types = apply_filters( 'radio_station_show_related_post_types', $post_types );
+
 	if ( in_array( $post->post_type, $post_types ) ) {
 
 		// --- link show posts ---
-		$related_show = get_post_meta( $post->ID, 'post_showblog_id', true );
-		if ( $related_show ) {
-			$positions = array( 'after' );	
-			$positions = apply_filters( 'radio_station_link_to_show_positions', $positions, $post->post_type );
+		$related_shows = get_post_meta( $post->ID, 'post_showblog_id', true );
+		// 2.3.3.6: convert string value if not multiple
+		if ( $related_shows && !is_array( $related_shows ) ) {
+			$related_shows = array( $related_shows );
+		}
+		// 2.3.3.6: remove possible zero values
+		foreach ( $related_shows as $i => $related_show ) {
+			if ( 0 == $related_show ) {
+				unset( $related_shows[$i] );
+			}
+		}
+		if ( $related_shows && is_array( $related_shows ) && ( count( $related_shows ) > 0 ) ) {
+
+			$positions = array( 'after' );
+			$positions = apply_filters( 'radio_station_link_to_show_positions', $positions, $post->post_type, $post );
 			if ( $positions && is_array( $positions ) && ( count( $positions ) > 0 ) ) {
 				if ( in_array( 'before', $positions ) || in_array( 'after', $positions ) ) {
+
+					// --- set related shows link(s) ---
+					// 2.3.3.6: get all related show links
+					$show_links = '';
+					$hash_ref = '#show-' . str_replace( 'rs-', '', $post->post_type ) . 's';
+					foreach ( $related_shows as $related_show ) {
+						$show = get_post( $related_show );
+						$title = $show->post_title;
+						$permalink = get_permalink( $show->ID ) . $hash_ref;
+						if ( '' != $show_links ) {
+							$show_links .= ', ';
+						}
+						$show_links .= '<a href="' . esc_url( $permalink ) . '">' . esc_html( $title ) . '</a>';
+					}
+
+					// --- set post type labels ---
 					$before = $after = '';
-					$show = get_post( $related_show );
 					$post_type_object = get_post_type_object( $post->post_type );
 					$singular = $post_type_object->labels->singular_name;
 					$plural = $post_type_object->labels->name;
-					$permalink = get_permalink( $show->ID );
+
+					// --- before content links ---
 					if ( in_array( 'before', $positions ) ) {
-						$show_link_before = sprintf( __( '%s for Show', 'radio-station' ), $singular );
-						$show_link_before .= ': <a href="' . esc_url( $permalink ) . '">' . $show->post_title . '</a>';
-						$before = $show_link_before . '<br><br>';
-						$before = apply_filters( 'radio_station_link_to_show_before', $before, $post, $show );
+						if ( count( $related_shows ) > 1 ) {
+							$label = sprintf( __( '%s for Shows', 'radio-station' ), $singular );
+						} else {
+							$label = sprintf( __( '%s for Show', 'radio-station' ), $singular );
+						}
+						$before = $label . ': ' . $show_links . '<br><br>';
+						$before = apply_filters( 'radio_station_link_to_show_before', $before, $post, $related_shows );
 					}
+
+					// --- after content links ---
 					if ( in_array( 'after', $positions ) ) {
-						$post_type_sections = array( 'post' );
-						if ( defined( 'RADIO_STATION_EPISODE_SLUG' ) ) {
-							$post_type_sections[] = RADIO_STATION_EPISODE_SLUG;
+						if ( count( $related_shows ) > 1 ) {
+							$label = sprintf( __( 'More %s for Shows', 'radio-station' ), $plural );
+						} else {
+							$label = sprintf( __( 'More %s for Show', 'radio-station' ), $plural );
 						}
-						if ( in_array( $post->post_type, $post_type_sections ) ) {
-							$post_type_ref = '#show-' . str_replace( 'rs-', '', $post->post_type ) . 's';
-							$anchor = sprintf( __( 'All %s for Show %s', 'radio-station' ), $plural, $show->post_title );
-							$show_link_after = '<a href="' . esc_url( $permalink ) . $post_type_ref . '">&larr; ' . $anchor . '</a>';
-						}
-						if ( isset( $show_link_after ) ) {
-							$after = '<br>' . $show_link_after;
-						}
-						$after = apply_filters( 'radio_station_link_to_show_after', $after, $post, $show );
+						$after = '<br>' . $label . ': ' . $show_links;
+						$after = apply_filters( 'radio_station_link_to_show_after', $after, $post, $related_shows );
 					}
 					$content = $before . $content . $after;
 				}
 			}
-		
-			// --- adjacent post links debug test ---
-			if ( RADIO_STATION_DEBUG ) {
-				$content .= "Previous Link: " . get_previous_post_link() . "<br>";
-				$content .= "Next Link: " . get_next_post_link() . "<br>";
-			}
 		}
-		
-	} 
-	
+
+	}
+
+	// --- adjacent post links debug output ---
+	if ( RADIO_STATION_DEBUG ) {
+		$content .= '<span style="display:none;">Previous Post Link: ' . get_previous_post_link() . '</span>' . PHP_EOL;
+		$content .= '<span style="display:none;">Next Post Link: ' . get_next_post_link() . '</span>' . PHP_EOL;
+	}
+
 	return $content;
 }
 
@@ -1880,33 +1955,103 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 	$post_types = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG );
 	if ( in_array( $post->post_type, $post_types ) ) {
 		if ( RADIO_STATION_OVERRIDE_SLUG == $post->post_type ) {
-			// TODO: get next/previous for override time/date	
+			// 2.3.3.6: get next/previous Show for override date/time
+			$sched = get_post_meta( $post->ID, 'show_override_sched', true );
+			$override_start = $sched['date'] . ' ' . $sched['start_hour'] . ':' . $sched['start_min'] . ' ' . $sched['start_meridian'];
+			$time = radio_station_get_time( ( $override_start + 1 ) );
+			if ( 'next' == $adjacent ) {
+				$show = radio_station_get_next_show( $time );
+			} elseif ( 'previous' == $adjacent ) {
+				$show = radio_station_get_previous_show( $time );
+			}
 		} else {
-			$shifts = get_post_meta( $post->id, 'show_sched', true );
+			$shifts = get_post_meta( $post->ID, 'show_sched', true );
 			if ( $shifts && is_array( $shifts ) ) {
 				if ( count( $shifts ) < 1 ) {
-					// TODO: get the most recent show shift ?
+					// 2.3.3.6: default to standard adjacent post link
+					return $output;
 				}
 				if ( 1 == count( $shifts ) ) {
 					$shift = $shifts[0];
 					$shift_start = $shift['day'] . ' ' . $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
 					$time = radio_station_get_time( ( $shift_start + 1 ) );
 					if ( 'next' == $adjacent ) {
-						$rel = 'next';
 						$show = radio_station_get_next_show( $time );
 					} elseif ( 'previous' == $adjacent ) {
-						$rel = 'prev';
 						$show = radio_station_get_previous_show( $time );
 					}
 				} else {
-					// TODO: method for multiple shifts ?
-					return $output;
+					// 2.3.3.6: added method for Show with multiple shifts
+					$now = radio_station_get_now();
+					$show_shifts = radio_station_get_current_schedule();
+					if ( !$show_shifts ) {
+						return $output;
+					}
+
+					// --- get upcoming shift for Show ---
+					$next_shift = false;
+					foreach ( $show_shifts as $day => $day_shifts ) {
+						foreach ( $day_shifts as $day_shift ) {
+							if ( !$next_shift && ( $day_shift['show']['id'] == $post->ID ) ) {
+								if ( !isset( $last_shift ) ) {
+									$last_shift = $day_shift;
+								}
+								$start = $day_shift['date'] . ' ' . $day_shift['start'];
+								$start_time = radio_station_to_time( $start );
+								$end = $day_shift['date'] . ' ' . $day_shift['end'];
+								$end_time = radio_station_to_time( $end );
+								if ( ( $start_time > $now ) || ( $now < $end_time ) ) {
+									$next_shift = $day_shift;
+								}
+							}
+						}
+					}
+					if ( !$next_shift ) {
+						$next_shift = $last_shift;
+					}
+					// echo "Next Show Shift: " . print_r( $next_shift, true );
+
+					// --- reverse order for finding previous show shift ---
+					if ( 'previous' == $adjacent ) {
+						foreach ( $show_shifts as $day => $day_shifts ) {
+							$show_shifts[$day] = array_reverse( $day_shifts, true );
+						}
+						$show_shifts = array_reverse( $show_shifts, true );
+					}
+
+					// --- loop shifts to find adjacent shift's Show ---
+					$found = false;
+					foreach ( $show_shifts as $day => $day_shifts ) {
+						foreach ( $day_shifts as $day_shift ) {
+							if ( !isset( $first_shift ) && ( $day_shift['show']['id'] != $post->ID ) ) {
+								$first_shift = $day_shift;
+							}
+							// echo "Shift: " . print_r( $day_shift, true ) . PHP_EOL;
+							if ( !isset( $show ) ) {
+								if ( $found && ( $day_shift['show']['id'] != $post->ID ) ) {
+									$show = $day_shift['show'];
+								} elseif ( !$found ) {
+									if ( $next_shift == $day_shift ) {
+										$found = true;
+									}
+								}
+							}
+						}
+					}
+					if ( !isset( $show ) && isset( $first_shift ) ) {
+						$show = $first_shift['show'];
+					}
 				}
 			}
 		}
-		
-		// --- generate adjacent post link ---
+
+		// --- generate adjacent Show link ---
 		if ( isset( $show ) ) {
+			if ( 'next' == $adjacent ) {
+				$rel = 'next';
+			} elseif ( 'previous' == $adjacent ) {
+				$rel = 'prev';
+			}
 			$adjacent_post = get_post( $show['id'] );
 			$date = mysql2date( get_option( 'date_format' ), $adjacent_post->post_date );
 			$string = '<a href="' . esc_url( get_permalink( $adjacent_post ) ) . '" rel="' . esc_attr( $rel ) . '" title="' . $title . '">';
@@ -1920,87 +2065,137 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 	}
 
 	// --- filter to allow related post types ---
-	$show_post_types = apply_filters( 'radio_station_show_related_post_types', array( 'post' ) );
-	if ( in_array( $post->post_type, $show_post_types ) ) {
+	$related_post_types = array( 'post' );
+	$show_post_types = apply_filters( 'radio_station_show_related_post_types', $related_post_types );
+	if ( in_array( $post->post_type, $related_post_types ) ) {
 
 		// --- filter to allow disabling ---
 		$link_show_posts = apply_filters( 'radio_station_link_show_posts', true, $post );
 		if ( !$link_show_posts ) {
 			return $output;
 		}
-	
+
 		// --- get related show ---
-		$related_show = get_post_meta( $post->ID,  'post_showblog_id', true );
+		$related_show = get_post_meta( $post->ID, 'post_showblog_id', true );
 		if ( !$related_show ) {
+			return $output;
+		}
+		if ( is_array( $related_show ) ) {
+			$related_shows = $related_show;
+		} else {
+			$related_shows = array( $related_show );
+		}
+		// 2.3.3.6: remove possible saved zero value
+		foreach ( $related_shows as $i => $related_show ) {
+			if ( 0 == $related_show ) {
+				unset( $related_shows[$i] );
+			}
+		}
+		if ( 0 == count( $related_shows ) ) {
+			return $output;
+		}
+		if ( RADIO_STATION_DEBUG ) {
+			echo '<span style="display:none;">Related Shows A: ' . print_r( $related_shows, true ) . '</span>';
+		}
+
+		// --- get more Shows related to this related Post ---
+		// 2.3.3.6: allow for multiple related posts
+		global $wpdb;
+		$query = "SELECT post_id,meta_value FROM " . $wpdb->prefix . "postmeta"
+				. " WHERE meta_key = 'post_showblog_id' AND meta_value LIKE '%" . $related_shows[0] . "%'";
+		if ( count( $related_shows ) > 1 ) {
+			foreach ( $related_show as $i => $show_id ) {
+				if ( $i > 0 ) {
+					$query .= " OR meta_key = 'post_showblog_id' AND meta_value LIKE '%" . $show_id . "%'";
+				}
+			}
+		}
+		$results = $wpdb->get_results( $query, ARRAY_A );
+		if ( RADIO_STATION_DEBUG ) {
+			echo '<span style="display:none;">Related Shows B: ' . print_r( $results, true ) . '</span>';
+		}
+		if ( !$results || !is_array( $results ) || ( count( $results ) < 1 ) ) {
+			return $output;
+		}
+		$related_posts = array();
+		foreach ( $results as $result ) {
+			$values = maybe_unserialize( $result['meta_value'] );
+			if ( RADIO_STATION_DEBUG ) {
+				echo '<span style="display:none;">Post ' . $result['post_id'] . ' Related Show Values : ' . print_r( $values, true ) . '</span>';
+			}
+			// --- double check Show ID is actually a match ---
+			if ( ( $result['meta_value'] == $related_show ) || ( is_array( $values ) && array_intersect( $related_shows, $values ) ) ) {
+				// --- recheck post is of the same post type ---
+				$query = "SELECT post_type FROM " . $wpdb->prefix . "posts WHERE ID = %d";
+				$query = $wpdb->prepare( $query, $result['post_id'] );
+				$related_post_type = $wpdb->get_var( $query );
+				if ( $related_post_type == $post->post_type ) {
+					$related_posts[] = $result['post_id'];
+				}
+			}
+		}
+		if ( RADIO_STATION_DEBUG ) {
+			echo '<span style="display:none;">Related Posts B: ' . print_r( $related_posts, true ) . '</span>';
+		}
+		if ( 0 == count( $related_posts ) ) {
 			return $output;
 		}
 
 		// --- get adjacent post query ---
+		// 2.3.3.6: use post__in related post array instead of meta_query
 		$args = array(
-			'post_type'	=> $post->post_type,
-			'meta_query'	=> array(
-				array(
-					'key'		=> 'post_showblog_id',
-					'value'		=> $related_show,
-					'compare'	=> '=',
-				),
-			),
-			'order_by'	=> 'post_date',
+			'post_type'			  => $post->post_type,
+			'posts_per_page'	  => 1,
+			'orderby'             => 'post_modified',
+			'post__in'            => $related_posts,
+			'ignore_sticky_posts' => true,
 		);
 
-		// --- setup previous or next post ---
+		// --- setup for previous or next post ---
+		// 2.3.3.6: set date_query instead of meta_query
 		$post_type_object = get_post_type_object( $post->post_type );
 		if ( 'previous' == $adjacent ) {
-			$rel = 'prev';
 			$args['order'] = 'DESC';
-			$title = __( 'Previous Show', 'radio-station' ) . ' ' . $post_type_object->labels->singular_name;
-			$show_posts = get_posts( $args );
+			$args['date_query'] = array( array( 'before' => $post->post_date ) );
+			$rel = 'prev';
+			$title = __( 'Previous Related Show', 'radio-station' ) . ' ' . $post_type_object->labels->singular_name;
 		} elseif ( 'next' == $adjacent ) {
-			$rel = 'next';
 			$args['order'] = 'ASC';
-			$title = __( 'Next Show', 'radio-station' ) . ' ' . $post_type_object->labels->singular_name;
-			$show_posts = get_posts( $args );
+			$args['date_query'] = array( array( 'after' => $post->post_date ) );
+			$rel = 'next';
+			$title = __( 'Next Related Show', 'radio-station' ) . ' ' . $post_type_object->labels->singular_name;
 		}
 
-		// --- loop posts to get adjacent post ---
-		$found_current_post = $adjacent_post = false;
-		if ( $show_posts && is_array( $show_posts ) && ( count( $show_posts ) > 0 ) ) {
-			foreach ( $show_posts as $show_post ) {
-				if ( $found_current_post ) {
-					$related_id = get_post_meta( $show_post->ID, 'post_showblog_id', true );
-					// 2.3.3.4: handle possible multiple show post values
-					if ( ( is_array( $related_id ) && in_array( $related_show, $related_id ) )
-					  || ( !is_array( $related_id ) && ( $related_id == $related_show ) ) ) {
-						$adjacent_post = $show_post;
-						break;
-					}
-				}
-				if ( $show_post->ID == $post->ID ) {
-					$found_current_post = true;
-				}
-			}
-
-			if ( $adjacent_post ) {
-
-				// --- adjacent post title ---
-				$post_title = $adjacent_post->post_title;
-				if ( empty( $adjacent_post->post_title ) ) {
-					$post_title = $title;
-				}
-				$post_title = apply_filters( 'the_title', $post_title, $adjacent_post->ID );
-
-				// --- adjacent post link ---
-				// (from get_adjacent_post_link)
-				$date = mysql2date( get_option( 'date_format' ), $adjacent_post->post_date );
-				$string = '<a href="' . esc_url( get_permalink( $adjacent_post ) ) . '" rel="' . esc_attr( $rel ) . '" title="' . $title . '">';
-				$inlink = str_replace( '%title', $post_title, $link );
-				$inlink = str_replace( '%date', $date, $inlink );
-				$inlink = $string . $inlink . '</a>';
-				$output = str_replace( '%link', $inlink, $format );
-
-			}
-
+		// --- get the adjacent post ---
+		// 2.3.3.6: use date_query instead of looping posts
+		$show_posts = get_posts( $args );
+		if ( RADIO_STATION_DEBUG ) {
+			echo '<span style="display:none;">Related Posts Args: ' . print_r( $args, true ) . '</span>';
 		}
+		if ( 0 == count( $show_posts ) ) {
+			return $output;
+		}
+		$adjacent_post = $show_posts[0];
+		if ( RADIO_STATION_DEBUG ) {
+			echo '<span style="display:none;">Realted Adjacent Post: ' . print_r( $adjacent_post, true ) . '</span>';
+		}
+
+		// --- adjacent post title ---
+		$post_title = $adjacent_post->post_title;
+		if ( empty( $adjacent_post->post_title ) ) {
+			$post_title = $title;
+		}
+		$post_title = apply_filters( 'the_title', $post_title, $adjacent_post->ID );
+
+		// --- adjacent post link ---
+		// (from function get_adjacent_post_link)
+		$date = mysql2date( get_option( 'date_format' ), $adjacent_post->post_date );
+		$string = '<a href="' . esc_url( get_permalink( $adjacent_post ) ) . '" rel="' . esc_attr( $rel ) . '" title="' . esc_attr( $title ) . '">';
+		$inlink = str_replace( '%title', $post_title, $link );
+		$inlink = str_replace( '%date', $date, $inlink );
+		$inlink = $string . $inlink . '</a>';
+		$output = str_replace( '%link', $inlink, $format );
+
 	}
 
 	return $output;
@@ -2128,7 +2323,13 @@ function radio_station_set_roles() {
 	if ( !is_array( $role_caps ) ) {
 		$role_caps = array();
 	}
-	$producer_caps = array( 'edit_producers', 'edit_published_producers', 'delete_producers', 'read_producers', 'publish_producers' );
+	$producer_caps = array(
+		'edit_producers',
+		'edit_published_producers',
+		'delete_producers',
+		'read_producers',
+		'publish_producers',
+	);
 	foreach ( $producer_caps as $cap ) {
 		if ( !array_key_exists( $cap, $role_caps ) || !$role_caps[$cap] ) {
 			$wp_roles->add_cap( 'producer', $cap, true );
@@ -2317,23 +2518,39 @@ function radio_station_set_roles() {
 // maybe Revoke Edit Show Capability
 // ---------------------------------
 // (revoke ability to edit show if user is not assigned to it)
-add_filter( 'user_has_cap', 'radio_station_revoke_show_edit_cap', 10, 3 );
-function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args ) {
+add_filter( 'user_has_cap', 'radio_station_revoke_show_edit_cap', 10, 4 );
+function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args, $user ) {
 
 	global $post, $wp_roles;
 
+	// --- get the current user ---
+	// 2.3.3.6: get user object from fourth argument instead
+	// $user = wp_get_current_user();
+
 	// --- check if super admin ---
 	// ? fix to not revoke edit caps from super admin ?
-	// (not implemented, causing connection reset error)
+	// (not implemented, as causing a connection reset error)
 	// if ( function_exists( 'is_super_admin' ) && is_super_admin() ) {
 	//	return $allcaps;
 	// }
 
-	// --- get the current user ---
-	$user = wp_get_current_user();
+	// --- debug passed capability arguments ---
+	// TODO: get post object from args instead of global ?
+	if ( isset( $_REQUEST['cap-debug'] ) && ( '1' == $_REQUEST['cap-debug'] ) ) {
+		echo '<span style="display:none;">Cap Args: ' . print_r( $args, true ) . '</span>';
+	}
 
-	// --- get roles with publish shows capability ---
-	$edit_show_roles = array( 'administrator' );
+	// --- check for editor
+	// 2.3.3.6: check editor roles first separately
+	$editor_roles = array( 'administrator', 'editor', 'show-editor' );
+	foreach ( $editor_roles as $role ) {
+		if ( in_array( $role, $user->roles ) ) {
+			return $allcaps;
+		}
+	}
+
+	// --- get roles with edit shows capability ---
+	$edit_show_roles = $edit_others_shows_roles = array();
 	if ( isset( $wp_roles->roles ) && is_array( $wp_roles->roles ) ) {
 		foreach ( $wp_roles->roles as $name => $role ) {
 			// 2.3.0: fix to skip roles with no capabilities assigned
@@ -2345,12 +2562,24 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args ) {
 							$edit_show_roles[] = $name;
 						}
 					}
+					// 2.3.3.6: add check for edit-others_shows capability
+					if ( ( 'edit_others_shows' === $capname ) && (bool) $capstatus ) {
+						if ( !in_array( $name, $edit_others_shows_roles ) ) {
+							$edit_others_shows_roles[] = $name;
+						}
+					}
 				}
 			}
 		}
 	}
 
-	// --- check if current user has any of these roles ---
+	// 2.3.3.6: preserve if user has edit_others_shows capability
+	foreach ( $edit_others_shows_roles as $role ) {
+		if ( in_array( $role, $user->roles ) ) {
+			return $allcaps;
+		}
+	}
+
 	// 2.2.8: remove strict in_array checking
 	$found = false;
 	foreach ( $edit_show_roles as $role ) {
@@ -2359,7 +2588,9 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args ) {
 		}
 	}
 
-	if ( !$found ) {
+	// --- maybe revoked edit show capability for post ---
+	// 2.3.3.6: fix to incorrect logic for removing edit show capability
+	if ( $found ) {
 
 		// --- limit this to published shows ---
 		// 2.3.0: added object and property_exists check to be safe

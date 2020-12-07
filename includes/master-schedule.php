@@ -56,7 +56,7 @@ function radio_station_master_schedule( $atts ) {
 		'selector'          => 1,
 		'clock'             => $clock,
 		'timezone'			=> 1,
-	
+
 		// --- schedule display options ---
 		'time'              => $time_format,
 		'show_times'		=> 1,
@@ -70,7 +70,7 @@ function radio_station_master_schedule( $atts ) {
 		'divheight'         => 45,
 
 		// --- converted and deprecated ---
-		// 'list'              => 0, 
+		// 'list'              => 0,
 		// 'show_djs'          => 0,
 		// 'display_show_time' => 1,
 
@@ -107,7 +107,7 @@ function radio_station_master_schedule( $atts ) {
 
 	// --- merge attributes with defaults ---
 	$atts = shortcode_atts( $defaults, $atts, 'master-schedule' );
-		
+
 	// --- enqueue schedule stylesheet ---
 	// 2.3.0: use abstracted method for enqueueing widget styles
 	radio_station_enqueue_style( 'schedule' );
@@ -121,47 +121,53 @@ function radio_station_master_schedule( $atts ) {
 		$atts['clock'] = 0;
 	}
 
+	// 2.3.3.6: set new line for easier debug viewing
+	$newline = '';
+	if ( RADIO_STATION_DEBUG ) {
+		$newline = "\n";
+	}
+
 	// --- table for selector and clock  ---
 	// 2.3.0: moved out from templates to apply to all views
 	// 2.3.2: moved shortcode calls inside and added filters
-	$output .= '<div id="master-schedule-controls-wrapper">';
+	$output .= '<div id="master-schedule-controls-wrapper">' . $newline;
 
 		$controls = array();
-		
+
 		// --- display radio clock or timezone (or neither)
 		if ( $atts['clock'] ) {
 
 			// --- radio clock ---
-			$controls['clock'] = '<div id="master-schedule-clock-wrapper">';
+			$controls['clock'] = '<div id="master-schedule-clock-wrapper">' . $newline;
 			$clock_atts = apply_filters( 'radio_station_schedule_clock', array(), $atts );
 			$controls['clock'] .= radio_station_clock_shortcode( $clock_atts );
-			$controls['clock'] .= '</div>';
+			$controls['clock'] .= PHP_EOL . '</div>' . $newline;
 
 		} elseif ( $atts['timezone'] ) {
 
 			// --- radio timezone ---
-			$controls['timezone'] = '<div id="master-schedule-timezone-wrapper">';
+			$controls['timezone'] = '<div id="master-schedule-timezone-wrapper">' . $newline;
 			$timezone_atts = apply_filters( 'radio_station_schedule_clock', array(), $atts );
 			$controls['timezone'] .= radio_station_timezone_shortcode( $timezone_atts );
-			$controls['timezone'] .= '</div>';
+			$controls['timezone'] .= PHP_EOL . '</div>' . $newline;
 
 		}
 
 		// --- genre selector ---
 		if ( $atts['selector'] ) {
-			$controls['selector'] = '<div id="master-schedule-selector-wrapper">';
+			$controls['selector'] = '<div id="master-schedule-selector-wrapper">' . $newline;
 			$controls['selector'] .= radio_station_master_schedule_selector();
-			$controls['selector'] .= '</div>';
+			$controls['selector'] .= PHP_EOL . '</div>' . $newline;
 		}
 
 		// 2.3.1: add filters for control order
 		$control_order = array( 'clock', 'timezone', 'selector' );
 		$control_order = apply_filters( 'radio_station_schedule_control_order', $control_order, $atts );
-		
+
 		// 2.3.1: add filter for controls HTML
 		$controls = apply_filters( 'radio_station_schedule_controls', $controls, $atts );
 
-		// --- add ordered controls to output ---		
+		// --- add ordered controls to output ---
 		if ( is_array( $control_order ) && ( count( $control_order ) > 0 ) ) {
 			foreach ( $control_order as $control ) {
 				if ( isset( $controls[$control] ) && ( '' != $control ) ) {
@@ -169,8 +175,8 @@ function radio_station_master_schedule( $atts ) {
 				}
 			}
 		}
-	
-	$output .= '<br></div><br>';
+
+	$output .= '<br></div><br>' . $newline;
 
 	// --- schedule display override ---
 	// 2.3.1: add full schedule override filter
@@ -451,6 +457,7 @@ function radio_station_master_schedule_table_js() {
 	// 2.3.2: added current show highlighting cycle
 	// 2.3.2: fix to currenthour substr
 	// 2.3.3.5: change selected day and arrow logic (to single day shifting)
+	// 2.3.3.6: also highlight split shift via matching shift class
 	$js = "/* Initialize Table */
 	jQuery(document).ready(function() {
 		radio_table_responsive(false);
@@ -469,11 +476,10 @@ function radio_station_master_schedule_table_js() {
 		if (radio.timezone.adjusted) {radio.offset_time = radio.current_time;}
 		jQuery('.master-program-day').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
-			if (start < radio.offset_time) {
-				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
-				if (end > radio.offset_time) {jQuery(this).addClass('current-day');}
-				else {jQuery(this).removeClass('current-day');}
-			} else {jQuery(this).removeClass('current-day');}		
+			end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
+			if ( (start < radio.offset_time) && (end > radio.offset_time) ) {
+				jQuery(this).addClass('current-day');
+			} else {jQuery(this).removeClass('current-day');}
 		});
 		jQuery('.master-program-hour').each(function() {
 			hour = parseInt(jQuery(this).find('.master-program-server-hour').attr('data'));
@@ -484,22 +490,41 @@ function radio_station_master_schedule_table_js() {
 			if (hour == currenthour) {jQuery(this).addClass('current-hour');}
 			else {jQuery(this).removeClass('current-hour');}
 		});
-		jQuery('.master-show-entry').each(function() {
-			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
-			if (radio.debug) {console.log(start);}
-			if (start < radio.offset_time) {
-				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
-				if (end > radio.offset_time) {
-					jQuery(this).addClass('nowplaying');
-					if (radio.debug) {console.log('^^^^^^^');}
-				} else {jQuery(this).removeClass('nowplaying');}
-			} else {jQuery(this).removeClass('nowplaying');}
-		});
+		var radio_active_shift = false; var radio_table_current = false;
+		for (i = 0; i < 7; i++) {
+			jQuery('#master-program-schedule .day-'+i).each(function() {
+				jQuery(this).find('.master-show-entry').each(function() {
+					start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
+					end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
+					if (radio.debug) {console.log(start+' - '+end);}
+					if ( (start < radio.offset_time) && (end > radio.offset_time) ) {
+						if (radio.debug) {console.log('^ Now Playing ^');}
+						radio_table_current = true;
+						jQuery(this).removeClass('before-current').removeClass('after-current').addClass('nowplaying');
+						/* also highlight split shift via matching shift class */
+						if (jQuery(this).hasClass('overnight')) {
+							classes = jQuery(this).attr('class').split(/\s+/);
+							for (i = 0; i < classes.length; i++) {
+								if (classes[i].substr(0,6) == 'split-') {radio_active_shift = classes[i];}
+							}
+						}
+					} else {
+						jQuery(this).removeClass('nowplaying');
+						if (radio_table_current) {jQuery(this).removeClass('before-current').addClass('after-current');}
+						else {jQuery(this).addClass('before-current').removeClass('after-current');}
+					}
+					if (radio_active_shift) {
+						jQuery('.'+radio_active_shift).removeClass('before-current').removeClass('after-current').addClass('nowplaying');
+					}
+				});
+			});
+		}
+		if (!radio_table_current) {jQuery('.master-show-entry').removeClass('before-current');}
 	}
 
 	/* Make Table Responsive */
 	function radio_table_responsive(leftright) {
-		
+
 		fallback = -1; selected = -1; foundtab = false;
 		if (!leftright || (leftright == 'left')) {
 			if (jQuery('.master-program-day.first-column').length) {
@@ -518,7 +543,7 @@ function radio_station_master_schedule_table_js() {
 		if (selected < 0) {selected = fallback;}
 		if (radio.debug) {console.log('Current Column: '+selected);}
 
-		if (leftright == 'left') {selected--;} else if (leftright == 'right') {selected++;} 
+		if (leftright == 'left') {selected--;} else if (leftright == 'right') {selected++;}
 		if (selected < 0) {selected = 0;} else if (selected > 6) {selected = 6;}
 		if (!jQuery('.master-program-day.day-'+selected).length) {
 			while (!foundtab) {
@@ -572,13 +597,13 @@ function radio_station_master_schedule_table_js() {
 						jQuery('.master-program-day.day-'+i).addClass('first-column');
 						if (radio.debug) {console.log('Showing Tab '+i);}
 						columns++;
-					}						
+					}
 				}
-			}		
+			}
 		}
 		jQuery('#master-program-schedule').css('width','100%');
 	}
-	
+
 	/* Shift Day Left /  Right */
 	function radio_shift_day(leftright) {
 		radio_table_responsive(leftright); return false;
@@ -606,9 +631,11 @@ function radio_station_master_schedule_tabs_js() {
 	} else {
 		jQuery('.master-schedule-tabs-day').first().addClass('active-day-tab');
 		jQuery('.master-schedule-tabs-panel').first().addClass('active-day-panel');
-	} */	
+	} */
+
+	// 2.3.3.6: allow for clicking on date to change days
 	$js = "jQuery(document).ready(function() {
-		jQuery('.master-schedule-tabs-day-name').bind('click', function (event) {
+		jQuery('.master-schedule-tabs-day-name, .master-schedule-tabs-date').bind('click', function (event) {
 			headerID = jQuery(event.target).closest('li').attr('id');
 			panelID = headerID.replace('header', 'day');
 			jQuery('.master-schedule-tabs-day').removeClass('active-day-tab');
@@ -622,6 +649,7 @@ function radio_station_master_schedule_tabs_js() {
 	// 2.3.0: added for tabbed responsiveness
 	// 2.3.2: display selected day message if outside view
 	// 2.3.3.5: change selected day and arrow logic (to single day shifting)
+	// 2.3.3.6: also highlight split shift via matching shift class
 	$js .= "/* Initialize Tabs */
 	jQuery(document).ready(function() {
 		radio.schedule_tabinit = false;
@@ -640,7 +668,7 @@ function radio_station_master_schedule_tabs_js() {
 		jQuery('.master-schedule-tabs-panel').removeClass('active-day-panel');
 		if (!day) {
 			jQuery('.master-schedule-tabs-day').first().addClass('active-day-tab');
-			jQuery('.master-schedule-tabs-panel').first().addClass('active-day-panel');		
+			jQuery('.master-schedule-tabs-panel').first().addClass('active-day-panel');
 		} else {
 			jQuery('#master-schedule-tabs-header-'+day).addClass('active-day-tab');
 			jQuery('#master-schedule-tabs-day-'+day).addClass('active-day-panel');
@@ -656,28 +684,42 @@ function radio_station_master_schedule_tabs_js() {
 		if (radio.timezone.adjusted) {radio.offset_time = radio.current_time;}
 		jQuery('.master-schedule-tabs-day').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
-			if (start < radio.offset_time) {
-				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
-				if (end > radio.offset_time) {
-					jQuery(this).addClass('current-day');
-					day = jQuery(this).attr('id').replace('master-schedule-tabs-header-', '');
-					radio_set_active_tab(day);
-				} else {jQuery(this).removeClass('current-day');}
-			} else {jQuery(this).removeClass('current-day');}	
+			end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
+			if ( (start < radio.offset_time) && (end > radio.offset_time) ) {
+				jQuery(this).addClass('current-day');
+				day = jQuery(this).attr('id').replace('master-schedule-tabs-header-', '');
+				radio_set_active_tab(day);
+			} else {jQuery(this).removeClass('current-day');}
 		});
 		radio_set_active_tab(false); /* fallback */
+		var radio_active_split = false; var radio_tabs_current = false;
 		jQuery('.master-schedule-tabs-show').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
-			if (radio.debug) {console.log(start);}
-			if (start < radio.offset_time) {
-				if (radio.debug) {console.log('^^^^^^^');}
-				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
-				if (end > radio.offset_time) {jQuery(this).addClass('nowplaying');}
-				else {jQuery(this).removeClass('nowplaying');}
-			} else {jQuery(this).removeClass('nowplaying');}
+			end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
+			if (radio.debug) {console.log(start+' - '+end);}
+			if ( (start < radio.offset_time) && (end > radio.offset_time) ) {
+				radio_tabs_current = true;
+				if (radio.debug) {console.log('^ Now Playing ^');}
+				jQuery(this).removeClass('before-current').removeClass('after-current').addClass('nowplaying');
+				/* also highlight split shift via matching shift class */
+				if (jQuery(this).hasClass('overnight')) {
+					classes = jQuery(this).attr('class').split(/\s+/);
+					for (i = 0; i < classes.length; i++) {
+						if (classes[i].substr(0,6) == 'split-') {radio_active_split = classes[i];}
+					}
+				}
+			} else {
+				jQuery(this).removeClass('nowplaying');
+				if (radio_tabs_current) {jQuery(this).removeClass('before-current').addClass('after-current');}
+				else {jQuery(this).addClass('before-current').removeClass('after-current');}
+			}
 		});
+		if (radio_active_split) {
+			jQuery('.'+radio_active_split).removeClass('before-current').removeClass('after-current').addClass('nowplaying');
+		}
+		if (!radio_tabs_current) {jQuery('.master-schedule-tabs-show').removeClass('before-current');}
 	}
-	
+
 	/* Make Tabs Responsive */
 	function radio_tabs_responsive(leftright) {
 
@@ -698,7 +740,7 @@ function radio_station_master_schedule_tabs_js() {
 		}
 		if (selected < 0) {selected = fallback;}
 		if (radio.debug) {console.log('Current Tab: '+selected);}
-		
+
 		if (leftright == 'left') {selected--;} else if (leftright == 'right') {selected++;}
 		if (selected < 0) {selected = 0;} else if (selected > 6) {selected = 6;}
 		if (!jQuery('.master-schedule-tabs-day.day-'+selected).length) {
@@ -714,8 +756,8 @@ function radio_station_master_schedule_tabs_js() {
 		tabswidth = jQuery('#master-schedule-tabs').width();
 		jQuery('#master-schedule-tabs').css('width','auto');
 		jQuery('.master-schedule-tabs-day').removeClass('first-tab').removeClass('last-tab').hide();
-		
-		totalwidth = 0; tabs = 0; firsttab = -1; lasttab = 7; endtabs = false; 
+
+		totalwidth = 0; tabs = 0; firsttab = -1; lasttab = 7; endtabs = false;
 		for (i = selected; i < 7; i++) {
 			if (!endtabs && (jQuery('.master-schedule-tabs-day.day-'+i).length)) {
 				if ((i > 0) && (i == selected)) {jQuery('.master-schedule-tabs-day.day-'+i).addClass('first-tab'); firsttab = i;}
@@ -735,7 +777,7 @@ function radio_station_master_schedule_tabs_js() {
 					lasttab = i; tabs++;
 				}
 			}
-		}		
+		}
 		if (lasttab < 6) {jQuery('.master-schedule-tabs-day.day-'+lasttab).addClass('last-tab');}
 
 		if (leftright == 'right') {
@@ -754,14 +796,14 @@ function radio_station_master_schedule_tabs_js() {
 						jQuery('.master-schedule-tabs-day.day-'+i).addClass('first-tab');
 						if (radio.debug) {console.log('Showing Tab '+i);}
 						tabs++;
-					}						
+					}
 				}
-			}		
+			}
 		}
 		jQuery('#master-schedule-tabs').css('width','100%');
 
 		/* display selected day message if outside view */
-		activeday = false; 
+		activeday = false;
 		for (i = 0; i < 7; i++) {
 			if (jQuery('.master-schedule-tabs-day.day-'+i).length) {
 				if (jQuery('.master-schedule-tabs-day.day-'+i).hasClass('active-day-tab')) {activeday = i;}
@@ -770,7 +812,7 @@ function radio_station_master_schedule_tabs_js() {
 		jQuery('.master-schedule-tabs-selected').hide();
 		if ( activeday && ( (activeday > lasttab) || (activeday < firsttab ) ) ) {
 			jQuery('#master-schedule-tabs-selected-'+activeday).show();
-		}		
+		}
 
 		if (radio.debug) {
 			console.log('Active Day: '+activeday);
@@ -781,7 +823,7 @@ function radio_station_master_schedule_tabs_js() {
 			console.log('Visible Tabs: '+tabs);
 		}
 	}
-	
+
 	/* Shift Day Left /  Right */
 	function radio_shift_tab(leftright) {
 		radio_tabs_responsive(leftright);
@@ -800,6 +842,7 @@ function radio_station_master_schedule_tabs_js() {
 function radio_station_master_schedule_list_js() {
 
 	// --- list view javascript ---
+	// 2.3.3.6: also highlight split shift via matching shift class
 	$js = "/* Initialize List */
 	jQuery(document).ready(function() {
 		radio_list_highlight();
@@ -812,23 +855,38 @@ function radio_station_master_schedule_list_js() {
 		if (radio.timezone.adjusted) {radio.offset_time = radio.current_time;}
 		jQuery('.master-list-day').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').first().attr('data'));
-			if (start < radio.offset_time) {
-				end = parseInt(jQuery(this).find('.rs-end-time').first().attr('data'));
-				if (end > radio.offset_time) {jQuery(this).addClass('current-day');}
-				else {jQuery(this).removeClass('current-day');}
-			} else {jQuery(this).removeClass('current-day');}		
-		});		
+			end = parseInt(jQuery(this).find('.rs-end-time').first().attr('data'));
+			if ( (start < radio.offset_time) && (end > radio.offset_time) ) {
+				jQuery(this).addClass('current-day');
+			} else {jQuery(this).removeClass('current-day');}
+		});
+		var radio_active_list = false; var radio_list_current = false;
 		jQuery('.master-list-day-item').each(function() {
 			start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
-			if (start < radio.offset_time) {	
-				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
-				if (end > radio.offset_time) {jQuery(this).addClass('nowplaying');}
-				else {jQuery(this).removeClass('nowplaying');}
-			} else {jQuery(this).removeClass('nowplaying');}
+			end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
+			if ( (start < radio.offset_time) && (end > radio.offset_time) ) {
+				radio_list_current = true;
+				if (radio.debug) {console.log('^ Now Playing ^');}
+				jQuery(this).addClass('nowplaying');
+				/* also highlight split shift via matching shift class */
+				if (jQuery(this).hasClass('overnight')) {
+					classes = jQuery(this).attr('class').split(/\s+/);
+					for (i = 0; i < classes.length; i++) {
+						if (classes[i].substr(0,6) == 'split-') {radio_active_list = classes[i];}
+					}
+				}
+			} else {
+				jQuery(this).removeClass('nowplaying');
+				if (radio_list_current) {jQuery(this).removeClass('before-current').addClass('after-current');}
+				else {jQuery(this).addClass('before-current').removeClass('after-current');}
+			}
 		});
+		if (radio_active_list) {
+			jQuery('.'+radio_active_list).removeClass('before-current').removeClass('after-current').addClass('nowplaying');
+		}
+		if (!radio_list_current) {jQuery('.master-list-day-item').removeClass('before-current');}
 	}";
-	
+
 	// --- enqueue script inline ---
 	wp_add_inline_script( 'radio-station', $js );
-}	
-	
+}

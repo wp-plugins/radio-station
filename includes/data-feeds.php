@@ -187,15 +187,11 @@ function radio_station_get_broadcast_data() {
 
 	// --- get current show ---
 	$current_show = radio_station_get_current_show();
-	// print_r( $current_show );
 	$current_show = radio_station_convert_show_shift( $current_show );
-	// print_r( $current_show );
 
 	// --- get next show ---
 	$next_show = radio_station_get_next_show();
-	// print_r( $next_show );
 	$next_show = radio_station_convert_show_shift( $next_show );
-	// print_r( $next_show );
 
 	// 2.3.3.5: just in case transients are the same
 	if ( $current_show == $next_show ) {

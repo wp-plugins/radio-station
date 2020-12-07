@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="SPLITTER_PROPORTION" value="0.49312168" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f22f1cb0-661b-4f16-9ba1-ccc73e950d34" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings" doNotAsk="true" synchronizationState="SYNCHRONIZE">
+    <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
+    <execution>
+      <executable />
+    </execution>
+  </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="2.3.0" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="CSS File" />
+      </list>
+    </option>
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration">
+    <include_path>
+      <path value="C:/!WP/InstantWP_4.5/iwpserver/htdocs/wordpress" />
+      <path value="$PROJECT_DIR$/vendor/composer" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
+      <path value="$PROJECT_DIR$/vendor/symfony/yaml" />
+    </include_path>
+  </component>
+  <component name="ProjectId" id="1Um3whxM1WmlNIjXSNDHY4h3olj" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/css" />
+    <property name="list.type.of.created.stylesheet" value="CSS" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="web-ide.project.structure" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\!STAGING\radio-station\2.3.0\css" />
+      <recent name="C:\!STAGING\radio-station\features\countdown\includes" />
+      <recent name="C:\!STAGING\radio-station\pro\includes" />
+      <recent name="C:\!STAGING\radio-station\features\clock" />
+      <recent name="C:\!STAGING\radio-station\2.3.0\" />
+    </key>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f22f1cb0-661b-4f16-9ba1-ccc73e950d34" name="Default Changelist" comment="" />
+      <created>1575948187082</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1575948187082</updated>
+      <workItem from="1575948200480" duration="21755000" />
+      <workItem from="1576221693156" duration="7969000" />
+      <workItem from="1576444983357" duration="1412000" />
+      <workItem from="1576645886901" duration="31848000" />
+      <workItem from="1577096591952" duration="5676000" />
+      <workItem from="1577488658456" duration="10962000" />
+      <workItem from="1577580271432" duration="27641000" />
+      <workItem from="1578361919378" duration="46301000" />
+      <workItem from="1578818279000" duration="12471000" />
+      <workItem from="1578968265585" duration="10276000" />
+      <workItem from="1579105539846" duration="38773000" />
+      <workItem from="1579601194890" duration="76695000" />
+      <workItem from="1581419455651" duration="143000" />
+      <workItem from="1581420126359" duration="12752000" />
+      <workItem from="1583424666269" duration="583000" />
+      <workItem from="1584356055304" duration="7703000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="333" y="18" key="#Code_Folding" timestamp="1576758837753">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="333" y="18" key="#Code_Folding/201.0.1079.720@201.0.1079.720" timestamp="1576758837753" />
+    <state x="449" y="0" key="#PHP" timestamp="1575948372306">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="449" y="0" key="#PHP/201.0.1079.720@201.0.1079.720" timestamp="1575948372306" />
+    <state x="306" y="13" key="#PHP_CodeSniffer" timestamp="1576721727753">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="306" y="13" key="#PHP_CodeSniffer/201.0.1079.720@201.0.1079.720" timestamp="1576721727753" />
+    <state x="333" y="18" key="#Scopes" timestamp="1579069872524">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="333" y="18" key="#Scopes/201.0.1079.720@201.0.1079.720" timestamp="1579069872524" />
+    <state x="392" y="269" key="#WordPress" timestamp="1575948345369">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="392" y="269" key="#WordPress/201.0.1079.720@201.0.1079.720" timestamp="1575948345369" />
+    <state x="200" y="15" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1579069953255">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="200" y="15" key="#com.intellij.execution.impl.EditConfigurationsDialog/201.0.1079.720@201.0.1079.720" timestamp="1579069953255" />
+    <state x="421" y="96" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1581419480266">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="421" y="96" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/201.0.1079.720@201.0.1079.720" timestamp="1581419480266" />
+    <state x="471" y="107" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1579419646305">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="471" y="107" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/201.0.1079.720@201.0.1079.720" timestamp="1579419646305" />
+    <state x="499" y="230" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1584357007453">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="499" y="230" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/201.0.1079.720@201.0.1079.720" timestamp="1584357007453" />
+    <state x="521" y="101" key="FileChooserDialogImpl" timestamp="1580292734292">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="521" y="101" key="FileChooserDialogImpl/201.0.1079.720@201.0.1079.720" timestamp="1580292734292" />
+    <state x="576" y="283" key="NewPhpFileDialog" timestamp="1580986148384">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="576" y="283" key="NewPhpFileDialog/201.0.1079.720@201.0.1079.720" timestamp="1580986148384" />
+    <state x="227" y="0" key="SettingsEditor" timestamp="1579070156621">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="227" y="0" key="SettingsEditor/201.0.1079.720@201.0.1079.720" timestamp="1579070156621" />
+    <state x="442" y="183" key="com.intellij.ide.util.TipDialog" timestamp="1584356055475">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="442" y="183" key="com.intellij.ide.util.TipDialog/201.0.1079.720@201.0.1079.720" timestamp="1584356055475" />
+    <state x="401" y="0" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1581043081389">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="401" y="0" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/201.0.1079.720@201.0.1079.720" timestamp="1581043081389" />
+    <state x="293" y="93" width="894" height="535" key="dock-window-1" timestamp="1577698165971">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="293" y="93" width="894" height="535" key="dock-window-1/201.0.1079.720@201.0.1079.720" timestamp="1577698165971" />
+    <state x="264" y="6" width="612" height="714" key="find.popup" timestamp="1585321506105">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="264" y="6" width="612" height="714" key="find.popup/201.0.1079.720@201.0.1079.720" timestamp="1585321506105" />
+    <state x="397" y="155" key="run.anything.popup" timestamp="1580362000813">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="397" y="155" key="run.anything.popup/201.0.1079.720@201.0.1079.720" timestamp="1580362000813" />
+    <state x="403" y="41" width="672" height="678" key="search.everywhere.popup" timestamp="1584360506666">
+      <screen x="201" y="0" width="1079" height="720" />
+    </state>
+    <state x="403" y="41" width="672" height="678" key="search.everywhere.popup/201.0.1079.720@201.0.1079.720" timestamp="1584360506666" />
+  </component>
+  <component name="WordPressConfiguration" enabled="true">
+    <wordpressPath>C:\!WP\InstantWP_4.5\iwpserver\htdocs\wordpress</wordpressPath>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/radio-station.php</url>
+          <line>487</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
