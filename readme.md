@@ -189,6 +189,8 @@ You may translate the plugin into another language. Please visit our [WordPress 
 ## Upgrade Notices
 
 #### 2.3.3.6
+* Update: Freemius SDK (2.4.1)
+* Update: Plugin Loader (1.1.6) with phone number and CSV validation
 * Added: Station phone number setting with default display option
 * Added: Schedule classes for Shows before and after current Show
 * Improved: current Show highlighting on Schedule for overnight shifts
