@@ -39,6 +39,7 @@
 // - Get Show Avatar
 // === URL Functions ===
 // - Get Streaming URL
+// - Get Stream Formats
 // - Get Master Schedule Page URL
 // - Get Radio Station API URL
 // - Get Route URL
@@ -2962,6 +2963,38 @@ function radio_station_get_stream_url() {
 	$streaming_url = apply_filters( 'radio_station_stream_url', $streaming_url );
 
 	return $streaming_url;
+}
+
+// Get Stream Formats
+// ------------------
+// 2.3.3.7: added streaming format options
+function radio_station_get_stream_formats() {
+
+	// TODO: recheck amplitude formats ?
+	// [Amplitude] HTML5 Support - mp3, aac ...?
+	// ref: https://en.wikipedia.org/wiki/HTML5_audio#Supporting_browsers
+	// [JPlayer] Audio: mp3, m4a - Video: m4v
+	// +Audio: webma, oga, wav, fla, rtmpa +Video: webmv, ogv, flv, rtmpv
+	// [Howler] mp3, opus, ogg, wav, aac, m4a, mp4, webm
+	// +mpeg, oga, caf, weba, webm, dolby, flac
+	// [Media Elements] Audio: mp3, wma, wav +Video: mp4, ogg, webm, wmv
+
+	$formats = array(
+		'aac'	=> 'AAC (A/H)',
+		'mp3'	=> 'MP3 (A/J/H)',
+		'm4a'	=> 'M4A (J/H)',
+		'ogg'	=> 'OGG (H)',
+		'oga'	=> 'OGA (J/H)',
+		'webm'	=> 'WebM (J/H)',
+		'rtmpa' => 'RTMPA (J)',
+		'opus'  => 'OPUS (H)',
+		'wav'	=> 'WAV (J/H)',
+		'flac'	=> 'FLAC (J/H)',
+	);
+
+	// --- filter and return ---
+	$formats = apply_filters( 'radio_station_stream_formats', $formats );
+	return $formats;
 }
 
 // ---------------

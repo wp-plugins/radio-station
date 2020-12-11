@@ -7,6 +7,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### 2.3.3.7
+* Fixed: Bulk Edit field repetition and possible jQuery conflict
+* Fixed: Related Posts check producing error output
+* Fixed: WordPress Readme Parser deprecated errors for PHP7
+
 ### 2.3.3.6
 * Update: Freemius SDK (2.4.1)
 * Update: Plugin Loader (1.1.6) with phone number and CSV validation

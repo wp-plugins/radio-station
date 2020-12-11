@@ -184,6 +184,11 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 == Changelog ==
 
+= 2.3.3.7 =
+* Fixed: Bulk Edit field repetition and possible jQuery conflict
+* Fixed: Related Posts check producing error output
+* Fixed: WordPress Readme Parser deprecated errors for PHP7
+
 = 2.3.3.6 =
 * Update: Freemius SDK (2.4.1)
 * Update: Plugin Loader (1.1.6) with phone number and CSV validation
