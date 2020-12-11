@@ -12,7 +12,7 @@ Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 
 Requires at least: 3.3.1
 
-Tested up to: 5.3.2
+Tested up to: 5.6
 
 Stable tag: trunk
 
@@ -187,6 +187,13 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 
 ## Upgrade Notices
+
+#### 2.3.3.6
+* Updated Freemius SDK and Plugin Loader libraries
+* Added Station phone number setting with default display option
+* Added Schedule classes for Shows before and after current Show
+* Multiple Related Show Post assignment edit and link fixes
+* Bugfixes for permissions, main language and shift checker
 
 #### 2.3.3.5
 * Ability to assign Post to relate to multiple Shows
