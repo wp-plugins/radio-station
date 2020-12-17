@@ -556,7 +556,8 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 							'url'      => get_permalink( $override['ID'] ),
 							'split'    => false,
 						);
-						$override_list[$date][] = $override_data;
+						// 2.3.3.7: set array order by start time
+						$override_list[$date][$override_start_time] = $override_data;
 
 					} else {
 
@@ -573,7 +574,8 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 							'url'      => get_permalink( $override['ID'] ),
 							'split'    => true,
 						);
-						$override_list[$date][] = $override_data;
+						// 2.3.3.7: set array order by start time
+						$override_list[$date][$override_start_time] = $override_data;
 
 						// --- set the next day split shift ---
 						// note: these should not wrap around to start of week
@@ -595,10 +597,19 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 							'url'        => get_permalink( $override['ID'] ),
 							'split'      => true,
 						);
-						$override_list[$nextdate][] = $override_data;
+						// 2.3.3.7: set array order by start time
+						$override_list[$nextdate][$override_start_time] = $override_data;
 					}
 				}
 			}
+		}
+	}
+
+	// 2.3.3.7: reorder overrides by sequential times
+	if ( count( $override_list ) > 0 ) {
+		foreach ( $override_list as $day => $overrides ) {
+			ksort( $overrides );
+			$override_list[$day] = $overrides;
 		}
 	}
 
@@ -1088,7 +1099,8 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 		if ( isset( $_REQUEST['debug-day'] ) ) {
 			$debugday = $_REQUEST['debug-day'];
 		}
-		$done_overrides = array();
+		// 2.3.3.7: remove check if override already done
+		// $done_overrides = array();
 		if ( $override_list && is_array( $override_list ) && ( count( $override_list ) > 0 ) ) {
 			foreach ( $show_shifts as $day => $shifts ) {
 
@@ -1110,9 +1122,10 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 					if ( count( $overrides ) > 0 ) {
 						foreach ( $overrides as $i => $override ) {
 
-							// 2.3.1: added check if override already done
 							if ( $date == $override['date'] ) {
-								if ( !in_array( $override['date'] . '--' . $i, $done_overrides ) ) {
+								// 2.3.1: added check if override already done
+								// 2.3.3.7: remove check if override already done
+								// if ( !in_array( $override['date'] . '--' . $i, $done_overrides ) ) {
 
 									// 2.3.2: replace strtotime with to_time for timezones
 									// 2.3.2: fix to convert to 24 hour format first
@@ -1156,13 +1169,13 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 											if ( $override_start_time < $start_time ) {
 
 												// --- maybe add the override ---
-												if ( !in_array( $override['date'] . '--' . $i, $done_overrides ) ) {
-
+												// 2.3.3.7: remove check if override already done
+												// if ( !in_array( $override['date'] . '--' . $i, $done_overrides ) ) {
 													// 2.3.1: track done overrides
-													$done_overrides[] = $override['date'] . '--' . $i;
+													// 2.3.3.7: remove check if override already done
+													// $done_overrides[] = $override['date'] . '--' . $i;
 													$show_shifts[$day][$override['start']] = $override;
-
-												}
+												// }
 
 												// --- check when the shift ends ---
 												if ( ( $override_end_time > $end_time )
@@ -1179,7 +1192,8 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 
 												// --- same start so overwrite the existing shift ---
 												// 2.3.1: set override done instead of unsetting override
-												$done_overrides[] = $date . '--' . $i;
+												// 2.3.3.7: remove check if override already done
+												// $done_overrides[] = $date . '--' . $i;
 												$show_shifts[$day][$start] = $override;
 
 												// --- check if there is remainder of existing show ---
@@ -1207,7 +1221,8 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 												// --- add the override ---
 												$show_shifts[$day][$override['start']] = $override;
 												// 2.3.1: track done instead of unsetting
-												$done_overrides[] = $date . '--' . $i;
+												// 2.3.3.7: remove check if override already done
+												// $done_overrides[] = $date . '--' . $i;
 
 												// --- partial shift after override ----
 												if ( $override_end_time < $end_time ) {
@@ -1219,7 +1234,8 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 											}
 										}
 									}
-								}
+								// 2.3.3.7: remove check if override already done
+								// }
 							}
 						}
 					}
@@ -1257,10 +1273,11 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 				if ( count( $overrides ) > 0 ) {
 					foreach ( $overrides as $i => $override ) {
 						if ( $date == $override['date'] ) {
-							if ( !in_array( $date . '--' . $i, $done_overrides ) ) {
+							// 2.3.3.7: remove check if override already done
+							// if ( !in_array( $date . '--' . $i, $done_overrides ) ) {
 								$show_shifts[$day][$override['start']] = $override;
-								$done_overrides[] = $date . '--' . $i;
-							}
+								// $done_overrides[] = $date . '--' . $i;
+							// }
 						}
 					}
 				}

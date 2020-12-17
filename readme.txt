@@ -185,6 +185,7 @@ You may translate the plugin into another language. Please visit our [WordPress 
 == Changelog ==
 
 = 2.3.3.7 =
+* Fixed: Schedule Overrides overlapping multiple Show shifts
 * Fixed: Bulk Edit field repetition and possible jQuery conflict
 * Fixed: Related Posts check producing error output
 * Fixed: WordPress Readme Parser deprecated errors for PHP7
