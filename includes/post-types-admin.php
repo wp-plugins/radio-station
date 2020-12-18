@@ -1476,6 +1476,7 @@ function radio_station_posts_quick_edit_script( $hook ) {
 		return;
 	}
 
+	// 2.3.3.7: use jQuery instead of \$ for better compatibility
 	if ( !isset( $_GET['post_type'] ) || ( 'post' == $_GET['post_type'] ) ) {
 		$js = "(function($) {
 			var \$wp_inline_edit = inlineEditPost.edit;
@@ -1484,26 +1485,26 @@ function radio_station_posts_quick_edit_script( $hook ) {
 				var post_id = 0; var disabled_ids;
 				if (typeof(id) == 'object') {post_id = parseInt(this.getId(id));}
 				if (post_id > 0) {
-					var show_ids = \$('#post-'+post_id+' .column-show .show-ids').text();
+					var show_ids = jQuery('#post-'+post_id+' .column-show .show-ids').text();
 					if (show_ids != '') {
 						if (show_ids.indexOf(',') > -1) {ids = show_ids.split(',');}
 						else {ids = new Array(); ids[0] = show_ids;}
 						for (i = 0; i < ids.length; i++) {
 							var thisshowid = ids[i];
-							\$('#edit-'+post_id+' .select-show option').each(function() {
-								if (\$(this).val() == thisshowid) {\$(this).attr('selected','selected');}
+							jQuery('#edit-'+post_id+' .select-show option').each(function() {
+								if (jQuery(this).val() == thisshowid) {jQuery(this).attr('selected','selected');}
 							});
 						}
 						/* disable uneditable options */
-						disabled = \$('#post-'+post_id+' .column-show .disabled-ids').text();
+						disabled = jQuery('#post-'+post_id+' .column-show .disabled-ids').text();
 						if (disabled != '') {
 							if (disabled.indexOf(',') > -1) {disabled_ids = disabled.split(',');}
 							else {disabled_ids = new Array(); disabled_ids[0] = disabled;}
-							\$('#edit-'+post_id+' .select-show option').each(function() {
+							jQuery('#edit-'+post_id+' .select-show option').each(function() {
 								for (j = 0; j < disabled_ids.length; j++) {
-									if (\$(this).val() == disabled_ids[j]) {
-										\$(this).attr('disabled','disabled');
-										if (\$(this).attr('selected') == 'selected') {\$(this).addClass('pre-selected');}
+									if (jQuery(this).val() == disabled_ids[j]) {
+										jQuery(this).attr('disabled','disabled');
+										if (jQuery(this).attr('selected') == 'selected') {jQuery(this).addClass('pre-selected');}
 									}
 								}
 							});
@@ -1540,14 +1541,18 @@ function radio_station_show_posts_bulk_edit_script( $hook ) {
 		return;
 	}
 
+	// 2.3.3.7: use jQuery instead of \$ for better compatibility
+	// 2.3.3.7: do not reclone the show field if it already exists
 	if ( !isset( $_GET['post_type'] ) || ( 'post' == $_GET['post_type'] ) ) {
-		$js = "\$(document).ready(function() {
-			$('#bulk-action-selector-top, #bulk-action-selector-bottom').on('change', function(e) {
-				if ( \$(this).val() == 'related_show' ) {
+		$js = "jQuery(document).ready(function() {
+			jQuery('#bulk-action-selector-top, #bulk-action-selector-bottom').on('change', function(e) {
+				if (jQuery(this).val() == 'related_show') {
 					/* clone the Quick Edit fieldset to after bulk action selector */
-					\$('.related-show-field').first().clone().insertAfter(\$(this));
+					if (!jQuery(this).parent().find('.related-show-field').length) {
+						jQuery('.related-show-field').first().clone().insertAfter(jQuery(this));
+					}
 				} else {
-					\$(this).find('.related-show-field').remove();
+					jQuery(this).find('.related-show-field').remove();
 				}
 			});
 		});";

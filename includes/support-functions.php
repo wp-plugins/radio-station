@@ -39,6 +39,7 @@
 // - Get Show Avatar
 // === URL Functions ===
 // - Get Streaming URL
+// - Get Stream Formats
 // - Get Master Schedule Page URL
 // - Get Radio Station API URL
 // - Get Route URL
@@ -555,7 +556,8 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 							'url'      => get_permalink( $override['ID'] ),
 							'split'    => false,
 						);
-						$override_list[$date][] = $override_data;
+						// 2.3.3.7: set array order by start time
+						$override_list[$date][$override_start_time] = $override_data;
 
 					} else {
 
@@ -572,7 +574,8 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 							'url'      => get_permalink( $override['ID'] ),
 							'split'    => true,
 						);
-						$override_list[$date][] = $override_data;
+						// 2.3.3.7: set array order by start time
+						$override_list[$date][$override_start_time] = $override_data;
 
 						// --- set the next day split shift ---
 						// note: these should not wrap around to start of week
@@ -594,10 +597,19 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 							'url'        => get_permalink( $override['ID'] ),
 							'split'      => true,
 						);
-						$override_list[$nextdate][] = $override_data;
+						// 2.3.3.7: set array order by start time
+						$override_list[$nextdate][$override_start_time] = $override_data;
 					}
 				}
 			}
+		}
+	}
+
+	// 2.3.3.7: reorder overrides by sequential times
+	if ( count( $override_list ) > 0 ) {
+		foreach ( $override_list as $day => $overrides ) {
+			ksort( $overrides );
+			$override_list[$day] = $overrides;
 		}
 	}
 
@@ -1109,112 +1121,143 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 					if ( count( $overrides ) > 0 ) {
 						foreach ( $overrides as $i => $override ) {
 
-							// 2.3.1: added check if override already done
 							if ( $date == $override['date'] ) {
-								if ( !in_array( $override['date'] . '--' . $i, $done_overrides ) ) {
+								// 2.3.1: added check if override already done
+								// 2.3.2: replace strtotime with to_time for timezones
+								// 2.3.2: fix to convert to 24 hour format first
+								// 2.3.3.7: remove check if override already done from here
 
-									// 2.3.2: replace strtotime with to_time for timezones
-									// 2.3.2: fix to convert to 24 hour format first
-									$override_start = radio_station_convert_shift_time( $override['start'] );
-									$override_end = radio_station_convert_shift_time( $override['end'] );
-									$override_start_time = radio_station_to_time( $date . ' ' . $override_start );
-									$override_end_time = radio_station_to_time( $date . ' ' . $override_end );
-									if ( isset( $override['split'] ) && $override['split'] && ( '11:59:59 pm' == $override['end'] ) ) {
-										$override_end_time = $override_end_time + 1;
-									}
-									// 2.3.2: fix for non-split overrides ending on midnight
-									if ( $override_end_time < $override_start_time ) {
-										$override_end_time = $override_end_time + ( 24 * 60 * 60 );
-									}
+								$override_start = radio_station_convert_shift_time( $override['start'] );
+								$override_end = radio_station_convert_shift_time( $override['end'] );
+								$override_start_time = radio_station_to_time( $date . ' ' . $override_start );
+								$override_end_time = radio_station_to_time( $date . ' ' . $override_end );
+								if ( isset( $override['split'] ) && $override['split'] && ( '11:59:59 pm' == $override['end'] ) ) {
+									$override_end_time = $override_end_time + 1;
+								}
+								// 2.3.2: fix for non-split overrides ending on midnight
+								if ( $override_end_time < $override_start_time ) {
+									$override_end_time = $override_end_time + ( 24 * 60 * 60 );
+								}
 
-									// --- check for overlapped shift (if any) ---
-									// 2.3.1 added check for shift count
-									if ( count( $shifts ) > 0 ) {
-										foreach ( $shifts as $start => $shift ) {
+								// --- check for overlapped shift (if any) ---
+								// 2.3.1 added check for shift count
+								if ( count( $shifts ) > 0 ) {
+									// 2.3.3.7: change shifts variable in loop not just show_shifts
+									foreach ( $shifts as $start => $shift ) {
 
-											// 2.3.2: replace strtotime with to_time for timezones
-											// 2.3.2: fix to convert to 24 hour format first
-											$shift_start = radio_station_convert_shift_time( $shift['start'] );
-											$shift_end = radio_station_convert_shift_time( $shift['end'] );
-											$start_time = radio_station_to_time( $date . ' ' . $shift_start );
-											$end_time = radio_station_to_time( $date . ' ' . $shift_end );
-											if ( isset( $shift['split'] ) && $shift['split'] && ( '11:59:59 pm' == $shift['end'] ) ) {
-												$end_time = $end_time + 1;
+										// 2.3.2: replace strtotime with to_time for timezones
+										// 2.3.2: fix to convert to 24 hour format first
+										$shift_start = radio_station_convert_shift_time( $shift['start'] );
+										$shift_end = radio_station_convert_shift_time( $shift['end'] );
+										$start_time = radio_station_to_time( $date . ' ' . $shift_start );
+										$end_time = radio_station_to_time( $date . ' ' . $shift_end );
+										if ( isset( $shift['split'] ) && $shift['split'] && ( '11:59:59 pm' == $shift['end'] ) ) {
+											$end_time = $end_time + 1;
+										}
+										// 2.3.2: fix for non-split shifts ending on midnight
+										if ( $end_time < $start_time ) {
+											$end_time = $end_time + ( 24 * 60 * 60 );
+										}
+
+										if ( $day == $debugday ) {
+											$debugshifts .= $day . ' Show from ' . $shift['start'] . ': ' . $start_time . ' to ' . $shift['end'] . ': ' . $end_time . PHP_EOL;
+											$debugshifts .= $day . ' Override from ' . $override['start'] . ': ' . $override_start_time . ' to ' . $override['end'] . ': ' . $override_end_time . PHP_EOL;
+										}
+
+										// --- check if the override starts earlier than shift ---
+										if ( $override_start_time < $start_time ) {
+
+											// --- check when the shift ends ---
+											if ( ( $override_end_time > $end_time )
+											  || ( $override_end_time == $end_time ) ) {
+												// --- overlaps so remove shift ---
+												if ( $day == $debugday ) {
+													$debugshifts .= "Removed Shift: " . print_r( $shift, true ) . PHP_EOL;
+												}
+												unset( $show_shifts[$day][$start] );
+												unset( $shifts[$start] );
+											} elseif ( $override_end_time > $start_time ) {
+												// --- add trimmed shift remainder ---
+												if ( $day == $debugday ) {
+													$debugshifts .= "Trimmed Start of Shift to " . $override['end'] . ": " . print_r( $shift, true ) . PHP_EOL;
+												}
+												unset( $show_shifts[$day][$start] );
+												unset( $shifts[$start] );
+												$shift['start'] = $override['end'];
+												$shift['trimmed'] = 'start';
+												$shifts[$override['end']] = $shift;
+												$show_shifts[$day] = $shifts;
 											}
-											// 2.3.2: fix for non-split shifts ending on midnight
-											if ( $end_time < $start_time ) {
-												$end_time = $end_time + ( 24 * 60 * 60 );
+
+											// --- add the override if not already added ---
+											if ( !in_array( $override['date'] . '--' . $i, $done_overrides ) ) {
+												// 2.3.1: track done overrides
+												$done_overrides[] = $override['date'] . '--' . $i;
+												if ( $day == $debugday ) {
+													$debugshifts .= "Added Override: " . print_r( $override, true ) . PHP_EOL;
+												}
+												$shifts[$override['start']] = $override;
+												$show_shifts[$day] = $shifts;
 											}
 
-											if ( RADIO_STATION_DEBUG && ( $day == $debugday ) ) {
-												echo $shift['start'] . ': ' . $start_time . ' - ' . $shift['end'] . ': ' . $end_time . PHP_EOL;
-												echo $override['start'] . ': ' . $override_start_time . ' - ' . $override['end'] . ': ' . $override_end_time . PHP_EOL;
+										} elseif ( $override_start_time == $start_time ) {
+
+											// --- same start so overwrite the existing shift ---
+											// 2.3.1: set override done instead of unsetting override
+											// 2.3.3.7: remove check if override already done
+											// $done_overrides[] = $date . '--' . $i;
+											if ( $day == $debugday ) {
+												$debugshifts .= "Replaced Shift with Override: " . print_r( $show_shifts[$day][$start], true ) . PHP_EOL;
 											}
+											$shifts[$start] = $override;
+											$show_shifts[$day] = $shifts;
 
-											// --- check if the override starts earlier than shift ---
-											if ( $override_start_time < $start_time ) {
-
-												// --- maybe add the override ---
-												if ( !in_array( $override['date'] . '--' . $i, $done_overrides ) ) {
-
-													// 2.3.1: track done overrides
-													$done_overrides[] = $override['date'] . '--' . $i;
-													$show_shifts[$day][$override['start']] = $override;
-
+											// --- check if there is remainder of existing show ---
+											if ( $override_end_time < $end_time ) {
+												$shift['start'] = $override['end'];
+												$shift['trimmed'] = 'start';
+												$shifts[$override['end']] = $shift;
+												$show_shifts[$day] = $shifts;
+												if ( $day == $debugday ) {
+													$debugshifts .= "And trimmed Shift Start to " . $override['end'] . PHP_EOL;
 												}
+											}
+											// elseif ( $override_end_time == $end_time ) {
+												// --- remove exact override ---
+												// do nothing, already overridden
+											// }
 
-												// --- check when the shift ends ---
-												if ( ( $override_end_time > $end_time )
-												  || ( $override_end_time == $end_time ) ) {
-													unset( $show_shifts[$day][$start] );
-												} elseif ( $override_end_time > $start_time ) {
-													unset( $show_shifts[$day][$start] );
-													$shift['start'] = $override['end'];
-													$shift['trimmed'] = 'start';
-													$show_shifts[$day][$override['end']] = $shift;
+										} elseif ( ( $override_start_time > $start_time )
+												&& ( $override_start_time < $end_time ) ) {
+
+											$end = $shift['end'];
+
+											// --- partial shift before override ---
+											if ( $day == $debugday ) {
+												$debugshifts .= "Trimmed Shift End to " . $override['start'] . ": " . print_r( $shift, true ) . PHP_EOL;
+											}
+											$shift['start'] = $start;
+											$shift['end'] = $override['start'];
+											$shift['trimmed'] = 'end';
+											$shifts[$start] = $shift;
+											$show_shifts[$day] = $shifts;
+
+											// --- add the override ---
+											$show_shifts[$day][$override['start']] = $override;
+											// 2.3.1: track done instead of unsetting
+											// 2.3.3.7: remove check if override already done here
+											// $done_overrides[] = $date . '--' . $i;
+
+											// --- partial shift after override ----
+											if ( $override_end_time < $end_time ) {
+												if ( $day == $debugday ) {
+													$debugshifts .= "And added partial Shift after " . $override['end'] . ": " . print_r( $shift, true ) . PHP_EOL;
 												}
-
-											} elseif ( $override_start_time == $start_time ) {
-
-												// --- same start so overwrite the existing shift ---
-												// 2.3.1: set override done instead of unsetting override
-												$done_overrides[] = $date . '--' . $i;
-												$show_shifts[$day][$start] = $override;
-
-												// --- check if there is remainder of existing show ---
-												if ( $override_end_time < $end_time ) {
-													$shift['start'] = $override['end'];
-													$shift['trimmed'] = 'start';
-													$show_shifts[$day][$override['end']] = $shift;
-												}
-												// elseif ( $override_end_time == $end_time ) {
-													// --- remove exact override ---
-													// do nothing, already overridden
-												// }
-
-											} elseif ( ( $override_start_time > $start_time )
-													&& ( $override_start_time < $end_time ) ) {
-
-												$end = $shift['end'];
-
-												// --- partial shift before override ---
-												$shift['start'] = $start;
-												$shift['end'] = $override['start'];
-												$shift['trimmed'] = 'end';
-												$show_shifts[$day][$start] = $shift;
-
-												// --- add the override ---
-												$show_shifts[$day][$override['start']] = $override;
-												// 2.3.1: track done instead of unsetting
-												$done_overrides[] = $date . '--' . $i;
-
-												// --- partial shift after override ----
-												if ( $override_end_time < $end_time ) {
-													$shift['start'] = $override['end'];
-													$shift['end'] = $end;
-													$shift['trimmed'] = 'start';
-													$show_shifts[$day][$override['end']] = $shift;
-												}
+												$shift['start'] = $override['end'];
+												$shift['end'] = $end;
+												$shift['trimmed'] = 'start';
+												$shifts[$override['end']] = $shift;
+												$show_shifts[$day] = $shifts;
 											}
 										}
 									}
@@ -1246,6 +1289,9 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 				}
 
 				if ( RADIO_STATION_DEBUG ) {
+					if ( isset( $debugshifts ) ) {
+						echo "Day Debug: " . $debugshifts . PHP_EOL;
+					}
 					echo "Shift Keys: " . print_r( $keys, true ) . PHP_EOL;
 					echo "Sorted Keys: " . print_r( $shift_keys, true ) . PHP_EOL;
 					echo "Sorted Shifts: " . print_r( $new_shifts, true ) . PHP_EOL;
@@ -1256,10 +1302,11 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 				if ( count( $overrides ) > 0 ) {
 					foreach ( $overrides as $i => $override ) {
 						if ( $date == $override['date'] ) {
-							if ( !in_array( $date . '--' . $i, $done_overrides ) ) {
+							// 2.3.3.7: remove check if override already done
+							// if ( !in_array( $date . '--' . $i, $done_overrides ) ) {
 								$show_shifts[$day][$override['start']] = $override;
-								$done_overrides[] = $date . '--' . $i;
-							}
+								// $done_overrides[] = $date . '--' . $i;
+							// }
 						}
 					}
 				}
@@ -2962,6 +3009,38 @@ function radio_station_get_stream_url() {
 	$streaming_url = apply_filters( 'radio_station_stream_url', $streaming_url );
 
 	return $streaming_url;
+}
+
+// Get Stream Formats
+// ------------------
+// 2.3.3.7: added streaming format options
+function radio_station_get_stream_formats() {
+
+	// TODO: recheck amplitude formats ?
+	// [Amplitude] HTML5 Support - mp3, aac ...?
+	// ref: https://en.wikipedia.org/wiki/HTML5_audio#Supporting_browsers
+	// [JPlayer] Audio: mp3, m4a - Video: m4v
+	// +Audio: webma, oga, wav, fla, rtmpa +Video: webmv, ogv, flv, rtmpv
+	// [Howler] mp3, opus, ogg, wav, aac, m4a, mp4, webm
+	// +mpeg, oga, caf, weba, webm, dolby, flac
+	// [Media Elements] Audio: mp3, wma, wav +Video: mp4, ogg, webm, wmv
+
+	$formats = array(
+		'aac'	=> 'AAC (A/H)',
+		'mp3'	=> 'MP3 (A/J/H)',
+		'm4a'	=> 'M4A (J/H)',
+		'ogg'	=> 'OGG (H)',
+		'oga'	=> 'OGA (J/H)',
+		'webm'	=> 'WebM (J/H)',
+		'rtmpa' => 'RTMPA (J)',
+		'opus'  => 'OPUS (H)',
+		'wav'	=> 'WAV (J/H)',
+		'flac'	=> 'FLAC (J/H)',
+	);
+
+	// --- filter and return ---
+	$formats = apply_filters( 'radio_station_stream_formats', $formats );
+	return $formats;
 }
 
 // ---------------

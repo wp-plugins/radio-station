@@ -3,7 +3,7 @@ Contributors: tonyzeoli, majick
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
-Tested up to: 5.5.3
+Tested up to: 5.6
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -183,6 +183,12 @@ You may translate the plugin into another language. Please visit our [WordPress 
 8. Show Conflict Display
 
 == Changelog ==
+
+= 2.3.3.7 =
+* Fixed: Schedule Overrides overlapping multiple Show shifts
+* Fixed: Bulk Edit field repetition and possible jQuery conflict
+* Fixed: Related Posts check producing error output
+* Fixed: WordPress Readme Parser deprecated errors for PHP7
 
 = 2.3.3.6 =
 * Update: Freemius SDK (2.4.1)
