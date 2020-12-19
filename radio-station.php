@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.3.3.6
+Version: 2.3.3.7
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -162,6 +162,7 @@ foreach ( $features as $feature ) {
 // 2.3.0: added plugin options
 $timezones = radio_station_get_timezone_options( true );
 $languages = radio_station_get_language_options( true );
+$formats = radio_station_get_stream_formats();
 $options = array(
 
 	// === Broadcast ===
@@ -177,12 +178,12 @@ $options = array(
 		'section' => 'broadcast',
 	),
 
-	// --- Fallback Stream Format ---
-	// 'fallback_url' => array(
+	// --- Stream Format ---
+	// 'streaming_format' => array(
 	// 	'type'    => 'select',
-	// 	'options' => array( 'mp3', 'aac' ), // ...
+	// 	'options' => $formats,
 	// 	'label'   => __( 'Streaming Format', 'radio-station' ),
-	//	'default' => 'mp3',
+	//	'default' => 'aac',
 	// 	'helper'  => __( 'Select streaming fallback for streaming URL.', 'radio-station' ),
 	// 	'tab'     => 'general',
 	// 	'section' => 'broadcast',
@@ -200,11 +201,11 @@ $options = array(
 	// ),
 
 	// --- Fallback Stream Format ---
-	// 'fallback_url' => array(
+	// 'fallback_format' => array(
 	// 	'type'    => 'text',
-	// 	'options' => array( 'mp3', 'aac' ), // ...
+	// 	'options' => $formats,
 	// 	'label'   => __( 'Fallback Format', 'radio-station' ),
-	//	'default' => 'mp3',
+	//	'default' => 'oga',
 	// 	'helper'  => __( 'Select streaming fallback for fallback URL.', 'radio-station' ),
 	// 	'tab'     => 'general',
 	// 	'section' => 'broadcast',
@@ -1212,6 +1213,21 @@ function radio_station_localize_script() {
 
 }
 
+// -------------------------
+// Filter for Streaming Data
+// -------------------------
+// 2.3.3.7: added streaming data filter for player integration
+add_filter( 'radio_station_player_data', 'radio_station_streaming_data' );
+function radio_station_streaming_data( $data ) {
+	$data = array(
+		'url'		=> radio_station_get_stream_url(),
+		'format'	=> radio_station_get_setting( 'streaming_format' ),
+		'fallback'	=> radio_station_get_setting( 'fallback_url' ),
+		'fformat'	=> radio_station_get_setting( 'fallback_format' ),
+	);
+	return $data;
+}
+
 // -----------------------------------------
 // Fix to Redirect Plugin Settings Menu Link
 // -----------------------------------------
@@ -1871,9 +1887,12 @@ function radio_station_add_show_links( $content ) {
 			$related_shows = array( $related_shows );
 		}
 		// 2.3.3.6: remove possible zero values
-		foreach ( $related_shows as $i => $related_show ) {
-			if ( 0 == $related_show ) {
-				unset( $related_shows[$i] );
+		// 2.3.3.7: added count check for before looping
+		if ( $related_shows && ( count( $related_shows ) > 0 ) ) {
+			foreach ( $related_shows as $i => $related_show ) {
+				if ( 0 == $related_show ) {
+					unset( $related_shows[$i] );
+				}
 			}
 		}
 		if ( $related_shows && is_array( $related_shows ) && ( count( $related_shows ) > 0 ) ) {
