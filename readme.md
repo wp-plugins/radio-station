@@ -187,6 +187,8 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 
 ## Upgrade Notices
+#### 2.3.3.7
+* Various bug fixes. Please [view the Changelog](./CHANGELOG.md) for details.
 
 #### 2.3.3.6
 * Update: Freemius SDK (2.4.1)
