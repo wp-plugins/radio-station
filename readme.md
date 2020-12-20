@@ -189,29 +189,11 @@ You may translate the plugin into another language. Please visit our [WordPress 
 ## Upgrade Notices
 
 #### 2.3.3.6
-<<<<<<< HEAD
-* Update: Freemius SDK (2.4.1)
-* Update: Plugin Loader (1.1.6) with phone number and CSV validation
-* Added: Station phone number setting with default display option
-* Added: Schedule classes for Shows before and after current Show
-* Improved: current Show highlighting on Schedule for overnight shifts
-* Improved: info section reordering filters on single Show template
-* Fixed: Edit permissions checks for Related to Show post assignments
-* Fixed: Main Language option value for WordPress Setting
-* Fixed: make Date on Tab clickable on Tabbed Schedule View
-* Fixed: prevent possible conflicts with changes not saved reload message
-* Fixed: do not conflict check Shift against itself for last shift check
-* Fixed: link back to Show posts for related Show posts (allow multiple)
-* Fixed: filter next/previous post link for (multiple) related Show posts
-* Fixed: automatic pages conflict where themes filter the_content early
-
-=======
 * Updated Freemius SDK and Plugin Loader libraries
 * Added Station phone number setting with default display option
 * Added Schedule classes for Shows before and after current Show
 * Multiple Related Show Post assignment edit and link fixes
 * Bugfixes for permissions, main language and shift checker
->>>>>>> release/2.3.3.7
 
 #### 2.3.3.5
 * Ability to assign Post to relate to multiple Shows
