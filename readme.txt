@@ -12,7 +12,7 @@ Radio Station let's you build and manage a Show Schedule for a radio station or 
 
 == Description ==
 
-Radio Station by NetMix is a plugin to build and manage a Show Schedule for a radio station or internet broadcaster's WordPress website, including podcasters. It's functionality was originally based on Drupal 6's Station plugin, reworked for use in Wordpress and then extended.
+Radio Station by NetMix is a plugin to build and manage a Show Schedule for a radio station or internet broadcaster's WordPress website. If you're a podcaster with scheduled releases or a Clubhouse app moderator who schedule rooms, you could use this plugin to announce your schedule on your website. It's functionality was originally based on Drupal 6's Station plugin, reworked for use in Wordpress and then extended.
 
 The plugin adds a new "Show" post type, schedulable blocks of time that contain a Show description, a Show shifts repeater field, assignable images and other meta information. You can also create Playlists associated with those shows, or assign standard blog posts to relate to a Show. It also supports adding Schedule Overrides for specific dates and times, and adds the ability to associate users (given a role of "Host" or "Producer") to Shows, so they can be displayed for that Show and to give them edit access.
 
@@ -22,7 +22,7 @@ The plugin contains a widget to display the on-air Current Show linked to the Sh
 
 As there is a lot you can do with Radio Station, we've made an effort to provide complete [Radio Station Plugin Documentation](https://netmix.com/radio-station/docs/). You can also find a Quickstart Guide there, as well as in the section below. You can see some example displays from the plugin via the Screenshots section, and full live examples are available on the [Radio Station Plugin Demo Site](https://radiostationdemo.com).
 
-We are actively seeking Radio Station partners and supporters to fund further development of the free, open source version of this plugin via [Patreon](https://www.patreon.com/radiostation) and are also in the process of developing more exciting features and functionality for a future [Radio Station Pro](https://netmix.com/radio-station-pro/) upgrade.
+We are actively seeking Radio Station partners and supporters to fund further development of the free, open source version of this plugin via [Patreon](https://www.patreon.com/radiostation) and are also in the process of developing more exciting features and functionality for a future [Radio Station Pro](https://netmix.com/radio-station-pro/) upgrade. Enter your [email address on the Radio Station Pro website] (https://radiostation.pro) to add yourself to the cue to be able to download the be notified when PRO is released.
 
 = Updating from Prior to 2.3.0 =
 
@@ -66,7 +66,7 @@ This plugin is under active development and we are continuously working to enhan
 
 = Upgrading to Radio Station Pro =
 
-Love Radio Station and ready for more? As the free version develops, we have also been working hard to introduce new features to create a Professional version that will "level up" the plugin to make your Station's site even more useable and accessible for your listeners! [Click here to learn more about Radio Station Pro](https://netmix.com/radio-station-pro/).
+Love Radio Station and ready for more? As the free version develops, we have also been working hard to introduce new features to create a Professional version that will "level up" the plugin to make your Station's site even more useable and accessible for your listeners! [Click here to learn more about Radio Station Pro](https://netmix.com/radio-station-pro/). Add your email address at [RadioStation.pro](https://radiostation.pro) to get in the cue so you can receive an invite to download the release when it's ready.
 
 
 == Installation ==
@@ -171,6 +171,20 @@ Right now:
 = Can the plugin be translated into my language? =
 
 You may translate the plugin into another language. Please visit our [WordPress Translate project page](https://translate.wordpress.org/locale/en-gb/default/wp-plugins/radio-station/) for this plugin for further instruction. The `radio-station.pot` file is located in the `/languages` directory of the plugin. Please send the finished translation to `info@netmix.com`. We'd love to include it.
+
+= Can I use this plugin for Podcasts? =
+
+While the plugin is not specifically geared toward Podcasting, which is not live programming, some podcaster's have used Radio Station to let their subscribers know when they publish new shows.
+
+= Can I use this plugin for TWitchTV, Facebook Live, or Clubhouse shows? =
+
+Sure, there's no reason why you couldn't use the plugin to display a show schedule on a WordPress site for those services. Unfortunately, we are not currently syncing events from these platforms, but may do so in the future. While there may be APIs available from the larger services, Clubhouse does not yet have a public API, so scheduled rooms can't be automated to the Radio Station show scheduling system.
+
+= I use Google Calendar to print a show schedule online. Can I import/sync my Google Calendar with Radio Station? =
+
+We haven't built an interface between Google Calendar and Radio Station just yet, but it's on our radar to do so in the foreseeable future.
+
+
 
 == Screenshots ==
 1. Table Schedule View

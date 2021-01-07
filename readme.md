@@ -23,7 +23,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 ## Description
 
-Radio Station by NetMix is a plugin to build and manage a Show Schedule for a radio station or internet broadcaster's WordPress website, including podcasters. It's functionality was originally based on Drupal 6's Station plugin, reworked for use in Wordpress and then extended.
+Radio Station by NetMix is a plugin to build and manage a Show Schedule for a radio station or internet broadcaster's WordPress website. If you're a podcaster with scheduled releases or a Clubhouse app moderator who schedule rooms, you could use this plugin to announce your schedule on your website. It's functionality was originally based on Drupal 6's Station plugin, reworked for use in Wordpress and then extended.
 
 The plugin adds a new "Show" post type, schedulable blocks of time that contain a Show description, a Show shifts repeater field, assignable images and other meta information. You can also create Playlists associated with those shows, or assign standard blog posts to relate to a Show. It also supports adding Schedule Overrides for specific dates and times, and adds the ability to associate users (given a role of "Host" or "Producer") to Shows, so they can be displayed for that Show and to give them edit access.
 
@@ -77,7 +77,7 @@ This plugin is under active development and we are continuously working to enhan
 
 ### Upgrading to Radio Station Pro
 
-Love Radio Station and ready for more? As the free version develops, we have also been working hard to introduce new features to create a Professional version that will "level up" the plugin to make your Station's site even more useable and accessible for your listeners! [Click here to learn more about Radio Station Pro](https://netmix.com/radio-station-pro/).
+Love Radio Station and ready for more? As the free version develops, we have also been working hard to introduce new features to create a Professional version that will "level up" the plugin to make your Station's site even more useable and accessible for your listeners! [Click here to learn more about Radio Station Pro](https://netmix.com/radio-station-pro/). Add your email address at [RadioStation.pro](https://radiostation.pro) to get in the cue so you can receive an invite to download the release when it's ready.
 
 
 ## Installation
@@ -161,6 +161,18 @@ The only Hosts and Producers that can edit a show are the ones listed as being H
 #### I don't want to use Gravatar for my Host/Producer's image on their profile page.
 
 Then you'll need to install a plugin that lets you add a different image to your Host/Producer's user account and edit your author.php theme file accordingly.  That's a little out of the scope of this plugin. I recommend [Cimy User Extra Fields](http://wordpress.org/extend/plugins/cimy-user-extra-fields/)
+
+#### Can I use this plugin for Podcasts?
+
+While the plugin is not specifically geared toward Podcasting, which is not live programming, some podcaster's have used Radio Station to let their subscribers know when they publish new shows.
+
+#### Can I use this plugin for TWitchTV, Facebook Live, or Clubhouse shows?
+
+Sure, there's no reason why you couldn't use the plugin to display a show schedule on a WordPress site for those services. Unfortunately, we are not currently syncing events from these platforms, but may do so in the future. While there may be APIs available from the larger services, Clubhouse does not yet have a public API, so scheduled rooms can't be automated to the Radio Station show scheduling system.
+
+#### Can I use Google Calendar to print a show schedule online. Can I import/sync my Google Calendar with Radio Station?
+
+We haven't built an interface between Google Calendar and Radio Station just yet, but it's on our radar to do so in the foreseeable future.
 
 #### What languages other than English is the plugin available in?
 
