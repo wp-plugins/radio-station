@@ -2950,7 +2950,7 @@ function radio_station_show_images_metabox() {
 		/* Delete Image on Click */
 		deleteimagelink.on( 'click', function( event ) {
 			event.preventDefault();
-			agree = confirm('" . esc_js( __( 'Are you sure?', 'radio-station' ) ) . "');
+			agree = confirm('" . esc_js( $confirm_remove ) . "');
 			if (!agree) {return;}
 			parentdiv = jQuery(this).parent().parent();
 			parentdiv.find('.custom-image-container').html('');

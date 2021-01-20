@@ -198,6 +198,21 @@ We haven't built an interface between Google Calendar and Radio Station just yet
 
 == Changelog ==
 
+= 2.3.3.8 =
+* Update: Plugin Panel (1.1.7) with Image and Color Picker fields
+* Added: Stream Format and Fallback/Format selection setting
+* Added: Station Email Address setting with default display option
+* Added: Section order filtering for Master Schedule Views
+* Added: Section display filtering for Master Schedule Views
+* Added: Section display filtering for Widget sections
+* Added: Show image alignment attribute to Schedule Tabs View
+* Added: Show Description/Excerpt to Show Data Endpoint (via querystring)
+* Added: Reduced opacity for past Shows on Schedule Tab/Table Views
+* Fixed: Display Widget Countdown when no Current Show/Playlist
+* Fixed: Check for explicit singular.php template usage setting
+* Fixed: Access to Shows Data via querystring of Show ID/name
+* Fixed: Shows Data for Genres/Languages querystring of ID/name
+
 = 2.3.3.7 =
 * Fixed: Schedule Overrides overlapping multiple Show shifts
 * Fixed: Bulk Edit field repetition and possible jQuery conflict
@@ -349,7 +364,7 @@ We haven't built an interface between Google Calendar and Radio Station just yet
 * Fix to not 404 author pages for DJs without blog posts
 
 = 2.2.7 =
-* Dutch translation added (Thank you to AndrÃ© Dortmont for the file!)
+* Dutch translation added (Thank you to André Dortmont for the file!)
 * Added Tabbed Display for Master Schedule Shortcode (via Tutorial)
 * Add Show list columns with active, shift, DJs and show image displays
 * Add Schedule Override list columns with date sorting and filtering
@@ -643,6 +658,20 @@ We haven't built an interface between Google Calendar and Radio Station just yet
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.3.3.8 =
+* Updated Plugin Panel Library
+* Added Stream Format selection setting
+* Added Station email address setting with default display option
+* Added Section order filtering for Master Schedules and Widgets
+* Added Show image alignment attribute to Schedule Tabs View
+
+= 2.3.3.7 =
+* Updated Freemius SDK and Plugin Loader libraries
+* Added Station phone number setting with default display option
+* Added Schedule classes for Shows before and after current Show
+* Multiple Related Show Post assignment edit and link fixes
+* Bugfixes for permissions, main language and shift checker
 
 = 2.3.3.6 =
 * Updated Freemius SDK and Plugin Loader libraries

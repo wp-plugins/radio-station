@@ -67,7 +67,6 @@ function radio_station_master_schedule( $atts ) {
 		'display_day'		=> 'short',
 		'display_date'		=> 'jS',
 		'display_month'		=> 'short',
-		'divheight'         => 45,
 
 		// --- converted and deprecated ---
 		// 'list'              => 0,
@@ -91,17 +90,24 @@ function radio_station_master_schedule( $atts ) {
 		$views = explode( ',', $atts['view'] );
 		if ( ( 'tabs' == $atts['view'] ) || in_array( 'tabs', $views ) ) {
 			// 2.3.2: add show descriptions default for tabbed view
-			// 2.3.2: add display_ and display_date attributes
+			// 2.3.2: add display_day and display_date attributes
 			// 2.3.3: revert show description default for tabbed view
+			// 2.3.3.8: add default show image position (left aligned)
+			// 2.3.3.8: add default for hide past shows (false)
 			$defaults['show_image'] = 1;
 			$defaults['show_hosts'] = 1;
 			$defaults['show_genres'] = 1;
 			$defaults['display_day'] = 'full';
 			$defaults['display_date'] = false;
+			$defaults['image_position'] = 'left';
+			$defaults['hide_past_shows'] = false;
 		} elseif ( ( 'list' == $atts['view'] ) || in_array( 'list', $views ) ) {
 			// 2.3.2: add display date attribute
 			$defaults['show_genres'] = 1;
 			$defaults['display_date'] = false;
+		} elseif ( 'divs' == $atts['view'] ) {
+			// 2.3.3.8: moved divs view only default here
+			$defaults['divheight'] = 45;
 		}
 	}
 
@@ -181,9 +187,9 @@ function radio_station_master_schedule( $atts ) {
 	// --- schedule display override ---
 	// 2.3.1: add full schedule override filter
 	$override = apply_filters( 'radio_station_schedule_override', '', $atts );
-	if ( ( '' != $override ) && strstr( $override, '<!-- OVERRIDE -->' ) ) {
-		$override = str_replace( '<!-- OVERRIDE -->', '', $override );
-		return $output . $override;
+	if ( ( '' != $override ) && strstr( $override, '<!-- SCHEDULE OVERRIDE -->' ) ) {
+		$override = str_replace( '<!-- SCHEDULE OVERRIDE -->', '', $override );
+		return $override;
 	}
 
 	// -------------------------
@@ -221,6 +227,7 @@ function radio_station_master_schedule( $atts ) {
 	// ----------------------
 	// Legacy Master Schedule
 	// ----------------------
+	// note: Legacy and Divs Views do not include Schedule Overrides
 
 	global $wpdb;
 
@@ -496,7 +503,7 @@ function radio_station_master_schedule_table_js() {
 				jQuery(this).find('.master-show-entry').each(function() {
 					start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
 					end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
-					if (radio.debug) {console.log(start+' - '+end);}
+					if (radio.debug) {console.log(jQuery(this)); console.log(start+' - '+end);}
 					if ( (start < radio.offset_time) && (end > radio.offset_time) ) {
 						if (radio.debug) {console.log('^ Now Playing ^');}
 						radio_table_current = true;
@@ -510,11 +517,17 @@ function radio_station_master_schedule_table_js() {
 						}
 					} else {
 						jQuery(this).removeClass('nowplaying');
-						if (radio_table_current) {jQuery(this).removeClass('before-current').addClass('after-current');}
-						else {jQuery(this).addClass('before-current').removeClass('after-current');}
+						if (radio_table_current) {
+							jQuery(this).removeClass('before-current').addClass('after-current');
+							if (radio.debug) {console.log('^ Adding Before Current Class');}
+						} else {
+							jQuery(this).addClass('before-current').removeClass('after-current');
+							if (radio.debug) {console.log('^ Adding After Current Class');}
+						}
 					}
 					if (radio_active_shift) {
 						jQuery('.'+radio_active_shift).removeClass('before-current').removeClass('after-current').addClass('nowplaying');
+						if (radio.debug) {console.log('^ Adding Now Playing Class');}
 					}
 				});
 			});

@@ -22,7 +22,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 	public function form( $instance ) {
 
 		$instance = wp_parse_args( (array) $instance, array( 'title' => '' ) );
-		
+
 		// 2.3.3: set time format default to empty (plugin setting)
 		$title = $instance['title'];
 		$display_djs = isset( $instance['display_djs'] ) ? $instance['display_djs'] : false;
@@ -39,6 +39,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		$title_position = isset( $instance['title_position'] ) ? $instance['title_position'] : 'right';
 		$avatar_width = isset( $instance['avatar_width'] ) ? $instance['avatar_width'] : '75';
 		$link_djs = isset( $instance['link_djs'] ) ? $instance['link_djs'] : '';
+		$show_encore = isset( $instance['show_encore'] ) ? $instance['show_encore'] : true;
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : '';
 		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : '';
 
@@ -55,7 +56,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 				' . esc_html( __( 'AJAX Load Widget?', 'radio-station' ) ) . '
 			</label>
         </p>
-        
+
         <p>
 			<label for="' . esc_attr( $this->get_field_id( 'title' ) ) . '">
 				' . esc_html( __( 'Title', 'radio-station' ) ) . ':
@@ -151,7 +152,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			<br />
 			<small>' . esc_html( __( 'Choose time format for displayed schedules.', 'radio-station' ) ) . '	</small>
 		</p>
-		
+
 		<p>
 			<label for="' . esc_attr( $this->get_field_id( 'countdown' ) ) . '">
 			<input id="' .esc_attr( $this->get_field_id( 'countdown' ) ) . '" name="' . esc_attr( $this->get_field_name( 'countdown' ) ) . '" type="checkbox" ' . checked( $countdown, true, false ) . '/>
@@ -168,7 +169,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 	public function update( $new_instance, $old_instance ) {
 
 		$instance = $old_instance;
-		
+
 		$instance['title'] = $new_instance['title'];
 		$instance['display_djs'] = isset( $new_instance['display_djs'] ) ? 1 : 0;
 		$instance['djavatar'] = isset( $new_instance['djavatar'] ) ? 1 : 0;
@@ -184,6 +185,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		$instance['title_position'] = $new_instance['title_position'];
 		$instance['avatar_width'] = $new_instance['avatar_width'];
 		$instance['link_djs'] = isset( $new_instance['link_djs'] ) ? 1 : 0;
+		$instance['show_encore'] = isset( $new_instance['show_encore'] ) ? 1 : 0;
 		$instance['countdown'] = isset( $new_instance['countdown'] ) ? 1 : 0;
 		$instance['ajax'] = isset( $new_instance['ajax'] ) ? $new_instance['ajax'] : 0;
 
@@ -222,6 +224,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		$position = empty( $instance['title_position'] ) ? 'right' : $instance['title_position'];
 		$width = empty( $instance['avatar_width'] ) ? '75' : $instance['avatar_width'];
 		$link_djs = isset( $instance['link_djs'] ) ? $instance['link_djs'] : '';
+		$encore = isset( $instance['encore'] ) ? $instnace['encore'] : 0;
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : 0;
 		$dynamic = isset( $instance['dynamic'] ) ? $instance['dynamic'] : 0;
 		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : 0;
@@ -245,6 +248,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			'title_position' => $position,
 			'avatar_width'   => $width,
 			'link_djs'       => $link_djs,
+			'show_encore'    => $encore,
 			'countdown'      => $countdown,
 			'dynamic'        => $dynamic,
 			'widget'         => 1,

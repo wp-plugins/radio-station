@@ -41,7 +41,9 @@ The following attributes are available for the shortcode:
 * *display_day* : Full or short day heading ('full' or 'short') Default short for Table, full for Tabs/List.
 * *display_date* : Date format for date subheading. 0 for none. Default 'jS' for Table/List, 0 for Tabs.
 * *display_month* : Full or short month subheading ('full', 'short') Default 'short'.
-* *divheight* : Set the height, in pixels, of the individual divs. For 'divs' view only. Default 45.
+* *image_position* : Show image position for Tabs view. 'right', 'left' or 'alternate'. Default 'left'.
+* *hide_past_shows* : Hide shows that are finished in the Schedule for Tabs view. 0 or 1. Default 0.
+* *divheight* : Set the height, in pixels, of the individual divs. For legacy 'divs' view only. Default 45.
 
 Example: Display the schedule in 24-hour time format, use `[master-schedule time="24"]`.  
 

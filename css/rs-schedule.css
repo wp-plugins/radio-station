@@ -191,7 +191,11 @@
 	border: 1px dashed orange;
 	background-color: rgba(235,235,0,0.4);
 }
-  
+
+#master-program-schedule .master-show-entry.before-current {
+	opacity: 0.8;
+}
+
 #master-program-schedule span.show-title,
 #master-program-schedule span.show-file,
 #master-program-schedule span.show-time,
@@ -336,14 +340,18 @@
 }
 
 #master-schedule-tabs .master-schedule-tabs-day.active-day-tab .master-schedule-tab-bottom {
-    position: absolute;
-    display: block;
+	position: absolute;
+	display: block;
 	bottom: 0;
-    height: 1px;
-    width: 100%;
-    background-color: #FFF;
-    margin-bottom: -1px;
-    z-index: 999;
+	height: 1px;
+	width: 100%;
+	background-color: #FFF;
+	margin-bottom: -1px;
+	z-index: 999;
+}
+
+#master-schedule-tab-panels {
+	min-width: 300px;
 }
 
 #master-schedule-tab-panels .master-schedule-tabs-selected {
@@ -394,6 +402,14 @@
 	border-radius: 0 7px 7px 7px;
 }
 
+#master-schedule-tab-panels .master-schedule-tabs-show.before-current {
+	opacity: 0.8;
+}
+
+#master-schedule-tab-panels.hide-past-shows .master-show-entry.before-current {
+	display: none;
+}
+
 #master-schedule-tab-panels .master-schedule-tabs-show .show-info,
 #master-schedule-tab-panels .master-schedule-tabs-show .show-image,
 #master-schedule-tab-panels .master-schedule-tabs-show .show-desc {
@@ -408,8 +424,25 @@
 	text-align: center;
 }
 
+#master-schedule-tab-panels .master-schedule-tabs-show .show-image.right-image {
+	margin-right: 0;
+	margin-left: 10px;
+}
+
 #master-schedule-tab-panels .master-schedule-tabs-show .show-info {
+	min-width: 260px;
+}
+
+#master-schedule-tab-panels .master-schedule-tabs-show .show-info.has-show-desc {
 	width: 260px;
+}
+
+#master-schedule-tab-panels .master-schedule-tabs-show .show-info.left-image {
+	text-align: left;
+}
+
+#master-schedule-tab-panels .master-schedule-tabs-show .show-info.right-image {
+	text-align: right;
 }
 
 #master-schedule-tab-panels .master-schedule-tabs-show .show-desc {
@@ -495,4 +528,19 @@
 	position: absolute;
 	width: 50px;
 	z-index: 5;
+}
+
+/* Media Queries */
+@media screen and (max-width: 782px) {
+ #master-schedule-tab-panels .master-schedule-tabs-show .show-image {width: 120px;}
+}
+
+@media screen and (max-width: 599px) {
+ #master-program-schedule .show-image,
+ #master-schedule-tab-panels .master-schedule-tabs-show .show-image {width: 90px;}
+ #master-program-schedule #master-program-hour-heading, #master-program-schedule .master-program-hour-row {width: 75px;}
+}
+
+@media screen and (max-width: 299px) {
+ #master-program-schedule #master-program-hour-heading, #master-program-schedule .master-program-hour-row {width: 50px;}
 }

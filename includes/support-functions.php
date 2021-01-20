@@ -923,6 +923,35 @@ function radio_station_get_show_data_meta( $show, $single = false ) {
 	return $show_data;
 }
 
+// --------------------
+// Get Show Description
+// --------------------
+// 2.3.3.8: added for show data API feed
+function radio_station_get_show_description( $show_data ) {
+
+	// --- get description and excerpt ---
+	$show_id = $show_data['id'];
+	$show_post = get_post( $show_id );
+	$description = $show_post->post_content;
+	if ( !empty( $show_post->post_excerpt ) ) {
+		$excerpt = $show_post->post_excerpt;
+	} else {
+		$length = apply_filters( 'radio_station_show_data_excerpt_length', false );
+		$more = apply_filters( 'radio_station_show_data_excerpt_more', '' );
+		$excerpt = radio_station_trim_excerpt( $description, $length, $more, false );
+	}
+
+	// --- filter description and excerpt ---
+	$description = apply_filters( 'radio_station_show_data_description', $description, $show_id );
+	$excerpt = apply_filters( 'radio_station_show_data_excerpt', $excerpt, $show_id );
+
+	// --- add to existing show data ---
+	$show_data['description'] = $description;
+	$show_data['excerpt'] = $excerpt;
+
+	return $show_data;
+}
+
 // ----------------------
 // Get Override Data Meta
 // ----------------------
@@ -2018,17 +2047,22 @@ function radio_station_get_show_playlists( $show_id = false, $args = array() ) {
 // ---------
 // 2.3.0: added genre data grabber
 function radio_station_get_genre( $genre ) {
-	$term = get_term_by( 'slug', $genre, RADIO_STATION_GENRES_SLUG );
-	if ( !$term ) {
-		$term = get_term_by( 'name', $genre, RADIO_STATION_GENRES_SLUG );
-	}
-	if ( !$term ) {
+	// 2.3.3.8: explicitly check for numberic genre term ID
+	$id = absint( $genre );
+	if ( $id < 1 ) {
+		// $genre = sanitize_title( $genre );
+		$term = get_term_by( 'slug', $genre, RADIO_STATION_GENRES_SLUG );
+		if ( !$term ) {
+			$term = get_term_by( 'name', $genre, RADIO_STATION_GENRES_SLUG );
+		}
+	} else {
 		$term = get_term_by( 'id', $genre, RADIO_STATION_GENRES_SLUG );
 	}
 	if ( !$term ) {
 		return false;
 	}
-	$genre[$term->name] = array(
+	$genre_data = array();
+	$genre_data[$term->name] = array(
 		'id'            => $term->term_id,
 		'name'          => $term->name,
 		'slug'          => $term->slug,
@@ -2036,7 +2070,7 @@ function radio_station_get_genre( $genre ) {
 		'url'           => get_term_link( $term, RADIO_STATION_GENRES_SLUG ),
 	);
 
-	return $genre;
+	return $genre_data;
 }
 
 // ----------
@@ -3019,23 +3053,20 @@ function radio_station_get_stream_formats() {
 	// TODO: recheck amplitude formats ?
 	// [Amplitude] HTML5 Support - mp3, aac ...?
 	// ref: https://en.wikipedia.org/wiki/HTML5_audio#Supporting_browsers
-	// [JPlayer] Audio: mp3, m4a - Video: m4v
-	// +Audio: webma, oga, wav, fla, rtmpa +Video: webmv, ogv, flv, rtmpv
 	// [Howler] mp3, opus, ogg, wav, aac, m4a, mp4, webm
 	// +mpeg, oga, caf, weba, webm, dolby, flac
+	// [JPlayer] Audio: mp3, m4a - Video: m4v
+	// +Audio: webma, oga, wav, fla, rtmpa +Video: webmv, ogv, flv, rtmpv
 	// [Media Elements] Audio: mp3, wma, wav +Video: mp4, ogg, webm, wmv
 
 	$formats = array(
-		'aac'	=> 'AAC (A/H)',
-		'mp3'	=> 'MP3 (A/J/H)',
-		'm4a'	=> 'M4A (J/H)',
-		'ogg'	=> 'OGG (H)',
-		'oga'	=> 'OGA (J/H)',
-		'webm'	=> 'WebM (J/H)',
-		'rtmpa' => 'RTMPA (J)',
-		'opus'  => 'OPUS (H)',
-		'wav'	=> 'WAV (J/H)',
-		'flac'	=> 'FLAC (J/H)',
+		'aac'	=> 'AAC/M4A',		// A/H/J
+		'mp3'	=> 'MP3',			// A/H/J
+		'ogg'	=> 'OGG',			// H
+		'oga'	=> 'OGA',			// H/J
+		'webm'	=> 'WebM',			// H/J
+		'rtmpa' => 'RTMPA',			// J
+		'opus'  => 'OPUS',			// H
 	);
 
 	// --- filter and return ---
@@ -3055,6 +3086,22 @@ function radio_station_get_station_url() {
 	$station_url = apply_filters( 'radio_station_station_url', $station_url );
 
 	return $station_url;
+}
+
+// ---------------------
+// Get Station Image URL
+// ---------------------
+// 2.3.3.8: added get station logo image URL
+function radio_station_get_station_image_url() {
+	$station_image = '';
+	$attachment_id = radio_station_get_setting( 'station_image' );
+	$image = wp_get_attachment_image_src( $attachment_id, 'full' );
+	if ( is_array( $image ) ) {
+		$station_image = $image[0];
+	}
+	$station_image = apply_filters( 'radio_station_station_image_url', $station_image );
+
+	return $station_image;
 }
 
 // ----------------------------
@@ -4140,13 +4187,18 @@ function radio_station_get_language( $lang = false ) {
 	}
 
 	// --- get the specified language term ---
-	$term = get_term_by( 'slug', $lang, RADIO_STATION_LANGUAGES_SLUG );
-	if ( !$term ) {
-		$term = get_term_by( 'name', $lang, RADIO_STATION_LANGUAGES_SLUG );
-	}
-	if ( !$term ) {
+	// 2.3.3.8: explicitly check for numberic language term ID
+	$id = absint( $lang );
+	if ( $id < 1 ) {
+		$term = get_term_by( 'slug', $lang, RADIO_STATION_LANGUAGES_SLUG );
+		if ( !$term ) {
+			$term = get_term_by( 'name', $lang, RADIO_STATION_LANGUAGES_SLUG );
+		}
+	} else {
 		$term = get_term_by( 'id', $lang, RADIO_STATION_LANGUAGES_SLUG );
 	}
+
+	// --- set language from term ---
 	if ( $term ) {
 		$language = array(
 			'id'          => $term->term_id,
@@ -4167,7 +4219,7 @@ function radio_station_get_language( $lang = false ) {
 						'name'        => $lang_data['native_name'],
 						'description' => $lang_data['english_name'],
 						// TODO: set URL for main language and filter archive page results ?
-						// 'url'   => '',
+						// 'url'      => '',
 					);
 				}
 			}
@@ -4209,7 +4261,6 @@ function radio_station_trim_excerpt( $content, $length = false, $more = false, $
 
 		if ( !$length ) {
 			$length = 35;
-			// $length = apply_filters( 'radio_station_excerpt_length', $length );
 			$length = (int) apply_filters( 'radio_station_excerpt_length', $length );
 		}
 		if ( !$more ) {

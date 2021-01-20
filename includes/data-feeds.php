@@ -221,20 +221,34 @@ function radio_station_get_shows_data( $show = false ) {
 
 	$shows = array();
 	if ( $show ) {
+		// 2.3.3.8: add show description if show specified
+		// 2.3.3.8: explicitly check if show is an ID or show name
 		if ( strstr( $show, ',' ) ) {
 			$show_ids = explode( ',', $show );
 			foreach ( $show_ids as $show ) {
-				$show = sanitize_title( $show );
+				$id = absint( $show );
+				if ( $id < 1 ) {
+					$show = sanitize_title( $show );
+				} else {
+					$show = $id;
+				}
 				$show = radio_station_get_show( $show );
 				$show = radio_station_get_show_data_meta( $show, true );
 				$show = radio_station_convert_show_shifts( $show );
+				// $show = radio_station_get_show_description( $show );
 				$shows[] = $show;
 			}
 		} else {
-			$show = sanitize_title( $show );
+			$id = absint( $show );
+			if ( $id < 1 ) {
+				$show = sanitize_title( $show );
+			} else {
+				$show = $id;
+			}
 			$show = radio_station_get_show( $show );
 			$show = radio_station_get_show_data_meta( $show, true );
 			$show = radio_station_convert_show_shifts( $show );
+			// $show = radio_station_get_show_description( $show );
 			$shows = array( $show );
 		}
 	} else {
@@ -247,7 +261,8 @@ function radio_station_get_shows_data( $show = false ) {
 			}
 		}
 	}
-	$shows = apply_filters( 'radio_station_shows_data', $shows );
+	// 2.3.3.8: add show querystring parameter as second filter argument
+	$shows = apply_filters( 'radio_station_shows_data', $shows, $show );
 
 	return $shows;
 }
@@ -258,17 +273,18 @@ function radio_station_get_shows_data( $show = false ) {
 function radio_station_get_genres_data( $genre = false ) {
 
 	// -- get genre or genres ---
+	// 2.3.3.8: removed sanitize_title usage for genre terms
 	$genres = array();
 	if ( $genre ) {
 		if ( strstr( $genre, ',' ) ) {
 			$genre_ids = explode( ',', $genre );
 			foreach ( $genre_ids as $genre ) {
-				$genre = sanitize_title( $genre );
+				// $genre = sanitize_title( $genre );
 				$genre = radio_station_get_genre( $genre );
 				$genres[] = $genre;
 			}
 		} else {
-			$genre = sanitize_title( $genre );
+			// $genre = sanitize_title( $genre );
 			$genres = radio_station_get_genre( $genre );
 		}
 	} else {
@@ -292,7 +308,8 @@ function radio_station_get_genres_data( $genre = false ) {
 			}
 		}
 	}
-	$genres = apply_filters( 'radio_station_genres_data', $genres );
+	// 2.3.3.8: add genre querystring parameter as second filter argument
+	$genres = apply_filters( 'radio_station_genres_data', $genres, $genre );
 
 	return $genres;
 }
@@ -303,19 +320,20 @@ function radio_station_get_genres_data( $genre = false ) {
 function radio_station_get_languages_data( $language = false ) {
 
 	// -- get language or languages ---
+	// 2.3.3.8: removed sanitize_title usage for language terms
 	$languages_data = array();
 	if ( $language ) {
 		if ( strstr( $language, ',' ) ) {
 			$language_ids = explode( ',', $language );
 			foreach ( $language_ids as $language ) {
-				$language = sanitize_title( $language );
+				// $language = sanitize_title( $language );
 				$language_data = radio_station_get_language( $language );
 				if ( $language_data ) {
 					$languages_data[$language] = $language_data;
 				}
 			}
 		} else {
-			$language = sanitize_title( $language );
+			// $language = sanitize_title( $language );
 			$language_data = radio_station_get_language( $language );
 			$languages_data[$language] = $language_data;
 		}
@@ -344,17 +362,35 @@ function radio_station_get_languages_data( $language = false ) {
 
 	// --- loop languages to get shows ---
 	if ( count( $languages_data ) > 0 ) {
+		// 2.3.3.8: fix show assignment to variable languages_data
 		foreach ( $languages_data as $slug => $lang ) {
+
+			// --- get shows for this language slug ---
 			$shows = radio_station_get_language_shows( $slug );
-			$languages[$slug]['shows'] = array();
-			$languages[$slug]['show_count'] = 0;
+			$languages_data[$slug]['shows'] = array();
+			$languages_data[$slug]['show_count'] = 0;
 			if ( is_object( $shows ) && property_exists( $shows, 'posts' )
 			     && is_array( $shows->posts ) && ( count( $shows->posts ) > 0 ) ) {
-				$languages[$slug]['show_count'] = count( $shows->posts );
+				$languages_data[$slug]['show_count'] = count( $shows->posts );
 				foreach ( $shows->posts as $show ) {
 					$show = radio_station_get_show_data_meta( $show );
 					$show = radio_station_convert_show_shifts( $show );
-					$languages[$slug]['shows'][] = $show;
+					$languages_data[$slug]['shows'][] = $show;
+				}
+			}
+
+			// --- maybe get shows for main language slug ---
+			// 2.3.3.8: fix to add shows for main language
+			if ( 0 == $lang['id'] ) {
+				$shows = radio_station_get_language_shows( false );
+				if ( is_object( $shows ) && property_exists( $shows, 'posts' )
+					 && is_array( $shows->posts ) && ( count( $shows->posts ) > 0 ) ) {
+					$languages_data[$slug]['show_count'] = $languages_data[$slug]['show_count'] + count( $shows->posts );
+					foreach ( $shows->posts as $show ) {
+						$show = radio_station_get_show_data_meta( $show );
+						$show = radio_station_convert_show_shifts( $show );
+						$languages_data[$slug]['shows'][] = $show;
+					}
 				}
 			}
 		}
