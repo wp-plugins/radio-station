@@ -1428,7 +1428,8 @@ function radio_station_post_column_data( $column, $post_id ) {
 						unset( $show_ids[$i] );
 					}
 				}
-				$data = implode( ',', $show_id );
+				// 2.3.3.8: fix to implode show_ids not show_id
+				$data = implode( ',', $show_ids );
 			} elseif ( $show_id > 0 ) {
 				$show_ids = array( $show_id );
 				$data = $show_id;
