@@ -48,7 +48,7 @@ if ( $atts['show_desc'] ) {
 
 // --- set list info key order ---
 // 2.3.3.8: added for possible info rearrangement
-$infokeys = array( 'avatar', 'title', 'hosts', 'times', 'encore', 'file', 'genres', 'excerpt' );
+$infokeys = array( 'avatar', 'title', 'hosts', 'times', 'encore', 'file', 'genres', 'excerpt', 'custom' );
 $infokeys = apply_filters( 'radio_station_schedule_table_info_order', $infokeys );
 
 // --- start list schedule output ---
@@ -446,6 +446,13 @@ foreach ( $weekdays as $weekday ) {
 						$info['excerpt'] = $excerpt;
 						// $list .= $excerpt;
 					}
+				}
+
+				// --- custom info section ---
+				// 2.3.3.8: allow for custom HTML to be added
+				$custom = apply_filters( 'radio_station_schedule_show_custom_display', '', $show['id'], 'list' );
+				if ( ( '' != $custom ) && is_string( $custom ) ) {
+					$info['custom'] = $custom;
 				}
 
 				// --- add item info according to key order ---

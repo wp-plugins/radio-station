@@ -49,7 +49,7 @@ if ( $atts['show_desc'] ) {
 
 // --- set cell info key order ---
 // 2.3.3.8: added for possible info rearrangement
-$infokeys = array( 'title', 'hosts', 'times', 'encore', 'file', 'genres' );
+$infokeys = array( 'title', 'hosts', 'times', 'encore', 'file', 'genres', 'custom' );
 $infokeys = apply_filters( 'radio_station_schedule_tabs_info_order', $infokeys );
 
 // --- start tabbed schedule output ---
@@ -500,6 +500,13 @@ foreach ( $weekdays as $i => $weekday ) {
 						$info['genres'] = $genres;
 						// $panels .= $genres;
 					}
+				}
+
+				// --- custom info section ---
+				// 2.3.3.8: allow for custom HTML to be added
+				$custom = apply_filters( 'radio_station_schedule_show_custom_display', '', $show['id'], 'tabs' );
+				if ( ( '' != $custom ) && is_string( $custom ) ) {
+					$info['custom'] = $custom;
 				}
 
 				// --- left aligned show avatar ---

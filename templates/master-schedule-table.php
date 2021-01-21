@@ -48,7 +48,7 @@ if ( $atts['show_desc'] ) {
 
 // --- set cell info key order ---
 // 2.3.3.8: added for possible info rearrangement
-$infokeys = array( 'avatar', 'title', 'hosts', 'times', 'encore', 'file', 'excerpt' );
+$infokeys = array( 'avatar', 'title', 'hosts', 'times', 'encore', 'file', 'excerpt', 'custom' );
 $infokeys = apply_filters( 'radio_station_schedule_table_info_order', $infokeys );
 
 // --- clear floats ---
@@ -615,6 +615,13 @@ foreach ( $hours as $hour ) {
 									$info['excerpt'] = $excerpt;
 									// $cell .= $excerpt;
 								}
+							}
+
+							// --- custom info section ---
+							// 2.3.3.8: allow for custom HTML to be added
+							$custom = apply_filters( 'radio_station_schedule_show_custom_display', '', $show['id'], 'table' );
+							if ( ( '' != $custom ) && is_string( $custom ) ) {
+								$info['custom'] = $custom;
 							}
 
 						}
