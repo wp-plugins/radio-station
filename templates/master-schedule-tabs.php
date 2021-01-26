@@ -465,13 +465,16 @@ foreach ( $weekdays as $i => $weekday ) {
 					// 2.3.2: check show download disable meta
 					// 2.3.3: fix to incorrect filter name
 					// 2.3.3.8: add filter for show file link div
+					// 2.3.3.8: added filter for show file anchor
 					$show_file = get_post_meta( $show['id'], 'show_file', true );
 					$show_file = apply_filters( 'radio_station_schedule_show_file', $show_file, $show['id'], 'tabs' );
 					$disable_download = get_post_meta( $show['id'], 'show_download', true );
 					if ( $show_file && !empty( $show_file ) && !$disable_download ) {
+						$anchor = __( 'Audio File', 'radio-station' );
+						$anchor = apply_filters( 'radio_station_schedule_show_file_anchor', $anchor, $show['id'], 'tabs' );
 						$file = '<div class="show-file">' . $newline;
 						$file .= '<a href="' . esc_url( $show_file ) . '">';
-						$file .= esc_html( __( 'Audio File', 'radio-station' ) );
+						$file .= esc_html( $anchor );
 						$file .= '</a>' . $newline;
 						$file .= '</div>' . $newline;
 						$file = apply_filters( 'radio_station_schedule_show_file_display', $file, show_file, $show['id'], 'tabs' );

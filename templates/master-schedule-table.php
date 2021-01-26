@@ -570,6 +570,7 @@ foreach ( $hours as $hour ) {
 							// --- show file ---
 							// 2.3.2: check disable download meta
 							// 2.3.3.8: add filter for show file link
+							// 2.3.3.8: added filter for show file anchor
 							$show_file = false;
 							if ( $atts['show_file'] ) {
 								$show_file = get_post_meta( $show['id'], 'show_file', true );
@@ -577,9 +578,11 @@ foreach ( $hours as $hour ) {
 							$show_file = apply_filters( 'radio_station_schedule_show_file', $show_file, $show['id'], 'table' );
 							$disable_download = get_post_meta( $show['id'], 'show_download', true );
 							if ( $show_file && !empty( $show_file ) && !$disable_download ) {
+								$anchor = __( 'Audio File', 'radio-station' );
+								$anchor = apply_filters( 'radio_station_schedule_show_file_anchor', $anchor, $show['id'], 'tabs' );
 								$file = '<div class="show-file">' . $newline;
 								$file .= '<a href="' . esc_url( $show_file ) . '">';
-								$file .= esc_html( __( 'Audio File', 'radio-station' ) );
+								$file .= esc_html( $anchor );
 								$file .= '</a>' . $newline;
 								$file .= '</div>' . $newline;
 								$file = apply_filters( 'radio_station_schedule_show_file_display', $file, $show_file, $show['id'], 'table' );

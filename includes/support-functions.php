@@ -1415,8 +1415,12 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 
 							// 2.3.3: set current show to global data
 							// 2.3.4: set previous show shift to global and transient
+							// 2.3.3.8: move expires declaration earlier
+							$expires = $shift_end_time - $now - 1;
+							if ( $expires > 3600 ) {
+								$expires = 3600;
+							}
 							if ( !$time ) {
-								$expires = $shift_end_time - $now - 1;
 								$radio_station_data['current_show'] = $current_show;
 								if ( $prev_shift ) {
 									$prev_show = apply_filters( 'radio_station_previous_show', $prev_shift, $time );
@@ -1431,13 +1435,9 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 									set_transient( 'radio_station_previous_show_' . $time, $prev_show, $expires );
 								}
 							}
-							$expires = $shift_end_time - $now - 1;
-							if ( $expires > 3600 ) {
-								$expires = 3600;
-							}
 
 							// 2.3.2: set temporary transient if time is specified
-							// 2.3.3: remove current show transient (being unreliable)
+							// 2.3.3: remove current show transient (as being unreliable)
 							/* if ( !$time ) {
 								set_transient( 'radio_station_current_show', $current_show, $expires );
 							} else {

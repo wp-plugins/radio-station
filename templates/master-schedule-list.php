@@ -52,7 +52,7 @@ $infokeys = array( 'avatar', 'title', 'hosts', 'times', 'encore', 'file', 'genre
 $infokeys = apply_filters( 'radio_station_schedule_table_info_order', $infokeys );
 
 // --- start list schedule output ---
-$list .= '<ul id="master-list" class="master-list">' . $newline;
+$list = '<ul id="master-list" class="master-list">' . $newline;
 
 $tcount = 0;
 // 2.3.0: loop weekdays instead of legacy master list
@@ -385,13 +385,16 @@ foreach ( $weekdays as $weekday ) {
 					// 2.3.2: check disable download meta
 					// 2.3.3: fix to incorrect filter name
 					// 2.3.3.8: add filter for show file link
+					// 2.3.3.8: add filter for show file anchor
 					$show_file = get_post_meta( $show['id'], 'show_file', true );
 					$show_file = apply_filters( 'radio_station_schedule_show_file', $show_file, $show['id'], 'list' );
 					$disable_download = get_post_meta( $show['id'], 'show_download', true );
 					if ( $show_file && !empty( $show_file ) && !$disable_download ) {
+						$anchor = __( 'Audio File', 'radio-station' );
+						$anchor = apply_filters( 'radio_station_schedule_show_file_anchor', $anchor, $show['id'], 'tabs' );
 						$file = '<div class="show-file">' . $newline;
 						$file .= '<a href="' . esc_url( $show_file ) . '">';
-						$file .= esc_html( __( 'Audio File', 'radio-station' ) );
+						$file .= esc_html( $anchor );
 						$file .= '</a>' . $newline;
 						$file .= '</div>' . $newline;
 						$file = apply_filters( 'radio_station_schedule_show_file_display', $file, show_file, $show['id'], 'list' );

@@ -208,6 +208,7 @@ We haven't built an interface between Google Calendar and Radio Station just yet
 * Added: Show image alignment attribute to Schedule Tabs View
 * Added: Show Description/Excerpt to Show Data Endpoint (via querystring)
 * Added: Reduced opacity for past Shows on Schedule Tab/Table Views
+* Added: Screen Reader text for Show icons on Show Page
 * Fixed: Display Widget Countdown when no Current Show/Playlist
 * Fixed: Check for explicit singular.php template usage setting
 * Fixed: Access to Shows Data via querystring of Show ID/name

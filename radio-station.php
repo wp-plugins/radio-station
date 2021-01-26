@@ -424,14 +424,28 @@ $options = array(
 	/* 'player_theme'      => array(
 	    'type'    => 'select',
 	    'label'   => __( 'Default Player Theme', 'radio-station' ),
-	    'default' => 'light-rounded',
+	    'default' => 'light',
 	    'options' => array(
-	    	'light-rounded'	=> 'Light on Dark, Rounded Buttons', 'radio-station' ),
-	    	'light-square'	=> 'Light on Dark, Square Buttons', 'radio-station' ),
-	    	'dark-rounded'	=> 'Dark on Light, Rounded Buttons', 'radio-station' ),
-	    	'dark-square'	=> 'Dark on Light, Square Buttons', 'radio-station' ),
+	    	'light'	=> 'Light', 'radio-station' ),
+	    	'dark'	=> 'Dark', 'radio-station' ),
 	    ),
-	    'helper'  => __( '', 'radio-station'
+	    'helper'  => __( 'Default Player Controls theme style.', 'radio-station',
+	    'tab'     => 'player',
+	    'section' => 'basic',
+	    'pro'     => false,
+	), */
+
+	// --- Player Buttons ---
+	/* 'player_buttons'      => array(
+	    'type'    => 'select',
+	    'label'   => __( 'Default Player Buttons', 'radio-station' ),
+	    'default' => 'light',
+	    'options' => array(
+	    	'circular'  => 'Circular Buttons', 'radio-station' ),
+	    	'rounded'	=> 'Rounded Buttons', 'radio-station' ),
+	    	'square'	=> 'Square Buttons', 'radio-station' ),
+	    ),
+	    'helper'  => __( 'Default Player Buttons shape style.', 'radio-station',
 	    'tab'     => 'player',
 	    'section' => 'basic',
 	    'pro'     => false,
@@ -480,8 +494,6 @@ $options = array(
 		'section' => 'colors',
 		'pro'     => true,
 	), */
-
-	// TODO: additional CSS input field ?
 
 	// === Advanced Stream Player ===
 
@@ -549,22 +561,11 @@ $options = array(
 		'pro'     => true,
 	), */
 
-	// --- [Pro] Continuous Playback ---
-	/* 'player_continuous' => array(
-		'type'    => 'checkbox',
-		'label'   => __( 'Continuous Playback', 'radio-station' ),
-		'default' => 'yes',
-		'helper'  => __( 'Uninterrupted sitewide bar playback while user is navigating between pages! Requires additional Plugin.', 'radio-station' ),
-		'tab'     => 'player',
-		'section' => 'bar',
-		'pro'     => true,
-	), */
-
 	// --- [Pro] Fade In Player Bar ---
 	/* 'player_fadein'        => array(
 		'type'    => 'number',
 		'label'   => __( 'Fade In Player Bar', 'radio-station' ),
-		'default' => '2500',
+		'default' => 2500,
 		'min'     => 0,
 		'step'    => 100,
 		'max'     => 10000,
@@ -573,6 +574,31 @@ $options = array(
 		'section' => 'bar',
 		'pro'     => true,
 	), */
+
+	// --- [Pro] Continuous Playback ---
+	/* 'player_continuous' => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Continuous Playback', 'radio-station' ),
+		'default' => 'yes',
+		'helper'  => __( 'Uninterrupted Sitewide Bar playback while user is navigating between pages! Pages are loaded in background and faded in while Player Bar persists.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'bar',
+		'pro'     => true,
+	), */
+
+	// --- [Pro] Player Page Fade ---
+	/* 'player_pagefade' => array(
+		'type'    => 'number',
+		'label'   => __( 'Fade In Player Bar', 'radio-station' ),
+		'default' => 2000,
+		'min'     => 0,
+		'step'    => 100,
+		'max'     => 10000,
+		'helper'  => __( 'Number of milliseconds over which to fade in new Pages when continuous playback is enabled. Use 0 for instant display.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'bar',
+		'pro'     => true,
+	*/
 
 	// --- [Pro] Bar Player Text Color ---
 	/* 'player_bar_text'        => array(
@@ -595,6 +621,8 @@ $options = array(
 		'section' => 'bar',
 		'pro'     => true,
 	), */
+
+	// TODO: additional CSS input field ?
 
 	// === Master Schedule Page ===
 
