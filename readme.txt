@@ -4,7 +4,7 @@ Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
 Tested up to: 5.6
-Stable tag: trunk
+Stable tag: 2.3.3.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -365,7 +365,7 @@ We haven't built an interface between Google Calendar and Radio Station just yet
 * Fix to not 404 author pages for DJs without blog posts
 
 = 2.2.7 =
-* Dutch translation added (Thank you to André Dortmont for the file!)
+* Dutch translation added (Thank you to AndrÃ© Dortmont for the file!)
 * Added Tabbed Display for Master Schedule Shortcode (via Tutorial)
 * Add Show list columns with active, shift, DJs and show image displays
 * Add Schedule Override list columns with date sorting and filtering
