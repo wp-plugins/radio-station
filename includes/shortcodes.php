@@ -2740,7 +2740,7 @@ function radio_station_current_playlist_shortcode( $atts ) {
 		$order = array( 'tracks', 'link', 'countdown', 'custom' );
 		$order = apply_filters( 'radio_station_current_playlist_section_order', $order, $atts );
 		foreach ( $order as $section ) {
-			if ( isset( $html[$section] ) && ( '' != $html['section'] ) ) {
+			if ( isset( $html[$section] ) && ( '' != $html[$section] ) ) {
 				$output .= $html[$section];
 			}
 		}

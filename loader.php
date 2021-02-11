@@ -707,7 +707,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 						// --- color or color alpha setting ---
 						// 1.1.7: added color picker value saving
-						// TODO: validate this setting ?
+						// TODO: maybe validate this setting ?
 						$settings[$key] = $posted;
 
 					}
@@ -717,7 +717,12 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						if ( $newsettings ) {
 							echo '(to-validate) ' . print_r( $newsettings, true ) . '<br>';
 						} else {
-							echo '(validated) ' . print_r( $settings[$key], true ) . '<br>';
+							// 1.1.7 handle if (new) key not set yet
+							if ( isset( $settings[$key] ) ) {
+								echo '(validated) ' . print_r( $settings[$key], true ) . '<br>';
+							} else {
+								echo 'No setting yet for key ' . $key . '<br>';
+							}
 						}
 					}
 
@@ -783,6 +788,13 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				$settings = call_user_func( $funcname, $settings );
 			}
 
+			// --- output new settings ---			
+			if ( $this->debug ) {
+				echo "<br><b>All New Settings:</b><br>";
+				print_r( $settings );
+				echo "<br><br>";
+			}
+				
 			if ( $settings && is_array( $settings ) ) {
 
 				// --- loop default keys to remove others ---
@@ -908,11 +920,18 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				// 1.0.4: added validated URL option
 				// 1.0.6: fix to posted variable type (vposted)
 				// 1.0.9: remove check for http prefix to allow other protocols
+				// 1.1.7: use FILTER_SANITIZE_URL not FILTER_SANITIZE_STRING
 				$posted = trim( $posted );
-				$url = filter_var( $posted, FILTER_SANITIZE_STRING );
-				if ( !filter_var( $url, FILTER_VALIDATE_URL ) ) {
-					$posted = '';
+				$posted = filter_var( $posted, FILTER_SANITIZE_URL );
+
+				// 1.1.7: remove FILTER_VALIDATE_URL check - not working!?
+				if ( $this->debug ) {
+					$check = filter_var( $url, FILTER_VALIDATE_URL );
+					echo 'Validated URL: ' . print_r( $check, true ) . '<br>';
 				}
+				// if ( !filter_var( $url, FILTER_VALIDATE_URL ) ) {
+				//	$posted = '';
+				// }
 				return $posted;
 
 			} elseif ( in_array( $valid, array( 'EMAIL', 'EMAILS' ) ) ) {
@@ -1889,6 +1908,13 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			$defaults = $this->default_settings();
 			$settings = $this->get_settings( false );
 
+			// --- output saved settings ---			
+			if ( $this->debug ) {
+				echo "<br><b>Saved Settings:</b><br>";
+				print_r( $settings );
+				echo "<br><br>";
+			}
+
 			// --- get option tabs and sections ---
 			$tabs = $this->tabs;
 			$sections = $this->sections;
@@ -2400,7 +2426,11 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 						// --- toggle ---
 						// 1.0.9: add toggle input (styled checkbox)
+						// 1.1.7: set default option value if not set
 						$checked = '';
+						if ( !isset( $option['value'] ) ) {
+							$option['value'] = '1';
+						}
 						if ( $setting == $option['value'] ) {
 							$checked = ' checked="checked"';
 						}
@@ -2415,7 +2445,11 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					} elseif ( 'checkbox' == $type ) {
 
 						// --- checkbox ---
+						// 1.1.7: set default option value if not set
 						$checked = '';
+						if ( !isset( $option['value'] ) ) {
+							$option['value'] = '1';
+						}
 						if ( $setting == $option['value'] ) {
 							$checked = ' checked="checked"';
 						}
@@ -2509,7 +2543,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						} else {
 							$placeholder = '';
 						}
-						$row .= '<input type="text" name="' . esc_attr( $name ) . '" class="' . esc_attr( $class ) . "' value='" . esc_attr( $setting ) . '" placeholder="' . esc_attr( $placeholder ) . '">';
+						// 1.1.7: fix to attribute quoting output
+						$row .= '<input type="text" name="' . esc_attr( $name ) . '" class="' . esc_attr( $class ) . '" value="' . esc_attr( $setting ) . '" placeholder="' . esc_attr( $placeholder ) . '">';
 						if ( isset( $option['suffix'] ) ) {
 							$row .= ' ' . $option['suffix'];
 						}
@@ -2553,11 +2588,12 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						} else {
 							$step = 1;
 						}
+						// 1.1.7: remove esc_js from onclick attributes
 						$onclickup = "settings_number_step('up', '" . esc_attr( $name ) . "', " . esc_attr( $min ) . ", " . esc_attr( $max ) . ", " . esc_attr( $step ) . ");";
 						$onclickdown = "settings_number_step('down', '" . esc_attr( $name ) . "', " . esc_attr( $min ) . ", " . esc_attr( $max ) . ", " . esc_attr( $step ) . ");";
-						$row .= '<input class="setting-button button-secondary" type="button" value="-" onclick="' . esc_js( $onclickdown ) . '">';
+						$row .= '<input class="setting-button button-secondary" type="button" value="-" onclick="' . $onclickdown . '">';
 						$row .= '<input class="setting-numeric" type="text" name="' . esc_attr( $name ) . '" id="' . esc_attr( $name ) . '" value="' . esc_attr( $setting ) . '" placeholder="' . esc_attr( $placeholder ) . '">';
-						$row .= '<input class="setting-button button-secondary" type="button" value="+" onclick="' . esc_js( $onclickup ) . '">';
+						$row .= '<input class="setting-button button-secondary" type="button" value="+" onclick="' . $onclickup . '">';
 						if ( isset( $option['suffix'] ) ) {
 							$row .= ' ' . $option['suffix'];
 						}
@@ -3023,6 +3059,9 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // - added media library upload image field type
 // - added color picker and color picker alpha field types
 // - automatically remove unused settings tabs
+// - fix to text field attribute quoting 
+// - fix to not escape number step button function 
+// - remove FILTER_VALIDATE_URL from URL saving (not working)
 
 // == 1.1.6 ==
 // - added phone number character validation

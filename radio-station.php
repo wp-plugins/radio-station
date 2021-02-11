@@ -137,13 +137,6 @@ require RADIO_STATION_DIR . '/includes/class-upcoming-shows-widget.php';
 require RADIO_STATION_DIR . '/includes/class-current-playlist-widget.php';
 require RADIO_STATION_DIR . '/includes/class-radio-clock-widget.php';
 
-// --- Player ---
-// 2.3.1.1: load radio player prototype (if present)
-$player_file = RADIO_STATION_DIR . '/player/radio-player.php';
-if ( file_exists( $player_file ) ) {
-	require $player_file;
-}
-
 // --- Feature Development ---
 // 2.3.0: add feature branch development includes
 // 2.3.1: added radio player widget file
@@ -153,6 +146,13 @@ foreach ( $features as $feature ) {
 	if ( file_exists ( $filepath ) ) {
 		include $filepath;
 	}
+}
+
+// --- Player ---
+// 2.3.1.1: load radio player prototype (if present)
+$player_file = RADIO_STATION_DIR . '/player/radio-player.php';
+if ( file_exists( $player_file ) ) {
+	require $player_file;
 }
 
 
@@ -202,7 +202,7 @@ $options = array(
 
 	// --- Fallback Stream Format ---
 	'fallback_format' => array(
-	 	'type'    => 'text',
+	 	'type'    => 'select',
 	 	'options' => $formats,
 	 	'label'   => __( 'Fallback Format', 'radio-station' ),
 		'default' => 'ogg',
@@ -223,6 +223,17 @@ $options = array(
 	),
 
 	// === Station ===
+
+	// --- Station Title ---
+	// 2.3.3.8: added station title field
+	'station_title'     => array(
+		'type'    => 'text',
+		'label'   => __( 'Station Title', 'radio-station' ),
+		'default' => '',
+		'helper'  => __( 'Name of your Radio Station. For use in Stream Player and Data Feeds.', 'radio-station' ),
+		'tab'     => 'general',
+		'section' => 'station',
+	),
 
 	// --- Station Image ---
 	// 2.3.3.8: added station logo image field
@@ -383,29 +394,31 @@ $options = array(
 	// TODO: add note about these defaults being overrideable in widgets
 
 	// --- Player Title ---
-	/* 'player_title'		=> array (
-		'type'    => 'text',
-		'label'   => __( 'Player Title Text', 'radio-station' ),
-		'default' => '',
-		'helper'  => __( 'Default Text to display along with Player.', 'radio-station' ),
+	'player_title'		=> array (
+		'type'    => 'checkbox',
+		'label'   => __( 'Display Station Title', 'radio-station' ),
+		'default' => 'yes',
+		'value'   => 'yes',
+		'helper'  => __( 'Display your Radio Station Title in Player by default.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'basic',
 		'pro'     => false,
-	), */
+	),
 
 	// --- Player Image ---
-	/* 'player_image'		=> array(
+	'player_image'		=> array(
 		'type'    => 'checkbox',
 		'label'   => __( 'Display Station Image', 'radio-station' ),
 		'default' => 'yes',
-		'helper'  => __( 'Display your Radio Station logo image in Player by default.', 'radio-station' ),
+		'value'   => 'yes',
+		'helper'  => __( 'Display your Radio Station Image in Player by default.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'basic',
 		'pro'     => false,
-	), */
+	),
 
 	// --- Player Script ---
-	/* 'player_script'       => array(
+	'player_script'       => array(
 		'type'    => 'select',
 		'label'   => __( 'Player Script', 'radio-station' ),
 		'default' => 'amplitude',
@@ -418,87 +431,101 @@ $options = array(
 		'tab'     => 'player',
 		'section' => 'basic',
 		'pro'     => false,
-	), */
+	),
 
 	// --- Player Theme ---
-	/* 'player_theme'      => array(
-	    'type'    => 'select',
-	    'label'   => __( 'Default Player Theme', 'radio-station' ),
-	    'default' => 'light',
-	    'options' => array(
-	    	'light'	=> 'Light', 'radio-station' ),
-	    	'dark'	=> 'Dark', 'radio-station' ),
-	    ),
-	    'helper'  => __( 'Default Player Controls theme style.', 'radio-station',
-	    'tab'     => 'player',
-	    'section' => 'basic',
-	    'pro'     => false,
-	), */
+	'player_theme'      => array(
+		'type'    => 'select',
+		'label'   => __( 'Default Player Theme', 'radio-station' ),
+		'default' => 'light',
+		'options' => array(
+			'light'	=> __( 'Light', 'radio-station' ),
+			'dark'	=> __( 'Dark', 'radio-station' ),
+		),
+		'helper'  => __( 'Default Player Controls theme style.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'basic',
+		'pro'     => false,
+	),
 
 	// --- Player Buttons ---
-	/* 'player_buttons'      => array(
-	    'type'    => 'select',
-	    'label'   => __( 'Default Player Buttons', 'radio-station' ),
-	    'default' => 'light',
-	    'options' => array(
-	    	'circular'  => 'Circular Buttons', 'radio-station' ),
-	    	'rounded'	=> 'Rounded Buttons', 'radio-station' ),
-	    	'square'	=> 'Square Buttons', 'radio-station' ),
-	    ),
-	    'helper'  => __( 'Default Player Buttons shape style.', 'radio-station',
-	    'tab'     => 'player',
-	    'section' => 'basic',
-	    'pro'     => false,
-	), */
+	'player_buttons'      => array(
+		'type'    => 'select',
+		'label'   => __( 'Default Player Buttons', 'radio-station' ),
+		'default' => 'rounded',
+		'options' => array(
+			'circular' => __( 'Circular Buttons', 'radio-station' ),
+			'rounded'  => __( 'Rounded Buttons', 'radio-station' ),
+			'square'   => __( 'Square Buttons', 'radio-station' ),
+		),
+		'helper'  => __( 'Default Player Buttons shape style.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'basic',
+		'pro'     => false,
+	),
 
+	// --- Player Debug Mode ---
+	'player_debug'                => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Player Debug Mode', 'radio-station' ),
+		'default' => '',
+		'value'   => 'yes',
+		'helper'  => __( 'Output player debug information in browser console.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'basic',
+		'pro'     => false,
+	),
+
+	// === Player Colours ===
+	
 	// --- [Pro] Playing Highlight Color ---
-	/* 'playing_button_color'        => array(
+	'player_playing_color'        => array(
 		'type'    => 'color',
 		'label'   => __( 'Playing Icon Highlight Color', 'radio-station' ),
-		'default' => '',
+		'default' => '#70E070',
 		'helper'  => __( 'Default highlight color to use for Play button icon when playing.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'colors',
 		'pro'     => true,
-	), */
+	),
 
 	// --- [Pro] Control Icons Highlight Color ---
-	/* 'control_buttons_color'        => array(
+	'player_buttons_color'        => array(
 		'type'    => 'color',
 		'label'   => __( 'Control Icons Highlight Color', 'radio-station' ),
-		'default' => '',
+		'default' => '#00A0E0',
 		'helper'  => __( 'Default highlight color to use for Control buttons when active.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'colors',
 		'pro'     => true,
-	), */
+	),
 
 	// --- [Pro] Volume Knob Color ---
-	/* 'volume_thumb_color'        => array(
+	'player_thumb_color'        => array(
 		'type'    => 'color',
 		'label'   => __( 'Volume Knob Color', 'radio-station' ),
-		'default' => '',
+		'default' => '#80C080',
 		'helper'  => __( 'Default Knob Color for Player Volume Slider.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'colors',
 		'pro'     => true,
-	), */
+	),
 
 	// --- [Pro] Volume Track Color ---
-	/* 'volume_track_color'        => array(
+	'player_range_color'        => array(
 		'type'    => 'coloralpha',
 		'label'   => __( 'Volume Track Color', 'radio-station' ),
-		'default' => '',
+		'default' => '#80C080',
 		'helper'  => __( 'Default Track Color for Player Volume Slider.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'colors',
 		'pro'     => true,
-	), */
+	),
 
 	// === Advanced Stream Player ===
 
 	// --- Player Volume ---
-	/* 'player_volume'     => array(
+	'player_volume'     => array(
 		'type'    => 'number',
 		'label'   => __( 'Player Start Volume', 'radio-station' ),
 		'default' => 77,
@@ -509,60 +536,75 @@ $options = array(
 		'tab'     => 'player',
 		'section' => 'advanced',
 		'pro'     => false,
-	), */
+	),
 
 	// --- Single Player ---
-	/* 'player_single'     => array(
+	'player_single'     => array(
 		'type'    => 'checkbox',
 		'label'   => __( 'Single Player at Once', 'radio-station' ),
 		'default' => 'yes',
-		'helper'  => __( 'Stop any existing Players in other windows or tabs when a Player is started.', 'radio-station' ),
+		'value'   => 'yes',
+		'helper'  => __( 'Stop any existing Players on the page or in other windows or tabs when a Player is started.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'advanced',
 		'pro'     => false,
-	), */
+	),
 
 	// --- [Pro] Player Autoresume ---
-	/* 'player_autoresume' => array(
+	'player_autoresume' => array(
 		'type'    => 'checkbox',
 		'label'   => __( 'Autoresume Playback', 'radio-station' ),
 		'default' => 'yes',
-		'helper'  => __( 'Attempt to resume playback if user was playing. Only triggered when the user first interacts with the page.', 'radio-station' ),
+		'value'   => 'yes',
+		'helper'  => __( 'Attempt to resume playback if visitor was playing. Only triggered when the user first interacts with the page.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'advanced',
 		'pro'     => true,
-	), */
+	),
 
 	// --- [Pro] Popup Player Window ---
 	/* 'player_popup'        => array(
 		'type'    => 'checkbox',
 		'label'   => __( 'Popup Player Window', 'radio-station' ),
 		'default' => '',
+		'value'   => 'yes',
 		'helper'  => __( 'Add a popup icon to your Player to open it in a separate window.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'advanced',
 		'pro'     => true,
 	), */
 
 	// === Sitewide Player Bar ===
 
+	// --- Player Bar Note ---
+	'player_bar_note'      => array(
+		'type'    => 'note',
+		'label'   => __( 'Bar Defaults Note', 'radio-station' ),
+		'helper'  => __( 'The Bar Player uses the default configurations set above.', 'radio-station' )
+			     . ' ' . __( 'You can override these in specific Player Widgets.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'bar',
+		// 'pro'  => true,
+	),
+
 	// --- [Pro] Sitewide Player Bar ---
-	/* 'player_bar'        => array(
+	'player_bar'        => array(
 		'type'    => 'select',
 		'label'   => __( 'Sitewide Player Bar', 'radio-station' ),
 		'default' => 'off',
 		'options' => array(
-			'off'		=> __( 'No Player Bar', 'radio-station
+			'off'		=> __( 'No Player Bar', 'radio-station' ),
 			'top'   	=> __( 'Top Player Bar', 'radio-station' ),
 			'bottom'	=> __( 'Bottom Player Bar', 'radio-station' ),
-
 		),
 		'tab'     => 'player',
 		'section' => 'bar',
 		'helper'  => __( 'Add a fixed position Player Bar which displays Sitewide.', 'radio-station' ),
 		'pro'     => true,
-	), */
+	),
 
 	// --- [Pro] Fade In Player Bar ---
-	/* 'player_fadein'        => array(
+	'player_bar_fadein'        => array(
 		'type'    => 'number',
 		'label'   => __( 'Fade In Player Bar', 'radio-station' ),
 		'default' => 2500,
@@ -573,10 +615,10 @@ $options = array(
 		'tab'     => 'player',
 		'section' => 'bar',
 		'pro'     => true,
-	), */
+	),
 
 	// --- [Pro] Continuous Playback ---
-	/* 'player_continuous' => array(
+	'player_bar_continuous' => array(
 		'type'    => 'checkbox',
 		'label'   => __( 'Continuous Playback', 'radio-station' ),
 		'default' => 'yes',
@@ -584,10 +626,10 @@ $options = array(
 		'tab'     => 'player',
 		'section' => 'bar',
 		'pro'     => true,
-	), */
+	),
 
 	// --- [Pro] Player Page Fade ---
-	/* 'player_pagefade' => array(
+	'player_bar_pagefade' => array(
 		'type'    => 'number',
 		'label'   => __( 'Fade In Player Bar', 'radio-station' ),
 		'default' => 2000,
@@ -598,29 +640,29 @@ $options = array(
 		'tab'     => 'player',
 		'section' => 'bar',
 		'pro'     => true,
-	*/
+	),
 
 	// --- [Pro] Bar Player Text Color ---
-	/* 'player_bar_text'        => array(
+	'player_bar_text'        => array(
 		'type'    => 'color',
-		'label'   => __( 'Sitewide Player Text Color', 'radio-station' ),
+		'label'   => __( 'Bar Player Text Color', 'radio-station' ),
 		'default' => '#FFFFFF',
 		'helper'  => __( 'Text color for the fixed position Sitewide Bar Player.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'bar',
 		'pro'     => true,
-	), */
+	),
 
 	// --- [Pro] Bar Player Background Color ---
-	/* 'player_bar_background'        => array(
+	'player_bar_background'        => array(
 		'type'    => 'coloralpha',
-		'label'   => __( 'Sitewide Player Background Color', 'radio-station' ),
-		'default' => 'rgba(0,0,0,1)',
+		'label'   => __( 'Bar Player Background Color', 'radio-station' ),
+		'default' => 'rgba(0,0,0,255)',
 		'helper'  => __( 'Background color for the fixed position Sitewide Bar Player.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'bar',
 		'pro'     => true,
-	), */
+	),
 
 	// TODO: additional CSS input field ?
 
@@ -943,7 +985,7 @@ $options = array(
 	//	'section' => 'archives',
 	// ),
 
-	// === Templates ===
+	// === Single Templates ===
 
 	// --- Templates Change Note ---
 	'templates_change_note'      => array(
@@ -952,7 +994,7 @@ $options = array(
 		'helper'  => __( 'Since 2.3.0, the way that Templates are implemented has changed.', 'radio-station' )
 		             . ' ' . __( 'See the Documentation for more information:', 'radio-station' )
 		             . ' <a href="' . RADIO_STATION_DOCS_URL . 'display/#page-templates" target="_blank">' . __( 'Templates Documentation', 'radio-station' ) . '</a>',
-		'tab'     => 'templates',
+		'tab'     => 'pages',
 		'section' => 'single',
 	),
 
@@ -968,7 +1010,7 @@ $options = array(
 		),
 		'default' => 'page',
 		'helper'  => __( 'Which template to use for displaying Show content.', 'radio-station' ),
-		'tab'     => 'templates',
+		'tab'     => 'pages',
 		'section' => 'single',
 	),
 
@@ -979,7 +1021,7 @@ $options = array(
 		'value'   => 'yes',
 		'default' => '',
 		'helper'  => __( 'Advanced usage. Use both a custom template AND content filtering for a Show. (Not compatible with Legacy templates.)', 'radio-station' ),
-		'tab'     => 'templates',
+		'tab'     => 'pages',
 		'section' => 'single',
 	),
 
@@ -996,7 +1038,7 @@ $options = array(
 		),
 		'default' => 'page',
 		'helper'  => __( 'Which template to use for displaying Playlist content.', 'radio-station' ),
-		'tab'     => 'templates',
+		'tab'     => 'pages',
 		'section' => 'single',
 	),
 
@@ -1007,7 +1049,7 @@ $options = array(
 		'value'   => 'yes',
 		'default' => '',
 		'helper'  => __( 'Advanced usage. Use both a custom template AND content filtering for a Playlist. (Not compatible with Legacy templates.)', 'radio-station' ),
-		'tab'     => 'templates',
+		'tab'     => 'pages',
 		'section' => 'single',
 	),
 
@@ -1095,11 +1137,12 @@ $options = array(
 	// --- Tab Labels ---
 	// 2.3.2: add widget options tab
 	// 2.3.3.8: added player options tab
+	// 2.3.3.8: move templates section onto pages tab
 	'tabs'                    => array(
 		'general'   => __( 'General', 'radio-station' ),
 		'player'    => __( 'Player', 'radio-station' ),
 		'pages'     => __( 'Pages', 'radio-station' ),
-		'templates' => __( 'Templates', 'radio-station' ),
+		// 'templates' => __( 'Templates', 'radio-station' ),
 		'widgets'   => __( 'Widgets', 'radio-station' ),
 		'roles'     => __( 'Roles', 'radio-station' ),
 	),
@@ -1113,6 +1156,7 @@ $options = array(
 		'basic'       => __( 'Basic Defaults', 'radio-station' ),
 		'advanced'    => __( 'Advanced Defaults', 'radio-station' ),
 		'colors'      => __( 'Player Colors', 'radio-station' ),
+		'bar'         => __( 'Sitewide Bar Player', 'radio-station' ),
 		'single'      => __( 'Single Templates', 'radio-station' ),
 		'archive'     => __( 'Archive Templates', 'radio-station' ),
 		'schedule'    => __( 'Schedule Page', 'radio-station' ),
@@ -1122,6 +1166,15 @@ $options = array(
 		'permissions' => __( 'Permissions', 'radio-station' ),
 	),
 );
+
+// 2.3.3.8: [temp] remove player options if player not present
+if ( !file_exists( $player_file ) ) {
+	foreach ( $options as $key => $option ) {
+		if ( 'player_' == substr( $key, 0, 7 ) ) {
+			unset( $options[$key] );
+		}
+	}
+}
 
 // ----------------------
 // Plugin Loader Settings
