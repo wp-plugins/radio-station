@@ -2303,7 +2303,7 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 			// --- custom HTML section ---
 			// 2.3.3.8: added custom HTML section
-			$html['custom'] = apply_filters( 'radio_station_upcoming_show_custom_display', '', $show['id'], $atts );
+			$html['custom'] = apply_filters( 'radio_station_upcoming_shows_custom_display', '', $show['id'], $atts );
 
 			// --- open upcoming show list item ---
 			$output .= '<li class="upcoming-show on-air-dj">';
@@ -2733,7 +2733,7 @@ function radio_station_current_playlist_shortcode( $atts ) {
 
 		// --- custom HTML section ---
 		// 2.3.3.8: added custom HTML section
-		$html['custom'] = apply_filters( 'radio_station_upcoming_show_custom_display', '', $playlist, $atts );
+		$html['custom'] = apply_filters( 'radio_station_current_playlist_custom_display', '', $playlist, $atts );
 
 		// --- filter display section order ---
 		// 2.3.1: added filter for section order display

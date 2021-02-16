@@ -1298,6 +1298,24 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 					}
 				}
 
+				// --- add directly any remaining overrides ---
+				// 2.3.1: fix to include standalone overrides on days
+				// 2.3.3.8: moved override adding to fix shift order
+				if ( count( $overrides ) > 0 ) {
+					foreach ( $overrides as $i => $override ) {
+						if ( $date == $override['date'] ) {
+							// 2.3.3.7: remove check if override already done
+							// if ( !in_array( $date . '--' . $i, $done_overrides ) ) {
+								// $done_overrides[] = $date . '--' . $i;
+								$show_shifts[$day][$override['start']] = $override;
+								if ( $day == $debugday ) {
+									$debugshifts .= "Added Override: " . print_r( $override, true ) . PHP_EOL;
+								}
+							// }
+						}
+					}
+				}
+
 				// --- sort the shifts using 24 hour time ---
 				$shifts = $show_shifts[$day];
 				if ( count( $shifts ) > 0 ) {
@@ -1326,23 +1344,6 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 					echo "Shift Keys: " . print_r( $keys, true ) . PHP_EOL;
 					echo "Sorted Keys: " . print_r( $shift_keys, true ) . PHP_EOL;
 					echo "Sorted Shifts: " . print_r( $new_shifts, true ) . PHP_EOL;
-				}
-
-				// --- add directly any remaining overrides ---
-				// 2.3.1: fix to include standalone overrides on days
-				if ( count( $overrides ) > 0 ) {
-					foreach ( $overrides as $i => $override ) {
-						if ( $date == $override['date'] ) {
-							// 2.3.3.7: remove check if override already done
-							// if ( !in_array( $date . '--' . $i, $done_overrides ) ) {
-								// $done_overrides[] = $date . '--' . $i;
-								$show_shifts[$day][$override['start']] = $override;
-								if ( $day == $debugday ) {
-									$debugshifts .= "Added Override: " . print_r( $override, true ) . PHP_EOL;
-								}
-							// }
-						}
-					}
 				}
 
 				$shifts = $show_shifts[$day];
