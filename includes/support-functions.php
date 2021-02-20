@@ -905,6 +905,7 @@ function radio_station_get_show_data_meta( $show, $single = false ) {
 	}
 
 	// --- add extra data for single show route/feed ---
+	$show_id = $show->ID;
 	if ( $single ) {
 
 		// --- add show posts ---
@@ -914,11 +915,11 @@ function radio_station_get_show_data_meta( $show, $single = false ) {
 		$show_data['playlists'] = radio_station_get_show_playlists( $show->ID );
 
 		// --- filter to maybe add more data ---
-		$show_data = apply_filters( 'radio_station_show_data_meta', $show_data, $show->ID );
+		$show_data = apply_filters( 'radio_station_show_data_meta', $show_data, $show_id );
 	}
 
 	// --- maybe cache Show meta data ---
-	do_action( 'radio_station_cache_data', 'show_meta', $show->ID, $show_data );
+	do_action( 'radio_station_cache_data', 'show_meta', $show_id, $show_data );
 
 	return $show_data;
 }
@@ -1037,7 +1038,8 @@ function radio_station_get_override_data_meta( $override ) {
 	);
 
 	// --- filter and return ---
-	$override_data = apply_filters( 'radio_station_override_data', $override_data, $override->ID );
+	$override_id = $override->ID;
+	$override_data = apply_filters( 'radio_station_override_data', $override_data, $override_id );
 
 	return $override_data;
 }

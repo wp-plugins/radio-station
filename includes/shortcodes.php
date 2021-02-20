@@ -594,23 +594,25 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 
 
 			// --- description ---
+			$post_content = $archive_post->post_content;
+			$post_id = $archive_post->ID;
 			if ( 'none' == $atts['description'] ) {
 				$list .= '';
 			} elseif ( 'full' == $atts['description'] ) {
 				$list .= '<div class="' . esc_attr( $type ) . '-archive-item-content">';
-				$content = apply_filters( 'radio_station_' . $type . '_archive_content', $archive_post->post_content, $archive_post->ID );
+				$content = apply_filters( 'radio_station_' . $type . '_archive_content', $post_content, $post_id );
 				$list .= $content;
 				$list .= '</div>';
 			} else {
 				$list .= '<div class="' . esc_attr( $type ) . '-archive-item-excerpt">';
-				$permalink = get_permalink( $archive_post->ID );
+				$permalink = get_permalink( $post_id );
 				if ( !empty( $archive_post->post_excerpt ) ) {
 					$excerpt = $archive_post->post_excerpt;
 					$excerpt .= ' <a href="' . esc_url( $permalink ) . '">' . $more . '</a>';
 				} else {
-					$excerpt = radio_station_trim_excerpt( $archive_post->post_content, $length, $more, $permalink );
+					$excerpt = radio_station_trim_excerpt( $post_content, $length, $more, $permalink );
 				}
-				$excerpt = apply_filters( 'radio_station_' . $type . '_archive_excerpt', $excerpt, $archive_post->ID );
+				$excerpt = apply_filters( 'radio_station_' . $type . '_archive_excerpt', $excerpt, $post_id );
 				$list .= $excerpt;
 				$list .= '</div>';
 			}
@@ -1043,11 +1045,13 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 		$list .= '</div>';
 
 		// --- post excerpt ---
+		$post_content = $post['post_content'];
+		$post_id = $post['ID'];
 		if ( 'none' == $atts['content'] ) {
 			$list .= '';
 		} elseif ( 'full' == $atts['content'] ) {
 			$list .= '<div class="show-' . esc_attr( $type ) . '-content">';
-			$content = apply_filters( 'radio_station_show_' . $type . '_content', $post['post_content'], $post['ID'] );
+			$content = apply_filters( 'radio_station_show_' . $type . '_content', $post_content, $post_id );
 			// $list .= $content;
 			$list .= '</div>';
 		} else {
@@ -1057,9 +1061,9 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 				$excerpt = $post['post_excerpt'];
 				$excerpt .= ' <a href="' . esc_url( $permalink ) . '">' . $more . '</a>';
 			} else {
-				$excerpt = radio_station_trim_excerpt( $post['post_content'], $length, $more, $permalink );
+				$excerpt = radio_station_trim_excerpt( $post_content, $length, $more, $permalink );
 			}
-			$excerpt = apply_filters( 'radio_station_show_' . $type . '_excerpt', $excerpt, $post['ID'] );
+			$excerpt = apply_filters( 'radio_station_show_' . $type . '_excerpt', $excerpt, $post_id );
 			$list .= $excerpt;
 			$list .= '</div>';
 		}
@@ -1301,8 +1305,10 @@ function radio_station_current_show_shortcode( $atts ) {
 
 	// --- maybe do AJAX load ---
 	// 2.3.2 added widget AJAX loading
-	$atts['ajax'] = apply_filters( 'radio_station_widgets_ajax_override', $atts['ajax'], 'current-show', $atts['widget'] );
-	if ( 'on' == $atts['ajax'] ) {
+	$ajax = $atts['ajax'];
+	$widget = $atts['widget'];
+	$ajax = apply_filters( 'radio_station_widgets_ajax_override', $ajax, 'current-show', $widget );
+	if ( 'on' == $ajax ) {
 		if ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) {
 
 			// --- AJAX load via iframe ---
@@ -1410,12 +1416,13 @@ function radio_station_current_show_shortcode( $atts ) {
 
 		// --- set current show data ---
 		$show = $current_shift['show'];
+		$show_id = $show['id'];
 
 		// --- get show link ---
 		$show_link = false;
 		if ( $atts['show_link'] ) {
-			$show_link = get_permalink( $show['id'] );
-			$show_link = apply_filters( 'radio_station_current_show_link', $show_link, $show['id'], $atts );
+			$show_link = get_permalink( $show_id );
+			$show_link = apply_filters( 'radio_station_current_show_link', $show_link, $show_id, $atts );
 		}
 
 		// --- check show schedule ---
@@ -1436,7 +1443,7 @@ function radio_station_current_show_shortcode( $atts ) {
 			// (only if not a schedule override)
 			// 2.3.2: fix to override variable key check
 			if ( !isset( $current_shift['override'] ) && $atts['show_all_sched'] ) {
-				$shifts = radio_station_get_show_schedule( $show['id'] );
+				$shifts = radio_station_get_show_schedule( $show_id );
 			} else {
 				$shifts = array( $current_shift );
 			}
@@ -1548,7 +1555,7 @@ function radio_station_current_show_shortcode( $atts ) {
 		}
 		$title .= '</div>';
 		// 2.3.3.8: added current show title filter
-		$title = apply_filters( 'radio_station_current_show_title_display', $title, $show['id'], $atts );
+		$title = apply_filters( 'radio_station_current_show_title_display', $title, $show_id, $atts );
 		if ( ( '' != $title ) && is_string( $title ) ) {
 			$html['title'] = $title;
 		}
@@ -1559,8 +1566,8 @@ function radio_station_current_show_shortcode( $atts ) {
 			// 2.3.0: get show avatar (with thumbnail fallback)
 			// 2.3.0: filter show avatar via display context
 			// 2.3.0: maybe add link from avatar to show
-			$show_avatar = radio_station_get_show_avatar( $show['id'] );
-			$show_avatar = apply_filters( 'radio_station_current_show_avatar', $show_avatar, $show['id'], $atts );
+			$show_avatar = radio_station_get_show_avatar( $show_id );
+			$show_avatar = apply_filters( 'radio_station_current_show_avatar', $show_avatar, $show_id, $atts );
 			if ( $show_avatar ) {
 				$avatar = '<div class="current-show-avatar on-air-dj-avatar' . esc_attr( $floatclass ) . '" ' . $widthstyle . '>';
 				if ( $show_link ) {
@@ -1571,7 +1578,7 @@ function radio_station_current_show_shortcode( $atts ) {
 				$avatar .= '</div>';
 
 				// 2.3.3.8: added avatar display filter
-				$avatar = apply_filters( 'radio_station_current_show_avatar_display', $avatar, $show['id'], $atts );
+				$avatar = apply_filters( 'radio_station_current_show_avatar_display', $avatar, $show_id, $atts );
 				if ( ( '' != $avatar ) && is_string( $avatar ) ) {
 					$html['avatar'] = $avatar;
 				}
@@ -1582,7 +1589,7 @@ function radio_station_current_show_shortcode( $atts ) {
 		if ( $atts['display_hosts'] ) {
 
 			$hosts = '';
-			$show_hosts = get_post_meta( $show['id'], 'show_user_list', true );
+			$show_hosts = get_post_meta( $show_id, 'show_user_list', true );
 			if ( $show_hosts && is_array( $show_hosts ) && ( count( $show_hosts ) > 0 ) ) {
 
 				$hosts = '<div class="current-show-hosts on-air-dj-names">';
@@ -1630,7 +1637,7 @@ function radio_station_current_show_shortcode( $atts ) {
 				}
 				$hosts .= '</div>';
 			}
-			$hosts = apply_filters( 'radio_station_current_show_hosts_display', $hosts, $show['id'], $atts );
+			$hosts = apply_filters( 'radio_station_current_show_hosts_display', $hosts, $show_id, $atts );
 			if ( ( '' != $hosts ) && is_string( $hosts ) ) {
 				$html['hosts'] = $hosts;
 			}
@@ -1652,7 +1659,7 @@ function radio_station_current_show_shortcode( $atts ) {
 				$encore .= '</div>';
 			}
 			// 2.3.3.8: added encore display filter
-			$encore = apply_filters( 'radio_station_current_show_encore_display', $encore, $show['id'], $atts );
+			$encore = apply_filters( 'radio_station_current_show_encore_display', $encore, $show_id, $atts );
 			if ( ( '' != $encore ) && is_string( $encore ) ) {
 				$html['encore'] = $encore;
 			}
@@ -1674,7 +1681,7 @@ function radio_station_current_show_shortcode( $atts ) {
 				$playlist .= '</div>';
 			}
 			// 2.3.3.8: added playlist diplay filter
-			$playlist = apply_filters( 'radio_station_current_show_playlist_display', $playlist, $show['id'], $atts );
+			$playlist = apply_filters( 'radio_station_current_show_playlist_display', $playlist, $show_id, $atts );
 			if ( ( '' != $playlist ) && is_string( $playlist ) ) {
 				$html['playlist'] = $playlist;
 			}
@@ -1690,8 +1697,8 @@ function radio_station_current_show_shortcode( $atts ) {
 		if ( $atts['show_desc'] ) {
 
 			// --- get show post ---
-			$show_post = get_post( $show['id'] );
-			$permalink = get_permalink( $show_post->ID );
+			$show_post = get_post( $show_id );
+			$permalink = get_permalink( $show_id );
 
 			// --- get show excerpt ---
 			if ( !empty( $show_post->post_excerpt ) ) {
@@ -1708,9 +1715,9 @@ function radio_station_current_show_shortcode( $atts ) {
 			// --- filter excerpt by context ---
 			// 2.3.0: added contextual filtering
 			if ( $atts['widget'] ) {
-				$excerpt = apply_filters( 'radio_station_current_show_widget_excerpt', $excerpt, $show['id'], $atts );
+				$excerpt = apply_filters( 'radio_station_current_show_widget_excerpt', $excerpt, $show_id, $atts );
 			} else {
-				$excerpt = apply_filters( 'radio_station_current_show_shortcode_excerpt', $excerpt, $show['id'], $atts );
+				$excerpt = apply_filters( 'radio_station_current_show_shortcode_excerpt', $excerpt, $show_id, $atts );
 			}
 
 			// --- set description ---
@@ -1720,7 +1727,7 @@ function radio_station_current_show_shortcode( $atts ) {
 				$description .= $excerpt;
 				$description .= '</div>';
 			}
-			$description = apply_filters( 'radio_station_current_show_description_display', $description, $show['id'], $atts );
+			$description = apply_filters( 'radio_station_current_show_description_display', $description, $show_id, $atts );
 			if ( ( '' != $description ) && is_string( $description ) ) {
 				$html['description'] = $description;
 			}
@@ -1729,7 +1736,7 @@ function radio_station_current_show_shortcode( $atts ) {
 		// --- output full show schedule ---
 		// 2.3.2: do not display all shifts for overrides
 		if ( $atts['show_all_sched'] && !isset( $current_shift['override'] ) ) {
-			$schedule = apply_filters( 'radio_station_current_show_shifts_display', $shift_display, $show['id'], $atts );
+			$schedule = apply_filters( 'radio_station_current_show_shifts_display', $shift_display, $show_id, $atts );
 			if ( ( '' != $schedule ) && is_string( $schedule ) ) {
 				$html['schedule'] = $schedule;
 			}
@@ -1737,7 +1744,7 @@ function radio_station_current_show_shortcode( $atts ) {
 
 		// --- custom HTML section ---
 		// 2.3.3.8: added custom HTML section
-		$html['custom'] = apply_filters( 'radio_station_current_show_custom_display', '', $show['id'], $atts );
+		$html['custom'] = apply_filters( 'radio_station_current_show_custom_display', '', $show_id, $atts );
 
 		// --- open current show list item ---
 		$output .= '<li class="current-show on-air-dj">';
@@ -1802,7 +1809,7 @@ function radio_station_current_show_shortcode( $atts ) {
 
 		// --- for dynamic reloading ---
 		if ( $atts['dynamic'] ) {
-			$dynamic = apply_filters( 'radio_station_countdown_dynamic', false, 'current_show', $atts, $current_shift_end );
+			$dynamic = apply_filters( 'radio_station_countdown_dynamic', false, 'current-show', $atts, $current_shift_end );
 			if ( $dynamic ) {
 				$output .= $dynamic;
 			}
@@ -1832,7 +1839,7 @@ function radio_station_current_show() {
 	// --- sanitize shortcode attributes ---
 	$atts = radio_station_sanitize_shortcode_values( 'current-show' );
 	if ( RADIO_STATION_DEBUG ) {
-		print_r( $atts );
+		echo "Current Show Shortcode Attributes: " . print_r( $atts, true );
 	}
 
 	// --- output widget contents ---
@@ -1968,8 +1975,10 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 	// --- maybe do AJAX load ---
 	// 2.3.2 added widget AJAX loading
-	$atts['ajax'] = apply_filters( 'radio_station_widgets_ajax_override', $atts['ajax'], 'upcoming-shows', $atts['widget'] );
-	if ( 'on' == $atts['ajax'] ) {
+	$ajax = $atts['ajax'];
+	$widget = $atts['widget'];
+	$ajax = apply_filters( 'radio_station_widgets_ajax_override', $ajax, 'upcoming-shows', $widget );
+	if ( 'on' == $ajax ) {
 		if ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) {
 
 			// --- AJAX load via iframe ---
@@ -2093,12 +2102,13 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 			// --- get show data ---
 			$show = $shift['show'];
+			$show_id = $show['id'];
 
 			// --- set show link ---
 			$show_link = false;
 			if ( $atts['show_link'] ) {
-				$show_link = get_permalink( $show['id'] );
-				$show_link = apply_filters( 'radio_station_upcoming_show_link', $show_link, $show['id'], $atts );
+				$show_link = get_permalink( $show_id );
+				$show_link = apply_filters( 'radio_station_upcoming_show_link', $show_link, $show_id, $atts );
 			}
 
 			// --- check show schedule ---
@@ -2184,7 +2194,7 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 				$title .= esc_html( $show['name'] );
 			}
 			$title .= '</div>';
-			$title = apply_filters( 'radio_station_upcoming_show_title_display', $title, $show['id'], $atts );
+			$title = apply_filters( 'radio_station_upcoming_show_title_display', $title, $show_id, $atts );
 			if ( ( '' != $title ) && is_string( $title ) ) {
 				$html['title'] = $title;
 			}
@@ -2196,8 +2206,8 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 				// 2.3.0: filter show avatar by context
 				// 2.3.0: maybe link avatar to show
 				$avatar = '';
-				$show_avatar = radio_station_get_show_avatar( $show['id'] );
-				$show_avatar = apply_filters( 'radio_station_upcoming_show_avatar', $show_avatar, $show['id'], $atts );
+				$show_avatar = radio_station_get_show_avatar( $show_id );
+				$show_avatar = apply_filters( 'radio_station_upcoming_show_avatar', $show_avatar, $show_id, $atts );
 				if ( $show_avatar ) {
 					$avatar = '<div class="upcoming-show-avatar on-air-dj-avatar' . esc_attr( $float_class ) . '" ' . $width_style . '>';
 					if ( $atts['show_link'] ) {
@@ -2209,7 +2219,7 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 					}
 					$avatar .= '</div>';
 				}
-				$avatar = apply_filters( 'radio_station_upcoming_show_avatar_display', $avatar, $show['id'], $atts );
+				$avatar = apply_filters( 'radio_station_upcoming_show_avatar_display', $avatar, $show_id, $atts );
 				if ( ( '' != $avatar ) && is_string( $avatar ) ) {
 					$html['avatar'] = $avatar;
 				}
@@ -2219,7 +2229,7 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 			if ( $atts['display_hosts'] ) {
 
 				$hosts = '';
-				$show_hosts = get_post_meta( $show['id'], 'show_user_list', true );
+				$show_hosts = get_post_meta( $show_id, 'show_user_list', true );
 				if ( isset( $show_hosts ) && is_array( $show_hosts ) && ( count( $show_hosts ) > 0 ) ) {
 
 					$hosts = '<div class="upcoming-show-hosts on-air-dj-names">';
@@ -2266,7 +2276,7 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 					}
 					$hosts .= '</div>';
 				}
-				$hosts = apply_filters( 'radio_station_upcoming_show_hosts_display', $hosts, $show['id'], $atts );
+				$hosts = apply_filters( 'radio_station_upcoming_show_hosts_display', $hosts, $show_id, $atts );
 				if ( ( '' != $hosts ) && is_string( $hosts ) ) {
 					$html['hosts'] = $hosts;
 				}
@@ -2282,7 +2292,7 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 					$encore .= esc_html( __( 'Encore Presentation', 'radio-station' ) );
 					$encore .= '</div>';
 				}
-				$encore = apply_filters( 'radio_station_upcoming_show_encore_display', $encore, $show['id'], $atts );
+				$encore = apply_filters( 'radio_station_upcoming_show_encore_display', $encore, $show_id, $atts );
 				if ( ( '' != $encore ) && is_string( $encore ) ) {
 					$html['encore'] = $encore;
 				}
@@ -2295,7 +2305,7 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 			// --- set show schedule ---
 			if ( $atts['show_sched'] ) {
-				$schedule = apply_filters( 'radio_station_upcoming_show_shifts_display', $shift_display, $show['id'], $atts );
+				$schedule = apply_filters( 'radio_station_upcoming_show_shifts_display', $shift_display, $show_id, $atts );
 				if ( ( '' != $schedule ) && is_string( $schedule ) ) {
 					$html['shift'] = $schedule;
 				}
@@ -2303,7 +2313,7 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 			// --- custom HTML section ---
 			// 2.3.3.8: added custom HTML section
-			$html['custom'] = apply_filters( 'radio_station_upcoming_shows_custom_display', '', $show['id'], $atts );
+			$html['custom'] = apply_filters( 'radio_station_upcoming_shows_custom_display', '', $show_id, $atts );
 
 			// --- open upcoming show list item ---
 			$output .= '<li class="upcoming-show on-air-dj">';
@@ -2357,7 +2367,7 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 		// --- for dynamic reloading ---
 		if ( $atts['dynamic'] ) {
-			$dynamic = apply_filters( 'radio_station_countdown_dynamic', false, 'upcoming_shows', $atts, $next_start_time );
+			$dynamic = apply_filters( 'radio_station_countdown_dynamic', false, 'upcoming-shows', $atts, $next_start_time );
 			if ( $dynamic ) {
 				$output .= $dynamic;
 			}
@@ -2386,7 +2396,7 @@ function radio_station_upcoming_shows() {
 	// --- sanitize shortcode attributes ---
 	$atts = radio_station_sanitize_shortcode_values( 'upcoming-shows' );
 	if ( RADIO_STATION_DEBUG ) {
-		print_r( $atts );
+		echo "Upcoming Shows Shortcode Attributes: " . print_r( $atts, true );
 	}
 
 	// --- output widget contents ---
@@ -2497,8 +2507,10 @@ function radio_station_current_playlist_shortcode( $atts ) {
 
 	// --- maybe do AJAX load ---
 	// 2.3.2 added widget AJAX loading
-	$atts['ajax'] = apply_filters( 'radio_station_widgets_ajax_override', $atts['ajax'], 'current-playlist', $atts['widget'] );
-	if ( 'on' == $atts['ajax'] ) {
+	$ajax = $atts['ajax'];
+	$widget = $atts['widget'];
+	$ajax = apply_filters( 'radio_station_widgets_ajax_override', $ajax, 'current-playlist', $widget );
+	if ( 'on' == $ajax ) {
 		if ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) {
 
 			// --- AJAX load via iframe ---
@@ -2629,7 +2641,7 @@ function radio_station_current_playlist_shortcode( $atts ) {
 
 					// --- for dynamic reloading ---
 					if ( $atts['dynamic'] ) {
-						$dynamic = apply_filters( 'radio_station_countdown_dynamic', false, 'current_playlist', $atts, $shift_end_time );
+						$dynamic = apply_filters( 'radio_station_countdown_dynamic', false, 'current-playlist', $atts, $shift_end_time );
 						if ( $dynamic ) {
 							$html['countdown'] .= $dynamic;
 						}
@@ -2756,6 +2768,7 @@ function radio_station_current_playlist_shortcode( $atts ) {
 		$no_current_playlist = apply_filters( 'radio_station_no_current_playlist_text', $no_current_playlist, $atts );
 		$no_playlist .= $no_current_playlist;
 		$no_playlist .= '</div>';
+
 		// 2.3.3.8: added no playlist display filter
 		$no_playlist = apply_filters( 'radio_station_current_playlist_no_playlist_display', $no_playlist, $atts );
 		if ( ( '' != $no_playlist ) && is_string( $no_playlist ) ) {
@@ -2789,6 +2802,9 @@ function radio_station_current_playlist() {
 
 	// --- sanitize shortcode attributes ---
 	$atts = radio_station_sanitize_shortcode_values( 'current-playlist' );
+	if ( RADIO_STATION_DEBUG ) {
+		echo "Current Playlist Shortcode Attributes: " . print_r( $atts, true );
+	}
 
 	// --- output widget contents ---
 	echo '<div id="widget-contents">';

@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.3.3.7
+Version: 2.3.3.8
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -1728,7 +1728,7 @@ function radio_station_email_address( $email, $post_id ) {
 // Automatic Pages Content Filter
 // ------------------------------
 // 2.3.0: standalone filter for automatic page content
-// 2.3.1: re-add filter so the_content can be processed multuple times
+// 2.3.1: re-add filter so the_content can be processed multiple times
 // 2.3.3.6: set automatic content early and clear existing content
 add_filter( 'the_content', 'radio_station_automatic_pages_content_set', 1 );
 function radio_station_automatic_pages_content_set( $content ) {
@@ -1926,7 +1926,8 @@ function radio_station_single_content_template( $content, $post_type ) {
 
 	// --- filter and return buffered content ---
 	$output = str_replace( '<!-- the_content -->', $content, $output );
-	$output = apply_filters( 'radio_station_content_' . $post_type, $output, get_the_ID() );
+	$post_id = get_the_ID();
+	$output = apply_filters( 'radio_station_content_' . $post_type, $output, $post_id );
 
 	return $output;
 }
@@ -2237,10 +2238,11 @@ function radio_station_add_show_links( $content ) {
 	// note: playlists are linked via single-playlist-content.php template
 
 	// --- filter to allow related post types ---
+	$post_type = $post->post_type;
 	$post_types = array( 'post' );
 	$post_types = apply_filters( 'radio_station_show_related_post_types', $post_types );
 
-	if ( in_array( $post->post_type, $post_types ) ) {
+	if ( in_array( $post_type, $post_types ) ) {
 
 		// --- link show posts ---
 		$related_shows = get_post_meta( $post->ID, 'post_showblog_id', true );
@@ -2260,14 +2262,14 @@ function radio_station_add_show_links( $content ) {
 		if ( $related_shows && is_array( $related_shows ) && ( count( $related_shows ) > 0 ) ) {
 
 			$positions = array( 'after' );
-			$positions = apply_filters( 'radio_station_link_to_show_positions', $positions, $post->post_type, $post );
+			$positions = apply_filters( 'radio_station_link_to_show_positions', $positions, $post_type, $post );
 			if ( $positions && is_array( $positions ) && ( count( $positions ) > 0 ) ) {
 				if ( in_array( 'before', $positions ) || in_array( 'after', $positions ) ) {
 
 					// --- set related shows link(s) ---
 					// 2.3.3.6: get all related show links
 					$show_links = '';
-					$hash_ref = '#show-' . str_replace( 'rs-', '', $post->post_type ) . 's';
+					$hash_ref = '#show-' . str_replace( 'rs-', '', $post_type ) . 's';
 					foreach ( $related_shows as $related_show ) {
 						$show = get_post( $related_show );
 						$title = $show->post_title;
@@ -2280,7 +2282,7 @@ function radio_station_add_show_links( $content ) {
 
 					// --- set post type labels ---
 					$before = $after = '';
-					$post_type_object = get_post_type_object( $post->post_type );
+					$post_type_object = get_post_type_object( $post_type );
 					$singular = $post_type_object->labels->singular_name;
 					$plural = $post_type_object->labels->name;
 

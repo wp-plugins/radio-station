@@ -782,7 +782,8 @@ if ( ( strlen( trim( $content ) ) > 0 ) || $show_posts || $show_playlists || $sh
 		$i ++;
 	}
 }
-$sections = apply_filters( 'radio_station_show_page_sections', $sections, $post_id, $post_id );
+// 2.3.3.8: remove duplicate post_id filter argument
+$sections = apply_filters( 'radio_station_show_page_sections', $sections, $post_id );
 
 
 // -----------------------

@@ -190,7 +190,7 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 #### 2.3.3.8
 * Updated Plugin Panel Library
-* Added Stream Format selection setting
+* Added Stream Format, Station Name and Image settings
 * Added Station email address setting with default display option
 * Added Section order filtering for Master Schedules and Widgets
 * Added Show image alignment attribute to Schedule Tabs View

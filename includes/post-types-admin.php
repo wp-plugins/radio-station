@@ -1144,7 +1144,8 @@ function radio_station_add_post_show_metabox() {
 	// 2.3.0: moved check for shows inside metabox
 
 	// ---- add a filter for which post types to show metabox on ---
-	$post_types = apply_filters( 'radio_station_show_related_post_types', array( 'post' ) );
+	$post_types = array( 'post' );
+	$post_types = apply_filters( 'radio_station_show_related_post_types', $post_types );
 
 	// --- add the metabox to post types ---
 	add_meta_box(

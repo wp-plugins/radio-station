@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2.3.3.8
 * Update: Plugin Panel (1.1.7) with Image and Color Picker fields
-* Added: Stream Format selection setting
+& Documentation: Full Plugin Filter List added to docs/Filters.md
+* Added: Stream Format and Fallback/Format selection setting
+* Added: Station Image and Station Title for future Player Display
 * Added: Station Email Address setting with default display option
 * Added: Section order filtering for Master Schedule Views
 * Added: Section display filtering for Master Schedule Views
@@ -22,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed: Check for explicit singular.php template usage setting
 * Fixed: Access to Shows Data via querystring of Show ID/name
 * Fixed: Shows Data for Genres/Languages querystring of ID/name
+* Fixed: Override Display order output for Tab/List Views
 
 ### 2.3.3.7
 * Fixed: Schedule Overrides overlapping multiple Show shifts

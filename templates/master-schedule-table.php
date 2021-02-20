@@ -374,9 +374,10 @@ foreach ( $hours as $hour ) {
 						// 2.3.3.8: reset info array for each cell
 						$info = array();
 						$show = $shift['show'];
+						$show_id = $show['id'];
 
 						// --- set the show div classes ---
-						$divclasses = array( 'master-show-entry', 'show-id-' . $show['id'], $show['slug'] );
+						$divclasses = array( 'master-show-entry', 'show-id-' . $show_id, $show['slug'] );
 						if ( $nowplaying ) {
 							$divclasses[] = 'nowplaying';
 						}
@@ -423,15 +424,15 @@ foreach ( $hours as $hour ) {
 							if ( $atts['show_link'] ) {
 								$show_link = $show['url'];
 							}
-							$show_link = apply_filters( 'radio_station_schedule_show_link', $show_link, $show['id'], 'table' );
+							$show_link = apply_filters( 'radio_station_schedule_show_link', $show_link, $show_id, 'table' );
 
 							// --- show logo / thumbnail ---
 							// 2.3.0: filter show avatar via show ID and context
 							$show_avatar = false;
 							if ( $atts['show_image'] ) {
-								$show_avatar = radio_station_get_show_avatar( $show['id'], $avatar_size );
+								$show_avatar = radio_station_get_show_avatar( $show_id, $avatar_size );
 							}
-							$show_avatar = apply_filters( 'radio_station_schedule_show_avatar', $show_avatar, $show['id'], 'table' );
+							$show_avatar = apply_filters( 'radio_station_schedule_show_avatar', $show_avatar, $show_id, 'table' );
 							if ( $show_avatar ) {
 								$avatar = '<div class="show-image">' . $newline;
 								if ( $show_link ) {
@@ -440,7 +441,7 @@ foreach ( $hours as $hour ) {
 									$avatar .= $show_avatar . $newline;
 								}
 								$avatar .= '</div>' . $newline;
-								$avatar = apply_filters( 'radio_station_schedule_show_avatar_display', $avatar, $show['id'], 'table' );
+								$avatar = apply_filters( 'radio_station_schedule_show_avatar_display', $avatar, $show_id, 'table' );
 								if ( ( '' != $avatar ) && is_string( $avatar ) ) {
 									$info['avatar'] = $avatar;
 									// $cell .= $avatar;
@@ -455,7 +456,7 @@ foreach ( $hours as $hour ) {
 								$title .= esc_html( $show['name'] ) . $newline;
 							}
 							$title .= '</div>' . $newline;
-							$title = apply_filters( 'radio_station_schedule_show_title_display', $title, $show['id'], 'table' );
+							$title = apply_filters( 'radio_station_schedule_show_title_display', $title, $show_id, 'table' );
 							if ( ( '' != $title ) && is_string( $title ) ) {
 								$info['title'] = $title;
 								// $cell .= $title;
@@ -491,12 +492,12 @@ foreach ( $hours as $hour ) {
 									}
 								}
 
-								$show_hosts = apply_filters( 'radio_station_schedule_show_hosts', $show_hosts, $show['id'], 'table' );
+								$show_hosts = apply_filters( 'radio_station_schedule_show_hosts', $show_hosts, $show_id, 'table' );
 								if ( $show_hosts ) {
 									$hosts = '<div class="show-dj-names show-host-names">' . $newline;
 									$hosts .= $show_hosts;
 									$hosts .= '</div>' . $newline;
-									$hosts = apply_filters( 'radio_station_schedule_show_hosts_display', $hosts, $show['id'], 'table' );
+									$hosts = apply_filters( 'radio_station_schedule_show_hosts_display', $hosts, $show_id, 'table' );
 									if ( ( '' != $hosts ) && is_string( $hosts ) ) {
 										$info['hosts'] = $hosts;
 										// $cell .= $hosts;
@@ -536,10 +537,10 @@ foreach ( $hours as $hour ) {
 							}
 
 							// --- add show time to cell ---
-							$show_time = apply_filters( 'radio_station_schedule_show_time', $show_time, $show['id'], 'table', $shift );
+							$show_time = apply_filters( 'radio_station_schedule_show_time', $show_time, $show_id, 'table', $shift );
 							$times = '<div class="show-time" id="show-time-' . esc_attr( $tcount ) . '"';
 							// note: unlike other display filters this hides/shows times rather than string filtering
-							$display = apply_filters( 'radio_station_schedule_show_time_display', true, $show['id'], 'table', $shift );
+							$display = apply_filters( 'radio_station_schedule_show_time_display', true, $show_id, 'table', $shift );
 							if ( !$display ) {
 								$times .= ' style="display:none;"';
 							}
@@ -555,12 +556,13 @@ foreach ( $hours as $hour ) {
 							if ( $atts['show_encore'] && isset( $shift['encore'] ) ) {
 								$show_encore = $shift['encore'];
 							}
-							$show_encore = apply_filters( 'radio_station_schedule_show_encore', $shift['encore'], $show['id'], 'table' );
+							// 2.3.3.8: fix to filtered value variable
+							$show_encore = apply_filters( 'radio_station_schedule_show_encore', $show_encore, $show_id, 'table' );
 							if ( 'on' == $show_encore ) {
 								$encore = '<div class="show-encore">';
 								$encore .= esc_html( __( 'encore airing', 'radio-station' ) );
 								$encore .= '</div>' . $newline;
-								$encore = apply_filters( 'radio_station_schedule_show_encore_display', $encore, $show['id'], 'table' );
+								$encore = apply_filters( 'radio_station_schedule_show_encore_display', $encore, $show_id, 'table' );
 								if ( ( '' != $encore ) && is_string( $encore ) ) {
 									$info['encore'] = $encore;
 									// $cell .= $encore;
@@ -573,19 +575,20 @@ foreach ( $hours as $hour ) {
 							// 2.3.3.8: added filter for show file anchor
 							$show_file = false;
 							if ( $atts['show_file'] ) {
-								$show_file = get_post_meta( $show['id'], 'show_file', true );
+								$show_file = get_post_meta( $show_id, 'show_file', true );
 							}
-							$show_file = apply_filters( 'radio_station_schedule_show_file', $show_file, $show['id'], 'table' );
-							$disable_download = get_post_meta( $show['id'], 'show_download', true );
+							$show_file = apply_filters( 'radio_station_schedule_show_file', $show_file, $show_id, 'table' );
+							$disable_download = get_post_meta( $show_id, 'show_download', true );
 							if ( $show_file && !empty( $show_file ) && !$disable_download ) {
 								$anchor = __( 'Audio File', 'radio-station' );
-								$anchor = apply_filters( 'radio_station_schedule_show_file_anchor', $anchor, $show['id'], 'tabs' );
+								// 2.3.3.8: fix to incorrect context argument 'tabs'
+								$anchor = apply_filters( 'radio_station_schedule_show_file_anchor', $anchor, $show_id, 'table' );
 								$file = '<div class="show-file">' . $newline;
 								$file .= '<a href="' . esc_url( $show_file ) . '">';
 								$file .= esc_html( $anchor );
 								$file .= '</a>' . $newline;
 								$file .= '</div>' . $newline;
-								$file = apply_filters( 'radio_station_schedule_show_file_display', $file, $show_file, $show['id'], 'table' );
+								$file = apply_filters( 'radio_station_schedule_show_file_display', $file, $show_file, $show_id, 'table' );
 								if ( ( '' != $file ) && is_string( $file ) ) {
 									$info['file'] = $file;
 									// $cell .= $link;
@@ -607,13 +610,13 @@ foreach ( $hours as $hour ) {
 								}
 
 								// --- filter excerpt by context ---
-								$show_excerpt = apply_filters( 'radio_station_schedule_show_excerpt', $show_excerpt, $show['id'], 'table' );
+								$show_excerpt = apply_filters( 'radio_station_schedule_show_excerpt', $show_excerpt, $show_id, 'table' );
 
 								// --- output excerpt ---
 								$excerpt = '<div class="show-desc">' . $newline;
 								$excerpt .= $show_excerpt . $newline;
 								$excerpt .= '</div>' . $newline;
-								$excerpt = apply_filters( 'radio_station_schedule_show_excerpt_display', $excerpy, $show['id'], 'table' );
+								$excerpt = apply_filters( 'radio_station_schedule_show_excerpt_display', $excerpy, $show_id, 'table' );
 								if ( ( '' != $excerpt ) && is_string( $excerpt ) ) {
 									$info['excerpt'] = $excerpt;
 									// $cell .= $excerpt;
@@ -622,7 +625,7 @@ foreach ( $hours as $hour ) {
 
 							// --- custom info section ---
 							// 2.3.3.8: allow for custom HTML to be added
-							$custom = apply_filters( 'radio_station_schedule_show_custom_display', '', $show['id'], 'table' );
+							$custom = apply_filters( 'radio_station_schedule_show_custom_display', '', $show_id, 'table' );
 							if ( ( '' != $custom ) && is_string( $custom ) ) {
 								$info['custom'] = $custom;
 							}
