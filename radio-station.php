@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.3.3.7
+Version: 2.3.3.8
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -137,13 +137,6 @@ require RADIO_STATION_DIR . '/includes/class-upcoming-shows-widget.php';
 require RADIO_STATION_DIR . '/includes/class-current-playlist-widget.php';
 require RADIO_STATION_DIR . '/includes/class-radio-clock-widget.php';
 
-// --- Player ---
-// 2.3.1.1: load radio player prototype (if present)
-$player_file = RADIO_STATION_DIR . '/player/radio-player.php';
-if ( file_exists( $player_file ) ) {
-	require $player_file;
-}
-
 // --- Feature Development ---
 // 2.3.0: add feature branch development includes
 // 2.3.1: added radio player widget file
@@ -153,6 +146,13 @@ foreach ( $features as $feature ) {
 	if ( file_exists ( $filepath ) ) {
 		include $filepath;
 	}
+}
+
+// --- Player ---
+// 2.3.1.1: load radio player prototype (if present)
+$player_file = RADIO_STATION_DIR . '/player/radio-player.php';
+if ( file_exists( $player_file ) ) {
+	require $player_file;
 }
 
 
@@ -179,37 +179,37 @@ $options = array(
 	),
 
 	// --- Stream Format ---
-	// 'streaming_format' => array(
-	// 	'type'    => 'select',
-	// 	'options' => $formats,
-	// 	'label'   => __( 'Streaming Format', 'radio-station' ),
-	//	'default' => 'aac',
-	// 	'helper'  => __( 'Select streaming fallback for streaming URL.', 'radio-station' ),
-	// 	'tab'     => 'general',
-	// 	'section' => 'broadcast',
-	// ),
+	'streaming_format' => array(
+	 	'type'    => 'select',
+	 	'options' => $formats,
+	 	'label'   => __( 'Streaming Format', 'radio-station' ),
+		'default' => 'aac',
+	 	'helper'  => __( 'Select streaming format for streaming URL.', 'radio-station' ),
+	 	'tab'     => 'general',
+	 	'section' => 'broadcast',
+	),
 
 	// --- Fallback Stream URL ---
-	// 'fallback_url' => array(
-	// 	'type'    => 'text',
-	// 	'options' => 'URL',
-	// 	'label'   => __( 'Fallback Stream URL', 'radio-station' ),
-	//  'default' => '',
-	// 	'helper'  => __( 'Enter an alternative Streaming URL for Player fallback.', 'radio-station' ),
-	// 	'tab'     => 'general',
-	// 	'section' => 'broadcast',
-	// ),
+	'fallback_url' => array(
+	 	'type'    => 'text',
+	 	'options' => 'URL',
+	 	'label'   => __( 'Fallback Stream URL', 'radio-station' ),
+		'default' => '',
+	 	'helper'  => __( 'Enter an alternative Streaming URL for Player fallback.', 'radio-station' ),
+	 	'tab'     => 'general',
+	 	'section' => 'broadcast',
+	),
 
 	// --- Fallback Stream Format ---
-	// 'fallback_format' => array(
-	// 	'type'    => 'text',
-	// 	'options' => $formats,
-	// 	'label'   => __( 'Fallback Format', 'radio-station' ),
-	//	'default' => 'oga',
-	// 	'helper'  => __( 'Select streaming fallback for fallback URL.', 'radio-station' ),
-	// 	'tab'     => 'general',
-	// 	'section' => 'broadcast',
-	// ),
+	'fallback_format' => array(
+	 	'type'    => 'select',
+	 	'options' => $formats,
+	 	'label'   => __( 'Fallback Format', 'radio-station' ),
+		'default' => 'ogg',
+	 	'helper'  => __( 'Select streaming fallback for fallback URL.', 'radio-station' ),
+	 	'tab'     => 'general',
+	 	'section' => 'broadcast',
+	),
 
 	// --- Main Radio Language ---
 	'radio_language'    => array(
@@ -222,32 +222,29 @@ $options = array(
 		'section' => 'broadcast',
 	),
 
-	// --- Station Phone Number ---
-	// 2.3.3.6: added station phone number option
-	'station_phone'		=> array(
+	// === Station ===
+
+	// --- Station Title ---
+	// 2.3.3.8: added station title field
+	'station_title'     => array(
 		'type'    => 'text',
-		'options' => 'PHONE',
-		'label'   => __( 'Station Phone', 'radio-station' ),
+		'label'   => __( 'Station Title', 'radio-station' ),
 		'default' => '',
-		'helper'  => __( 'Main call in phone number for the Station (for requests etc.)', 'radio-station' ),
+		'helper'  => __( 'Name of your Radio Station. For use in Stream Player and Data Feeds.', 'radio-station' ),
 		'tab'     => 'general',
-		'section' => 'broadcast',
+		'section' => 'station',
 	),
 
-	// --- Phone for Shows ---
-	// 2.3.3.6: added default to station phone option
-	'shows_phone'		=> array(
-		'type'    => 'checkbox',
+	// --- Station Image ---
+	// 2.3.3.8: added station logo image field
+	'station_image'     => array(
+		'type'    => 'image',
+		'label'   => __( 'Station Logo Image', 'radio-station' ),
 		'default' => '',
-		'value'   => 'yes',
-		'label'   => __( 'Show Phone Display', 'radio-station' ),
-		'helper'  => __( 'Display Station phone number on Shows where a Show phone number is not set.', 'radio-station' ),
+		'helper'  => __( 'Add a logo image for your Radio Station. Please ensure image is square before uploading. Recommended size 256 x 256', 'radio-station' ),
 		'tab'     => 'general',
-		'section' => 'broadcast',
+		'section' => 'station',
 	),
-
-
-	// === Times ===
 
 	// --- Timezone Location ---
 	'timezone_location' => array(
@@ -257,7 +254,7 @@ $options = array(
 		'default' => '',
 		'helper'  => __( 'Select your Broadcast Location for Radio Timezone display.', 'radio-station' ),
 		'tab'     => 'general',
-		'section' => 'times',
+		'section' => 'station',
 	),
 
 	// --- Clock Time Format ---
@@ -271,8 +268,57 @@ $options = array(
 		'default' => '12',
 		'helper'  => __( 'Default Time Format for display output. Can be overridden in each shortcode or widget.', 'radio-station' ),
 		'tab'     => 'general',
-		'section' => 'times',
+		'section' => 'station',
 	),
+
+	// --- Station Phone Number ---
+	// 2.3.3.6: added station phone number option
+	'station_phone'		=> array(
+		'type'    => 'text',
+		'options' => 'PHONE',
+		'label'   => __( 'Station Phone', 'radio-station' ),
+		'default' => '',
+		'helper'  => __( 'Main call in phone number for the Station (for requests etc.)', 'radio-station' ),
+		'tab'     => 'general',
+		'section' => 'station',
+	),
+
+	// --- Phone for Shows ---
+	// 2.3.3.6: added default to station phone option
+	'shows_phone'		=> array(
+		'type'    => 'checkbox',
+		'default' => '',
+		'value'   => 'yes',
+		'label'   => __( 'Show Phone Display', 'radio-station' ),
+		'helper'  => __( 'Display Station phone number on Shows where a Show phone number is not set.', 'radio-station' ),
+		'tab'     => 'general',
+		'section' => 'station',
+	),
+
+	// --- Station Email Address ---
+	// 2.3.3.8: added station email address option
+	'station_email'		=> array(
+		'type'    => 'email',
+		'default' => '',
+		'label'   => __( 'Station Email', 'radio-station' ),
+		'helper'  => __( 'Main email address for the Station (for requests etc.)', 'radio-station' ),
+		'tab'     => 'general',
+		'section' => 'station',
+	),
+
+	// --- Email for Shows ---
+	// 2.3.3.8: added default to email address option
+	'shows_email'		=> array(
+		'type'    => 'checkbox',
+		'default' => '',
+		'value'   => 'yes',
+		'label'   => __( 'Show Email Display', 'radio-station' ),
+		'helper'  => __( 'Display Station email address on Shows where a Show email address is not set.', 'radio-station' ),
+		'tab'     => 'general',
+		'section' => 'station',
+	),
+
+	// === Feeds ===
 
 	// --- REST Data Routes ---
 	'enable_data_routes' => array(
@@ -342,6 +388,283 @@ $options = array(
 		'section' => 'feeds',
 		'pro'     => true,
 	), */
+
+	// === Basic Stream Player ===
+
+	// TODO: add note about these defaults being overrideable in widgets
+
+	// --- Player Title ---
+	'player_title'		=> array (
+		'type'    => 'checkbox',
+		'label'   => __( 'Display Station Title', 'radio-station' ),
+		'default' => 'yes',
+		'value'   => 'yes',
+		'helper'  => __( 'Display your Radio Station Title in Player by default.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'basic',
+		'pro'     => false,
+	),
+
+	// --- Player Image ---
+	'player_image'		=> array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Display Station Image', 'radio-station' ),
+		'default' => 'yes',
+		'value'   => 'yes',
+		'helper'  => __( 'Display your Radio Station Image in Player by default.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'basic',
+		'pro'     => false,
+	),
+
+	// --- Player Script ---
+	'player_script'       => array(
+		'type'    => 'select',
+		'label'   => __( 'Player Script', 'radio-station' ),
+		'default' => 'amplitude',
+		'options' => array(
+			'amplitude' => __( 'Amplitude', 'radio-station' ),
+			'howler'    => __( 'Howler', 'radio-station' ),
+			'jplayer'   => __( 'jPlayer', 'radio-station' ),
+		),
+		'helper'  => __( 'Default Script to use for Radio Streaming Player.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'basic',
+		'pro'     => false,
+	),
+
+	// --- Player Theme ---
+	'player_theme'      => array(
+		'type'    => 'select',
+		'label'   => __( 'Default Player Theme', 'radio-station' ),
+		'default' => 'light',
+		'options' => array(
+			'light'	=> __( 'Light', 'radio-station' ),
+			'dark'	=> __( 'Dark', 'radio-station' ),
+		),
+		'helper'  => __( 'Default Player Controls theme style.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'basic',
+		'pro'     => false,
+	),
+
+	// --- Player Buttons ---
+	'player_buttons'      => array(
+		'type'    => 'select',
+		'label'   => __( 'Default Player Buttons', 'radio-station' ),
+		'default' => 'rounded',
+		'options' => array(
+			'circular' => __( 'Circular Buttons', 'radio-station' ),
+			'rounded'  => __( 'Rounded Buttons', 'radio-station' ),
+			'square'   => __( 'Square Buttons', 'radio-station' ),
+		),
+		'helper'  => __( 'Default Player Buttons shape style.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'basic',
+		'pro'     => false,
+	),
+
+	// --- Player Debug Mode ---
+	'player_debug'                => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Player Debug Mode', 'radio-station' ),
+		'default' => '',
+		'value'   => 'yes',
+		'helper'  => __( 'Output player debug information in browser console.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'basic',
+		'pro'     => false,
+	),
+
+	// === Player Colours ===
+	
+	// --- [Pro] Playing Highlight Color ---
+	'player_playing_color'        => array(
+		'type'    => 'color',
+		'label'   => __( 'Playing Icon Highlight Color', 'radio-station' ),
+		'default' => '#70E070',
+		'helper'  => __( 'Default highlight color to use for Play button icon when playing.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'colors',
+		'pro'     => true,
+	),
+
+	// --- [Pro] Control Icons Highlight Color ---
+	'player_buttons_color'        => array(
+		'type'    => 'color',
+		'label'   => __( 'Control Icons Highlight Color', 'radio-station' ),
+		'default' => '#00A0E0',
+		'helper'  => __( 'Default highlight color to use for Control buttons when active.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'colors',
+		'pro'     => true,
+	),
+
+	// --- [Pro] Volume Knob Color ---
+	'player_thumb_color'        => array(
+		'type'    => 'color',
+		'label'   => __( 'Volume Knob Color', 'radio-station' ),
+		'default' => '#80C080',
+		'helper'  => __( 'Default Knob Color for Player Volume Slider.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'colors',
+		'pro'     => true,
+	),
+
+	// --- [Pro] Volume Track Color ---
+	'player_range_color'        => array(
+		'type'    => 'coloralpha',
+		'label'   => __( 'Volume Track Color', 'radio-station' ),
+		'default' => '#80C080',
+		'helper'  => __( 'Default Track Color for Player Volume Slider.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'colors',
+		'pro'     => true,
+	),
+
+	// === Advanced Stream Player ===
+
+	// --- Player Volume ---
+	'player_volume'     => array(
+		'type'    => 'number',
+		'label'   => __( 'Player Start Volume', 'radio-station' ),
+		'default' => 77,
+		'min'     => 0,
+		'step'    => 1,
+		'max'     => 100,
+		'helper'  => __( 'Initial volume for when the Player starts playback.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'advanced',
+		'pro'     => false,
+	),
+
+	// --- Single Player ---
+	'player_single'     => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Single Player at Once', 'radio-station' ),
+		'default' => 'yes',
+		'value'   => 'yes',
+		'helper'  => __( 'Stop any existing Players on the page or in other windows or tabs when a Player is started.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'advanced',
+		'pro'     => false,
+	),
+
+	// --- [Pro] Player Autoresume ---
+	'player_autoresume' => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Autoresume Playback', 'radio-station' ),
+		'default' => 'yes',
+		'value'   => 'yes',
+		'helper'  => __( 'Attempt to resume playback if visitor was playing. Only triggered when the user first interacts with the page.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'advanced',
+		'pro'     => true,
+	),
+
+	// --- [Pro] Popup Player Window ---
+	/* 'player_popup'        => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Popup Player Window', 'radio-station' ),
+		'default' => '',
+		'value'   => 'yes',
+		'helper'  => __( 'Add a popup icon to your Player to open it in a separate window.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'advanced',
+		'pro'     => true,
+	), */
+
+	// === Sitewide Player Bar ===
+
+	// --- Player Bar Note ---
+	'player_bar_note'      => array(
+		'type'    => 'note',
+		'label'   => __( 'Bar Defaults Note', 'radio-station' ),
+		'helper'  => __( 'The Bar Player uses the default configurations set above.', 'radio-station' )
+			     . ' ' . __( 'You can override these in specific Player Widgets.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'bar',
+		// 'pro'  => true,
+	),
+
+	// --- [Pro] Sitewide Player Bar ---
+	'player_bar'        => array(
+		'type'    => 'select',
+		'label'   => __( 'Sitewide Player Bar', 'radio-station' ),
+		'default' => 'off',
+		'options' => array(
+			'off'		=> __( 'No Player Bar', 'radio-station' ),
+			'top'   	=> __( 'Top Player Bar', 'radio-station' ),
+			'bottom'	=> __( 'Bottom Player Bar', 'radio-station' ),
+		),
+		'tab'     => 'player',
+		'section' => 'bar',
+		'helper'  => __( 'Add a fixed position Player Bar which displays Sitewide.', 'radio-station' ),
+		'pro'     => true,
+	),
+
+	// --- [Pro] Fade In Player Bar ---
+	'player_bar_fadein'        => array(
+		'type'    => 'number',
+		'label'   => __( 'Fade In Player Bar', 'radio-station' ),
+		'default' => 2500,
+		'min'     => 0,
+		'step'    => 100,
+		'max'     => 10000,
+		'helper'  => __( 'Number of milliseconds after Page load over which to fade in Player Bar. Use 0 for instant display.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'bar',
+		'pro'     => true,
+	),
+
+	// --- [Pro] Continuous Playback ---
+	'player_bar_continuous' => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Continuous Playback', 'radio-station' ),
+		'default' => 'yes',
+		'helper'  => __( 'Uninterrupted Sitewide Bar playback while user is navigating between pages! Pages are loaded in background and faded in while Player Bar persists.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'bar',
+		'pro'     => true,
+	),
+
+	// --- [Pro] Player Page Fade ---
+	'player_bar_pagefade' => array(
+		'type'    => 'number',
+		'label'   => __( 'Fade In Player Bar', 'radio-station' ),
+		'default' => 2000,
+		'min'     => 0,
+		'step'    => 100,
+		'max'     => 10000,
+		'helper'  => __( 'Number of milliseconds over which to fade in new Pages when continuous playback is enabled. Use 0 for instant display.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'bar',
+		'pro'     => true,
+	),
+
+	// --- [Pro] Bar Player Text Color ---
+	'player_bar_text'        => array(
+		'type'    => 'color',
+		'label'   => __( 'Bar Player Text Color', 'radio-station' ),
+		'default' => '#FFFFFF',
+		'helper'  => __( 'Text color for the fixed position Sitewide Bar Player.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'bar',
+		'pro'     => true,
+	),
+
+	// --- [Pro] Bar Player Background Color ---
+	'player_bar_background'        => array(
+		'type'    => 'coloralpha',
+		'label'   => __( 'Bar Player Background Color', 'radio-station' ),
+		'default' => 'rgba(0,0,0,255)',
+		'helper'  => __( 'Background color for the fixed position Sitewide Bar Player.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'bar',
+		'pro'     => true,
+	),
+
+	// TODO: additional CSS input field ?
 
 	// === Master Schedule Page ===
 
@@ -662,7 +985,7 @@ $options = array(
 	//	'section' => 'archives',
 	// ),
 
-	// === Templates ===
+	// === Single Templates ===
 
 	// --- Templates Change Note ---
 	'templates_change_note'      => array(
@@ -671,7 +994,7 @@ $options = array(
 		'helper'  => __( 'Since 2.3.0, the way that Templates are implemented has changed.', 'radio-station' )
 		             . ' ' . __( 'See the Documentation for more information:', 'radio-station' )
 		             . ' <a href="' . RADIO_STATION_DOCS_URL . 'display/#page-templates" target="_blank">' . __( 'Templates Documentation', 'radio-station' ) . '</a>',
-		'tab'     => 'templates',
+		'tab'     => 'pages',
 		'section' => 'single',
 	),
 
@@ -687,7 +1010,7 @@ $options = array(
 		),
 		'default' => 'page',
 		'helper'  => __( 'Which template to use for displaying Show content.', 'radio-station' ),
-		'tab'     => 'templates',
+		'tab'     => 'pages',
 		'section' => 'single',
 	),
 
@@ -698,22 +1021,24 @@ $options = array(
 		'value'   => 'yes',
 		'default' => '',
 		'helper'  => __( 'Advanced usage. Use both a custom template AND content filtering for a Show. (Not compatible with Legacy templates.)', 'radio-station' ),
-		'tab'     => 'templates',
+		'tab'     => 'pages',
 		'section' => 'single',
 	),
 
 	// --- Playlist Template ---
+	// 2.3.3.8: added missing singular.php option to match show_template
 	'playlist_template'          => array(
 		'label'   => __( 'Playlist Template', 'radio-station' ),
 		'type'    => 'select',
 		'options' => array(
-			'page'   => __( 'Theme Page Template (page.php)', 'radio-station' ),
-			'post'   => __( 'Theme Post Template (single.php)', 'radio-station' ),
-			'legacy' => __( 'Legacy Plugin Template', 'radio-station' ),
+			'page'     => __( 'Theme Page Template (page.php)', 'radio-station' ),
+			'post'     => __( 'Theme Post Template (single.php)', 'radio-station' ),
+			'singular' => __( 'Theme Singular Template (singular.php)', 'radio-station' ),
+			'legacy'   => __( 'Legacy Plugin Template', 'radio-station' ),
 		),
 		'default' => 'page',
 		'helper'  => __( 'Which template to use for displaying Playlist content.', 'radio-station' ),
-		'tab'     => 'templates',
+		'tab'     => 'pages',
 		'section' => 'single',
 	),
 
@@ -724,7 +1049,7 @@ $options = array(
 		'value'   => 'yes',
 		'default' => '',
 		'helper'  => __( 'Advanced usage. Use both a custom template AND content filtering for a Playlist. (Not compatible with Legacy templates.)', 'radio-station' ),
-		'tab'     => 'templates',
+		'tab'     => 'pages',
 		'section' => 'single',
 	),
 
@@ -811,10 +1136,13 @@ $options = array(
 
 	// --- Tab Labels ---
 	// 2.3.2: add widget options tab
+	// 2.3.3.8: added player options tab
+	// 2.3.3.8: move templates section onto pages tab
 	'tabs'                    => array(
 		'general'   => __( 'General', 'radio-station' ),
+		'player'    => __( 'Player', 'radio-station' ),
 		'pages'     => __( 'Pages', 'radio-station' ),
-		'templates' => __( 'Templates', 'radio-station' ),
+		// 'templates' => __( 'Templates', 'radio-station' ),
 		'widgets'   => __( 'Widgets', 'radio-station' ),
 		'roles'     => __( 'Roles', 'radio-station' ),
 	),
@@ -822,10 +1150,13 @@ $options = array(
 	// --- Section Labels ---
 	// 2.3.2: add widget loading section
 	'sections'                => array(
-		'station'     => __( 'Station', 'radio-station' ),
 		'broadcast'   => __( 'Broadcast', 'radio-station' ),
-		'times'       => __( 'Times', 'radio-station' ),
+		'station'     => __( 'Station', 'radio-station' ),
 		'feeds'       => __( 'Feeds', 'radio-station' ),
+		'basic'       => __( 'Basic Defaults', 'radio-station' ),
+		'advanced'    => __( 'Advanced Defaults', 'radio-station' ),
+		'colors'      => __( 'Player Colors', 'radio-station' ),
+		'bar'         => __( 'Sitewide Bar Player', 'radio-station' ),
 		'single'      => __( 'Single Templates', 'radio-station' ),
 		'archive'     => __( 'Archive Templates', 'radio-station' ),
 		'schedule'    => __( 'Schedule Page', 'radio-station' ),
@@ -835,6 +1166,15 @@ $options = array(
 		'permissions' => __( 'Permissions', 'radio-station' ),
 	),
 );
+
+// 2.3.3.8: [temp] remove player options if player not present
+if ( !file_exists( $player_file ) ) {
+	foreach ( $options as $key => $option ) {
+		if ( 'player_' == substr( $key, 0, 7 ) ) {
+			unset( $options[$key] );
+		}
+	}
+}
 
 // ----------------------
 // Plugin Loader Settings
@@ -1218,8 +1558,10 @@ function radio_station_localize_script() {
 // -------------------------
 // 2.3.3.7: added streaming data filter for player integration
 add_filter( 'radio_station_player_data', 'radio_station_streaming_data' );
-function radio_station_streaming_data( $data ) {
+function radio_station_streaming_data( $data, $station = false ) {
 	$data = array(
+		'script'	=> radio_station_get_setting( 'player_script' ),
+		'instance'	=> 0,
 		'url'		=> radio_station_get_stream_url(),
 		'format'	=> radio_station_get_setting( 'streaming_format' ),
 		'fallback'	=> radio_station_get_setting( 'fallback_url' ),
@@ -1348,9 +1690,9 @@ function radio_station_get_template( $type, $template, $paths = false ) {
 	return false;
 }
 
-// ---------------------------
-// Station Phone Number Filter
-// ---------------------------
+// -------------------------------------
+// Station Phone Number for Shows Filter
+// -------------------------------------
 // 2.3.3.6: added to return station phone for all Shows (if not set for Show)
 add_filter( 'radio_station_show_phone', 'radio_station_phone_number', 10, 2 );
 function radio_station_phone_number( $phone, $post_id ) {
@@ -1365,11 +1707,28 @@ function radio_station_phone_number( $phone, $post_id ) {
 	return false;
 }
 
+// --------------------------------------
+// Station Email Address for Shows Filter
+// --------------------------------------
+// 2.3.3.8: added to return station email for all Shows (if not set for Show)
+add_filter( 'radio_station_show_email', 'radio_station_email_address', 10, 2 );
+function radio_station_email_address( $email, $post_id ) {
+	if ( $email ) {
+		return $email;
+	}
+	$shows_email = radio_station_get_setting( 'shows_email' );
+	if ( 'yes' == $shows_email ) {
+		$email = radio_station_get_setting( 'station_email' );
+		return $email;
+	}
+	return false;
+}
+
 // ------------------------------
 // Automatic Pages Content Filter
 // ------------------------------
 // 2.3.0: standalone filter for automatic page content
-// 2.3.1: re-add filter so the_content can be processed multuple times
+// 2.3.1: re-add filter so the_content can be processed multiple times
 // 2.3.3.6: set automatic content early and clear existing content
 add_filter( 'the_content', 'radio_station_automatic_pages_content_set', 1 );
 function radio_station_automatic_pages_content_set( $content ) {
@@ -1567,7 +1926,8 @@ function radio_station_single_content_template( $content, $post_type ) {
 
 	// --- filter and return buffered content ---
 	$output = str_replace( '<!-- the_content -->', $content, $output );
-	$output = apply_filters( 'radio_station_content_' . $post_type, $output, get_the_ID() );
+	$post_id = get_the_ID();
+	$output = apply_filters( 'radio_station_content_' . $post_type, $output, $post_id );
 
 	return $output;
 }
@@ -1799,14 +2159,17 @@ function radio_station_load_template( $single_template, $type, $templates ) {
 			}
 
 			// --- use post or page template ---
+			// 2.3.3.8: added missing singular.php template setting
 			if ( 'post' == $show_template ) {
 				$templates = array( 'single.php' );
 			} elseif ( 'page' == $show_template ) {
 				$templates = array( 'page.php' );
+			} elseif ( 'singular' == $show_template ) {
+				$template = array( 'singular.php' );
 			}
 
-			// --- add standard fallbacks to singular and index ---
-			$templates[] = 'singular.php';
+			// --- add standard fallbacks to index ---
+			// 2.3.3.8: remove singular fallback as it is explicitly chosen
 			$templates[] = 'index.php';
 			$single_template = get_query_template( $post_type, $templates );
 		}
@@ -1875,10 +2238,11 @@ function radio_station_add_show_links( $content ) {
 	// note: playlists are linked via single-playlist-content.php template
 
 	// --- filter to allow related post types ---
+	$post_type = $post->post_type;
 	$post_types = array( 'post' );
 	$post_types = apply_filters( 'radio_station_show_related_post_types', $post_types );
 
-	if ( in_array( $post->post_type, $post_types ) ) {
+	if ( in_array( $post_type, $post_types ) ) {
 
 		// --- link show posts ---
 		$related_shows = get_post_meta( $post->ID, 'post_showblog_id', true );
@@ -1898,14 +2262,14 @@ function radio_station_add_show_links( $content ) {
 		if ( $related_shows && is_array( $related_shows ) && ( count( $related_shows ) > 0 ) ) {
 
 			$positions = array( 'after' );
-			$positions = apply_filters( 'radio_station_link_to_show_positions', $positions, $post->post_type, $post );
+			$positions = apply_filters( 'radio_station_link_to_show_positions', $positions, $post_type, $post );
 			if ( $positions && is_array( $positions ) && ( count( $positions ) > 0 ) ) {
 				if ( in_array( 'before', $positions ) || in_array( 'after', $positions ) ) {
 
 					// --- set related shows link(s) ---
 					// 2.3.3.6: get all related show links
 					$show_links = '';
-					$hash_ref = '#show-' . str_replace( 'rs-', '', $post->post_type ) . 's';
+					$hash_ref = '#show-' . str_replace( 'rs-', '', $post_type ) . 's';
 					foreach ( $related_shows as $related_show ) {
 						$show = get_post( $related_show );
 						$title = $show->post_title;
@@ -1918,7 +2282,7 @@ function radio_station_add_show_links( $content ) {
 
 					// --- set post type labels ---
 					$before = $after = '';
-					$post_type_object = get_post_type_object( $post->post_type );
+					$post_type_object = get_post_type_object( $post_type );
 					$singular = $post_type_object->labels->singular_name;
 					$plural = $post_type_object->labels->name;
 

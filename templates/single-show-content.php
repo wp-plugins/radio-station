@@ -85,13 +85,14 @@ $icon_colors = array(
 
 // --- show home link icon ---
 // 2.3.3.4: added filter for title attribute
+// 2.3.3.8: added alt text to span for screen readers
 if ( $show_link ) {
 	$title = __( 'Visit Show Website', 'radio-station' );
 	$title = apply_filters( 'radio_station_show_website_title', $title, $post_id );
-	$icon = '<span style="color:' . esc_attr( $icon_colors['website'] ) . ';" class="dashicons dashicons-admin-links"></span>' . $newline;
+	$icon = '<span style="color:' . esc_attr( $icon_colors['website'] ) . ';" class="dashicons dashicons-admin-links" aria-hidden="true"></span>' . $newline;
 	$icon = apply_filters( 'radio_station_show_home_icon', $icon, $post_id );
 	$show_icons['home'] = '<div class="show-icon show-website">' . $newline;
-	$show_icons['home'] .= '<a href="' . esc_url( $show_link ) . '" title="' . esc_attr( $title ) . '" target="_blank">' . $newline;
+	$show_icons['home'] .= '<a href="' . esc_url( $show_link ) . '" title="' . esc_attr( $title ) . '" aria-label="' . esc_attr( $title ) . '" target="_blank">' . $newline;
 	$show_icons['home'] .= $icon;
 	$show_icons['home'] .= '</a>' . $newline;
 	$show_icons['home'] .= '</div>' . $newline;
@@ -99,13 +100,14 @@ if ( $show_link ) {
 
 // --- phone number icon ---
 // 2.3.3.6: added show phone icon
+// 2.3.3.8: added aria label to link and hidden to span icon
 if ( $show_phone ) {
 	$title = __( 'Call in Phone Number', 'radio-station' );
 	$title = apply_filters( 'radio_station_show_phone_title', $title, $post_id );
-	$icon = '<span style="color:' . esc_attr( $icon_colors['phone'] ) . ';" class="dashicons dashicons-phone"></span>' . $newline;
+	$icon = '<span style="color:' . esc_attr( $icon_colors['phone'] ) . ';" class="dashicons dashicons-phone" aria-hidden="true"></span>' . $newline;
 	$icon = apply_filters( 'radio_station_show_phone_icon', $icon, $post_id );
 	$show_icons['phone'] = '<div class="show-icon show-phone">' . $newline;
-	$show_icons['phone'] .= '<a href="tel:' . esc_attr( $show_phone ) . '" title="' . esc_attr( $title ) . '">' . $newline;
+	$show_icons['phone'] .= '<a href="tel:' . esc_attr( $show_phone ) . '" title="' . esc_attr( $title ) . '" aria-label="' . esc_attr( $title ) . '">' . $newline;
 	$show_icons['phone'] .= $icon . $newline;
 	$show_icons['phone'] .= '</a>' . $newline;
 	$show_icons['phone'] .= '</div>' . $newline;
@@ -113,13 +115,14 @@ if ( $show_phone ) {
 
 // --- email DJ / host icon ---
 // 2.3.3.4: added filter for title attribute
+// 2.3.3.8: added aria label to link and hidden to span icon
 if ( $show_email ) {
 	$title = __( 'Email Show Host', 'radio-station' );
 	$title = apply_filters( 'radio_station_show_email_title', $title, $post_id );
-	$icon = '<span style="color:' . esc_attr( $icon_colors['email'] ) . ';" class="dashicons dashicons-email"></span>' . $newline;
+	$icon = '<span style="color:' . esc_attr( $icon_colors['email'] ) . ';" class="dashicons dashicons-email" aria-hidden="true"></span>' . $newline;
 	$icon = apply_filters( 'radio_station_show_email_icon', $icon, $post_id );
 	$show_icons['email'] = '<div class="show-icon show-email">' . $newline;
-	$show_icons['email'] .= '<a href="mailto:' . sanitize_email( $show_email ) . '" title="' . esc_attr( $title ) . '">' . $newline;
+	$show_icons['email'] .= '<a href="mailto:' . sanitize_email( $show_email ) . '" title="' . esc_attr( $title ) . '" aria-label="' . esc_attr( $title ) . '">' . $newline;
 	$show_icons['email'] .= $icon . $newline;
 	$show_icons['email'] .= '</a>' . $newline;
 	$show_icons['email'] .= '</div>' . $newline;
@@ -127,14 +130,15 @@ if ( $show_email ) {
 
 // --- show RSS feed icon ---
 // 2.3.3.4: added filter for title attribute
+// 2.3.3.8: added aria label to link and hidden to span icon
 if ( $show_rss ) {
 	$feed_url = radio_station_get_show_rss_url( $post_id );
 	$title =  __( 'Show RSS Feed', 'radio-station' );
 	$title = apply_filters( 'radio_station_show_rss_title', $title, $post_id );
-	$icon = '<span style="color:' . esc_attr( $icon_colors['rss'] ) . ';" class="dashicons dashicons-rss"></span>' . $newline;
+	$icon = '<span style="color:' . esc_attr( $icon_colors['rss'] ) . ';" class="dashicons dashicons-rss" aria-hidden="true"></span>' . $newline;
 	$icon = apply_filters( 'radio_station_show_rss_icon', $icon, $post_id );
 	$show_icons['rss'] = '<div class="show-icon show-rss">' . $newline;
-	$show_icons['rss'] .= '<a href="' . esc_url( $feed_url ) . '" title="' . esc_attr( $title ) . '">' . $newline;
+	$show_icons['rss'] .= '<a href="' . esc_url( $feed_url ) . '" title="' . esc_attr( $title ) . '" aria-label="' . esc_attr( $title ) . '">' . $newline;
 	$show_icons['rss'] .= $icon . $newline;
 	$show_icons['rss'] .= '</a>' . $newline;
 	$show_icons['rss'] .= '</div>' . $newline;
@@ -269,12 +273,13 @@ if ( ( $avatar_id || $thumbnail_id ) || ( count( $show_icons ) > 0 ) || ( $show_
 
 			// --- Download Audio Icon ---
 			// 2.3.2: check show download switch
+			// 2.3.3.8: added aria label to link and hidden to span icon
 			if ( $show_download ) {
 				$title = __( 'Download Latest Broadcast', 'radio-station' );
 				$title = apply_filters( 'radio_station_show_download_title', $title, $post_id );
 				$image_blocks['player'] .= '<div class="show-download">' . $newline;
-				$image_blocks['player'] .= '<a href="' . esc_url( $show_file ) . '" title="' . esc_attr( $title ) . '">' . $newline;
-				$image_blocks['player'] .= '<span style="color:#7DBB00;" class="dashicons dashicons-download"></span>' . $newline;
+				$image_blocks['player'] .= '<a href="' . esc_url( $show_file ) . '" title="' . esc_attr( $title ) . '" aria-label="' . esc_attr( $title ) . '">' . $newline;
+				$image_blocks['player'] .= '<span style="color:#7DBB00;" class="dashicons dashicons-download" aria-hidden="true"></span>' . $newline;
 				$image_blocks['player'] .= '</a>' . $newline;
 				$image_blocks['player'] .= '</div>' . $newline;
 			}
@@ -777,7 +782,8 @@ if ( ( strlen( trim( $content ) ) > 0 ) || $show_posts || $show_playlists || $sh
 		$i ++;
 	}
 }
-$sections = apply_filters( 'radio_station_show_page_sections', $sections, $post_id, $post_id );
+// 2.3.3.8: remove duplicate post_id filter argument
+$sections = apply_filters( 'radio_station_show_page_sections', $sections, $post_id );
 
 
 // -----------------------

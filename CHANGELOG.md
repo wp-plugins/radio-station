@@ -7,6 +7,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### 2.3.3.8
+* Update: Plugin Panel (1.1.7) with Image and Color Picker fields
+& Documentation: Full Plugin Filter List added to docs/Filters.md
+* Added: Stream Format and Fallback/Format selection setting
+* Added: Station Image and Station Title for future Player Display
+* Added: Station Email Address setting with default display option
+* Added: Section order filtering for Master Schedule Views
+* Added: Section display filtering for Master Schedule Views
+* Added: Section display filtering for Widget sections
+* Added: Show image alignment attribute to Schedule Tabs View
+* Added: Show Description/Excerpt to Show Data Endpoint (via querystring)
+* Added: Reduced opacity for past Shows on Schedule Tab/Table Views
+* Added: Screen Reader text for Show icons on Show Page
+* Fixed: Display Widget Countdown when no Current Show/Playlist
+* Fixed: Check for explicit singular.php template usage setting
+* Fixed: Access to Shows Data via querystring of Show ID/name
+* Fixed: Shows Data for Genres/Languages querystring of ID/name
+* Fixed: Override Display order output for Tab/List Views
+
 ### 2.3.3.7
 * Fixed: Schedule Overrides overlapping multiple Show shifts
 * Fixed: Bulk Edit field repetition and possible jQuery conflict

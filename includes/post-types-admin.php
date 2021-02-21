@@ -1144,7 +1144,8 @@ function radio_station_add_post_show_metabox() {
 	// 2.3.0: moved check for shows inside metabox
 
 	// ---- add a filter for which post types to show metabox on ---
-	$post_types = apply_filters( 'radio_station_show_related_post_types', array( 'post' ) );
+	$post_types = array( 'post' );
+	$post_types = apply_filters( 'radio_station_show_related_post_types', $post_types );
 
 	// --- add the metabox to post types ---
 	add_meta_box(
@@ -1428,7 +1429,8 @@ function radio_station_post_column_data( $column, $post_id ) {
 						unset( $show_ids[$i] );
 					}
 				}
-				$data = implode( ',', $show_id );
+				// 2.3.3.8: fix to implode show_ids not show_id
+				$data = implode( ',', $show_ids );
 			} elseif ( $show_id > 0 ) {
 				$show_ids = array( $show_id );
 				$data = $show_id;
@@ -2950,7 +2952,7 @@ function radio_station_show_images_metabox() {
 		/* Delete Image on Click */
 		deleteimagelink.on( 'click', function( event ) {
 			event.preventDefault();
-			agree = confirm('" . esc_js( __( 'Are you sure?', 'radio-station' ) ) . "');
+			agree = confirm('" . esc_js( $confirm_remove ) . "');
 			if (!agree) {return;}
 			parentdiv = jQuery(this).parent().parent();
 			parentdiv.find('.custom-image-container').html('');

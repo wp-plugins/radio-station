@@ -38,9 +38,11 @@ class DJ_Widget extends WP_Widget {
 		// 2.2.4: added title position, avatar width and DJ link options
 		// 2.3.0: added countdown display option
 		// 2.3.2: added AJAX load option
+		// 2.3.3.8: added show encore text display option
 		$title_position = isset( $instance['title_position'] ) ? $instance['title_position'] : 'below';
 		$avatar_width = isset( $instance['avatar_width'] ) ? $instance['avatar_width'] : '';
 		$link_djs = isset( $instance['link_djs'] ) ? $instance['link_djs'] : '';
+		$show_encore = isset( $instance['show_encore'] ) ? $instance['show_encore'] : true;
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : false;
 		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : '';
 
@@ -57,7 +59,7 @@ class DJ_Widget extends WP_Widget {
 				' . esc_html( __( 'AJAX Load Widget?', 'radio-station' ) ) . '
 			</label>
         </p>
-        
+
         <p>
 			<label for="' . esc_attr( $this->get_field_id( 'title' ) ) . '">
 			' . esc_html( __( 'Title', 'radio-station' ) ) . ':
@@ -99,7 +101,7 @@ class DJ_Widget extends WP_Widget {
 		</p>
 
 		<p>
-			<label for="' . esc_attr( $this->get_field_id( 'avatar_width' ) ) . '"> 
+			<label for="' . esc_attr( $this->get_field_id( 'avatar_width' ) ) . '">
 				' . esc_html( __( 'Avatar Width', 'radio-station' ) ) . ':
 				<input class="widefat" id="' . esc_attr( $this->get_field_id( 'avatar_width' ) ) . '" name="' . esc_attr( $this->get_field_name( 'avatar_width' ) ) . '" type="text" value="' . esc_attr( $avatar_width ) . '">
 			</label>
@@ -116,7 +118,7 @@ class DJ_Widget extends WP_Widget {
 		<p>
 			<label for="' . esc_attr( $this->get_field_id( 'link_djs' ) ) . '">
 			<input id="' . esc_attr( $this->get_field_id( 'link_djs' ) ) . '" name="' . esc_attr( $this->get_field_name( 'link_djs' ) ) . '" type="checkbox" ' . checked( $link_djs, true, false ) . '>
-				' . esc_html( __( 'Link DJ names to author pages', 'radio-station' ) ) . '
+				' . esc_html( __( 'Link Host/DJ names to author pages', 'radio-station' ) ) . '
 			</label>
 		</p>
 
@@ -131,6 +133,13 @@ class DJ_Widget extends WP_Widget {
 			<label for="' . esc_attr( $this->get_field_id( 'show_all_sched' ) ) . '">
 			<input id="' . esc_attr( $this->get_field_id( 'show_all_sched' ) ) . '" name="' . esc_attr( $this->get_field_name( 'show_all_sched' ) ) . '" type="checkbox" ' . checked( $show_all_sched, true, false ) . '>
 				' . esc_html( __( 'Display multiple schedules (if show airs more than once per week)', 'radio-station' ) ) . '
+			</label>
+		</p>
+
+		<p>
+			<label for="' . esc_attr( $this->get_field_id( 'show_encore' ) ) . '">
+			<input id="' . esc_attr( $this->get_field_id( 'show_encore' ) ) . '" name="' . esc_attr( $this->get_field_name( 'show_encore' ) ) . '" type="checkbox" ' . checked( $show_encore, true, false ) . '>
+				' . esc_html( __( 'Display encore presentation text for Show', 'radio-station' ) ) . '
 			</label>
 		</p>
 
@@ -167,7 +176,7 @@ class DJ_Widget extends WP_Widget {
 			<br />
 			<small>' . esc_html( __( 'Choose time format for displayed schedules', 'radio-station' ) ) . '</small>
 		</p>
-		
+
 		<p>
 			<label for="' . esc_attr( $this->get_field_id( 'countdown' ) ) . '">
 			<input id="' .esc_attr( $this->get_field_id( 'countdown' ) ) . '" name="' . esc_attr( $this->get_field_name( 'countdown' ) ) . '" type="checkbox" ' . checked( $countdown, true, false ) . '>
@@ -186,7 +195,7 @@ class DJ_Widget extends WP_Widget {
 	public function update( $new_instance, $old_instance ) {
 
 		$instance = $old_instance;
-		
+
 		// 2.2.7: fix checkbox value saving
 		$instance['title'] = $new_instance['title'];
 		$instance['display_djs'] = isset( $new_instance['display_djs'] ) ? 1 : 0;
@@ -205,8 +214,9 @@ class DJ_Widget extends WP_Widget {
 		$instance['title_position'] = $new_instance['title_position'];
 		$instance['avatar_width'] = $new_instance['avatar_width'];
 		$instance['link_djs'] = isset( $new_instance['link_djs'] ) ? 1 : 0;
+		$instance['show_encore'] = isset( $new_instance['show_encore'] ) ? 1 : 0;
 		$instance['countdown'] = isset( $new_instance['countdown'] ) ? 1 : 0;
-		$instance['ajax'] = isset( $new_instance['ajax'] ) ? $new_instance['ajax'] : 0;		
+		$instance['ajax'] = isset( $new_instance['ajax'] ) ? $new_instance['ajax'] : 0;
 
 		// 2.3.0: filter widget update instance
 		$instance = apply_filters( 'radio_station_current_show_widget_update', $instance, $new_instance, $old_instance );
@@ -224,7 +234,7 @@ class DJ_Widget extends WP_Widget {
 			$id = $radio_station_data['widgets']['current-show'] = 0;
 		} else {
 			$id = $radio_station_data['widgets']['current-show']++;
-		}		
+		}
 
 		// 2.3.0: filter widget_title whether empty or not
 		$title = empty( $instance['title'] ) ? '' : $instance['title'];
@@ -236,12 +246,13 @@ class DJ_Widget extends WP_Widget {
 		$time = empty( $instance['time'] ) ? '' : $instance['time'];
 		$show_sched = $instance['show_sched'];
 		$show_playlist = $instance['show_playlist'];
-		
+
 		// 2.3.2: fix old false values to use 0 for shortcodes
 		// keep the default settings for people updating from 1.6.2 or earlier
 		$show_all_sched = isset( $instance['show_all_sched'] ) ? $instance['show_all_sched'] : 0;
 		// keep the default settings for people updating from 2.0.12 or earlier
 		$show_desc = isset( $instance['show_desc'] ) ? $instance['show_desc'] : 0;
+		$encore = isset( $instance['show_encore'] ) ? $instance['show_encore'] : 0;
 
 		// 2.2.4: added title position, avatar width and DJ link settings
 		// 2.3.2: added AJAX load option
@@ -271,6 +282,7 @@ class DJ_Widget extends WP_Widget {
 			'title_position' => $position,
 			'avatar_width'   => $width,
 			'link_djs'       => $link_djs,
+			'show_encore'    => $encore,
 			'countdown'      => $countdown,
 			'dynamic'        => $dynamic,
 			'widget'         => 1,

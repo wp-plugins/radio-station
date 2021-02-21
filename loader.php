@@ -5,7 +5,7 @@
 // ===========================
 //
 // --------------
-// Version: 1.1.6
+// Version: 1.1.7
 // --------------
 // Note: Changelog and structure at end of file.
 //
@@ -692,6 +692,24 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						// 1.0.9: added multiselect value saving
 						$newsettings = array_values( $posted );
 
+					} elseif ( 'image' == $type ) {
+
+						// --- check attachment ID value ---
+						// 1.1.7: add image attachment ID saving
+						if ( '' != $posted ) {
+							$attachment = wp_get_attachment_image_src( $posted, 'full' );
+							if ( is_array( $attachment ) ) {
+								$settings[$key] = $posted;
+							}
+						}
+
+					} elseif ( ( 'color' == $type ) || ( 'coloralpha' == $type ) ) {
+
+						// --- color or color alpha setting ---
+						// 1.1.7: added color picker value saving
+						// TODO: maybe validate this setting ?
+						$settings[$key] = $posted;
+
 					}
 
 					if ( $this->debug ) {
@@ -699,7 +717,12 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						if ( $newsettings ) {
 							echo '(to-validate) ' . print_r( $newsettings, true ) . '<br>';
 						} else {
-							echo '(validated) ' . print_r( $settings[$key], true ) . '<br>';
+							// 1.1.7 handle if (new) key not set yet
+							if ( isset( $settings[$key] ) ) {
+								echo '(validated) ' . print_r( $settings[$key], true ) . '<br>';
+							} else {
+								echo 'No setting yet for key ' . $key . '<br>';
+							}
 						}
 					}
 
@@ -765,6 +788,13 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				$settings = call_user_func( $funcname, $settings );
 			}
 
+			// --- output new settings ---			
+			if ( $this->debug ) {
+				echo "<br><b>All New Settings:</b><br>";
+				print_r( $settings );
+				echo "<br><br>";
+			}
+				
 			if ( $settings && is_array( $settings ) ) {
 
 				// --- loop default keys to remove others ---
@@ -890,11 +920,18 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				// 1.0.4: added validated URL option
 				// 1.0.6: fix to posted variable type (vposted)
 				// 1.0.9: remove check for http prefix to allow other protocols
+				// 1.1.7: use FILTER_SANITIZE_URL not FILTER_SANITIZE_STRING
 				$posted = trim( $posted );
-				$url = filter_var( $posted, FILTER_SANITIZE_STRING );
-				if ( !filter_var( $url, FILTER_VALIDATE_URL ) ) {
-					$posted = '';
+				$posted = filter_var( $posted, FILTER_SANITIZE_URL );
+
+				// 1.1.7: remove FILTER_VALIDATE_URL check - not working!?
+				if ( $this->debug ) {
+					$check = filter_var( $url, FILTER_VALIDATE_URL );
+					echo 'Validated URL: ' . print_r( $check, true ) . '<br>';
 				}
+				// if ( !filter_var( $url, FILTER_VALIDATE_URL ) ) {
+				//	$posted = '';
+				// }
 				return $posted;
 
 			} elseif ( in_array( $valid, array( 'EMAIL', 'EMAILS' ) ) ) {
@@ -1844,8 +1881,39 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			$options = $this->options;
 			$options = apply_filters( $namespace . '_options', $options );
 
+			// --- maybe enqueue media scripts ---
+			// 1.1.7: added media gallery script enqueueing for image field
+			// 1.1.7: added color picker and color picker alpha script enqueueing
+			$enqueued_media = $enqueued_color_picker = $enqueued_color_picker_alpha = false;
+			foreach ( $options as $option ) {
+				if ( ( 'image' == $option['type'] ) && !$enqueued_media ) {
+					wp_enqueue_media();
+					$enqueued_media = true;
+				} elseif ( ( 'color' == $option['type'] ) && !$enqueued_color_picker ) {
+					wp_enqueue_style( 'wp-color-picker' );
+					wp_enqueue_script( 'wp-color-picker' );
+					$enqueued_color_picker = true;
+				} elseif ( ( 'coloralpha' == $option['type'] ) && !$enqueued_color_picker_alpha ) {
+					wp_enqueue_style( 'wp-color-picker' );
+					$suffix = '.min';
+					if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+						$suffix = '';
+					}
+					$url = plugins_url( '/js/wp-color-picker-alpha' . $suffix . '.js', $args['file'] );
+				    wp_enqueue_script( 'wp-color-picker-a', $url, array( 'wp-color-picker' ), '3.0.0', true );
+				    $enqueued_color_picker = $enqueued_color_picker_alpha = true;
+				}
+			}
+
 			$defaults = $this->default_settings();
 			$settings = $this->get_settings( false );
+
+			// --- output saved settings ---			
+			if ( $this->debug ) {
+				echo "<br><b>Saved Settings:</b><br>";
+				print_r( $settings );
+				echo "<br><br>";
+			}
 
 			// --- get option tabs and sections ---
 			$tabs = $this->tabs;
@@ -1871,6 +1939,14 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					} else {
 						$taboptions['general']['general'][$key] = $option;
 					}
+				}
+			}
+
+			// --- remove unused tabs automatically ---
+			// 1.1.7: added for cleaner interface while developing
+			foreach ( $tabs as $tab => $tablabel ) {
+				if ( !isset( $taboptions[$tab] ) ) {
+					unset( $tabs[$tab] );
 				}
 			}
 
@@ -1920,10 +1996,10 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// 1.0.9: add to settings scripts
 			$confirmreset = __( 'Are you sure you want to reset to default settings?' );
 			$script = "function settings_reset_defaults() {
-			agree = confirm('" . esc_js( $confirmreset ) . "'); if (!agree) {return false;}
-			document.getElementById('settings-action').value = 'reset';
-			document.getElementById('settings-form').submit();
-		}";
+				agree = confirm('" . esc_js( $confirmreset ) . "'); if (!agree) {return false;}
+				document.getElementById('settings-action').value = 'reset';
+				document.getElementById('settings-form').submit();
+			}";
 			$this->scripts[] = $script;
 
 			// --- start settings form ---
@@ -2050,15 +2126,75 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// --- number input step script ---
 			// 1.0.9: added to script array
 			$script = "function settings_number_step(updown, id, min, max, step) {
-			if (updown == 'up') {multiplier = 1;}
-			if (updown == 'down') {multiplier = -1;}
-			current = parseInt(document.getElementById(id).value);
-			newvalue = current + (multiplier * parseInt(step));
-			if (newvalue < parseInt(min)) {newvalue = min;}
-			if (newvalue > parseInt(max)) {newvalue = max;}
-			document.getElementById(id).value = newvalue;
-		}";
+				if (updown == 'up') {multiplier = 1;} else if (updown == 'down') {multiplier = -1;}
+				current = parseInt(document.getElementById(id).value);
+				newvalue = current + (multiplier * parseInt(step));
+				if (newvalue < parseInt(min)) {newvalue = min;}
+				if (newvalue > parseInt(max)) {newvalue = max;}
+				document.getElementById(id).value = newvalue;
+			}";
 			$this->scripts[] = $script;
+
+			// --- image selection script ---
+			// 1.1.7: added for image field type
+			if ( $enqueued_media ) {
+				$confirm_remove = __( 'Are you sure you want to remove this image?' );
+				$script = "jQuery(function(){
+
+					var mediaframe, parentdiv;
+
+					/* Add Image on Click */
+					jQuery('.upload-custom-image').on( 'click', function( event ) {
+
+						event.preventDefault();
+						parentdiv = jQuery(this).parent().parent();
+
+						if (mediaframe) {mediaframe.open(); return;}
+						mediaframe = wp.media({
+							title: 'Select or Upload Image',
+							button: {text: 'Use this Image'},
+							multiple: false
+						});
+
+						mediaframe.on( 'select', function() {
+							var attachment = mediaframe.state().get('selection').first().toJSON();
+							image = '<img src=\"'+attachment.url+'\" alt=\"\" style=\"max-width:100%;\"/>';
+							parentdiv.find('.custom-image-container').append(image);
+							parentdiv.find('.custom-image-id').val(attachment.id);
+							parentdiv.find('.upload-custom-image').addClass('hidden');
+							parentdiv.find('.delete-custom-image').removeClass('hidden');
+						});
+
+						mediaframe.open();
+						jQuery('.media-modal-close').on( 'click', function() {
+							console.log('close click detected');
+							mediaframe.close();
+						});
+					});
+
+					/* Delete Image on Click */
+					jQuery('.delete-custom-image').on( 'click', function( event ) {
+						event.preventDefault();
+						agree = confirm('" . esc_js( $confirm_remove ) . "');
+						if (!agree) {return;}
+						parentdiv = jQuery(this).parent().parent();
+						parentdiv.find('.custom-image-container').html('');
+						parentdiv.find('.custom-image-id').val('');
+						parentdiv.find('.upload-custom-image').removeClass('hidden');
+						parentdiv.find('.delete-custom-image').addClass('hidden');
+					});
+
+				});";
+				$this->scripts[] = $script;
+			}
+
+			// --- color picker script ---
+			if ( $enqueued_color_picker ) {
+				$script = "jQuery(document).ready(function(){
+					if (jQuery('.color-picker').length) {jQuery('.color-picker').wpColorPicker();}
+				});";
+				$this->scripts[] = $script;
+			}
 
 			// --- enqueue settings scripts ---
 			add_action( 'admin_footer', array( $this, 'setting_scripts' ) );
@@ -2126,22 +2262,22 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			}
 
 			// --- prepare row output ---
-			$row = "<tr class='settings-row'>";
+			$row = '<tr class="settings-row">';
 
-			$row .= "<td class='settings-label'>" . $option['label'];
+			$row .= '<td class="settings-label">' . $option['label'];
 			if ( 'multiselect' == $type ) {
-				$row .= "<br><span>" . esc_html( __( 'Use Ctrl and Click to Select' ) ) . "</span>";
+				$row .= '<br><span>' . esc_html( __( 'Use Ctrl and Click to Select' ) ) . '</span>';
 			}
-			$row .= "</td><td width='25'></td>";
+			$row .= '</td><td width="25"></td>';
 
 			// 1.0.9: added multiple cell spanning note type
 			if ( ( 'note' == $type ) || ( 'info' == $type ) || ( 'helper' == $type ) ) {
 
-				$row .= "<td class='settings-helper' colspan='3'>";
+				$row .= '<td class="settings-helper" colspan="3">';
 				if ( isset( $option['helper'] ) ) {
 					$row .= $option['helper'];
 				}
-				$row .= "</td>";
+				$row .= '</td>';
 
 			} else {
 
@@ -2149,26 +2285,26 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				if ( isset( $option['pro'] ) && $option['pro'] ) {
 
 					// --- Pro version setting (teaser) ---
-					$row .= "<td class='settings-input setting-pro'>";
+					$row .= '<td class="settings-input setting-pro">';
 					$upgrade_link = false;
 					if ( $args['hasplans'] || $args['hasaddons'] ) {
 						$upgrade_link = add_query_arg( 'page=', $args['slug'] . '-pricing', admin_url( 'admin.php' ) );
 						$target = '';
 					} elseif ( isset( $args['upgrade_link'] ) ) {
 						$upgrade_link = $args['upgrade_link'];
-						$target = " target='_blank'";
+						$target = ' target="_blank"';
 					}
 					if ( $upgrade_link ) {
 						$row .= __( 'Available in Pro Version.' ) . '<br>';
-						$row .= "<a href='" . esc_url( $upgrade_link ) . "'" . $target . ">" . esc_html( __( 'Click Here to Upgrade!' ) ) . "</a>";
+						$row .= '<a href="' . esc_url( $upgrade_link ) . '"' . $target . '>' . esc_html( __( 'Click Here to Upgrade!' ) ) . '</a>';
 					} else {
 						$row .= esc_html( __( 'Coming soon in Pro version!' ) );
 					}
-					$row .= "</td>";
+					$row .= '</td>';
 
 				} else {
 
-					$row .= "<td class='settings-input'>";
+					$row .= '<td class="settings-input">';
 
 					// --- maybe prepare special options ---
 					if ( isset( $option['options'] ) && is_string( $option['options'] ) ) {
@@ -2290,28 +2426,36 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 						// --- toggle ---
 						// 1.0.9: add toggle input (styled checkbox)
+						// 1.1.7: set default option value if not set
 						$checked = '';
-						if ( $setting == $option['value'] ) {
-							$checked = " checked='checked'";
+						if ( !isset( $option['value'] ) ) {
+							$option['value'] = '1';
 						}
-						$row .= "<label for='" . esc_attr( $name ) . "' class='setting-toggle'>";
-						$row .= "<input type='checkbox' name='" . esc_attr( $name ) . "' class='setting-toggle' value='" . esc_attr( $option['value'] ) . "'" . $checked . ">";
-						$row .= "<span class='setting-slider round'></span>";
-						$row .= "</label>";
+						if ( $setting == $option['value'] ) {
+							$checked = ' checked="checked"';
+						}
+						$row .= '<label for="' . esc_attr( $name ) . '" class="setting-toggle">';
+						$row .= '<input type="checkbox" name="' . esc_attr( $name ) . '" class="setting-toggle" value="' . esc_attr( $option['value'] ) . '"' . $checked . '>';
+						$row .= '<span class="setting-slider round"></span>';
+						$row .= '</label>';
 						if ( isset( $option['suffix'] ) ) {
-							$row .= " " . $option['suffix'];
+							$row .= ' ' . $option['suffix'];
 						}
 
 					} elseif ( 'checkbox' == $type ) {
 
 						// --- checkbox ---
+						// 1.1.7: set default option value if not set
 						$checked = '';
-						if ( $setting == $option['value'] ) {
-							$checked = " checked='checked'";
+						if ( !isset( $option['value'] ) ) {
+							$option['value'] = '1';
 						}
-						$row .= "<input type='checkbox' name='" . $name . "' class='setting-checkbox' value='" . esc_attr( $option['value'] ) . "'" . $checked . ">";
+						if ( $setting == $option['value'] ) {
+							$checked = ' checked="checked"';
+						}
+						$row .= '<input type="checkbox" name="' . $name . '" class="setting-checkbox" value="' . esc_attr( $option['value'] ) . '"' . $checked . '>';
 						if ( isset( $option['suffix'] ) ) {
-							$row .= " " . $option['suffix'];
+							$row .= ' ' . $option['suffix'];
 						}
 
 					} elseif ( 'multicheck' == $type ) {
@@ -2321,11 +2465,11 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						foreach ( $option['options'] as $key => $label ) {
 							$checked = '';
 							if ( is_array( $setting ) && in_array( $key, $setting ) ) {
-								$checked = " checked='checked'";
+								$checked = ' checked="checked"';
 							}
-							$checkboxes[] = "<input type='checkbox' name='" . esc_attr( $name ) . "-" . esc_attr( $key ) . "' class='setting-checkbox' value='yes'" . $checked . "> " . esc_html( $label );
+							$checkboxes[] = '<input type="checkbox" name="' . esc_attr( $name ) . "-" . esc_attr( $key ) . '" class="setting-checkbox" value="yes"' . $checked . '> ' . esc_html( $label );
 						}
-						$row .= implode( "<br>", $checkboxes );
+						$row .= implode( '<br>', $checkboxes );
 
 					} elseif ( 'radio' == $type ) {
 
@@ -2334,57 +2478,57 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						foreach ( $option['options'] as $value => $label ) {
 							$checked = '';
 							if ( $setting == $value ) {
-								$checked = " checked='checked'";
+								$checked = ' checked="checked"';
 							}
-							$radios[] = "<input type='radio' class='setting-radio' name='" . esc_attr( $name ) . "' value='" . esc_attr( $value ) . "'" . $checked . "> " . esc_html( $label );
+							$radios[] = '<input type="radio" class="setting-radio" name="' . esc_attr( $name ) . "' value='" . esc_attr( $value ) . '"' . $checked . '> ' . esc_html( $label );
 						}
 						$row .= implode( '<br>', $radios );
 
 					} elseif ( 'select' == $type ) {
 
 						// --- select dropdown ---
-						$row .= "<select class='setting-select' name='" . esc_attr( $name ) . "'>";
+						$row .= '<select class="setting-select" name="' . esc_attr( $name ) . '">';
 						foreach ( $option['options'] as $value => $label ) {
 							// 1.0.9: support option grouping (set unique key containing OPTGROUP-)
 							if ( strstr( $value, '*OPTGROUP*' ) ) {
-								$row .= "<optgroup label='" . esc_attr( $label ) . "'>" . esc_html( $label ) . '</optgroup>';
+								$row .= '<optgroup label="' . esc_attr( $label ) . '">' . esc_html( $label ) . '</optgroup>';
 							} else {
 								// 1.1.3: remove strict value checking
 								if ( $setting == $value ) {
-									$selected = " selected='selected'";
+									$selected = ' selected="selected"';
 								} else {
 									$selected = '';
 								}
-								$row .= "<option value='" . esc_attr( $value ) . "'" . $selected . ">" . esc_html( $label ) . "</option>";
+								$row .= '<option value="' . esc_attr( $value ) . '"' . $selected . '>' . esc_html( $label ) . '</option>';
 							}
 						}
-						$row .= "</select>";
+						$row .= '</select>';
 						if ( isset( $option['suffix'] ) ) {
-							$row .= " " . $option['suffix'];
+							$row .= ' ' . $option['suffix'];
 						}
 
 					} elseif ( 'multiselect' == $type ) {
 
 						// --- multiselect dropdown ---
-						$row .= "<select multiple='multiple' class='setting-select' name='" . esc_attr( $name ) . "[]'>";
+						$row .= '<select multiple="multiple" class="setting-select" name="' . esc_attr( $name ) . '[]">';
 						foreach ( $option['options'] as $value => $label ) {
 							if ( '' != $value ) {
 								// 1.1.3: check for OPTGROUP instead of *OPTGROUP*
 								if ( strstr( $value, 'OPTGROUP' ) ) {
-									$row .= "<optgroup label='" . esc_attr( $label ) . "'>";
+									$row .= '<optgroup label="' . esc_attr( $label ) . '">';
 								} else {
 									if ( is_array( $setting ) && in_array( $value, $setting ) ) {
-										$selected = " selected='selected'";
+										$selected = ' selected="selected"';
 									} else {
 										$selected = '';
 									}
-									$row .= "<option value='" . esc_attr( $value ) . "'" . $selected . ">" . esc_html( $label ) . "</option>";
+									$row .= '<option value="' . esc_attr( $value ) . '"' . $selected . ">" . esc_html( $label ) . '</option>';
 								}
 							}
 						}
-						$row .= "</select>";
+						$row .= '</select>';
 						if ( isset( $option['suffix'] ) ) {
-							$row .= " " . $option['suffix'];
+							$row .= ' ' . $option['suffix'];
 						}
 
 					} elseif ( 'text' == $type ) {
@@ -2399,9 +2543,10 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						} else {
 							$placeholder = '';
 						}
-						$row .= "<input type='text' name='" . esc_attr( $name ) . "' class='" . esc_attr( $class ) . "' value='" . esc_attr( $setting ) . "' placeholder='" . esc_attr( $placeholder ) . "'>";
+						// 1.1.7: fix to attribute quoting output
+						$row .= '<input type="text" name="' . esc_attr( $name ) . '" class="' . esc_attr( $class ) . '" value="' . esc_attr( $setting ) . '" placeholder="' . esc_attr( $placeholder ) . '">';
 						if ( isset( $option['suffix'] ) ) {
-							$row .= " " . $option['suffix'];
+							$row .= ' ' . $option['suffix'];
 						}
 
 					} elseif ( 'textarea' == $type ) {
@@ -2417,7 +2562,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						} else {
 							$placeholder = '';
 						}
-						$row .= "<textarea class='setting-textarea' name='" . esc_attr( $name ) . "' rows='" . esc_attr( $rows ) . "' placeholder='" . esc_attr( $placeholder ) . ">" . $setting . "</textarea>";
+						$row .= '<textarea class="setting-textarea" name="' . esc_attr( $name ) . '" rows="' . esc_attr( $rows ) . '" placeholder="' . esc_attr( $placeholder ) . '">' . $setting . '</textarea>';
 
 					} elseif ( ( 'numeric' == $type ) || ( 'number' == $type ) ) {
 
@@ -2443,31 +2588,80 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						} else {
 							$step = 1;
 						}
-						$onclickup = 'settings_number_step("up", "' . esc_attr( $name ) . '", ' . esc_attr( $min ) . ', ' . esc_attr( $max ) . ', ' . esc_attr( $step ) . ');';
-						$onclickdown = 'settings_number_step("down", "' . esc_attr( $name ) . '", ' . esc_attr( $min ) . ', ' . esc_attr( $max ) . ', ' . esc_attr( $step ) . ');';
-						$row .= "<input class='setting-button button-secondary' type='button' value='-' onclick='" . esc_js( $onclickdown ) . "'>";
-						$row .= "<input class='setting-numeric' type='text' name='" . esc_attr( $name ) . "' id='" . esc_attr( $name ) . "' value='" . esc_attr( $setting ) . "' placeholder='" . esc_attr( $placeholder ) . "'>";
-						$row .= "<input class='setting-button button-secondary' type='button' value='+' onclick='" . esc_js( $onclickup ) . "'>";
+						// 1.1.7: remove esc_js from onclick attributes
+						$onclickup = "settings_number_step('up', '" . esc_attr( $name ) . "', " . esc_attr( $min ) . ", " . esc_attr( $max ) . ", " . esc_attr( $step ) . ");";
+						$onclickdown = "settings_number_step('down', '" . esc_attr( $name ) . "', " . esc_attr( $min ) . ", " . esc_attr( $max ) . ", " . esc_attr( $step ) . ");";
+						$row .= '<input class="setting-button button-secondary" type="button" value="-" onclick="' . $onclickdown . '">';
+						$row .= '<input class="setting-numeric" type="text" name="' . esc_attr( $name ) . '" id="' . esc_attr( $name ) . '" value="' . esc_attr( $setting ) . '" placeholder="' . esc_attr( $placeholder ) . '">';
+						$row .= '<input class="setting-button button-secondary" type="button" value="+" onclick="' . $onclickup . '">';
 						if ( isset( $option['suffix'] ) ) {
-							$row .= " " . $option['suffix'];
+							$row .= ' ' . $option['suffix'];
 						}
+
+					} elseif ( 'image' == $type ) {
+
+						// 1.1.7: added image attachment selection from media library
+
+						// --- get current image ---
+						$image = wp_get_attachment_image_src( $setting, 'full' );
+						$has_image = is_array( $image );
+
+						// --- image container ---
+						$row .= '<div class="custom-image-container">';
+						if ( $has_image ) {
+							$row .= '<img src="' . esc_url( $image[0] ) . '" alt="" style="max-width:100%;">';
+						}
+						$row .= '</div>';
+
+						// --- add and remove links ---
+						$upload_link = get_upload_iframe_src( 'image' );
+						$row .= '<p class="hide-if-no-js">';
+							$hidden = '';
+							if ( $has_image ) {
+								$hidden = ' hidden';
+							}
+							$row .= '<a class="upload-custom-image' . esc_attr( $hidden ) . '" href="' . esc_url( $upload_link ) . '">';
+							$row .= esc_html( __( 'Add Image' ) );
+							$row .= '</a>';
+
+							$hidden = '';
+							if ( !$has_image ) {
+								$hidden = ' hidden';
+							}
+							$row .= '<a class="delete-custom-image' . esc_attr( $hidden ) . '" href="#">';
+							$row .= esc_html( __( 'Remove Image' ) );
+							$row .= '</a>';
+						$row .= '</p>';
+
+						// --- hidden input for image ID ---
+						$row .= '<input class="custom-image-id" name="' . esc_attr( $name ) . '" type="hidden" value="' . esc_attr( $setting ) . '">';
+
+					} elseif ( 'color' == $type ) {
+
+						// 1.1.7: added color picker field
+						$row .= '<input type="text" class="color-picker" data-default-color="' . esc_attr( $option['default'] ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( $setting ) . '">';
+
+					} elseif ( 'coloralpha' == $type ) {
+
+						// 1.1.7: added color picker alpha field
+						$row .= '<input type="text" class="color-picker" data-alpha-enabled="true" data-default-color="' . esc_attr( $option['default'] ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( $setting ) . '">';
 
 					}
 
-					$row .= "</td>";
+					$row .= '</td>';
 				}
 
 				// --- setting helper text ---
 				if ( isset( $option['helper'] ) ) {
-					$row .= "<td width='25'></td>";
-					$row .= "<td class='settings-helper'>" . esc_html( $option['helper'] ) . "</td>";
+					$row .= '<td width="25"></td>';
+					$row .= '<td class="settings-helper">' . esc_html( $option['helper'] ) . '</td>';
 				}
 			}
 
-			$row .= "</tr>";
+			$row .= '</tr>';
 
 			// --- settings row spacer ---
-			$row .= "<tr class='settings-spacer'><td> </td></tr>";
+			$row .= '<tr class="settings-spacer"><td> </td></tr>';
 
 			// --- filter and return setting row ---
 			$row = apply_filters( $namespace . '_setting_row', $row, $option );
@@ -2530,23 +2724,23 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// --- toggle input styles ---
 			// Ref: https://www.w3schools.com/howto/howto_css_switch.asp
 			$styles[] = '
-		.setting-toggle {position:relative; display:inline-block; width:30px; height:17px;}
-		.setting-toggle input {opacity:0; width:0; height:0;}
-		.setting-slider {position:absolute; cursor:pointer;
-		  top:0; left:0; right:0; bottom:0; background-color:#ccc;
-		  -webkit-transition:.4s; transition:.4s;
-		}
-		.setting-slider:before {position:absolute; content:""; height:13px; width:13px;
-		  left:2px; bottom:2px; background-color:white; -webkit-transition:.4s; transition:.4s;
-		}
-		input:checked + .setting-slider {background-color: #2196F3;}
-		input:focus + .setting-slider {box-shadow: 0 0 1px #2196F3;}
-		input:checked + .setting-slider:before {
-		  -webkit-transform:translateX(13px); -ms-transform:translateX(13px); transform:translateX(13px);
-		}
-		.setting-slider.round {border-radius: 17px;}
-		.setting-slider.round:before {border-radius: 50%;}
-		';
+			.setting-toggle {position:relative; display:inline-block; width:30px; height:17px;}
+			.setting-toggle input {opacity:0; width:0; height:0;}
+			.setting-slider {position:absolute; cursor:pointer;
+			  top:0; left:0; right:0; bottom:0; background-color:#ccc;
+			  -webkit-transition:.4s; transition:.4s;
+			}
+			.setting-slider:before {position:absolute; content:""; height:13px; width:13px;
+			  left:2px; bottom:2px; background-color:white; -webkit-transition:.4s; transition:.4s;
+			}
+			input:checked + .setting-slider {background-color: #2196F3;}
+			input:focus + .setting-slider {box-shadow: 0 0 1px #2196F3;}
+			input:checked + .setting-slider:before {
+			  -webkit-transform:translateX(13px); -ms-transform:translateX(13px); transform:translateX(13px);
+			}
+			.setting-slider.round {border-radius: 17px;}
+			.setting-slider.round:before {border-radius: 50%;}
+			';
 
 			// --- filter and output styles ---
 			$namespace = $this->namespace;
@@ -2860,6 +3054,14 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // =========
 // CHANGELOG
 // =========
+
+// == 1.1.7 ==
+// - added media library upload image field type
+// - added color picker and color picker alpha field types
+// - automatically remove unused settings tabs
+// - fix to text field attribute quoting 
+// - fix to not escape number step button function 
+// - remove FILTER_VALIDATE_URL from URL saving (not working)
 
 // == 1.1.6 ==
 // - added phone number character validation

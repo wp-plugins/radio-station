@@ -26,7 +26,9 @@ class Playlist_Widget extends WP_Widget {
 		// 2.3.0: added hide widget if empty option
 		// 2.3.0: added countdown display option
 		// 2.3.2: added AJAX load option
+		// 2.3.3.8: added playlist link option
 		$title = $instance['title'];
+		$link = isset( $instance['link'] ) ? $instance['link'] : true;
 		$artist = isset( $instance['artist'] ) ? $instance['artist'] : true;
 		$song = isset( $instance['song'] ) ? $instance['song'] : true;
 		$album = isset( $instance['album'] ) ? $instance['album'] : false;
@@ -38,6 +40,7 @@ class Playlist_Widget extends WP_Widget {
 
 		// 2.3.0: convert template style code to strings
 		// 2.3.2: added AJAX load option field
+		// 2.3.3.8: added playlist link field
 		$fields = '
 		<p>
 			<label for="' . esc_attr( $this->get_field_id( 'ajax' ) ) . '">
@@ -54,6 +57,13 @@ class Playlist_Widget extends WP_Widget {
 			<label for="' . esc_attr( $this->get_field_id( 'title' ) ) . '">
 				' . esc_html( __( 'Title', 'radio-station' ) ) . ':
 				<input class="widefat" id="' . esc_attr( $this->get_field_id( 'title' ) ) . '" name="' . esc_attr( $this->get_field_name( 'title' ) ) . '" type="text" value="' . esc_attr( $title ) . '">
+			</label>
+		</p>
+
+		<p>
+			<label for="' . esc_attr( $this->get_field_id( 'link' ) ) . '">
+			<input id="' . esc_attr( $this->get_field_id( 'link' ) ) . '" name="' . esc_attr( $this->get_field_name( 'link' ) ) . '" type="checkbox" ' . checked( $link, true, false ) . '>
+				' . esc_html( __( 'Link to Playlist?', 'radio-station' ) ) . '
 			</label>
 		</p>
 
@@ -98,7 +108,7 @@ class Playlist_Widget extends WP_Widget {
 				' . esc_html( __( 'Hide Widget if Empty', 'radio-station' ) ) . '
 			</label>
 		</p>
-		
+
 		<p>
 			<label for="' . esc_attr( $this->get_field_id( 'countdown' ) ) . '">
 			<input id="' .esc_attr( $this->get_field_id( 'countdown' ) ) . '" name="' . esc_attr( $this->get_field_name( 'countdown' ) ) . '" type="checkbox" ' . checked( $countdown, true, false ) . '>
@@ -120,7 +130,9 @@ class Playlist_Widget extends WP_Widget {
 		// 2.3.0: added hide widget if empty option
 		// 2.3.0: added countdown display option
 		// 2.3.2: added AJAX load option
+		// 2.3.3.8: added playlist link option
 		$instance['title'] = $new_instance['title'];
+		$instance['link'] = isset( $new_instance['link'] ) ? 1 : 0;
 		$instance['artist'] = isset( $new_instance['artist'] ) ? 1 : 0;
 		$instance['song'] = isset( $new_instance['song'] ) ? 1 : 0;
 		$instance['album'] = isset( $new_instance['album'] ) ? 1 : 0;
@@ -147,7 +159,7 @@ class Playlist_Widget extends WP_Widget {
 		} else {
 			$id = $radio_station_data['widgets']['current-playlist']++;
 		}
-		
+
 		// 2.3.0: filter widget_title whether empty or not
 		// 2.3.0: added hide widget if empty option
 		// 2.3.0: added countdown display option
@@ -155,6 +167,7 @@ class Playlist_Widget extends WP_Widget {
 		// 2.3.2: added AJAX load option
 		$title = empty( $instance['title'] ) ? '' : $instance['title'];
 		$title = apply_filters( 'widget_title', $title );
+		$link = isset( $instance['link'] ) ? $instance['link'] : 1;
 		$artist = $instance['artist'];
 		$song = $instance['song'];
 		$album = $instance['album'];
@@ -168,6 +181,7 @@ class Playlist_Widget extends WP_Widget {
 		// --- set shortcode attributes for display ---
 		$atts = array(
 			'title'     => $title,
+			'link'      => $link,
 			'artist'    => $artist,
 			'song'      => $song,
 			'album'     => $album,

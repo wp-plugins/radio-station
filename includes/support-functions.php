@@ -905,6 +905,7 @@ function radio_station_get_show_data_meta( $show, $single = false ) {
 	}
 
 	// --- add extra data for single show route/feed ---
+	$show_id = $show->ID;
 	if ( $single ) {
 
 		// --- add show posts ---
@@ -914,11 +915,40 @@ function radio_station_get_show_data_meta( $show, $single = false ) {
 		$show_data['playlists'] = radio_station_get_show_playlists( $show->ID );
 
 		// --- filter to maybe add more data ---
-		$show_data = apply_filters( 'radio_station_show_data_meta', $show_data, $show->ID );
+		$show_data = apply_filters( 'radio_station_show_data_meta', $show_data, $show_id );
 	}
 
 	// --- maybe cache Show meta data ---
-	do_action( 'radio_station_cache_data', 'show_meta', $show->ID, $show_data );
+	do_action( 'radio_station_cache_data', 'show_meta', $show_id, $show_data );
+
+	return $show_data;
+}
+
+// --------------------
+// Get Show Description
+// --------------------
+// 2.3.3.8: added for show data API feed
+function radio_station_get_show_description( $show_data ) {
+
+	// --- get description and excerpt ---
+	$show_id = $show_data['id'];
+	$show_post = get_post( $show_id );
+	$description = $show_post->post_content;
+	if ( !empty( $show_post->post_excerpt ) ) {
+		$excerpt = $show_post->post_excerpt;
+	} else {
+		$length = apply_filters( 'radio_station_show_data_excerpt_length', false );
+		$more = apply_filters( 'radio_station_show_data_excerpt_more', '' );
+		$excerpt = radio_station_trim_excerpt( $description, $length, $more, false );
+	}
+
+	// --- filter description and excerpt ---
+	$description = apply_filters( 'radio_station_show_data_description', $description, $show_id );
+	$excerpt = apply_filters( 'radio_station_show_data_excerpt', $excerpt, $show_id );
+
+	// --- add to existing show data ---
+	$show_data['description'] = $description;
+	$show_data['excerpt'] = $excerpt;
 
 	return $show_data;
 }
@@ -1008,7 +1038,8 @@ function radio_station_get_override_data_meta( $override ) {
 	);
 
 	// --- filter and return ---
-	$override_data = apply_filters( 'radio_station_override_data', $override_data, $override->ID );
+	$override_id = $override->ID;
+	$override_data = apply_filters( 'radio_station_override_data', $override_data, $override_id );
 
 	return $override_data;
 }
@@ -1132,7 +1163,8 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 								$override_start_time = radio_station_to_time( $date . ' ' . $override_start );
 								$override_end_time = radio_station_to_time( $date . ' ' . $override_end );
 								if ( isset( $override['split'] ) && $override['split'] && ( '11:59:59 pm' == $override['end'] ) ) {
-									$override_end_time = $override_end_time + 1;
+									// 2.3.3.8: fix to add 60 seconds instead of 1
+									$override_end_time = $override_end_time + 60;
 								}
 								// 2.3.2: fix for non-split overrides ending on midnight
 								if ( $override_end_time < $override_start_time ) {
@@ -1152,7 +1184,8 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 										$start_time = radio_station_to_time( $date . ' ' . $shift_start );
 										$end_time = radio_station_to_time( $date . ' ' . $shift_end );
 										if ( isset( $shift['split'] ) && $shift['split'] && ( '11:59:59 pm' == $shift['end'] ) ) {
-											$end_time = $end_time + 1;
+											// 2.3.3.8: fix to add 60 seconds instead of 1
+											$end_time = $end_time + 60;
 										}
 										// 2.3.2: fix for non-split shifts ending on midnight
 										if ( $end_time < $start_time ) {
@@ -1190,15 +1223,15 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 											}
 
 											// --- add the override if not already added ---
-											if ( !in_array( $override['date'] . '--' . $i, $done_overrides ) ) {
-												// 2.3.1: track done overrides
+											// 2.3.3.8: removed adding of overrides here
+											/* if ( !in_array( $override['date'] . '--' . $i, $done_overrides ) ) {
 												$done_overrides[] = $override['date'] . '--' . $i;
 												if ( $day == $debugday ) {
 													$debugshifts .= "Added Override: " . print_r( $override, true ) . PHP_EOL;
 												}
 												$shifts[$override['start']] = $override;
 												$show_shifts[$day] = $shifts;
-											}
+											} */
 
 										} elseif ( $override_start_time == $start_time ) {
 
@@ -1267,6 +1300,24 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 					}
 				}
 
+				// --- add directly any remaining overrides ---
+				// 2.3.1: fix to include standalone overrides on days
+				// 2.3.3.8: moved override adding to fix shift order
+				if ( count( $overrides ) > 0 ) {
+					foreach ( $overrides as $i => $override ) {
+						if ( $date == $override['date'] ) {
+							// 2.3.3.7: remove check if override already done
+							// if ( !in_array( $date . '--' . $i, $done_overrides ) ) {
+								// $done_overrides[] = $date . '--' . $i;
+								$show_shifts[$day][$override['start']] = $override;
+								if ( $day == $debugday ) {
+									$debugshifts .= "Added Override: " . print_r( $override, true ) . PHP_EOL;
+								}
+							// }
+						}
+					}
+				}
+
 				// --- sort the shifts using 24 hour time ---
 				$shifts = $show_shifts[$day];
 				if ( count( $shifts ) > 0 ) {
@@ -1295,20 +1346,6 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 					echo "Shift Keys: " . print_r( $keys, true ) . PHP_EOL;
 					echo "Sorted Keys: " . print_r( $shift_keys, true ) . PHP_EOL;
 					echo "Sorted Shifts: " . print_r( $new_shifts, true ) . PHP_EOL;
-				}
-
-				// --- add directly any remaining overrides ---
-				// 2.3.1: fix to include standalone overrides on days
-				if ( count( $overrides ) > 0 ) {
-					foreach ( $overrides as $i => $override ) {
-						if ( $date == $override['date'] ) {
-							// 2.3.3.7: remove check if override already done
-							// if ( !in_array( $date . '--' . $i, $done_overrides ) ) {
-								$show_shifts[$day][$override['start']] = $override;
-								// $done_overrides[] = $date . '--' . $i;
-							// }
-						}
-					}
 				}
 
 				$shifts = $show_shifts[$day];
@@ -1386,8 +1423,12 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 
 							// 2.3.3: set current show to global data
 							// 2.3.4: set previous show shift to global and transient
+							// 2.3.3.8: move expires declaration earlier
+							$expires = $shift_end_time - $now - 1;
+							if ( $expires > 3600 ) {
+								$expires = 3600;
+							}
 							if ( !$time ) {
-								$expires = $shift_end_time - $now - 1;
 								$radio_station_data['current_show'] = $current_show;
 								if ( $prev_shift ) {
 									$prev_show = apply_filters( 'radio_station_previous_show', $prev_shift, $time );
@@ -1402,13 +1443,9 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 									set_transient( 'radio_station_previous_show_' . $time, $prev_show, $expires );
 								}
 							}
-							$expires = $shift_end_time - $now - 1;
-							if ( $expires > 3600 ) {
-								$expires = 3600;
-							}
 
 							// 2.3.2: set temporary transient if time is specified
-							// 2.3.3: remove current show transient (being unreliable)
+							// 2.3.3: remove current show transient (as being unreliable)
 							/* if ( !$time ) {
 								set_transient( 'radio_station_current_show', $current_show, $expires );
 							} else {
@@ -2018,17 +2055,22 @@ function radio_station_get_show_playlists( $show_id = false, $args = array() ) {
 // ---------
 // 2.3.0: added genre data grabber
 function radio_station_get_genre( $genre ) {
-	$term = get_term_by( 'slug', $genre, RADIO_STATION_GENRES_SLUG );
-	if ( !$term ) {
-		$term = get_term_by( 'name', $genre, RADIO_STATION_GENRES_SLUG );
-	}
-	if ( !$term ) {
+	// 2.3.3.8: explicitly check for numberic genre term ID
+	$id = absint( $genre );
+	if ( $id < 1 ) {
+		// $genre = sanitize_title( $genre );
+		$term = get_term_by( 'slug', $genre, RADIO_STATION_GENRES_SLUG );
+		if ( !$term ) {
+			$term = get_term_by( 'name', $genre, RADIO_STATION_GENRES_SLUG );
+		}
+	} else {
 		$term = get_term_by( 'id', $genre, RADIO_STATION_GENRES_SLUG );
 	}
 	if ( !$term ) {
 		return false;
 	}
-	$genre[$term->name] = array(
+	$genre_data = array();
+	$genre_data[$term->name] = array(
 		'id'            => $term->term_id,
 		'name'          => $term->name,
 		'slug'          => $term->slug,
@@ -2036,7 +2078,7 @@ function radio_station_get_genre( $genre ) {
 		'url'           => get_term_link( $term, RADIO_STATION_GENRES_SLUG ),
 	);
 
-	return $genre;
+	return $genre_data;
 }
 
 // ----------
@@ -3019,23 +3061,20 @@ function radio_station_get_stream_formats() {
 	// TODO: recheck amplitude formats ?
 	// [Amplitude] HTML5 Support - mp3, aac ...?
 	// ref: https://en.wikipedia.org/wiki/HTML5_audio#Supporting_browsers
-	// [JPlayer] Audio: mp3, m4a - Video: m4v
-	// +Audio: webma, oga, wav, fla, rtmpa +Video: webmv, ogv, flv, rtmpv
 	// [Howler] mp3, opus, ogg, wav, aac, m4a, mp4, webm
 	// +mpeg, oga, caf, weba, webm, dolby, flac
+	// [JPlayer] Audio: mp3, m4a - Video: m4v
+	// +Audio: webma, oga, wav, fla, rtmpa +Video: webmv, ogv, flv, rtmpv
 	// [Media Elements] Audio: mp3, wma, wav +Video: mp4, ogg, webm, wmv
 
 	$formats = array(
-		'aac'	=> 'AAC (A/H)',
-		'mp3'	=> 'MP3 (A/J/H)',
-		'm4a'	=> 'M4A (J/H)',
-		'ogg'	=> 'OGG (H)',
-		'oga'	=> 'OGA (J/H)',
-		'webm'	=> 'WebM (J/H)',
-		'rtmpa' => 'RTMPA (J)',
-		'opus'  => 'OPUS (H)',
-		'wav'	=> 'WAV (J/H)',
-		'flac'	=> 'FLAC (J/H)',
+		'aac'	=> 'AAC/M4A',		// A/H/J
+		'mp3'	=> 'MP3',			// A/H/J
+		'ogg'	=> 'OGG',			// H
+		'oga'	=> 'OGA',			// H/J
+		'webm'	=> 'WebM',			// H/J
+		'rtmpa' => 'RTMPA',			// J
+		'opus'  => 'OPUS',			// H
 	);
 
 	// --- filter and return ---
@@ -3055,6 +3094,22 @@ function radio_station_get_station_url() {
 	$station_url = apply_filters( 'radio_station_station_url', $station_url );
 
 	return $station_url;
+}
+
+// ---------------------
+// Get Station Image URL
+// ---------------------
+// 2.3.3.8: added get station logo image URL
+function radio_station_get_station_image_url() {
+	$station_image = '';
+	$attachment_id = radio_station_get_setting( 'station_image' );
+	$image = wp_get_attachment_image_src( $attachment_id, 'full' );
+	if ( is_array( $image ) ) {
+		$station_image = $image[0];
+	}
+	$station_image = apply_filters( 'radio_station_station_image_url', $station_image );
+
+	return $station_image;
 }
 
 // ----------------------------
@@ -4140,13 +4195,18 @@ function radio_station_get_language( $lang = false ) {
 	}
 
 	// --- get the specified language term ---
-	$term = get_term_by( 'slug', $lang, RADIO_STATION_LANGUAGES_SLUG );
-	if ( !$term ) {
-		$term = get_term_by( 'name', $lang, RADIO_STATION_LANGUAGES_SLUG );
-	}
-	if ( !$term ) {
+	// 2.3.3.8: explicitly check for numberic language term ID
+	$id = absint( $lang );
+	if ( $id < 1 ) {
+		$term = get_term_by( 'slug', $lang, RADIO_STATION_LANGUAGES_SLUG );
+		if ( !$term ) {
+			$term = get_term_by( 'name', $lang, RADIO_STATION_LANGUAGES_SLUG );
+		}
+	} else {
 		$term = get_term_by( 'id', $lang, RADIO_STATION_LANGUAGES_SLUG );
 	}
+
+	// --- set language from term ---
 	if ( $term ) {
 		$language = array(
 			'id'          => $term->term_id,
@@ -4167,7 +4227,7 @@ function radio_station_get_language( $lang = false ) {
 						'name'        => $lang_data['native_name'],
 						'description' => $lang_data['english_name'],
 						// TODO: set URL for main language and filter archive page results ?
-						// 'url'   => '',
+						// 'url'      => '',
 					);
 				}
 			}
@@ -4209,7 +4269,6 @@ function radio_station_trim_excerpt( $content, $length = false, $more = false, $
 
 		if ( !$length ) {
 			$length = 35;
-			// $length = apply_filters( 'radio_station_excerpt_length', $length );
 			$length = (int) apply_filters( 'radio_station_excerpt_length', $length );
 		}
 		if ( !$more ) {

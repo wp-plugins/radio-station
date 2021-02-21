@@ -47,9 +47,12 @@ if ( $atts['show_desc'] ) {
 	$more = apply_filters( 'radio_station_schedule_tabs_excerpt_more', '[&hellip;]' );
 }
 
-// --- start tabbed schedule output ---
-$output .= '<ul id="master-schedule-tabs">' . $newline;
+// --- set cell info key order ---
+// 2.3.3.8: added for possible info rearrangement
+$infokeys = array( 'title', 'hosts', 'times', 'encore', 'file', 'genres', 'custom' );
+$infokeys = apply_filters( 'radio_station_schedule_tabs_info_order', $infokeys );
 
+// --- start tabbed schedule output ---
 $panels = '';
 $tcount = 0;
 $start_tab = false;
@@ -142,31 +145,31 @@ foreach ( $weekdays as $i => $weekday ) {
 		// 2.3.1: added (negative) return to arrow onclick functions
 		$arrows = array( 'right' => '&#9658;', 'left' => '&#9668;' );
 		$arrows = apply_filters( 'radio_station_schedule_arrows', $arrows, 'tabs' );
-		$output .= '<li id="master-schedule-tabs-header-' . strtolower( $weekday ) . '" class="' . esc_attr( $classlist ) . '">' . $newline;
-		$output .= '<div class="shift-left-arrow">' . $newline;
-		$output .= '<a href="javacript:void(0);" onclick="return radio_shift_tab(\'left\');" title="' . esc_attr( __( 'Previous Day', 'radio-station' ) ) . '">' . $arrows['left'] . '</a>' . $newline;
-		$output .= '</div>' . $newline;
+		$tabs .= '<li id="master-schedule-tabs-header-' . strtolower( $weekday ) . '" class="' . esc_attr( $classlist ) . '">' . $newline;
+		$tabs .= '<div class="shift-left-arrow">' . $newline;
+		$tabs .= '<a href="javacript:void(0);" onclick="return radio_shift_tab(\'left\');" title="' . esc_attr( __( 'Previous Day', 'radio-station' ) ) . '">' . $arrows['left'] . '</a>' . $newline;
+		$tabs .= '</div>' . $newline;
 
 		// 2.3.2: added optional display_date attribute and subheading
-		$output .= '<div class="master-schedule-tabs-headings">' . $newline;
-		$output .= '<div class="master-schedule-tabs-day-name"';
+		$tabs .= '<div class="master-schedule-tabs-headings">' . $newline;
+		$tabs .= '<div class="master-schedule-tabs-day-name"';
 		if ( !$atts['display_date'] ) {
-			$output .= ' title="' . esc_attr( $date_subheading ) . '"';
+			$tabs .= ' title="' . esc_attr( $date_subheading ) . '"';
 		}
-		$output .= '>' . esc_html( $display_day ) . '</div>' . $newline;
+		$tabs .= '>' . esc_html( $display_day ) . '</div>' . $newline;
 		if ( $atts['display_date'] ) {
-			$output .= '<div class="master-schedule-tabs-date">' . esc_html( $date_subheading ) . '</div>' . $newline;
+			$tabs .= '<div class="master-schedule-tabs-date">' . esc_html( $date_subheading ) . '</div>' . $newline;
 		}
-		$output .= '</div>' . $newline;
+		$tabs .= '</div>' . $newline;
 
-		$output .= '<div class="shift-right-arrow">' . $newline;
-		$output .= '<a href="javacript:void(0);" onclick="return radio_shift_tab(\'right\');" title="' . esc_attr( __( 'Next Day', 'radio-station' ) ) . '">' . $arrows['right'] . '</a>' . $newline;
-		$output .= '</div>' . $newline;
-		$output .= '<div id="master-schedule-tab-bottom-' . strtolower( $weekday ) . '" class="master-schedule-tab-bottom"></div>' . $newline;
+		$tabs .= '<div class="shift-right-arrow">' . $newline;
+		$tabs .= '<a href="javacript:void(0);" onclick="return radio_shift_tab(\'right\');" title="' . esc_attr( __( 'Next Day', 'radio-station' ) ) . '">' . $arrows['right'] . '</a>' . $newline;
+		$tabs .= '</div>' . $newline;
+		$tabs .= '<div id="master-schedule-tab-bottom-' . strtolower( $weekday ) . '" class="master-schedule-tab-bottom"></div>' . $newline;
 		// 2.3.2: add start and end day times for automatic highlighting
-		$output .= '<span class="rs-time rs-start-time" data="' . esc_attr( $day_start_time ) . '"></span>' . $newline;
-		$output .= '<span class="rs-time rs-end-time" data="' . esc_attr( $day_end_time ) . '"></span>' . $newline;
-		$output .= '</li>';
+		$tabs .= '<span class="rs-time rs-start-time" data="' . esc_attr( $day_start_time ) . '"></span>' . $newline;
+		$tabs .= '<span class="rs-time rs-end-time" data="' . esc_attr( $day_end_time ) . '"></span>' . $newline;
+		$tabs .= '</li>';
 
 		// 2.2.7: separate headings from panels for tab view
 		$classes = array( 'master-schedule-tabs-panel' );
@@ -197,18 +200,29 @@ foreach ( $weekdays as $i => $weekday ) {
 
 			$foundshows = true;
 
+			// --- maybe set start avatar position ---
+			// 2.3.3.8: added for possible alternating avatar positions
+			$avatar_position = false;
+			if ( 'alternate' == $atts['image_position'] ) {
+				$avatar_position = 'left';
+				$avatar_position = apply_filters( 'radio_station_schedule_tabs_avatar_position_start', $avatar_position );
+			}
+
 			$j = 0;
 			foreach ( $shifts as $shift ) {
 
+				// 2.3.3.8: reset info array
 				$j++;
 				$show = $shift['show'];
+				$info = array();
 				$split_id = false;
 
 				$show_link = false;
+				$show_id = $show['id'];
 				if ( $atts['show_link'] ) {
 					$show_link = $show['url'];
 				}
-				$show_link = apply_filters( 'radio_station_schedule_show_link', $show_link, $show['id'], 'tabs' );
+				$show_link = apply_filters( 'radio_station_schedule_show_link', $show_link, $show_id, 'tabs' );
 
 				// --- convert shift time data ---
 				// 2.3.2: replace strtotime with to_time for timezones
@@ -260,7 +274,7 @@ foreach ( $weekdays as $i => $weekday ) {
 
 				// 2.3.0: add genre classes for highlighting
 				$classes = array( 'master-schedule-tabs-show' );
-				$terms = wp_get_post_terms( $show['id'], RADIO_STATION_GENRES_SLUG, array() );
+				$terms = wp_get_post_terms( $show_id, RADIO_STATION_GENRES_SLUG, array() );
 				if ( $terms && ( count( $terms ) > 0 ) ) {
 					foreach ( $terms as $term ) {
 						$classes[] = strtolower( $term->slug );
@@ -289,26 +303,38 @@ foreach ( $weekdays as $i => $weekday ) {
 
 				// --- Show Image ---
 				// (defaults to display on)
+				$avatar = '';
 				if ( $atts['show_image'] ) {
+
+					// --- get show avatar image ---
 					// 2.3.0: filter show avatar by show and context
 					// 2.3.0: maybe link avatar to show
-					$show_avatar = radio_station_get_show_avatar( $show['id'], $avatar_size );
-					$show_avatar = apply_filters( 'radio_station_schedule_show_avatar', $show_avatar, $show['id'], 'tabs' );
-					if ( $show_avatar ) {
-						$panels .= '<div class="show-image">' . $newline;
-						if ( $show_link ) {
-							$panels .= '<a href="' . esc_url( $show_link ) . '">' . $show_avatar . '</a>' . $newline;
-						} else {
-							$panels .= $show_avatar;
-						}
-						$panels .= '</div>' . $newline;
-					} else {
-						$panels .= '<div class="show-image"></div>' . $newline;
-					}
-				}
+					$show_avatar = radio_station_get_show_avatar( $show_id, $avatar_size );
+					$show_avatar = apply_filters( 'radio_station_schedule_show_avatar', $show_avatar, $show_id, 'tabs' );
 
-				// --- Show Information ---
-				$panels .= '<div class="show-info">' . $newline;
+					// --- set show image classes ---
+					$classes = array( 'show-image' );
+					if ( ( 'left' == $atts['image_position'] ) || ( 'left' == $avatar_position ) ) {
+						$classes[] = 'left-image';
+					} elseif ( ( 'right' == $atts['image_position'] ) || ( 'right' == $avatar_position ) ) {
+						$classes[] = 'right-image';
+					}
+					$classlist = implode( ' ', $classes );
+
+					if ( $show_avatar ) {
+						$avatar = '<div class="' . esc_attr( $classlist ) . '">' . $newline;
+						if ( $show_link ) {
+							$avatar .= '<a href="' . esc_url( $show_link ) . '">' . $show_avatar . '</a>' . $newline;
+						} else {
+							$avatar .= $show_avatar;
+						}
+						$avatar .= '</div>' . $newline;
+					} else {
+						$avatar = '<div class="' . esc_attr( $classlist ) . '"></div>' . $newline;
+					}
+					$avatar = apply_filters( 'radio_station_schedule_show_avatar_display', $avatar, $show_id, 'tabs' );
+					// $panels .= $avatar;
+				}
 
 				// --- show title ---
 				if ( $show_link ) {
@@ -316,78 +342,60 @@ foreach ( $weekdays as $i => $weekday ) {
 				} else {
 					$show_title = esc_html( $show['name'] );
 				}
-				$panels .= '<div class="show-title">' . $newline;
-				$panels .= $show_title . $newline;
-				$panels .= '</div>' . $newline;
+				$title = '<div class="show-title">' . $newline;
+				$title .= $show_title . $newline;
+				$title .= '</div>' . $newline;
+				$title = apply_filters( 'radio_station_schedule_show_title_display', $title, $show_id, 'tabs' );
+				if ( ( '' != $title ) && is_string( $title ) ) {
+					$info['title'] = $title;
+					// $panels .= $title;
+				}
 
 				// --- show hosts ---
 				if ( $atts['show_hosts'] ) {
 
-					$hosts = '';
+					$show_hosts = '';
 					if ( $show['hosts'] && is_array( $show['hosts'] ) && ( count( $show['hosts'] ) > 0 ) ) {
 
 						$count = 0;
 						$host_count = count( $show['hosts'] );
-						$hosts .= '<span class="show-dj-names-leader"> ';
-						$hosts .= esc_html( __( 'with', 'radio-station' ) );
-						$hosts .= ' </span>' . $newline;
+						$show_hosts .= '<span class="show-dj-names-leader"> ';
+						$show_hosts .= esc_html( __( 'with', 'radio-station' ) );
+						$show_hosts .= ' </span>' . $newline;
 
 						foreach ( $show['hosts'] as $host ) {
 							$count ++;
 							// 2.3.0: added link_hosts attribute check
 							if ( $atts['link_hosts'] && !empty( $host['url'] ) ) {
-								$hosts .= '<a href="' . esc_url( $host['url'] ) . '">' . esc_html( $host['name'] ) . '</a>' . $newline;
+								$show_hosts .= '<a href="' . esc_url( $host['url'] ) . '">' . esc_html( $host['name'] ) . '</a>' . $newline;
 							} else {
-								$hosts .= esc_html( $host['name'] );
+								$show_hosts .= esc_html( $host['name'] );
 							}
 
 							if ( ( ( 1 === $count ) && ( 2 === $host_count ) )
 								 || ( ( $host_count > 2 ) && ( ( $host_count - 1 ) === $count ) ) ) {
-								$hosts .= ' ' . esc_html( __( 'and', 'radio-station' ) ) . ' ';
+								$show_hosts .= ' ' . esc_html( __( 'and', 'radio-station' ) ) . ' ';
 							} elseif ( ( $count < $host_count ) && ( $host_count > 2 ) ) {
-								$hosts .= ', ';
+								$show_hosts .= ', ';
 							}
 						}
 					}
 
-					$hosts = apply_filters( 'radio_station_schedule_show_hosts', $hosts, $show['id'], 'tabs' );
-					if ( $hosts ) {
-						$panels .= '<div class="show-dj-names show-host-names">' . $newline;
-						$panels .= $hosts;
-						$panels .= '</div>' . $newline;
+					$show_hosts = apply_filters( 'radio_station_schedule_show_hosts', $show_hosts, $show_id, 'tabs' );
+					if ( $show_hosts ) {
+						$hosts = '<div class="show-dj-names show-host-names">' . $newline;
+						$hosts .= $show_hosts;
+						$hosts .= '</div>' . $newline;
+						$hosts = apply_filters( 'radio_station_schedule_show_hosts_display', $hosts, $show_id, 'tabs' );
+						if ( ( '' != $hosts ) && is_string( $hosts ) ) {
+							$info['hosts'] = $hosts;
+							// $panels .= $hosts;
+						}
 					}
 				}
 
 				// --- show times ---
 				if ( $atts['show_times'] ) {
-
-					// --- convert shift time for display ---
-					// 2.3.0: updated to use new schedule data
-					/* if ( '00:00 am' == $shift['start'] ) {
-						$shift['start'] = '12:00 am';
-					}
-					if ( '11:59:59 pm' == $shift['end'] ) {
-						$shift['end'] = '12:00 am';
-					}
-					if ( 24 == (int) $atts['time'] ) {
-						$start = radio_station_convert_shift_time( $shift['start'], 24 );
-						// 2.3.2: display real end of split shift
-						if ( isset( $shift['split'] ) && $shift['split'] && isset( $shift['real_end'] ) ) {
-							$end = radio_station_convert_shift_time( $shift['real_end'], 24 );
-						} else {
-							$end = radio_station_convert_shift_time( $shift['end'], 24 );
-						}
-						$data_format = 'H:i';
-					} else {
-						$start = str_replace( array( 'am', 'pm'), array( ' ' . $am, ' ' . $pm), $shift['start'] );
-						// 2.3.2: display real end of split shift
-						if ( isset( $shift['split'] ) && $shift['split'] && isset( $shift['real_end'] ) ) {
-							$end = str_replace( array( 'am', 'pm'), array( ' ' . $am, ' ' . $pm ), $shift['real_end'] );
-						} else {
-							$end = str_replace( array( 'am', 'pm'), array( ' ' . $am, ' ' . $pm ), $shift['end'] );
-						}
-						$data_format = 'g:i a';
-					} */
 
 					// --- get start and end times ---
 					// 2.3.2: maybe use real start and end times
@@ -408,19 +416,28 @@ foreach ( $weekdays as $i => $weekday ) {
 					$show_time = '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $start_data_format ) . '">' . esc_html( $start ) . '</span>' . $newline;
 					$show_time .= '<span class="rs-sep"> ' . esc_html( __( 'to', 'radio-station' ) ) . ' </span>' . $newline;
 					$show_time .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $end_data_format ) . '">' . esc_html( $end ) . '</span>' . $newline;
-					$show_time = apply_filters( 'radio_station_schedule_show_time', $show_time, $show['id'], 'tabs' );
-
-					$panels .= '<div class="show-time" id="show-time-' . esc_attr( $tcount ) . '">' . $show_time . '</div>' . $newline;
-					$panels .= '<div class="show-user-time" id="show-user-time-' . esc_attr( $tcount ) . '"></div>' . $newline;
-					$tcount ++;
 
 				} else {
 
 					// 2.3.2: added for now playing check
-					$panels .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="H:i"></span>' . $newline;
-					$panels .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="H:i"></span>' . $newline;
+					// 2.3.3.8: moved for better conditional logic
+					$show_time = '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $start_data_format ) . '"></span>' . $newline;
+					$show_time .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $end_data_format ) . '"></span>' . $newline;
 
 				}
+
+				// 2.3.3.8: moved show time filter out and added display filter
+				$show_time = apply_filters( 'radio_station_schedule_show_time', $show_time, $show_id, 'tabs', $shift );
+				$times = '<div class="show-time" id="show-time-' . esc_attr( $tcount ) . '"';
+				// note: unlike other display filters this hides/shows times rather than string filtering
+				$display = apply_filters( 'radio_station_schedule_show_times_display', true, $show_id, 'tabs', $shift );
+				if ( !$display ) {
+					$times .= ' style="display:none;"';
+				}
+				$times .= '>' . $show_time . '</div>' . $newline;
+				$times .= '<div class="show-user-time" id="show-user-time-' . esc_attr( $tcount ) . '"></div>' . $newline;
+				$info['times'] = $times;
+				$tcount ++;
 
 				// --- encore ---
 				// 2.3.0: filter encore switch by show and context
@@ -430,11 +447,16 @@ foreach ( $weekdays as $i => $weekday ) {
 					} else {
 						$show_encore = false;
 					}
-					$show_encore = apply_filters( 'radio_station_schedule_show_encore', $show_encore, $show['id'], 'tabs' );
+					$show_encore = apply_filters( 'radio_station_schedule_show_encore', $show_encore, $show_id, 'tabs' );
 					if ( 'on' == $show_encore ) {
-						$panels .= '<div class="show-encore">';
-						$panels .= esc_html( __( 'encore airing', 'radio-station' ) );
-						$panels .= '</div>' . $newline;
+						$encore = '<div class="show-encore">';
+						$encore .= esc_html( __( 'encore airing', 'radio-station' ) );
+						$encore .= '</div>' . $newline;
+						$encore = apply_filters( 'radio_station_schedule_show_encore_display', $encore, $show_id, 'tabs' );
+						if ( ( '' != $encore ) && is_string( $encore ) ) {
+							$info['encore'] = $encore;
+							// $panel .= $encore;
+						}
 					}
 				}
 
@@ -443,56 +465,125 @@ foreach ( $weekdays as $i => $weekday ) {
 					// 2.3.0: filter audio file by show and context
 					// 2.3.2: check show download disable meta
 					// 2.3.3: fix to incorrect filter name
-					$show_file = get_post_meta( $show['id'], 'show_file', true );
-					$show_file = apply_filters( 'radio_station_schedule_show_file', $show_file, $show['id'], 'tabs' );
-					$disable_download = get_post_meta( $show['id'], 'show_download', true );
+					// 2.3.3.8: add filter for show file link div
+					// 2.3.3.8: added filter for show file anchor
+					$show_file = get_post_meta( $show_id, 'show_file', true );
+					$show_file = apply_filters( 'radio_station_schedule_show_file', $show_file, $show_id, 'tabs' );
+					$disable_download = get_post_meta( $show_id, 'show_download', true );
 					if ( $show_file && !empty( $show_file ) && !$disable_download ) {
-						$panels .= '<div class="show-file">' . $newline;
-						$panels .= '<a href="' . esc_url( $show_file ) . '">';
-						$panels .= esc_html( __( 'Audio File', 'radio-station' ) );
-						$panels .= '</a>' . $newline;
-						$panels .= '</div>' . $newline;
+						$anchor = __( 'Audio File', 'radio-station' );
+						$anchor = apply_filters( 'radio_station_schedule_show_file_anchor', $anchor, $show_id, 'tabs' );
+						$file = '<div class="show-file">' . $newline;
+						$file .= '<a href="' . esc_url( $show_file ) . '">';
+						$file .= esc_html( $anchor );
+						$file .= '</a>' . $newline;
+						$file .= '</div>' . $newline;
+						$file = apply_filters( 'radio_station_schedule_show_file_display', $file, $show_file, $show_id, 'tabs' );
+						if ( ( '' != $file ) && is_string( $file ) ) {
+							$info['file'] = $file;
+							// $panels .= $link;
+						}
 					}
 				}
 
 				// --- show genres ---
 				// (defaults to display on)
 				if ( $atts['show_genres'] ) {
-					$panels .= '<div class="show-genres">' . $newline;
-					$genres = array();
+					$genres = '<div class="show-genres">' . $newline;
+					$show_genres = array();
 					if ( count( $terms ) > 0 ) {
+						$genres .= esc_html( __( 'Genres', 'radio-station' ) ) . ': ';
 						foreach ( $terms as $term ) {
-							$genres[] = '<a href="' . esc_url( get_term_link( $term ) ) . '">' . esc_html( $term->name ) . '</a>' . $newline;
+							$show_genres[] = '<a href="' . esc_url( get_term_link( $term ) ) . '">' . esc_html( $term->name ) . '</a>' . $newline;
 						}
-						$genre_display = implode( ', ', $genres );
-						$panels .= esc_html( __( 'Genres', 'radio-station' ) ) . ': ' . $genre_display;
+						$genres .= implode( ', ', $show_genres );
 					}
-					$panels .= '</div>' . $newline;
+					$genres .= '</div>' . $newline;
+					$genres = apply_filters( 'radio_station_schedule_show_genres', $genres, $show_id, 'tabs' );
+					if ( ( '' != $genres ) && is_string( $genres ) ) {
+						$info['genres'] = $genres;
+						// $panels .= $genres;
+					}
 				}
 
+				// --- custom info section ---
+				// 2.3.3.8: allow for custom HTML to be added
+				$custom = apply_filters( 'radio_station_schedule_show_custom_display', '', $show_id, 'tabs' );
+				if ( ( '' != $custom ) && is_string( $custom ) ) {
+					$info['custom'] = $custom;
+				}
+
+				// --- left aligned show avatar ---
+				// 2.3.3.8: add image according to position
+				if ( $avatar ) {
+					if ( ( 'left' == $atts['image_position'] ) || ( 'left' == $avatar_position ) ) {
+						$panels .= $avatar;
+					}
+				}
+
+				// --- Show Information ---
+				// 2.3.3.8: add avatar classes to show info for style targeting
+				$classes = array( 'show-info' );
+				if ( $atts['show_desc'] ) {
+					$classes[] = 'has-show-desc';
+				}
+				if ( ( 'left' == $atts['image_position'] ) || ( 'left' == $avatar_position ) ) {
+					$classes[] = 'left-image';
+				} elseif ( ( 'right' == $atts['image_position'] ) || ( 'right' == $avatar_position ) ) {
+					$classes[] = 'right-image';
+				}
+				$classlist = implode( ' ', $classes );
+				$panels .= '<div class="' . esc_attr( $classlist ) . '">' . $newline;
+
+				// --- add item info according to key order ---
+				// 2.3.3.8: added for possible order rearrangement
+				foreach ( $infokeys as $infokey ) {
+					if ( isset( $info[$infokey] ) ) {
+						$panels .= $info[$infokey];
+					}
+				}
+
+				// --- close show info section ---
 				$panels .= '</div>' . $newline;
+
+				// --- right aligned show avatar ---
+				// 2.3.3.8: add image according to position
+				if ( $avatar ) {
+					if ( 'right' == $atts['image_position'] ) {
+						$panels .= $avatar;
+					} elseif ( 'right' == $avatar_position ) {
+						$panels .= $avatar;
+						$avatar_position = 'left';
+					} elseif ( 'left' == $avatar_position ) {
+						$avatar_position = 'right';
+					}
+				}
 
 				// --- show description ---
 				if ( $atts['show_desc'] ) {
 
-					$show_post = get_post( $show['id'] );
-					$permalink = get_permalink( $show_post->ID );
+					$show_post = get_post( $show_id );
+					$permalink = get_permalink( $show_id );
 
 					// --- get show excerpt ---
 					if ( !empty( $show_post->post_excerpt ) ) {
-						$excerpt = $show_post->post_excerpt;
-						$excerpt .= ' <a href="' . esc_url( $permalink ) . '">' . $more . '</a>';
+						$show_excerpt = $show_post->post_excerpt;
+						$show_excerpt .= ' <a href="' . esc_url( $permalink ) . '">' . $more . '</a>';
 					} else {
-						$excerpt = radio_station_trim_excerpt( $show_post->post_content, $length, $more, $permalink );
+						$show_excerpt = radio_station_trim_excerpt( $show_post->post_content, $length, $more, $permalink );
 					}
 
 					// --- filter excerpt by context ---
-					$excerpt = apply_filters( 'radio_station_schedule_show_excerpt', $excerpt, $show['id'], 'tabs' );
+					$show_excerpt = apply_filters( 'radio_station_schedule_show_excerpt', $show_excerpt, $show_id, 'tabs' );
 
 					// --- output excerpt ---
-					$panels .= '<div class="show-desc">' . $newline;
-					$panels .= $excerpt . $newline;
-					$panels .= '</div>' . $newline;
+					$excerpt = '<div class="show-desc">' . $newline;
+					$excerpt .= $show_excerpt . $newline;
+					$excerpt .= '</div>' . $newline;
+					$excerpt = apply_filters( 'radio_station_schedule_show_excerpt_display', $excerpt, $show_id, 'tabs' );
+					if ( ( '' != $excerpt ) && is_string( $excerpt ) ) {
+						$panels .= $excerpt;
+					}
 
 				}
 
@@ -511,9 +602,18 @@ foreach ( $weekdays as $i => $weekday ) {
 	$panels .= '</ul>' . $newline;
 }
 
+// --- add day tabs to output ---
+$output = '<ul id="master-schedule-tabs">' . $newline;
+$output .= $tabs;
 $output .= '</ul>' . $newline;
 
-$output .= '<div id="master-schedule-tab-panels">' . $newline;
+// --- add day panels to output ---
+// 2.3.3.8: check for hide past shows attribute
+$output .= '<div id="master-schedule-tab-panels"';
+if ( $atts['hide_past_shows'] ) {
+	$output .= ' class="hide-past-shows"';
+}
+$output .= '>' . $newline;
 $output .= $panels;
 $output .= '</div>' . $newline;
 
