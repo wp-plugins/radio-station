@@ -647,8 +647,9 @@ function radio_station_master_schedule_tabs_js() {
 	} */
 
 	// 2.3.3.6: allow for clicking on date to change days
+	// 2.3.3.8: make entire heading label div clickable to change tabs
 	$js = "jQuery(document).ready(function() {
-		jQuery('.master-schedule-tabs-day-name, .master-schedule-tabs-date').bind('click', function (event) {
+		jQuery('.master-schedule-tabs-headings').bind('click', function (event) {
 			headerID = jQuery(event.target).closest('li').attr('id');
 			panelID = headerID.replace('header', 'day');
 			jQuery('.master-schedule-tabs-day').removeClass('active-day-tab');
