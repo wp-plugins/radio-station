@@ -12,7 +12,8 @@
 | [Roles](./Roles.md) | Plugin Roles and related Capabilities |
 | [Widgets](./Widgets.md) | Current Show, Upcoming Shows, Playlist, Clock, Player |
 | [Shortcodes](./Shortcodes.md) | Data List Archives and Master Schedule Views |
-| [Data](./Data.md) | Post Types, Taxonomies and Data Filters |
+| [Data](./Data.md) | Post Types and Taxonomies |
+| [Filters](./Filters.md) | Custom Development Value Filters |
 | [API](./API.md) | Data API via REST and Feed Endpoints
 | [Roadmap](./Roadmap.md) | Feature Roadmap for Free and Pro Versions |
 | [Changelog](../CHANGELOG.md) | Log of Changes for each Release |
