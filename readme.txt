@@ -4,7 +4,7 @@ Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
 Tested up to: 5.6
-Stable tag: 2.3.3.7
+Stable tag: 2.3.3.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
