@@ -472,9 +472,6 @@ function radio_station_get_show_shifts( $check_conflicts = true, $split = true, 
 	return $day_shifts;
 }
 
-
-
-
 // ----------------------
 // Get Schedule Overrides
 // ----------------------
@@ -4001,8 +3998,9 @@ function radio_station_convert_show_shifts( $show ) {
 	if ( isset( $show['schedule'] ) ) {
 		$schedule = $show['schedule'];
 		foreach ( $schedule as $i => $shift ) {
-			$start_hour = substr( radio_station_convert_hour( $shift['start_hour'] . $shift['start_meridian'] ), 0, 2 );
-			$end_hour = substr( radio_station_convert_hour( $shift['end_hour'] . $shift['end_meridian'] ), 0, 2 );
+			// 2.3.3.9: fixed to not use radio_station_convert_hour
+			$start_hour = substr( radio_station_convert_shift_time( $shift['start_hour'] . $shift['start_meridian'], 24 ), 0, 2 );
+			$end_hour = substr( radio_station_convert_shift_time( $shift['end_hour'] . $shift['end_meridian'], 24 ), 0, 2 );
 			$schedule[$i] = array(
 				'day'	=> $shift['day'],
 				'start'	=> $start_hour . ':' . $shift['start_min'],

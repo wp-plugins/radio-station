@@ -2,7 +2,7 @@
 
 /**
  * @package Radio Station
- * @version 2.3.3.7
+ * @version 2.3.3
  */
 /*
 
@@ -3049,12 +3049,13 @@ function radio_station_clear_transients() {
 	$clear_transients = radio_station_get_setting( 'clear_transients' );
 	if ( RADIO_STATION_DEBUG || ( 'yes' == $clear_transients ) ) {
 		// 2.3.2: do not clear on AJAX calls
-		if ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) {
-			delete_transient( 'radio_station_current_schedule' );
-			delete_transient( 'radio_station_next_show' );
-			// 2.3.3: remove current show transient
-			// delete_transient( 'radio_station_current_show' );
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+			return;
 		}
+		delete_transient( 'radio_station_current_schedule' );
+		delete_transient( 'radio_station_next_show' );
+		// 2.3.3: remove current show transient
+		// delete_transient( 'radio_station_current_show' );
 	}
 }
 
