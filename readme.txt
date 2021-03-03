@@ -4,7 +4,7 @@ Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
 Tested up to: 5.6
-Stable tag: 2.3.3.7
+Stable tag: 2.3.3.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -213,6 +213,7 @@ We haven't built an interface between Google Calendar and Radio Station just yet
 * Fixed: Check for explicit singular.php template usage setting
 * Fixed: Access to Shows Data via querystring of Show ID/name
 * Fixed: Shows Data for Genres/Languages querystring of ID/name
+* Fixed: Changed stable tag from trunk to version number to fix translations issue
 
 = 2.3.3.7 =
 * Fixed: Schedule Overrides overlapping multiple Show shifts
