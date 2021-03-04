@@ -473,7 +473,7 @@ foreach ( $hours as $hour ) {
 									$show_hosts .= ' </span>' . $newline;
 
 									$count = 0;
-									$hostcount = count( $show['hosts'] );
+									$host_count = count( $show['hosts'] );
 									foreach ( $show['hosts'] as $host ) {
 										$count ++;
 										// 2.3.0: added link_hosts attribute check
@@ -483,10 +483,10 @@ foreach ( $hours as $hour ) {
 											$show_hosts .= esc_html( $host['name'] );
 										}
 
-										if ( ( ( 1 === $count ) && ( 2 === $hostcount ) )
-											 || ( ( $hostcount > 2 ) && ( ( $hostcount - 1 ) === $count ) ) ) {
+										if ( ( ( 1 === $count ) && ( 2 === $host_count ) )
+											 || ( ( $host_count > 2 ) && ( ( $host_count - 1 ) === $count ) ) ) {
 											$show_hosts .= ' ' . esc_html( __( 'and', 'radio-station' ) ) . ' ';
-										} elseif ( ( $count < $hostcount ) && ( $hostcount > 2 ) ) {
+										} elseif ( ( $count < $host_count ) && ( $host_count > 2 ) ) {
 											$show_hosts .= ', ';
 										}
 									}
