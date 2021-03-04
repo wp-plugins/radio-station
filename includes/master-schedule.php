@@ -55,18 +55,18 @@ function radio_station_master_schedule( $atts ) {
 		// --- control display options ---
 		'selector'          => 1,
 		'clock'             => $clock,
-		'timezone'			=> 1,
+		'timezone'          => 1,
 
 		// --- schedule display options ---
 		'time'              => $time_format,
-		'show_times'		=> 1,
+		'show_times'        => 1,
 		'show_link'         => 1,
 		'view'              => 'table',
-		'days'				=> false,
-		'start_day'			=> false,
-		'display_day'		=> 'short',
-		'display_date'		=> 'jS',
-		'display_month'		=> 'short',
+		'days'              => false,
+		'start_day'         => false,
+		'display_day'       => 'short',
+		'display_date'      => 'jS',
+		'display_month'	    => 'short',
 
 		// --- converted and deprecated ---
 		// 'list'              => 0,
@@ -75,7 +75,7 @@ function radio_station_master_schedule( $atts ) {
 
 		// --- show display options ---
 		'show_image'        => 0,
-		'show_desc'			=> 0,
+		'show_desc'         => 0,
 		'show_hosts'        => 0,
 		'link_hosts'        => 0,
 		'show_genres'       => 0,
