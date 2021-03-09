@@ -1564,7 +1564,7 @@ function radio_station_streaming_data( $data, $station = false ) {
 		'instance'	=> 0,
 		'url'		=> radio_station_get_stream_url(),
 		'format'	=> radio_station_get_setting( 'streaming_format' ),
-		'fallback'	=> radio_station_get_setting( 'fallback_url' ),
+		'fallback'	=> radio_station_get_fallback_url(),
 		'fformat'	=> radio_station_get_setting( 'fallback_format' ),
 	);
 	return $data;

@@ -105,9 +105,13 @@ function radio_station_master_schedule( $atts ) {
 			// 2.3.2: add display date attribute
 			$defaults['show_genres'] = 1;
 			$defaults['display_date'] = false;
-		} elseif ( 'divs' == $atts['view'] ) {
+		} elseif ( ( 'divs' == $atts['view'] ) || in_array( 'divs', $views ) ) {
 			// 2.3.3.8: moved divs view only default here
+			// 2.3.3.9: added check if divs in views array
 			$defaults['divheight'] = 45;
+		} elseif ( ( 'grid' == $atts['grid'] ) || in_array( 'grid', $views ) ) {
+			// 2.3.3.9: add default for grid view width
+			$defaults['gridwidth'] = 150;
 		}
 	}
 
@@ -121,12 +125,7 @@ function radio_station_master_schedule( $atts ) {
 	// --- set initial empty output string ---
 	$output = '';
 
-	// --- disable clock if feature is not present ---
-	// (temporarily while clock is in development)
-	if ( !function_exists( 'radio_station_clock_shortcode' ) ) {
-		$atts['clock'] = 0;
-	}
-
+	// 2.3.3.9: remove check if clock shortcode present
 	// 2.3.3.6: set new line for easier debug viewing
 	$newline = '';
 	if ( RADIO_STATION_DEBUG ) {
@@ -140,7 +139,7 @@ function radio_station_master_schedule( $atts ) {
 
 		$controls = array();
 
-		// --- display radio clock or timezone (or neither)
+		// --- display radio clock or timezone (or neither) ---
 		if ( $atts['clock'] ) {
 
 			// --- radio clock ---
@@ -838,7 +837,7 @@ function radio_station_master_schedule_tabs_js() {
 		}
 	}
 
-	/* Shift Day Left /  Right */
+	/* Shift Day Left / Right */
 	function radio_shift_tab(leftright) {
 		radio_tabs_responsive(leftright);
 		return false;

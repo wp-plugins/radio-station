@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2.3.3.9
 * Update: Plugin Panel (1.1.8) with Number Step Min/Max fix
-* Fixed: 24 Schedule Time format in Shift Scheduel for Shows Data Endpoint
+* Fixed: Shows Data Endpoint 24 Hour Shift Format and Encore Switch
+* Fixed: Multiple host separator display in Current Show Widget
 
 ### 2.3.3.8
 * Update: Plugin Panel (1.1.7) with Image and Color Picker fields
