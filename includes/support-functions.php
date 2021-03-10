@@ -4017,11 +4017,11 @@ function radio_station_convert_show_shifts( $show ) {
 			$start_hour = substr( radio_station_convert_shift_time( $shift['start_hour'] . $shift['start_meridian'], 24 ), 0, 2 );
 			$end_hour = substr( radio_station_convert_shift_time( $shift['end_hour'] . $shift['end_meridian'], 24 ), 0, 2 );
 			// 2.3.3.9: added missing shift encore designation
-			$encore = ( 'on' == $shift['encore'] ) ? 1 : 0;
+			$encore = ( 'on' == $shift['encore'] ) ? true : false;
 			$schedule[$i] = array(
-				'day'	=> $shift['day'],
-				'start'	=> $start_hour . ':' . $shift['start_min'],
-				'end'	=> $end_hour . ':' . $shift['end_min'],
+				'day'	 => $shift['day'],
+				'start'	 => $start_hour . ':' . $shift['start_min'],
+				'end'	 => $end_hour . ':' . $shift['end_min'],
 				'encore' => $encore,				
 			);
 		}
