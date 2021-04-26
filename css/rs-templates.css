@@ -7,6 +7,15 @@
 	clear: both;
 }
 
+.show-user-time {
+	display: none;
+	font-style: italic;
+}
+
+.rs-start-date, .rs-end-date {
+	margin-right: 0.5em;
+}
+
 /* Show Page Styles */
 /* ---------------- */
 

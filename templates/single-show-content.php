@@ -10,8 +10,11 @@
 // -----------------
 
 // --- get global and get show post ID ---
+// 2.3.3.9: added doing template flag
 global $radio_station_data, $post;
+$radio_station_data['doing-template'] = true;
 $post_id = $radio_station_data['show-id'] = $post->ID;
+$post_type = $radio_station_data['show-type'] = $post->post_type;
 
 // 2.3.3.6: set new line for easier debug viewing
 $newline = '';
@@ -72,6 +75,17 @@ $show_phone = apply_filters( 'radio_station_show_phone', $show_phone, $post_id )
 $show_patreon = apply_filters( 'radio_station_show_patreon', $show_patreon, $post_id );
 $show_rss = apply_filters( 'radio_station_show_rss', $show_rss, $post_id );
 $social_icons = apply_filters( 'radio_station_show_social_icons', false, $post_id );
+
+// --- get data format ---
+// 2.3.2: set filterable time formats
+// 2.3.3.9: moved out of show times block
+if ( 24 == (int) $time_format ) {
+	$start_data_format = $end_data_format = 'H:i';
+} else {
+	$start_data_format = $end_data_format = 'g:i a';
+}
+$start_data_format = apply_filters( 'radio_station_time_format_start', $start_data_format, 'show-template', $post_id );
+$end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_format, 'show-template', $post_id );
 
 // --- create show icon display early ---
 // 2.3.0: converted show links to icons
@@ -539,13 +553,18 @@ if ( !$active || !$shifts ) {
 
 	// --- display timezone ---
 	// 2.3.3.4: added filter for timezone label
+	// 2.3.3.9: added span wrap with class for actual timezone
 	$label = __( 'Timezone', 'radio-station' );
 	$label = apply_filters( 'radio_station_show_timezone_label', $label, $post_id );
 	$blocks['show_times'] .= '<span class="show-timezone-label">' . esc_html( $label ) . '</span>: ' . $newline;
 	if ( !isset( $timezone_code ) ) {
+		$blocks['show_times'] .= '<span class="show-timezone">';
 		$blocks['show_times'] .= esc_html( __( 'UTC', 'radio-station' ) ) . $utc_offset;
+		$blocks['show_times'] .= '</span>';		
 	} else {
+		$blocks['show_times'] .= '<span class="show-timezone">';
 		$blocks['show_times'] .= esc_html( $timezone_code );
+		$blocks['show_times'] .= '</span>';
 		$blocks['show_times'] .= '<span class="show-offset">';
 		$blocks['show_times'] .= ' [' . esc_html( __( 'UTC', 'radio-station' ) ) . $utc_offset . ']';
 		$blocks['show_times'] .= '</span>' . $newline;
@@ -557,16 +576,6 @@ if ( !$active || !$shifts ) {
 	$blocks['show_times'] .= '<table class="show-times" cellpadding="0" cellspacing="0">' . $newline;
 
 	$found_encore = false;
-
-	// --- get data format ---
-	// 2.3.2: set filterable time formats
-	if ( 24 == (int) $time_format ) {
-		$start_data_format = $end_data_format = 'H:i';
-	} else {
-		$start_data_format = $end_data_format = 'g:i a';
-	}
-	$start_data_format = apply_filters( 'radio_station_time_format_start', $start_data_format, 'show-template', $post_id );
-	$end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_format, 'show-template', $post_id );
 
 	$weekdays = radio_station_get_schedule_weekdays();
 	$now = radio_station_get_now();
@@ -590,10 +599,10 @@ if ( !$active || !$shifts ) {
 					}
 
 					// --- get shift time display ---
-					$start = radio_station_get_time( $start_data_format, $shift_start_time );
-					$end = radio_station_get_time( $end_data_format, $shift_end_time );
-					$start = radio_station_translate_time( $start );
-					$end = radio_station_translate_time( $end );
+					$start_display = radio_station_get_time( $start_data_format, $shift_start_time );
+					$end_display = radio_station_get_time( $end_data_format, $shift_end_time );
+					$start_display = radio_station_translate_time( $start_display );
+					$end_display = radio_station_translate_time( $end_display );
 
 					// --- check if current shift ---
 					$classes = array( 'show-shift-time' );
@@ -605,14 +614,22 @@ if ( !$active || !$shifts ) {
 					// --- set show time output ---
 					// 2.3.4: fix to start data_format attribute
 					$show_time = '<div class="' . esc_attr( $class ) . '">' . $newline;
-					$show_time .= '<span class="rs-time rs-start-time" data-format="' . esc_attr( $start_data_format ) . '">' . esc_html( $start ) . '</span>' . $newline;
+					$show_time .= '<span class="rs-time rs-start-time" data-format="' . esc_attr( $start_data_format ) . '" data="' . esc_attr( $shift_start_time ) . '">' . esc_html( $start_display ) . '</span>' . $newline;
 					$show_time .= '<span class="rs-sep"> - </span>' . $newline;
-					$show_time .= '<span class="rs-time rs-end-time" data-format="' . esc_attr( $end_data_format ) . '">' . esc_html( $end ) . '</span>' . $newline;
+					$show_time .= '<span class="rs-time rs-end-time" data-format="' . esc_attr( $end_data_format ) . '" data="' . esc_attr( $shift_end_time ) . '">' . esc_html( $end_display ) . '</span>' . $newline;
 					if ( isset( $shift['encore'] ) && ( 'on' == $shift['encore'] ) ) {
 						$found_encore = true;
 						$show_time .= '<span class="show-encore">*</span>' . $newline;
 					}
 					$show_time .= '</div>' . $newline;
+
+					// 2.3.3.9: add user show time div
+					$show_time .= '<div class="show-user-time" id="show-user-time-' . esc_attr( $tcount ) . '">' . $newline;
+					$show_time .= '[<span class="rs-time rs-start-time"></span>' . $newline;
+					$show_time .= '<span class="rs-sep"> - </span>' . $newline;
+					$show_time .= '<span class="rs-time rs-end-time"></span>]' . $newline;
+					$show_time .= '</div>' . $newline;
+
 					$show_times[] = $show_time;
 				}
 			}
@@ -624,7 +641,7 @@ if ( !$active || !$shifts ) {
 			$blocks['show_times'] .= '<b>' . esc_html( $weekday ) . '</b>: ' . $newline;
 			$blocks['show_times'] .= '</td><td>' . $newline;
 			foreach ( $show_times as $i => $show_time ) {
-				$blocks['show_times'] .= '<span class="show-time">' . $show_time . '</span>';
+				$blocks['show_times'] .= '<span class="show-time">' . $show_time . '</span>' . $newline;
 				// if ( $i < ( $show_times_count - 1 ) ) {
 				//	$blocks['show_times'] .= '<br>';
 				// }
@@ -647,6 +664,46 @@ if ( !$active || !$shifts ) {
 	}
 
 	$blocks['show_times'] .= '</table>' . $newline;
+}
+
+// 2.3.3.9: maybe output linked override times
+$date_format = apply_filters( 'radio_station_override_date_format', 'j F' );
+$overrides = radio_station_get_linked_overrides( $post_id );
+if ( $overrides && is_array( $overrides ) && ( count( $overrides ) > 0 ) ) {
+	$blocks['show_times'] .= '<h5>' . esc_html( __( 'Special Times', 'radio-station' ) ) . '</h5>';
+	foreach ( $overrides as $override ) {
+		if ( 'yes' != $override['disabled'] ) {
+			
+			$start = $override['date'] . ' ' . $override['start_hour'] . ':' . $override['start_min'] . ' ' . $override['start_meridian'];
+			$end = $override['date'] . ' ' . $override['end_hour'] . ':' . $override['end_min'] . ' ' . $override['end_meridian'];
+			$override_start_time = radio_station_to_time( $start );
+			$override_end_time = radio_station_to_time( $end );
+			if ( $override_end_time < $override_start_time ) {
+				$override_end_time = $override_end_time + ( 24 * 60 * 60 );
+			}
+			$start_display = radio_station_get_time( $start_data_format, $override_start_time );
+			$end_display = radio_station_get_time( $end_data_format, $override_end_time );
+			$start_display = radio_station_translate_time( $start_display );
+			$end_display = radio_station_translate_time( $end_display );
+			$date_time = radio_station_to_time( $override['date'] . ' 00:00' );
+			$date = radio_station_get_time( $date_format, $date_time );
+
+			$blocks['show_times'] .= '<div class="override-time">' . $newline;
+			$blocks['show_times'] .= '<span class="rs-date rs-start-date" data-format="' . esc_attr( $date_format ) . '" data="' . esc_attr( $date_time ) . '">' . esc_html( $date ) . '</span>' . $newline;
+			$blocks['show_times'] .= '<span class="rs-time rs-start-time" data-format="' . esc_attr( $start_data_format ) . '" data="' . esc_attr( $override_start_time ) . '">' . esc_html( $start_display ) . '</span>' . $newline;
+			$blocks['show_times'] .= '<span class="rs-sep"> - </span>' . $newline;
+			$blocks['show_times'] .= '<span class="rs-time rs-end-time" data-format="' . esc_attr( $end_data_format ) . '" data="' . esc_attr( $override_end_time ) . '">' . esc_html( $end_display ) . '</span>' . $newline;
+			$blocks['show_times'] .= '</div>' . $newline;
+
+			$blocks['show_times'] .= '<div class="show-user-time">' . $newline;
+			$blocks['show_times'] .= '[<span class="rs-date rs-start-date"></span>' . $newline;
+			$blocks['show_times'] .= '<span class="rs-time rs-start-time"></span>' . $newline;
+			$blocks['show_times'] .= '<span class="rs-sep"> - </span>' . $newline;
+			$blocks['show_times'] .= '<span class="rs-time rs-end-time"></span>]' . $newline;
+			$blocks['show_times'] .= '</div>' . $newline;
+
+		}
+	}
 }
 
 // --- maybe add link to full schedule page ---
@@ -720,7 +777,7 @@ if ( ( strlen( trim( $content ) ) > 0 ) || $show_posts || $show_playlists || $sh
 	}
 
 	// --- Show Episodes Tab ---
-	// 2.3.3.4: added filter for show epiodes label and anchor
+	// 2.3.3.4: added filter for show episodes label and anchor
 	if ( $show_episodes ) {
 
 		$sections['episodes']['heading'] = '<a name="show-episodes"></a>' . $newline;
@@ -733,7 +790,7 @@ if ( ( strlen( trim( $content ) ) > 0 ) || $show_posts || $show_playlists || $sh
 
 		$sections['episodes']['content'] = '<div id="show-episodes" class="show-section-content"><br>' . $newline;
 		$radio_station_data['show-episodes'] = $show_posts;
-		$shortcode = '[show-episodes-archive per_page="' . $episodes_per_page . '"]';
+		$shortcode = '[show-episodes-archive per_page="' . $episodes_per_page . '" show="' . $post_id . '"]';
 		$shortcode = apply_filters( 'radio_station_show_page_episodes_shortcode', $shortcode, $post_id );
 		$sections['episodes']['content'] .= do_shortcode( $shortcode );
 		$sections['episodes']['content'] .= '</div>' . $newline;
@@ -754,7 +811,7 @@ if ( ( strlen( trim( $content ) ) > 0 ) || $show_posts || $show_playlists || $sh
 
 		$sections['posts']['content'] = '<div id="show-posts" class="show-section-content"><br>' . $newline;
 		$radio_station_data['show-posts'] = $show_posts;
-		$shortcode = '[show-posts-archive per_page="' . $posts_per_page . '"]';
+		$shortcode = '[show-posts-archive per_page="' . $posts_per_page . '" show="' . $post_id . '"]';
 		$shortcode = apply_filters( 'radio_station_show_page_posts_shortcode', $shortcode, $post_id );
 		$sections['posts']['content'] .= do_shortcode( $shortcode );
 		$sections['posts']['content'] .= '</div>' . $newline;
@@ -775,7 +832,7 @@ if ( ( strlen( trim( $content ) ) > 0 ) || $show_posts || $show_playlists || $sh
 
 		$sections['playlists']['content'] = '<div id="show-playlists" class="show-section-content"><br>' . $newline;
 		$radio_station_data['show-playlists'] = $show_playlists;
-		$shortcode = '[show-playlists-archive per_page="' . $playlists_per_page . '"]';
+		$shortcode = '[show-playlists-archive per_page="' . $playlists_per_page . '" show="' . $post_id . '"]';
 		$shortcode = apply_filters( 'radio_station_show_page_playlists_shortcode', $shortcode, $post_id );
 		$sections['playlists']['content'] .= do_shortcode( $shortcode );
 		$sections['playlists']['content'] .= '</div>' . $newline;
@@ -881,7 +938,7 @@ $class = implode( ' ', $classes );
 					</div>
 					<?php
 						$radio_station_data['show-latests'] = $show_latest;
-						$shortcode = '[show-latest-archive thumbnails="0" pagination="0" content="none"]';
+						$shortcode = '[show-latest-archive show="' . $post_id . '" thumbnails="0" pagination="0" content="none"]';
 						$shortcode = apply_filters( 'radio_station_show_page_latest_shortcode', $shortcode, $post_id );
 						echo do_shortcode( $shortcode );
 					?>
@@ -914,9 +971,11 @@ $class = implode( ' ', $classes );
 
 					<div class="show-tabs">
 						<?php
-                        $i = 0;
+						$i = 0;
+						$found_section = false;
 						foreach ( $section_order as $section ) {
 							if ( isset( $sections[$section] ) ) {
+								$found_section = true;
 								if ( 0 == $i ) {
 									$class = "tab-active";
 								} else {
@@ -930,6 +989,10 @@ $class = implode( ' ', $classes );
 								}
 								$i++;
 							}
+						}
+						// 2.3.3.9: add end tab right spacer
+						if ( $found_section ) {
+							echo '<div class="show-tab-spacer">&nbsp;</div>';
 						}
 						?>
                     </div>
@@ -1017,3 +1080,6 @@ if ( 'tabbed' == 'section_layout' ) {
 	}, 500);";
 	wp_add_inline_script( 'radio-station-show-page', $js );
 }
+
+// 2.3.3.9: turn off doing template flag
+$radio_station_data['doing-template'] = false;

@@ -9,6 +9,19 @@ $now = radio_station_get_now();
 $date = radio_station_get_time( 'date', $now );
 $today = radio_station_get_time( 'day', $now );
 
+// --- check if start date is set ---
+// 2.3.3.9: added for non-now schedule displays
+if ( isset( $atts['start_date'] ) && $atts['start_date'] ) {
+	$start_date = $atts['start_date'];
+	$start_time = radio_station_to_time( $start_date . ' 00:00:00' );
+	// --- force display of date and month ---
+	$atts['display_date'] = ( !$atts['display_date'] ) ? '1' : $atts['display_date'];
+	$atts['display_month'] = ( !$atts['display_month'] ) ? 'short' : $atts['display_month'];
+} else {
+	$start_time = $now;
+}
+$start_time = apply_filters( 'radio_station_schedule_start_time', $start_time, 'table' );
+
 // --- set shift time formats ---
 // 2.3.2: set time formats early
 if ( 24 == (int) $atts['time'] ) {
@@ -24,18 +37,20 @@ $end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_for
 // 2.3.3.5: use the start_day value for getting the current schedule
 if ( isset( $atts['start_day'] ) && $atts['start_day'] ) {
 	$start_day = $atts['start_day'];
-	$schedule = radio_station_get_current_schedule( $now, $start_day );
 } else {
 	// 2.3.3.5: add filter for changing start day (to accept 'today')
 	$start_day = apply_filters( 'radio_station_schedule_start_day', false, 'table' );
-	if ( $start_day ) {
-		$schedule = radio_station_get_current_schedule( $now , $start_day );
-	} else {
-		$schedule = radio_station_get_current_schedule();
-	}
+}
+if ( $start_day ) {
+	$schedule = radio_station_get_current_schedule( $start_time, $start_day );
+} elseif ( $start_time != $now ) {
+	// 2.3.3.9: load current or time-specific schedule
+	$schedule = radio_station_get_current_schedule( $start_time );
+} else {
+	$schedule = radio_station_get_current_schedule();
 }
 $weekdays = radio_station_get_schedule_weekdays( $start_day );
-$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
+$weekdates = radio_station_get_schedule_weekdates( $weekdays, $start_time );
 
 // --- filter avatar size ---
 $avatar_size = apply_filters( 'radio_station_schedule_show_avatar_size', 'thumbnail', 'table' );
@@ -47,7 +62,7 @@ if ( $atts['show_desc'] ) {
 }
 
 // --- filter arrows ---
-$arrows = array( 'right' => '&#9658;', 'left' => '&#9668;' );
+$arrows = array( 'left' => '&#8249;', 'right' => '&#8250;', 'doubleleft' => '&#171;', 'doubleright' => '&#187;' );
 $arrows = apply_filters( 'radio_station_schedule_arrows', $arrows, 'table' );
 
 // --- set cell info key order ---
@@ -461,7 +476,15 @@ foreach ( $hours as $hour ) {
 							$title = apply_filters( 'radio_station_schedule_show_title_display', $title, $show_id, 'table' );
 							if ( ( '' != $title ) && is_string( $title ) ) {
 								$info['title'] = $title;
-								// $cell .= $title;
+							}
+							// 2.3.3.9: allow for admin edit link
+							$edit_link = apply_filters( 'radio_station_show_edit_link', '', $show_id, $shift['id'], 'table' );
+							if ( '' != $edit_link ) {
+								if ( isset( $info['title'] ) ) {
+									$info['title'] .= $edit_link;
+								} else {
+									$info['title'] = $edit_link;
+								}
 							}
 
 							// --- show DJs / hosts ---
@@ -539,7 +562,8 @@ foreach ( $hours as $hour ) {
 							}
 
 							// --- add show time to cell ---
-							$show_time = apply_filters( 'radio_station_schedule_show_time', $show_time, $show_id, 'table', $shift );
+							// 2.3.3.9: added tcount argument to filter
+							$show_time = apply_filters( 'radio_station_schedule_show_time', $show_time, $show_id, 'table', $shift, $tcount );
 							$times = '<div class="show-time" id="show-time-' . esc_attr( $tcount ) . '"';
 							// note: unlike other display filters this hides/shows times rather than string filtering
 							$display = apply_filters( 'radio_station_schedule_show_time_display', true, $show_id, 'table', $shift );
@@ -547,9 +571,13 @@ foreach ( $hours as $hour ) {
 								$times .= ' style="display:none;"';
 							}
 							$times .= '>' . $show_time . '</div>' . $newline;
-							$times .= '<div class="show-user-time" id="show-user-time-' . esc_attr( $tcount ) . '"></div>' . $newline;
+							// 2.3.3.9: added internal spans for user time
+							$times .= '<div class="show-user-time" id="show-user-time-' . esc_attr( $tcount ) . '">' . $newline;
+							$times .= '[<span class="rs-time rs-start-time"></span>' . $newline;
+							$times .= '<span class="rs-sep"> ' . esc_html( __( 'to', 'radio-station' ) ) . ' </span>' . $newline;
+							$times .= '<span class="rs-time rs-end-time"></span>]' . $newline;
+							$times .= '</div>' . $newline;
 							$info['times'] = $times;
-							// $cell .= $times;
 							$tcount ++;
 
 							// --- encore airing ---
@@ -665,6 +693,14 @@ foreach ( $hours as $hour ) {
 			} else {
 				// 2.3.2: add no-shifts class
 				$cellclasses[] = 'no-shifts';
+				$times = array( 'date' => $weekdate, 'day' => $weekday, 'hour' => $hour, 'mins' => 0 );
+				$add_link = apply_filters( 'radio_station_schedule_add_link', '', $times, 'table' );
+				if ( '' != $add_link ) {
+					if ( !isset( $cell ) ) {
+						$cell = '';
+					}
+					$cell .= $add_link;
+				}
 			}
 			$cellclass = implode( ' ', $cellclasses );
 			$table .= '<td class="' . $cellclass . '">' . $newline;
@@ -683,7 +719,11 @@ foreach ( $hours as $hour ) {
 
 $table .= '</table>' . $newline;
 
+// --- hidden iframe for schedule reloading ---
+$table .= '<iframe src="javascript:void(0);" id="schedule-table-loader" name="schedule-table-loader" style="display:none;"></iframe>' . $newline;
+
 if ( isset( $_GET['rs-shift-debug'] ) && ( '1' == $_GET['rs-shift-debug'] ) ) {
 	$table .= '<br><b>Shift Debug Info:</b><br>' . $shiftdebug . '<br>';
 }
-$output = $table;
+
+echo $table;

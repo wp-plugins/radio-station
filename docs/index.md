@@ -7,16 +7,17 @@
 | --- | --- |
 | [FAQ](./FAQ.md) | Frequently Asked Questions |
 | [Options](./Options.md) | Plugin Option Details and Value Filters |
-| [Display](./Display.md) | Automatic Pages, Templates and Images |
+| [Display](./Display.md) | Automatic Pages, Templates, Images and Translations |
 | [Manage](./Manage.md) | Admin Lists, Shift Editing, Conflict Checker |
 | [Roles](./Roles.md) | Plugin Roles and related Capabilities |
 | [Widgets](./Widgets.md) | Current Show, Upcoming Shows, Playlist, Clock, Player |
 | [Shortcodes](./Shortcodes.md) | Data List Archives and Master Schedule Views |
-| [Data](./Data.md) | Post Types and Taxonomies |
+| [Data](./Data.md) | Post Types,  Taxonomies and Translations |
 | [Filters](./Filters.md) | Custom Development Value Filters |
 | [API](./API.md) | Data API via REST and Feed Endpoints
 | [Roadmap](./Roadmap.md) | Feature Roadmap for Free and Pro Versions |
 | [Changelog](../CHANGELOG.md) | Log of Changes for each Release |
+| [Pro](./Pro.md) | Index of Pro Feature Documenation |
 
 
 ### Quickstart Guide
@@ -35,7 +36,7 @@ Then there are also a number of other [Shortcodes](./Shortcodes.md) you can use 
 
 Radio Station has several in-built [Data](./Data.md) types. These include [Custom Post Types](./Data.md#custom-post-types) for Shows, Schedule Overrides and Playlists. There are [Taxonomies](./Data.md#taxonomies) for Genres and Languages. You can override most data values and display output via [Custom Filters](./Filters.md) throughout the plugin. We have also incorporated an [API](./API.md) in the plugin via REST and/or WordPress Feeds, and this data is accessible in JSON format. 
 
-This plugin is under active development and we are continuously working to enhance the Free version available on [WordPress.Org](https://wordpress.org/plugins/radio-station/), as well as creating new feature additions for [Radio Station Pro](https://netmix.com/radio-station-pro/). Check out the [Roadmap](./Roadmap.md) if you are interested in seeing what is coming up next!
+This plugin is under active development and we are continuously working to enhance the Free version available on [WordPress.Org](https://wordpress.org/plugins/radio-station/), as well as creating new feature additions for [Radio Station Pro](https://radiostation.pro/). Check out the [Roadmap](./Roadmap.md) if you are interested in seeing what is coming up next!
 
 
 #### Plugin Support and Contributing
@@ -44,3 +45,7 @@ If you are wanting to Submit a Bug or Feature Request, you can do so via the [Wo
 
 Similarly, you can Contribute directly to the plugin via submitting an Issue or Pull Request on the [Github Plugin Repository](https://github.com/netmix/radio-station/). Or if you would prefer to get involved in the plugin's development even more substantially, please [Contact Us via Email](mailto:info@netmix.com) and let us know what you would like to do.
 
+
+#### [Pro] Professional Version Documentation
+
+For ease of reference, documentation of features that are included in [Radio Station Pro](https://radiostation.pro) are included within the Free Documentation here, simply marked with `[Pro]` like the heading above. For a list of all these features linked to their revelant sections see the [Pro Feature Index](./Pro.md)

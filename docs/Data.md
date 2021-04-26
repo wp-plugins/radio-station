@@ -35,13 +35,13 @@ For each Track the following can be specified:
 
 Standard WordPress Posts are assignable to a Show via a metabox on the Post Edit screen. This is good for allowing listeners to find news and other announcements for a particular Show, for when assigned to a Show they will display in a paginated list on that Show's page.
 
-### [Pro] Episodes
+### [Pro] Show Episodes
 
-A future release of Radio Statio Pro will include Show Episodes. These will be assignable to a Show to create and archive of Episodes for specific dates that will display on the Show page.
+[Radio Statio Pro](https://radiostation.pro) will include Show Episodes. These will be assignable to a Show to create and archive of Episodes for specific dates that will display on the Show page.
 
-### [Pro] Profiles
+### [Pro] Host and Producer Profiles
 
-A future release of Radio Station Pro will include Show Host and Producers Profile pages. These will display a profile template rather than the standard Author template for Hosts and Producers.
+[Radio Station Pro](https://radiostation.pro) will include Show Host and Producers Profile pages. These will display a profile template rather than the standard Author template for Hosts and Producers.
 
 
 ## Taxonomies
@@ -53,4 +53,6 @@ A flexible taxonomy allowing for the addition of Genre terms that can be assigne
 ### Language Taxonomy
 
 A fixed taxonomy allowing for assigning of Language terms to a Show (or Override.) In a Show does not have a Language assigned, it is assumed to be in the main Language selected in the Plugin Settings. Languages are displayed on a Show's page, and discoverable via the plugin's data [API](./API.md) Languages Endpoint, and in future will be displayable in widgets and other shortcodes also. There will also be an addition of a Languages Archive Shortcode that will work similar to the Genre Archive Shortcode.
+
+
 

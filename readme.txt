@@ -4,7 +4,7 @@ Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
 Tested up to: 5.6.2
-Stable tag: 2.3.3.8
+Stable tag: 2.3.3.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -197,6 +197,19 @@ We haven't built an interface between Google Calendar and Radio Station just yet
 8. Show Conflict Display
 
 == Changelog ==
+
+= 2.3.3.9 =
+* Update: Plugin Panel (1.1.8) with Number Step Min/Max fix
+* Update: Freemius SDK (2.4.2)
+* Improved: Allow for Multiple Override Times (with AJAX Saving)
+* Added: Link Override to Show Data with selectable Show Fields
+* Added: Language Archive Shortcode (similar to Genre Archive)
+* Fixed: Current Show highlighting timer interval cycling
+* Fixed: Before and After Show classes when no current Show
+* Fixed: Shows Data Endpoint 24 Hour Shift Format and Encore Switch
+* Fixed: Multiple host separator display in Current Show Widget
+* Fixed: Playlist Widget playlist ended label when no next playlist
+* Fixed: Conflicting duplicate filter name for Show Avatar
 
 = 2.3.3.8 =
 * Update: Plugin Panel (1.1.7) with Image and Color Picker fields
@@ -660,6 +673,13 @@ We haven't built an interface between Google Calendar and Radio Station just yet
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.3.3.9 =
+* Multiple Dates and Times for Schedule Overrides!
+* Link Override to Show with Selective Fields
+* Language Archive Shortcode for Shows
+* Various Bugfixes and Improvements
+* Updated Freemius SDK and Plugin Loader
 
 = 2.3.3.8 =
 * Updated Plugin Panel Library

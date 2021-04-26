@@ -10,6 +10,11 @@ Shows, Overrides and Playlists each have their own standard list page via the Wo
 
 You can add Show Shifts from the Show's Edit page. You can click Add Shift as many times as you like to create new Shift entries. For a Shift to be valid it must have all time fields filled in. The Encore field (repeat airing) is optional. You can disable a Shift and it will be unused but still saved. Each Shift entry also has a Duplicate and Remove icon to copy that entry to a new Shift or remove it. Shifts are not altered until you save them via clicking Update for a Show.
 
+### [Pro] Visual Shift Editor
+
+[Radio Station Pro](https://radiostation.pro) includes a Visual Shift Editor to allow you to assign Shifts directly to the Schedule. ...
+
+
 ## Shift Conflict Checking
 
 ### Shift Save Checking

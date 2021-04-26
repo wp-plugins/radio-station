@@ -2,9 +2,25 @@
 
 ***
 
-Plugin Settings are stored in an array under the `radio_station` option key.
+Plugin Settings are stored in an array under the `radio_station` key in the WordPress options table.
 
 Below is a list of plugin options available via the Plugin Settings Screen.
+
+
+### Plugin Setting Value Filters
+
+Note for custom flexibility, all Plugin Settings can also be filtered programmatically via their respective option key. Use `add_filter` to add a filter to `radio_station_{settings_key}`, then check your desired conditions to modify the value before returning it. eg: 
+
+```
+add_filter( 'radio_station_station_phone', 'my_custom_station_phone' );
+function my_custom_station_phone( $number ) {
+	$current_hour = (int) date( 'G', time() );
+	if ( $current_hour > 20 ) {$number = '(123) 456 7890';}
+	return $number;
+}
+```
+
+The above example will change the display of the Station Phone number after 8pm (server time).
 
 
 ## General 
@@ -12,37 +28,85 @@ Below is a list of plugin options available via the Plugin Settings Screen.
 ### Broadcast
 
 #### Streaming URL
-Default: None. Enter the Streaming URL for your Radio Station. This will be discoverable via Data Feeds and used in the upcoming Radio Player.
+Default: None. Key: streaming_format
+Enter the Streaming URL for your Radio Station. This will be discoverable via Data Feeds and used by default by the Radio Player.
+
+#### Stream Format
+Default: AAC/M4A. Key: streaming_format
+Select the format for your stream. This will be discoverable via Data Feeds and used by default by the Radio Player.
+
+#### Fallback URL
+Default: None. Key: fallback_url
+Enter the fallback Streaming URL for your Radio Station. This will be discoverable via Data Feeds and used by default by the Radio Player.
+
+#### Streaming URL
+Default: OGG. Key: fallback_format
+Select the format for your fallback stream. This will be discoverable via Data Feeds and used by default by the Radio Player.
 
 #### Main Broadcast Language
-Default: WordPress Language. Select the main language used on your Radio Station.
+Default: WordPress Language. Key: radio_language
+Select the main language used on your Radio Station.
 
 
-### Times
+### Station
+
+#### Station Title
+Default: none. Key: station_title
+
+#### Station Image
+Default: none. Key: station_image
 
 #### Location Timezone
-Default: WordPress Timezone. Select your Broadcast Location for Radio Timezone display.
+Default: WordPress Timezone. Key: timezone_location
+Select your Broadcast Location for Radio Timezone display.
 
 #### Clock Time Format
-Default: 12 Hour Format. Default Time Format for display output. Can be overridden in each shortcode or widget.
+Default: 12 Hour Format. Key: clock_time_format
+Default Time Format for display output. Can be overridden in each shortcode or widget.
+
+#### Station Phone
+Default: none. Key: station_phone
+Default Phone Number to use for requests etc.
+
+#### Shows Phone
+Default: On. Key: shows_phone
+Use the Station Phone Number on Shows which do not have a phone number specified.
+
+#### Station Email
+Default: none. Key: station_email
+Default Email Address to use for requests etc.
+
+#### Shows Email
+Default: On. Key: shows_email
+Use the Station Email Address on Shows which do not have an email address specified.
 
 
 ### Feeds
 
 #### Enable Data Routes
-Default: On. Enables Station Data Routes via WordPress REST API.
-
+Default: On. Key: enable_data_routes
+Enables Station Data Routes via WordPress REST API.
 
 #### Enable Data Feeds
-Default: On. Enable Station Data Feeds via WordPress Feed links.
+Default: On. Key: enable_data_feeds
+Enable Station Data Feeds via WordPress Feed links.
 
+#### Ping Netmix Directory
+Default: On. Key: ping_netmix_directory
 
-#### [Pro] Show Shift Feeds
-Default: On. Convert RSS Feeds for a single Show to a Show shift feed, allowing a visitor to subscribe to a Show feed to be notified of Show shifts.
-
+#### Clear Transients
+Default: Off. Key: clear_transients
 
 #### [Pro] Transient Caching
-Default: On. Use Transient Caching to improve Schedule calculation performance.
+Default: On. transient_caching
+Use Transient Caching to improve Schedule calculation performance.
+
+#### [Pro] Show Shift Feeds
+Default: On. Key: show_shift_feeds
+Convert RSS Feeds for a single Show to a Show shift feed, allowing a visitor to subscribe to a Show feed to be notified of Show shifts.
+
+
+## Player
 
 
 
@@ -51,66 +115,98 @@ Default: On. Use Transient Caching to improve Schedule calculation performance.
 ### Master Schedule
 
 #### Master Schedule Page
-Default: None. Select the Page you are displaying the Master Schedule on.
-
+Default: None. Key: schedule_page
+Select the Page you are displaying the Master Schedule on.
 
 #### Automatic Schedule Display
-Default: Yes. Replaces selected page content with Master Schedule.  
+Default: On. Key: schedule_auto
+Replaces selected page content with Master Schedule.  
 Alternatively customize with the shortcode: `[master-schedule]`
 See [Master Schedule Shortcode](./Shortcodes.md#master-schedule) for more info.
 
 #### Schedule View Default
-Default: Table. View type to use for automatic display on Master Schedule Page.
+Default: Table. Key: schedule_view
+View type to use for automatic display on Master Schedule Page.
+
+#### Radio Clock
+Default: On. Key: schedule_clock
+Whether to enable the display of the Radio/User Times clock on the automatic Master Schedule Page.
 
 #### [Pro] Schedule View Switcher
-Default: On. Enable View Switching on the Master Schedule.
+Default: On. Key: schedule_switcher
+Enable View Switching on the automatic Master Schedule Page.
+
+#### [Pro] Available Views
+Default: table, tabs. Key: schedule_views
+Which Views to enable for switching on the automatic Master Schedule Page.
 
 
 ### Show Pages
 
 #### Show Info Blocks Position
-Default: Left. Where to position Show info blocks relative to Show Page content.
+Default: Left. Key: show_block_position
+Where to position Show info blocks relative to Show Page content.
 
 #### Show Content Layout
-Default: Tabbed. How to display extra sections below Show description. In content tabs or standard layout down the page.
-
+Default: Tabbed. Key: show_section_layout
+How to display extra sections below Show description. In content tabs or standard layout down the page.
 
 #### Show Content Header Image
-Default: Off. If your chosen template does not display the Featured Image, enable this and use the Content Header Image box on the Show edit screen instead.
+Default: Off. Key: show_header_image
+If your chosen template does not display the Featured Image, enable this and use the Content Header Image box on the Show edit screen instead.
 
 #### Show Posts Per Page
-Default: 10. Linked Show Posts per page on the Show Page tab/display.
+Default: 10. Key: show_posts_per_page
+Linked Show Posts per page on the Show Page tab/display.
 
 #### Show Playlists per Page
-Default: 10. Playlists per page on the Show Page tab/display.
+Default: 10. Key: show_playlists_per_page
+Playlists per page on the Show Page tab/display.
 
 #### [Pro] Show Episodes per Page
-Default: 10. Number of Show Episodes per page on the Show page tab/display.
+Default: 10. Key: show_episodes_per_page
+Number of Show Episodes per page on the Show page tab/display.
 
 
 ### Archives
 
 #### Show Archives Page
-Default: None. Select the Page for displaying the Show archive list.
+Default: None. Key: show_archive_page
+Select the Page for displaying the Show archive list.
 
 #### Show Archives Automatic Display
-Default: On. Replaces selected page content with default Show Archive.  
+Default: On. Key: show_archive_auto
+Replaces selected page content with default Show Archive.  
 Alternatively customize display using the shortcode: `[shows-archive]`
 See [Show Archives Shortcode](./Shortcodes.md#show-archives-shortcode) for more info.  
 
+#### Override Archives Page
+Default: None. Key: override_archive_page
+Select the Page for displaying the Override archive list.
+
+#### Override Archives Automatic Display
+Default: On. Key: override_archive_auto
+Replaces selected page content with default Override Archive.  
+Alternatively customize display using the shortcode: `[overrides-archive]`
+See [Show Archives Shortcode](./Shortcodes.md#overrides-archives-shortcode) for more info.  
+
 #### Playlist Archives Page
-Default: None. Select the Page for displaying the Playlist archive list.
+Default: None. Key: playlist_archive_page
+Select the Page for displaying the Playlist archive list.
 
 #### Playlist Archives Automatic Display
-Default: On. Replaces selected page content with default Playlist Archive.  
+Default: On. Key: playlist_archive_auto
+Replaces selected page content with default Playlist Archive.  
 Alternatively customize display using the shortcode: `[playlists-archive]`
 See [Playlist Archives Shortcode](./Shortcodes.md#playlist-archives-shortcode) for more info.  
 
 #### Genre Archives Page
-Default: None. Select the Page for displaying the Genre archive list.
+Default: None. Key: genre_archive_page
+Select the Page for displaying the Genre archive list.
 
 #### Genre Archives Automatic Display
-Default: On. Replaces selected page content with default Genre Archive.  
+Default: On. Key: genre_archive_auto
+Replaces selected page content with default Genre Archive.  
 Alternatively customize display using the shortcode: `[genres-archive]`
 See [Genre Archives Shortcode](./Shortcodes.md#genre-archives-shortcode) for more info.
 
@@ -123,39 +219,51 @@ See [Templates](./Display.md#page-templates) for more info.
 ### Single Templates
 
 #### Show Template
-Default: page.php. Which template to use for displaying Show content.
+Default: page.php. Key: show_template
+Which template to use for displaying Show and Override content.
 
 #### Combines Show Template Method
-Default: Off. Advanced usage. Use both a custom template AND content filtering for a Show. (Not compatible with Legacy templates.)
+Default: Off. Key: show_template_combined
+For advanced usage. Use both a custom template AND content filtering for a Show. (Not compatible with Legacy templates.)
 
 #### Playlist Template
-Default: page.php. Which template to use for displaying Playlist content.
+Default: page.php. Key: playlist_template
+Which template to use for displaying Playlist content.
 
 #### Combined Playlist Template Method
-Default: Off. Advanced usage. Use both a custom template AND content filtering for a Playlist. (Not compatible with Legacy templates.)
+Default: Off. Key: playlist_template_combined
+For advanced usage. Use both a custom template AND content filtering for a Playlist. (Not compatible with Legacy templates.)
+
+## Widgets
+
+#### AJAX Loading
+Default: On. Key: ajax_widgets
+Whether to load Widget contents via AJAX by default. This prevents stale cached displays of Current/Upcoming Shows etc. Note this can be changed on a per widget basis.
+
+#### [Pro] Dynamic Reloading
+Default: On. Key: dynamic_reload
+Whether to reload Widgets automatically on change of Current Show. Can also be set on a per widget basis.
 
 
 ## Roles
 
 Since 2.3.0, a new Show Editor role has been added with Publish and Edit capabilities for all Radio Station Post Types.
-You can assign this Role to any user to give them full Station Schedule updating permissions.
+You can assign this Role to any user to give them full Station Schedule updating permissions without giving them a WordPress administrator role.
 See [Roles](./Roles.md#show-editor-role] for more info.
 
 ### Permissions
 
 #### Add to Author Role Capabilities
-Default: On. Allow users with WordPress Author role to publish and edit their own Shows and Playlists.
+Default: On. Key: add_author_capabilities
+Allow users with the WordPress Author role to publish and edit their own Shows and Playlists.
 
 #### Add to Editor Role Capabilities
-Default: On. Allow users with WordPress Editor role to edit all Radio Station post types.
+Default: On. Key: add_editor_capabilities
+Allow users with the WordPress Editor role to edit all Radio Station post types.
 
 
 ### Role Editing
 
 #### [Pro] Role Editor Interface
-Allows you to assign any of the Radio Station plugin Roles directly to any user.
+Allows you to assign any of the Radio Station plugin Roles directly to any user. For more information see [Roles Documentation](./Roles.md#role-editing)
 
-
-## Setting Value Filters
-
-For custom flexibility, all Plugin Settings can also be filtered via their respective option key. Use `add_filter` to add a filter to `radio_station_{settings_key}`, then check your desired conditions to modify the value before returning it. eg: 

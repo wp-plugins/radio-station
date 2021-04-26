@@ -118,6 +118,16 @@ class Radio_Clock_Widget extends WP_Widget {
 	// --- output widget display ---
 	public function widget( $args, $instance ) {
 
+		global $radio_station_data;
+
+		// --- set widget id ---
+		// 2.3.3.9: added unique widget id
+		if ( !isset( $radio_station_data['widgets']['clock'] ) ) {
+			$id = $radio_station_data['widgets']['clock'] = 0;
+		} else {
+			$id = $radio_station_data['widgets']['clock']++;
+		}
+
 		// 2.3.0: added hide widget if empty option
 		$title = empty( $instance['title'] ) ? '' : $instance['title'];
 		$title = apply_filters( 'widget_title', $title );
@@ -140,18 +150,16 @@ class Radio_Clock_Widget extends WP_Widget {
 			'widget'  => 1,
 		);
 
-		// --- get default display output ---
-		$output = radio_station_clock_shortcode( $atts );
-
-		// --- check for widget output override ---
-		$output = apply_filters( 'radio_station_radio_clock_widget_override', $output, $args, $atts );
+		// 2.3.3.9: add missing filter for clock widget attributes
+		$atts = apply_filters( 'radio_station_clock_widget_atts', $atts, $instance );
 
 		// --- before widget ---
 		// phpcs:ignore WordPress.Security.OutputNotEscaped
 		echo $args['before_widget'];
 
 		// --- open widget container ---
-		echo '<div class="widget">';
+		// 2.3.0: add instance id and class to widget container
+		echo '<div id="radio-clock-widget-' . esc_attr( $id ). '" class="radio-clock-widget widget">';
 
 		// --- output widget title ---
 		// phpcs:ignore WordPress.Security.OutputNotEscaped
@@ -162,9 +170,20 @@ class Radio_Clock_Widget extends WP_Widget {
 		// phpcs:ignore WordPress.Security.OutputNotEscaped
 		echo $args['after_title'];
 
+		echo '<div id="radio-clock-widget-contents-' . esc_attr( $id ) . '" class="radio-clock-wrap">';
+
+		// --- get default display output ---
+		$output = radio_station_clock_shortcode( $atts );
+
+		// --- check for widget output override ---
+		$output = apply_filters( 'radio_station_radio_clock_widget_override', $output, $args, $atts );
+
 		// --- output widget display ---
 		// phpcs:ignore WordPress.Security.OutputNotEscaped
 		echo $output;
+
+		// --- close widget contents ---
+		echo '</div>';
 
 		// --- close widget container ---
 		echo '</div>';

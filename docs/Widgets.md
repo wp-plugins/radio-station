@@ -37,9 +37,9 @@ Example: `[current-show title="Now On-Air" show_avatar="1" show_link="1" show_sc
 
 [Demo Site Example Output](https://radiostationdemo.com/extra-shortcodes/current-show-widget/)
 
+
 ## Upcoming Shows Widget
 Displays a limited list of Upcoming Shows - if there are Shows scheduled.
-
 
 ### Upcoming Shows Shortcode
 `[upcoming-shows]` (legacy supported name: `[dj-coming-up-widget]`)
@@ -64,6 +64,7 @@ Example: `[upcoming-shows title="Coming Up On-Air" show_avatar="1" show_link="1"
 
 [Demo Site Example Output](https://radiostationdemo.com/extra-shortcodes/upcoming-shows-widget/)
 
+
 ## Current Playlist Widget
 Displays the Playlist assigned to the currently playing Show - if there is one assigned to it.
 
@@ -85,17 +86,28 @@ Example: `[current-playlist title="Current Song" artist="1" song="1" album="1" l
 
 [Demo Site Example Output](https://radiostationdemo.com/extra-shortcodes/current-playlist-widget/)
 
+
 ## Radio Clock Widget
-`[radio-clock]` (see [Radio Clock Shortcode](./Shortcodes.md#radio-clock-widget)
+`[radio-clock]` (see [Radio Clock Shortcode](./Shortcodes.md#radio-clock-shortcode))
 
 As of 2.3.2, Radio Station now includes a Radio Clock Widget which will display the current Radio Station time in your selected Radio Station Timezone (via the Plugin Settings page) alongside the site visitor's current time (via browser detection.)
 
 ### [Pro] Timezone Switcher
-A future version of Radio Station Pro will include a user Timezone Switcher in the which will allow your listener's to select a timezone and display adjusted Schedule and Show times.
+[Radio Station Pro](https://radiostation.pro) will include a user Timezone Switcher in the which will allow your listener's to select a timezone and display adjusted Schedule and Show times.
 
-## Streaming Player Widget
+
+## Radio Player Widget
 A future version of Radio Station will include a Streaming Player Widget.
 
-### [Pro] Sitewide Player
-A future version of Radio Station Pro will include a Sitewide Streaming Player.
+### Radio Player Shortcode
+`[radio-player]` (see [Radio Player Shortcode](./Shortcodes.md#radio-player-shortcode))
+
+The following attributes are available for this shortcode:
+
+
+
+
+
+### [Pro] Sitewide Bar Player
+Radio Station Pro includes a Sitewide Bar Streaming Player. It isn't added via the Widgets Page, but uses the Radio Player Shortcode with Settings from the Plugin Settings Page.
 

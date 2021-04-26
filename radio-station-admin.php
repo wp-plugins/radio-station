@@ -60,28 +60,6 @@ function radio_station_enqueue_admin_scripts() {
 
 }
 
-// ------------------
-// Enqueue Datepicker
-// ------------------
-// 2.3.0: enqueued separately by override post type only
-function radio_station_enqueue_datepicker() {
-
-	// --- enqueue jquery datepicker ---
-	wp_enqueue_script( 'jquery-ui-datepicker' );
-
-	// --- enqueue jquery datepicker styles ---
-	// 2.3.0: update theme styles from 1.8.2 to 1.12.1
-	// 2.3.0: use local datepicker styles instead of via Google
-	// $protocol = 'http';
-	// if ( is_ssl() ) {$protocol .= 's';}
-	// $url = $protocol . '://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css';
-	// wp_enqueue_style( 'jquery-ui-style', $url, array(), '1.12.1' );
-	$style = radio_station_get_template( 'both', 'jquery-ui.css', 'css' );
-	wp_enqueue_style( 'jquery-ui-smoothness', $style['url'], array(), '1.12.1', 'all' );
-
-}
-
-
 // -----------------
 // Admin Style Fixes
 // -----------------
@@ -212,12 +190,12 @@ function radio_station_add_admin_menus() {
 					case 'add-override':
 						$submenu[$i][$j][2] = 'post-new.php?post_type=' . RADIO_STATION_OVERRIDE_SLUG;
 						break;
-					// case 'hosts':
-					//	$submenu[$i][$j][2] = 'post-new.php?post_type=' . RADIO_STATION_HOST_SLUG;
-					//	break;
-					// case 'producers':
-					//	$submenu[$i][$j][2] = 'post-new.php?post_type=' . RADIO_STATION_PRODUCER_SLUG;
-					//	break;
+					case 'hosts':
+						$submenu[$i][$j][2] = 'edit.php?post_type=' . RADIO_STATION_HOST_SLUG;
+						break;
+					case 'producers':
+						$submenu[$i][$j][2] = 'edit.php?post_type=' . RADIO_STATION_PRODUCER_SLUG;
+						break;
 				}
 			}
 		}
@@ -1092,13 +1070,14 @@ function radio_station_listing_offer_content( $dismissable = true ) {
 	$blurb .= '<p style="font-size: 14px; line-height: 21px; margin-top: 0;">';
 	$blurb .= esc_html( __( 'We are excited to announce the opening of the new', 'radio-station' ) );
 	$blurb .= ' <a href="' . RADIO_STATION_NETMIX_DIR . '" target="_blank">Netmix Station Directory</a>!!!<br>';
-	$blurb .= esc_html( __( 'Allowing listeners to newly discover Stations and Shows - which can include yours...' ) ) . '<br>';
+	$blurb .= esc_html( __( 'Allowing listeners to newly discover Stations and Shows - which can include yours...', 'radio-station' ) ) . '<br>';
 	
-	$blurb .= esc_html( __( 'Because while launching,') ) . ' <b>' . esc_html( __( 'we are offering 30 days free listing to all Radio Station users!' ) ) . '</b><br>';
-	$blurb .= esc_html( __( 'Interested in more exposure and listeners for your Radio Station, for free?' ) );
+	$blurb .= esc_html( __( 'Because while launching,') ) . ' <b>' . esc_html( __( 'we are offering 30 days free listing to all Radio Station users!', 'radio-station' ) ) . '</b><br>';
+	$blurb .= esc_html( __( 'Interested in more exposure and listeners for your Radio Station, for free?', 'radio-station' ) );
 	$blurb .= '</p></li>';
 	
 	// --- accept / decline offer button links ---
+	// 2.3.3.9: added missing string text domains
 	$blurb .= '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">';
 	$blurb .= '<center>';
 	$onclick = '';
@@ -1106,14 +1085,14 @@ function radio_station_listing_offer_content( $dismissable = true ) {
 		$onclick = ' onclick="radio_display_dismiss_link();"';
 	}
 	$blurb .= '<div id="directory-offer-accept-button" style="display:inline-block; margin-right:10px;">';
-	$blurb .= '<a href="' . RADIO_STATION_NETMIX_DIR . 'station-listing/" style="font-size: 11px;" target="_blank" class="button-primary"' . $onclick . '>' . esc_html( __( 'Yes please!' ) ) . '</a>';
+	$blurb .= '<a href="' . RADIO_STATION_NETMIX_DIR . 'station-listing/" style="font-size: 11px;" target="_blank" class="button-primary"' . $onclick . '>' . esc_html( __( 'Yes please!', 'radio-station' ) ) . '</a>';
 	$blurb .= '</div>';
 	$blurb .= '<div id="directory-offer-blog-button" style="display:inline-block;">';
-	$blurb .= '<a href="' . RADIO_STATION_NETMIX_DIR . 'announcing-new-netmix-directory/" style="font-size: 11px;" target="_blank" class="button-secondary">' . esc_html( __( 'More Details' ) ) . '</a>';
+	$blurb .= '<a href="' . RADIO_STATION_NETMIX_DIR . 'announcing-new-netmix-directory/" style="font-size: 11px;" target="_blank" class="button-secondary">' . esc_html( __( 'More Details', 'radio-station' ) ) . '</a>';
 	$blurb .= '</div><br>';
 	
 	$blurb .= '<div id="directory-offer-dismiss-link" style="display:none;">';
-	$blurb .= '<a href="' . esc_url( $accept_dismiss_url ) . '" style="font-size: 12px;" target="radio-station-notice-iframe">' . esc_html( __( "Great! I'm listed, dismiss this notice." ) ) . '</a>';
+	$blurb .= '<a href="' . esc_url( $accept_dismiss_url ) . '" style="font-size: 12px;" target="radio-station-notice-iframe">' . esc_html( __( "Great! I'm listed, dismiss this notice.", 'radio-station' ) ) . '</a>';
 	$blurb .= '</div>';
 	$blurb .= '</center><br>';
 
@@ -1220,6 +1199,8 @@ function radio_station_announcement_content( $dismissable = true ) {
 	$blurb .= '<b>' . esc_html( __( 'Radio Station', 'radio-station' ) ) . '</b> ';
 	$blurb .= esc_html( __( ' plugin development has been actively taken over by', 'radio-station' ) );
 	$blurb .= ' <a href="https://netmix.com/" target="_blank">Netmix</a>.<br>';
+	// 2.3.3.9: add updated text after 2000 user milestone
+	$blurb .= esc_html( __( 'And due to our continued efforts we now have a community of over two thousand active stations!', 'radio-station' ) ) . '<br>';
 	$blurb .= esc_html( __( 'We invite you to', 'radio-station' ) );
 	$blurb .= ' <a href="https://patreon.com/radiostation" target="_blank">';
 	$blurb .= esc_html( __( 'Become a Radio Station Patreon Supporter', 'radio-station' ) );

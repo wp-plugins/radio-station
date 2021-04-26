@@ -119,3 +119,10 @@ Optionally, a single or comma-separated `genre` argument will retrieve specific 
 Optionally, a single or comma-separated `language` argument will retrieve specific Language information.
 
 * *languages*: Data array of all Languages with all the `[Shows]` for each Language.
+
+#### [Pro] Episodes Endpoint
+
+#### [Pro] Hosts Endpoint
+
+#### [Pro] Producers Endpoint
+

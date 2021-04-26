@@ -14,17 +14,21 @@ Shortcode Output Examples can be seen on the [Radio Station Demo Site](http://ra
 
 Use the shortcode `[master-schedule]` on any page. This will generate a full-page schedule in one of five Views: 
 
-* Table (default) - responsive program grid in table form
-* Tabbed - responsive styled list view with day selection tabs
-* List - unstyled plain list view for custom development use
-* Divs - (display issues) legacy unstyled div based view 
-* Legacy - (deprecated) legacy table grid view 
+* [Table](https://radiostationdemo.com/master-schedule/table-view/) (default) - responsive program in table form
+* [Tabbed](https://radiostationdemo.com/master-schedule/tabbed-view/) - responsive styled list view with day selection tabs
+* [List](https://radiostationdemo.com/master-schedule/list-view/) - unstyled plain list view for custom development use
+* [Divs](https://radiostationdemo.com/master-schedule/divs-view/) - (deprecated - display issues) legacy unstyled div-based view 
+* [Legacy](https://radiostationdemo.com/master-schedule/legacy-view/) - (deprecated) legacy table view
+* [Grid](https://radiostationdemo.com/master-schedule/grid-view/) - [Pro] extra grid style view available in Pro version
+* [Calendar](https://radiostationdemo.com/master-schedule/calendar-view/) - [Pro] extra calendar style view available in Pro version
 
-Note that Divs and Legacy do not honour Schedule Overrides, but have been kept for backwards compatibility. The legacy Divs view also has display issues but may be rewritten in future.
+The above View names are linked to examples on the Demo Site.
+
+Note that Divs and Legacy Views are considered deprecated as they do not honour Schedule Overrides, but have been kept for backwards compatibility. The legacy Divs view also has display issues.
 
 The following attributes are available for the shortcode:
 
-* *view* : Which View to use for display output. 'table', 'tabbed', 'list', 'divs', 'legacy'. Default 'table'.
+* *view* : Which View to use for display output. 'table', 'tabs', 'list', 'divs', 'legacy', 'grid', 'calendar'. Default 'table'.
 * *time* : Display time format you with to use. 12 and 24. Default is the Plugin Setting.
 * *clock* : Display Radio Clock above schedule. 0 or 1. Default is the Plugin Setting.
 * *show_link* : Display the title of the show as a link to its profile page. 0 or 1.  Default 1.
@@ -44,12 +48,17 @@ The following attributes are available for the shortcode:
 * *image_position* : Show image position for Tabs view. 'right', 'left' or 'alternate'. Default 'left'.
 * *hide_past_shows* : Hide shows that are finished in the Schedule for Tabs view. 0 or 1. Default 0.
 * *divheight* : Set the height, in pixels, of the individual divs. For legacy 'divs' view only. Default 45.
+* *gridheight* : Set the width, in pixels, of the grid columns. For Pro 'grid' view only. Default 150.
+* *weeks* : Number of weeks to display in calendar. For Pro 'calendar' view only. Default 4.
+* *previous_weeks* : Number of past weeks to display in calendar. For Pro 'calendar' view only. Default 1.
 
 Example: Display the schedule in 24-hour time format, use `[master-schedule time="24"]`.  
 
-##### [Pro] Multi-View Switching
+##### [Pro] Multiple View Switching
 
-In Radio Station Pro, you can display multiple views which the user can switch between. This gives your visitors better access to your schedule in the way that is better suited to them. You can set the available views in the plugin settings for the automatic schedule page as well as the default view. Alternatively you can use the Master Schedule Shortcode as normal on a page and provide a comma-separated list of views (the first value provided will be used as the default view.) eg. `[master-schedule view="table,tabs"]`
+In [Radio Station Pro](https://radiostation.pro), you can display multiple views which the user can switch between. This gives your visitors better access to your schedule in the way that is better suited to them. You can set the available views in the plugin settings for the automatic schedule page as well as the default view. Alternatively you can use the Master Schedule Shortcode as normal on a page and provide a comma-separated list of views (the first value provided will be used as the default view.) eg. `[master-schedule view="table,tabs,grid"]`
+
+The default view can also be set via the plugin settings page, or by adding a `default_view` shortcode attribute if you wish to override this setting in the shortcode.
 
 Further, if you wish to customize the attributes for each particular view, you can use the `radio_station_pro_multiview_attributes` filter. By adding a view prefix to the attribute you wish to change, this will override the attribute for that view. eg. To display the full day heading in Tabs view, but short day headings in Table view:
 
@@ -60,7 +69,9 @@ function my_custom_multiview_attributes( $atts ) {
 	$atts['tabs_display_day'] = 'long';
 	return $atts;
 }
-``
+```
+
+[Demo Site Example Output](https://radiostationdemo.com/master-schedule/multiple-view-switching/)
 
 
 #### Radio Timezone Shortcode
@@ -68,6 +79,7 @@ function my_custom_multiview_attributes( $atts ) {
 `[radio-timezone]`
 
 Displays the Radio Station Timezone selected via Plugin Settings. There are no attributes for this shortcode. This is the default display above the Master Schedule when the Radio Clock is turned off in the Plugin Settings.
+
 
 #### Radio Clock Shortcode
 
@@ -182,7 +194,24 @@ The following attributes are available for this shortcode:
 
 `[languages-archive]` (or `[language-archive]`)
 
-This shortcode will be available in a future version, similar to the Genre archive shortcode.
+The following attributes are available for this shortcode:
+
+* *languages* : Genres to display (ID or slug). Separate multiple values with commas. Default empty (all)
+* *link_languages* : Link Genre titles to term pages. 0 or 1. Default 1.
+* *language_desc' :  Display Genre term description. 0 or 1. Default 1.
+* *hide_empty' : No output if no records to display for Genre. 0 or 1. Default 1.
+* *status* : Query for Show status. Default 'publish'.
+* *perpage* : Query for number of Shows. Default -1 (all)
+* *offset* : Query for Show offset. Default '' (no offset)
+* *orderby* : Query to order Show display by. Default 'title'.
+* *order* : Query order for Shows. Default 'ASC'.
+* *with_shifts* : Only display Shows with active Shifts. 0 or 1. Default 0.
+* *show_avatars* : Display the Show Avatar. 0 or 1. Default 1.
+* *thumbnails* : Display Show Featured image if no Show Avatar. 0 or 1. Default 0.
+* *avatar_width* : * *avatar_width* : Set a width style in pixels for Show Avatars. Default is 75.
+* *show_desc* : Display Show Descriptions. 'none', 'full' or 'excerpt'. Default 'none'.
+
+[Demo Site Example Output](https://radiostationdemo.com/archive-shortcodes/languages-archive/)
 
 ### Show Posts Archive Shortcode
 
@@ -215,7 +244,7 @@ The following attributes are available for this shortcode:
 
 `[show-episodes-archive]` (or `[show-episode-archive]`)
 
-This shortcode will be available in a future version of Radio Station Pro.
+This shortcode will be available in [Radio Station Pro](https://radiostation.pro)
 
 
 ## Widget Shortcodes

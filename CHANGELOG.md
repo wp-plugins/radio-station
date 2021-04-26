@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2.3.3.9
 * Update: Plugin Panel (1.1.8) with Number Step Min/Max fix
+* Update: Freemius SDK (2.4.2)
 * Fixed: Shows Data Endpoint 24 Hour Shift Format and Encore Switch
 * Fixed: Multiple host separator display in Current Show Widget
 

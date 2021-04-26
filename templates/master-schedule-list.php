@@ -7,6 +7,20 @@
 $hours = radio_station_get_hours();
 $now = radio_station_get_now();
 $date = radio_station_get_time( 'date', $now );
+$today = radio_station_get_time( 'day', $now );
+
+// --- check if start date is set ---
+// 2.3.3.9: added for non-now schedule displays
+if ( isset( $atts['start_date'] ) && $atts['start_date'] ) {
+	$start_date = $atts['start_date'];
+	$start_time = radio_station_to_time( $start_date . ' 00:00:00' );
+	// --- force display of date and month ---
+	$atts['display_date'] = ( !$atts['display_date'] ) ? '1' : $atts['display_date'];
+	$atts['display_month'] = ( !$atts['display_month'] ) ? 'short' : $atts['display_month'];
+} else {
+	$start_time = $now;
+}
+$start_time = apply_filters( 'radio_station_schedule_start_time', $start_time, 'list' );
 
 // --- set shift time formats ---
 // 2.3.2: set time formats early
@@ -23,18 +37,20 @@ $end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_for
 // 2.3.3.5: use the start_day value for getting the current schedule
 if ( isset( $atts['start_day'] ) && $atts['start_day'] ) {
 	$start_day = $atts['start_day'];
-	$schedule = radio_station_get_current_schedule( $now , $start_day );
 } else {
 	// 2.3.3.5: add filter for changing start day (to accept 'today')
 	$start_day = apply_filters( 'radio_station_schedule_start_day', false, 'list' );
-	if ( $start_day ) {
-		$schedule = radio_station_get_current_schedule( $now , $start_day );
-	} else {
-		$schedule = radio_station_get_current_schedule();
-	}
+}
+if ( $start_day ) {
+	$schedule = radio_station_get_current_schedule( $start_time , $start_day );
+} elseif ( $start_time != $now ) {
+	// 2.3.3.9: load current or time-specific schedule
+	$schedule = radio_station_get_current_schedule( $start_time );
+} else {	
+	$schedule = radio_station_get_current_schedule();
 }
 $weekdays = radio_station_get_schedule_weekdays( $start_day );
-$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
+$weekdates = radio_station_get_schedule_weekdates( $weekdays, $start_time );
 
 // --- filter show avatar size ---
 // 2.3.3.5: fix to incorrect context value (tabs)
@@ -266,7 +282,15 @@ foreach ( $weekdays as $weekday ) {
 				$title = apply_filters( 'radio_station_schedule_show_title', $title, $show_id, 'list' );
 				if ( ( '' != $title ) && is_string( $title ) ) {
 					$info['title'] = $title;
-					// $list .= $title;
+				}
+				// 2.3.3.9: allow for admin edit link
+				$edit_link = apply_filters( 'radio_station_show_edit_link', '', $show_id, $shift['id'], 'list' );
+				if ( '' != $edit_link ) {
+					if ( isset( $info['title'] ) ) {
+						$info['title'] .= $edit_link;
+					} else {
+						$info['title'] = $edit_link;
+					}
 				}
 
 				// --- show hosts ---
@@ -347,7 +371,8 @@ foreach ( $weekdays as $weekday ) {
 				}
 
 				// 2.3.3.8: moved filter out and added display filter
-				$show_time = apply_filters( 'radio_station_schedule_show_time', $show_time, $show_id, 'list', $shift );
+				// 2.3.3.9: added tcount argument to filter
+				$show_time = apply_filters( 'radio_station_schedule_show_time', $show_time, $show_id, 'list', $shift, $tcount );
 				$times = '<div class="show-time" id="show-time-' . esc_attr( $tcount ) . '"';
 				// note: unlike other display filters this hides/shows times rather than string filtering
 				$display = apply_filters( 'radio_station_schedule_show_time_display', true, $show_id, 'list', $shift );
@@ -355,9 +380,13 @@ foreach ( $weekdays as $weekday ) {
 					$times .= ' style="display:none;"';
 				}
 				$times .= '>' . $show_time . '</div>' . $newline;
-				$times .= '<div class="show-user-time" id="show-user-time-' . esc_attr( $tcount ) . '"></div>' . $newline;
+				// 2.3.3.9: added internal spans for user time
+				$times .= '<div class="show-user-time" id="show-user-time-' . esc_attr( $tcount ) . '">';
+				$times .= '[<span class="rs-time rs-start-time"></span>' . $newline;
+				$times .= '<span class="rs-sep"> ' . esc_html( __( 'to', 'radio-station' ) ) . ' </span>' . $newline;
+				$times .= '<span class="rs-time rs-end-time"></span>]' . $newline;
+				$times .= '</div>' . $newline;
 				$info['times'] = $times;
-				// $list .= $times;
 				$tcount ++;
 
 				// --- encore ---
@@ -480,4 +509,8 @@ foreach ( $weekdays as $weekday ) {
 
 // --- close master list ---
 $list .= '</ul>' . $newline;
-$output = $list;
+
+// --- hidden iframe for schedule reloading ---
+$list .= '<iframe src="javascript:void(0);" id="schedule-grid-loader" name="schedule-grid-loader" style="display:none;"></iframe>' . $newline;
+
+echo $list;

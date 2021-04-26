@@ -16,6 +16,7 @@
 // - Get Show Data
 // - Get Show Metadata
 // - Get Override Metadata
+// - Get Show Override Value
 // - Get Current Schedule
 // - Get Current Show
 // - Get Previous Show
@@ -80,6 +81,7 @@
 // - Trim Excerpt
 // - Shorten String
 // - Sanitize Values
+// - Sanitize Input Values
 // - Sanitize Shortcode Values
 // === Translations ===
 // - Translate Weekday
@@ -266,9 +268,15 @@ function radio_station_get_show_shifts( $check_conflicts = true, $split = true, 
 		foreach ( $shows as $show ) {
 
 			$shifts = radio_station_get_show_schedule( $show->ID );
+			if ( RADIO_STATION_DEBUG ) {
+				echo '<span style="display:none;">Shifts for Show ' . $show->ID . ': ' . print_r( $shifts, true ) . '</span>';
+			}
 
 			if ( $shifts && is_array( $shifts) && ( count( $shifts ) > 0 ) ) {
 				foreach ( $shifts as $i => $shift ) {
+
+					// 2.3.3.9: set shift ID to key
+					$shift['id'] = $i;
 
 					// --- make sure shift has sufficient info ---
 					if ( isset( $shift['disabled'] ) && ( 'yes' == $shift['disabled'] ) ) {
@@ -467,7 +475,8 @@ function radio_station_get_show_shifts( $check_conflicts = true, $split = true, 
 	}
 
 	// --- filter and return ---
-	$day_shifts = apply_filters( 'radio_station_show_shifts', $day_shifts );
+	// 2.3.3.9: changed conflicting filter name from radio_station_show_shifts
+	$day_shifts = apply_filters( 'radio_station_show_day_shifts', $day_shifts );
 
 	return $day_shifts;
 }
@@ -503,99 +512,131 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 	// --- loop overrides and get data ---
 	$override_list = array();
 	foreach ( $overrides as $i => $override ) {
-		$data = get_post_meta( $override['ID'], 'show_override_sched', true );
 
-		if ( $data ) {
-			$date = $data['date'];
-			if ( '' != $date ) {
+		// 2.3.3.9: allow for usage of linked show title
+		$title = $override['post_title'];
+		$linked_id = get_post_meta( $override['ID'], 'linked_show_id', true );
+		if ( $linked_id ) {
+			$linked_show = get_post( $linked_id );
+			$linked_fields = get_post_meta( $override['ID'], 'linked_show_fields', true );
+			if ( !isset( $linked_fields['show_title'] ) || !$linked_fields['show_title'] ) {
+				$title = $linked_show->post_title;
+			}
+		}
+	
+		// 2.3.3.9: get possible array of override shifts
+		$override_shifts = get_post_meta( $override['ID'], 'show_override_sched', true );
+		if ( array_key_exists( 'date', $override_shifts ) ) {
+			$override_shifts = array( $override_shifts );
+		}
+		
+		if ( $override_shifts && is_array( $override_shifts ) && ( count( $override_shifts ) > 0 ) )  {
 
-				// 2.3.2: replace strtotime with to_time for timezones
-				$date_time = radio_station_to_time( $date );
-				$inrange = true;
+			// --- loop override shifts ---
+			// 2.3.3.9: loop to allow for multiple overrides
+			foreach ( $override_shifts as $j => $data ) {
 
-				// --- check if in specified date range ---
-				if ( ( isset( $range_start_time ) && ( $date_time < $range_start_time ) )
-				     || ( isset( $range_end_time ) && ( $date_time > $range_end_time ) ) ) {
-					$inrange = false;
-				}
+				// 2.3.3.9: ignore disabled overrides
+				if ( !isset( $data['disabled'] ) || ( 'yes' != $data['disabled'] ) ) {
 
-				// --- add the override data ---
-				if ( $inrange ) {
+					$date = $data['date'];
+					if ( '' != $date ) {
 
-					// 2.3.2: get day from date directly
-					// $thisday = date( 'l', $date_time );
-					$day = date( 'l', strtotime( $date ) );
+						// 2.3.2: replace strtotime with to_time for timezones
+						$date_time = radio_station_to_time( $date );
+						$inrange = true;
 
-					// 2.3.2: replace strtotime with to_time for timezones
-					// 2.3.2: fix to conver to 24 hour format first
-					$start = $data['start_hour'] . ':' . $data['start_min'] . ' ' . $data['start_meridian'];
-					$end = $data['end_hour'] . ':' . $data['end_min'] . ' ' . $data['end_meridian'];
-					$start_time = radio_station_convert_shift_time( $start );
-					$end_time = radio_station_convert_shift_time( $end );
-					$override_start_time = radio_station_to_time( $date . ' ' . $start_time );
-					$override_end_time = radio_station_to_time( $date . ' ' . $end_time );
-					// 2.3.2: fix for overrides ending at midnight
-					if ( '12:00 am' == $end ) {
-						$override_end_time = $override_end_time + ( 24 * 60 * 60 );
-					}
+						// --- check if in specified date range ---
+						if ( ( isset( $range_start_time ) && ( $date_time < $range_start_time ) )
+						     || ( isset( $range_end_time ) && ( $date_time > $range_end_time ) ) ) {
+							$inrange = false;
+						}
 
-					if ( $override_start_time < $override_end_time ) {
+						// --- add the override data ---
+						if ( $inrange ) {
 
-						// --- add the override as is ---
-						$override_data = array(
-							'override' => $override['ID'],
-							'name'     => $override['post_title'],
-							'slug'     => $override['post_name'],
-							'date'     => $date,
-							'day'      => $day,
-							'start'    => $start,
-							'end'      => $end,
-							'url'      => get_permalink( $override['ID'] ),
-							'split'    => false,
-						);
-						// 2.3.3.7: set array order by start time
-						$override_list[$date][$override_start_time] = $override_data;
+							// 2.3.2: get day from date directly
+							// $thisday = date( 'l', $date_time );
+							$day = date( 'l', strtotime( $date ) );
 
-					} else {
+							// 2.3.2: replace strtotime with to_time for timezones
+							// 2.3.2: fix to conver to 24 hour format first
+							$start = $data['start_hour'] . ':' . $data['start_min'] . ' ' . $data['start_meridian'];
+							$end = $data['end_hour'] . ':' . $data['end_min'] . ' ' . $data['end_meridian'];
+							$start_time = radio_station_convert_shift_time( $start );
+							$end_time = radio_station_convert_shift_time( $end );
+							$override_start_time = radio_station_to_time( $date . ' ' . $start_time );
+							$override_end_time = radio_station_to_time( $date . ' ' . $end_time );
+							// 2.3.2: fix for overrides ending at midnight
+							if ( '12:00 am' == $end ) {
+								$override_end_time = $override_end_time + ( 24 * 60 * 60 );
+							}
+							// TODO: allow for multiday overrides ?
+							/* if ( isset( $data['multiday'] ) && ( 'yes' == $data['multiday'] ) ) {
+								if ( isset( $data['enddate'] ) && ( '' != $data['enddate'] ) ) {
 
-						// --- split the override overnight ---
-						$override_data = array(
-							'override' => $override['ID'],
-							'name'     => $override['post_title'],
-							'slug'     => $override['post_name'],
-							'date'     => $date,
-							'day'      => $day,
-							'start'    => $start,
-							'end'      => '11:59:59 pm',
-							'real_end' => $end,
-							'url'      => get_permalink( $override['ID'] ),
-							'split'    => true,
-						);
-						// 2.3.3.7: set array order by start time
-						$override_list[$date][$override_start_time] = $override_data;
+								}
+							} */
 
-						// --- set the next day split shift ---
-						// note: these should not wrap around to start of week
-						// 2.3.2: use get next date/day functions
-						// $nextday = date( 'l', $next_date_time );
-						// $nextdate = date( 'Y-m-d', $next_date_time );
-						$nextdate = radio_station_get_next_date( $date );
-						$nextday = radio_station_get_next_day( $day );
+							if ( $override_start_time < $override_end_time ) {
 
-						$override_data = array(
-							'override'   => $override['ID'],
-							'name'       => $override['post_title'],
-							'slug'       => $override['post_name'],
-							'date'       => $nextdate,
-							'day'        => $nextday,
-							'real_start' => $start,
-							'start'      => '00:00 am',
-							'end'        => $end,
-							'url'        => get_permalink( $override['ID'] ),
-							'split'      => true,
-						);
-						// 2.3.3.7: set array order by start time
-						$override_list[$nextdate][$override_start_time] = $override_data;
+								// --- add the override as is ---
+								$override_data = array(
+									'override' => $override['ID'],
+									'name'     => $title,
+									'slug'     => $override['post_name'],
+									'date'     => $date,
+									'day'      => $day,
+									'start'    => $start,
+									'end'      => $end,
+									'url'      => get_permalink( $override['ID'] ),
+									'split'    => false,
+								);
+								// 2.3.3.7: set array order by start time
+								$override_list[$date][$override_start_time] = $override_data;
+
+							} else {
+
+								// --- split the override overnight ---
+								$override_data = array(
+									'override' => $override['ID'],
+									'name'     => $title,
+									'slug'     => $override['post_name'],
+									'date'     => $date,
+									'day'      => $day,
+									'start'    => $start,
+									'end'      => '11:59:59 pm',
+									'real_end' => $end,
+									'url'      => get_permalink( $override['ID'] ),
+									'split'    => true,
+								);
+								// 2.3.3.7: set array order by start time
+								$override_list[$date][$override_start_time] = $override_data;
+
+								// --- set the next day split shift ---
+								// note: these should not wrap around to start of week
+								// 2.3.2: use get next date/day functions
+								// $nextday = date( 'l', $next_date_time );
+								// $nextdate = date( 'Y-m-d', $next_date_time );
+								$nextdate = radio_station_get_next_date( $date );
+								$nextday = radio_station_get_next_day( $day );
+
+								$override_data = array(
+									'override'   => $override['ID'],
+									'name'       => $title,
+									'slug'       => $override['post_name'],
+									'date'       => $nextdate,
+									'day'        => $nextday,
+									'real_start' => $start,
+									'start'      => '00:00 am',
+									'end'        => $end,
+									'url'        => get_permalink( $override['ID'] ),
+									'split'      => true,
+								);
+								// 2.3.3.7: set array order by start time
+								$override_list[$nextdate][$override_start_time] = $override_data;
+							}
+						}
 					}
 				}
 			}
@@ -648,11 +689,6 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array() ) {
 	} elseif ( false !== $args['limit'] ) {
 		$default = false;
 	}
-	if ( !isset( $args['data'] ) ) {
-		$args['data'] = true;
-	} elseif ( true !== $args['data'] ) {
-		$default = false;
-	}
 	if ( !isset( $args['columns'] ) || !is_array( $args['columns'] ) || ( count( $args['columns'] ) < 1 ) ) {
 		$columns = 'posts.ID, posts.post_title, posts.post_content, posts.post_excerpt, posts.post_date';
 	} else {
@@ -703,15 +739,18 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array() ) {
 	}
 
 	// --- get records with associated show ID ---
-
 	global $wpdb;
 	if ( 'posts' == $datatype ) {
 
 		// 2.3.3.4: handle possible multiple show post values
+		// 2.3.3.9: added 'i:' prefix to LIKE match value
 		$query = "SELECT post_id,meta_value FROM " . $wpdb->prefix . "postmeta"
-				. " WHERE meta_key = '" . $metakey . "' AND meta_value LIKE '%" . $show_id . "%'";
+				. " WHERE meta_key = '" . $metakey . "' AND meta_value LIKE '%i:" . $show_id . "%'";
 		$results = $wpdb->get_results( $query, ARRAY_A );
-		// echo "Results: "; print_r( $results );
+		if ( RADIO_STATION_DEBUG ) {
+			echo '<span style="display:none;">Related Query: ' . $query . '</span>';
+			echo '<span style="display:none;">Related Results: ' . print_r( $results, true ) . '</span>';
+		}
 		if ( !$results || !is_array( $results ) || ( count( $results ) < 1 ) ) {
 			return false;
 		}
@@ -719,18 +758,22 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array() ) {
 		// --- get/check post IDs in post meta ---
 		$post_ids = array();
 		foreach ( $results as $result ) {
-			// TODO: check raw result is serialized or array ?
+			// TODO: check if raw result is serialized or array ?
 			$show_ids = maybe_unserialize( $result['meta_value'] );
 			if ( $show_id == $result['meta_value'] || in_array( $show_id, $show_ids ) ) {
 				$post_ids[] = $result['post_id'];
 			}
 		}
-		// echo "Post IDs: "; print_r( $post_ids );
+
 	} else {
 		$query = "SELECT post_id FROM " . $wpdb->prefix . "postmeta"
 		         . " WHERE meta_key = '" . $metakey . "' AND meta_value = %d";
 		$query = $wpdb->prepare( $query, $show_id );
 		$post_metas = $wpdb->get_results( $query, ARRAY_A );
+		if ( RADIO_STATION_DEBUG ) {
+			echo '<span style="display:none;">Related Query: ' . $query . '</span>';
+			echo '<span style="display:none;">Related Results: ' . print_r( $post_metas, true ) . '</span>';
+		}
 		if ( !$post_metas || !is_array( $post_metas ) || ( count( $post_metas ) < 1 ) ) {
 			return false;
 		}
@@ -756,18 +799,6 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array() ) {
 		$query .= $wpdb->prepare( " LIMIT %d", $args['limit'] );
 	}
 	$results = $wpdb->get_results( $query, ARRAY_A );
-
-	// --- maybe get additional data ---
-	// TODO: maybe get additional data for each data type ?
-	// if ( $args['data'] && $results && is_array( $results ) && ( count( $results ) > 0 ) ) {
-	//	if ( 'posts' == $datatype ) {
-	//
-	//	} elseif ( 'playlists' == $datatype ) {
-	//
-	//	} elseif ( 'episodes' == $datatype ) {
-	//
-	//	}
-	// }
 
 	// --- maybe cache default show data ---
 	if ( $default ) {
@@ -835,10 +866,13 @@ function radio_station_get_show_data_meta( $show, $single = false ) {
 				$user = get_user_by( 'ID', $host );
 				$radio_station_data['user-' . $host] = $user;
 			}
-			$hosts[] = array(
-				'name'  => $user->display_name,
-				'url'   => radio_station_get_host_url( $host ),
-			);
+			// 2.3.3.9: added check user still exists
+			if ( $user ) {
+				$hosts[] = array(
+					'name'  => $user->display_name,
+					'url'   => radio_station_get_host_url( $host ),
+				);
+			}
 		}
 	}
 	if ( is_array( $show_producers ) && ( count( $show_producers ) > 0 ) ) {
@@ -849,10 +883,13 @@ function radio_station_get_show_data_meta( $show, $single = false ) {
 				$user = get_user_by( 'ID', $producer );
 				$radio_station_data['user-' . $producer] = $user;
 			}
-			$producers[] = array(
-				'name'  => $user->display_name,
-				'url'   => radio_station_get_producer_url( $producer ),
-			);
+			// 2.3.3.9: added check user still exists
+			if ( $user ) {
+				$producers[] = array(
+					'name'  => $user->display_name,
+					'url'   => radio_station_get_producer_url( $producer ),
+				);
+			}
 		}
 	}
 
@@ -961,16 +998,17 @@ function radio_station_get_override_data_meta( $override ) {
 	if ( !is_object( $override ) ) {
 		$override = get_post( $override );
 	}
+	$override_id = $override->ID;
 
 	// --- get override terms ---
 	$genre_list = $language_list = array();
-	$genres = wp_get_post_terms( $override->ID, RADIO_STATION_GENRES_SLUG );
+	$genres = wp_get_post_terms( $override_id, RADIO_STATION_GENRES_SLUG );
 	if ( $genres ) {
 		foreach ( $genres as $genre ) {
 			$genre_list[] = $genre->name;
 		}
 	}
-	$languages = wp_get_post_terms( $override->ID, RADIO_STATION_LANGUAGES_SLUG );
+	$languages = wp_get_post_terms( $override_id, RADIO_STATION_LANGUAGES_SLUG );
 	if ( $languages ) {
 		foreach ( $languages as $language ) {
 			$language_list[] = $language->name;
@@ -978,8 +1016,8 @@ function radio_station_get_override_data_meta( $override ) {
 	}
 
 	// --- get override user data ---
-	$override_hosts = get_post_meta( $override->ID, 'override_user_list', true );
-	$override_producers = get_post_meta( $override->ID, 'override_producer_list', true );
+	$override_hosts = get_post_meta( $override_id, 'override_user_list', true );
+	$override_producers = get_post_meta( $override_id, 'override_producer_list', true );
 	$hosts = $producers = array();
 	if ( is_array( $override_hosts ) && ( count( $override_hosts ) > 0 ) ) {
 		foreach ( $override_hosts as $host ) {
@@ -1008,12 +1046,12 @@ function radio_station_get_override_data_meta( $override ) {
 
 	// --- get avatar and thumbnail URL ---
 	// 2.3.1: added show avatar and image URLs
-	$avatar_url = radio_station_get_show_avatar_url( $override->ID );
+	$avatar_url = radio_station_get_show_avatar_url( $override_id );
 	if ( !$avatar_url ) {
 		$avatar_url = '';
 	}
 	$thumbnail_url = '';
-	$thumbnail_id = get_post_meta( $override->ID, '_thumbnail_id', true );
+	$thumbnail_id = get_post_meta( $override_id, '_thumbnail_id', true );
 	if ( $thumbnail_id ) {
 		$thumbnail = wp_get_attachment_image_src( $thumbnail_id, 'thumbnail' );
 		$thumbnail_url = $thumbnail[0];
@@ -1022,10 +1060,10 @@ function radio_station_get_override_data_meta( $override ) {
 	// --- create array and return ---
 	// 2.3.1: added show avatar and image URLs
 	$override_data = array(
-		'id'         => $override->ID,
+		'id'         => $override_id,
 		'name'       => $override->post_title,
 		'slug'       => $override->post_name,
-		'url'        => get_permalink( $override->ID ),
+		'url'        => get_permalink( $override_id ),
 		'genres'     => $genre_list,
 		'languages'  => $language_list,
 		'hosts'      => $hosts,
@@ -1034,11 +1072,123 @@ function radio_station_get_override_data_meta( $override ) {
 		'image_url'  => $thumbnail_url,
 	);
 
+	// --- linked Show ID ---
+	// 2.3.3.9: maybe use linked show data
+	$linked_id = get_post_meta( $override_id, 'linked_show_id', true );
+	if ( $linked_id ) {
+
+		// --- use linked show data ---
+		$show_data = radio_station_get_show_data_meta( $linked_id );
+		$show_fields = get_post_meta( $override_id, 'linked_show_fields', true );
+
+		// --- map info keys to meta keys ---
+		$fields = array(
+			'name'       => 'show_title',
+			'hosts'      => 'show_user_list',
+			'producers'  => 'show_producer_list',
+			'avatar_url' => 'show_avatar',
+			// 'image_url' => 'show_thumbnail',
+		);
+	
+		// --- apply selected show data to override ---
+		foreach ( $fields as $key => $meta_key ) {
+			if ( isset( $show_fields[$meta_key] ) && $show_fields[$meta_key] ) {
+				$override_data[$key] = $show_data[$key];
+			}
+		}
+	}
+
 	// --- filter and return ---
-	$override_id = $override->ID;
 	$override_data = apply_filters( 'radio_station_override_data', $override_data, $override_id );
 
 	return $override_data;
+}
+
+// -----------------------
+// Get Show Override Value
+// -----------------------
+// 2.3.3.9: added to check linked show field by key
+function radio_station_get_show_override( $override_id, $meta_key ) {
+
+	global $radio_station_data;
+
+	// --- check/cache linked show values ---
+	if ( isset( $radio_station_data['linked-show-' . $override_id] ) ) {
+		$linked_id = $radio_station_data['linked-show-' . $override_id];
+		if ( isset( $radio_station_data['linked-fields-' . $override_id] ) ) {
+			$linked_fields = $radio_station_data['linked-fields-' . $override_id];
+		}
+	} else {
+		$linked_id = get_post_meta( $override_id, 'linked_show_id', true );
+		$radio_station_data['linked-show-' . $override_id] = $linked_id;
+		if ( $linked_id ) {
+			$linked_fields = get_post_meta( $override_id, 'linked_show_fields', true );
+			$radio_station_data['linked-fields-' . $override_id] = $linked_fields;
+		}
+	}
+
+	// --- return the show field value for this key ---
+	// echo "Override: " . $override_id . " - Meta Key: " . $meta_key;
+	if ( $linked_id ) {
+		// echo " - Linked Show: " . $linked_id;
+		if ( !isset( $linked_fields[$meta_key] ) || empty( $linked_fields[$meta_key] ) ) {
+			if ( 'show_title' == $meta_key ) {
+				$post = get_post( $linked_id );
+				$value = $post->post_title;
+			} elseif ( 'show_image' == $meta_key ) {
+				$value = get_post_meta( $linked_id, '_thumbnail_id', true );
+			} else {
+				$value = get_post_meta( $linked_id, $meta_key, true );
+				// echo " - Value: " . $value . "<br>" . PHP_EOL;
+			}
+			if ( $value ) {
+				return $value;
+			} else {
+				return '';
+			}
+		}
+	}
+	return false;
+}
+
+// -----------------------------
+// Get Linked Overrides for Show
+// -----------------------------
+// 2.3.3.9: added for show page display
+function radio_station_get_linked_overrides( $post_id ) {
+
+	// -- get show ID for override or show post ---
+	$linked_id = get_post_meta( $post_id, 'linked_show_id', true );
+	if ( $linked_id ) {
+		$show_id = $linked_id;
+	} else {
+		$show_id = $post_id;
+	}
+
+	// --- get linked overrides via show ID ---
+	global $wpdb;
+	$query = "SELECT post_id FROM " . $wpdb->prefix . "postmeta WHERE meta_key = 'linked_show_id' AND meta_value = %d";
+	$query = $wpdb->prepare( $query, $show_id );
+	$results = $wpdb->get_results( $query, ARRAY_A );
+	$overrides = false;
+	if ( $results && is_array( $results ) && ( count( $results ) > 0 ) ) {
+		foreach ( $results as $result ) {
+			$override_id = $result['post_id'];
+			$schedule = get_post_meta( $override_id, 'show_override_sched', true );
+			if ( $schedule ) {
+				if ( !is_array( $overrides ) ) {
+					$override = array();
+				}
+				if ( !is_array( $schedule ) ) {
+					$schedule = array( $schedule );
+				}
+				foreach ( $schedule as $override ) {
+					$overrides[] = $override;
+				}
+			}
+		}	
+	}	
+	return $overrides;
 }
 
 // --------------------
@@ -1103,7 +1253,8 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 		// (from 12am this morning, for one week ahead and back)
 		// 2.3.1: get start and end dates from weekdays
 		// 2.3.2: use get time function with timezone
-		$date = radio_station_get_time( 'date' );
+		// 2.3.3.9: pass second argument as time may not be now
+		$date = radio_station_get_time( 'date', $now );
 
 		// $start_time = strtotime( '12am ' . $date );
 		// $end_time = $start_time + ( 7 * 24 * 60 * 60 ) + 1;
@@ -1498,8 +1649,7 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 							$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 						}
 
-						if ( isset( $current_show )
-						|| ( $prev_shift_end && ( $now > $prev_shift_end ) && ( $now < $shift_start_time ) ) ) {
+						if ( isset( $current_show ) || ( $prev_shift_end && ( $now > $prev_shift_end ) && ( $now < $shift_start_time ) ) ) {
 
 							// --- set next show ---
 							// 2.3.2: set date for widget
@@ -1677,7 +1827,7 @@ function radio_station_get_current_show( $time = false ) {
 
 				if ( RADIO_STATION_DEBUG ) {
 					echo '<span style="display:none;">';
-					echo 'Current? ' . $now . ' - ' . $shift_start_time . ' - ' . $shift_end_time . PHP_EOL;
+					echo 'Now: ' . $now . ' - Shift Start: ' . $shift_start_time . ' - Shift End: ' . $shift_end_time . PHP_EOL;
 					echo print_r( $shift, true ) . PHP_EOL;
 				}
 
@@ -1728,6 +1878,10 @@ function radio_station_get_current_show( $time = false ) {
 	// --- filter current show ---
 	// 2.3.2: added time argument to filter
 	$current_show = apply_filters( 'radio_station_current_show', $current_show, $time );
+
+	if ( RADIO_STATION_DEBUG ) {
+		echo 'Current Show: ' . print_r( $current_show, true ) . PHP_EOL;
+	}
 
 	// --- set to global data ---
 	if ( !$time ) {
@@ -2443,6 +2597,8 @@ function radio_station_check_shifts( $all_shifts ) {
 					// (...but only if not disabled!)
 					if ( $set_shift && !$disabled ) {
 						// - no longer need shift and post updated times -
+						// 2.3.3.9: keep shift ID with schedule data
+						$shift['id'] = $shift['shift']['id'];
 						unset( $shift['shift'] );
 						unset( $shift['updated'] );
 						if ( '00:00 am' == $shift['start'] ) {
@@ -2605,10 +2761,11 @@ function radio_station_check_shift( $show_id, $shift, $context = 'all' ) {
 
 	// --- get shift start and end time ---
 	// 2.3.2: fix to convert to 24 hour times first
-	$start_time =  $shift['start_hour'] . ':' . $shift['start_min'] . $shift['start_meridian'];
-	$end_time = $shift['end_hour'] . ':' . $shift['end_min'] . $shift['end_meridian'];
-	$start_time = radio_station_convert_shift_time( $start_time );
-	$end_time = radio_station_convert_shift_time( $end_time );
+	// 2.3.3.9: set shift start and end to prevent undefined index warning later
+	$shift['start'] = $shift['start_hour'] . ':' . $shift['start_min'] . $shift['start_meridian'];
+	$shift['end'] = $shift['end_hour'] . ':' . $shift['end_min'] . $shift['end_meridian'];
+	$start_time = radio_station_convert_shift_time( $shift['start'] );
+	$end_time = radio_station_convert_shift_time( $shift['end'] );
 
 	// 2.3.2: use next week day instead of date
 	$shift_start_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $start_time );
@@ -2733,6 +2890,7 @@ function radio_station_check_shift( $show_id, $shift, $context = 'all' ) {
 	if ( isset( $day_shift ) ) {
 
 		// 2.3.3.6: added check to not last check shift against itself
+		// TODO: check possible re-occurrence undefined index 'start' warning here ?
 		if ( ( $day_shift['show'] != $show_id )
 		  || ( $day_shift['day'] != $shift['day'] )
 		  || ( $day_shift['start'] != $shift['start'] )
@@ -2951,8 +3109,18 @@ function radio_station_validate_shift( $shift ) {
 // 2.3.0: trigger show avatar check/update when editing
 add_action( 'replace_editor', 'radio_station_update_show_avatar', 10, 2 );
 function radio_station_update_show_avatar( $replace_editor, $post ) {
-	$show_id = $post->ID;
-	radio_station_get_show_avatar_id( $show_id );
+
+	// 2.3.3.9: fix to only apply to image-specific post types
+	$post_types = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG );
+	$post_types = apply_filters( 'radio_station_show_avatar_post_types', $post_types );
+	if ( in_array( $post->post_type, $post_types ) ) {
+		$show_id = $post->ID;
+		radio_station_get_show_avatar_id( $show_id );
+	} else {
+		// 2.3.3.9: add cleanup for non-intended post types
+		delete_post_meta( $post->ID, 'show_avatar' );
+		delete_post_meta( $post->ID, '_rs_image_updated' );
+	}
 
 	return $replace_editor;
 }
@@ -3026,7 +3194,8 @@ function radio_station_get_show_avatar( $show_id, $size = 'thumbnail', $attr = a
 	}
 
 	// --- filter and return ---
-	$avatar = apply_filters( 'radio_station_show_avatar', $avatar, $show_id );
+	// 2.3.3.9: change conflicting (duplicate) filter name for show avatar
+	$avatar = apply_filters( 'radio_station_show_avatar_output', $avatar, $show_id );
 	return $avatar;
 }
 
@@ -4106,6 +4275,38 @@ function radio_station_get_profile_id( $type, $user_id ) {
 	return false;
 }
 
+// ------------------
+// Get Language Terms
+// ------------------
+// 2.3.3.9: added for language archive shortcode
+function radio_station_get_language_terms( $args = false ) {
+
+	$defaults = array( 'taxonomy' => RADIO_STATION_LANGUAGES_SLUG, 'orderby' => 'name', 'hide_empty' => true );
+	if ( $args && is_array( $args ) ) {
+		foreach ( $args as $key => $value ) {
+			$defaults[$key] = $value;
+		}
+	}
+	$terms = get_terms( $defaults );
+	$languages = array();
+	if ( $terms ) {
+		foreach ( $terms as $term ) {
+			$languages[$term->name] = array(
+				'id'            => $term->term_id,
+				'name'          => $term->name,
+				'slug'          => $term->slug,
+				'description'   => $term->description,
+				'url'           => get_term_link( $term, RADIO_STATION_LANGUAGES_SLUG ),
+			);
+		}
+	}
+
+	// --- filter and return ---
+	$languages = apply_filters( 'radio_station_get_language_terms', $languages, $args );
+
+	return $languages;
+}
+
 // -------------
 // Get Languages
 // -------------
@@ -4331,6 +4532,75 @@ function radio_station_sanitize_values( $data, $keys ) {
 	return $sanitized;
 }
 
+// --------------------
+// Sanitize Input Value
+// --------------------
+// 2.3.3.9: added for combined show/override input saving
+function radio_station_sanitize_input( $prefix, $key ) {
+
+	$postkey = $prefix . '_' . $key;
+	$numeric_keys = array( 'avatar', 'image' );
+	$checkbox_keys = array( 'active', 'download' );
+	$user_keys = array( 'user_list', 'producer_list' );
+	if ( 'file' == $key ) {
+		$value = wp_strip_all_tags( trim( $_POST[$postkey] ) );
+	} elseif ( 'email' == $key ) {
+		$value = sanitize_email( trim( $_POST[$postkey] ) );
+	} elseif ( 'link' == $key ) {
+		$value = filter_var( trim( $_POST[$postkey] ), FILTER_SANITIZE_URL );
+	} elseif ( 'patreon' == $key ) {
+		$value = sanitize_title( $_POST[$postkey] );
+	} elseif ( 'phone' == $key ) {
+		// 2.3.3.6: added phone number with character filter validation
+		$value = trim( $_POST[$postkey] );
+		if ( strlen( $value ) > 0 ) {
+			$value = str_split( $value, 1 );
+			$value = preg_filter( '/^[0-9+\(\)#\.\s\-]+$/', '$0', $value );
+			if ( count( $value ) > 0 ) {
+				$value = implode( '', $value );
+			} else {
+				$value = '';
+			}
+		}
+	} elseif ( in_array( $key, $numeric_keys ) ) {
+		$value = absint( $_POST[$postkey] );
+		if ( $value < 0 ) {
+			$value = '';
+		}		
+	} elseif ( in_array( $key, $checkbox_keys ) ) {
+	
+		// 2.2.8: removed strict in_array checking
+		// 2.3.2: fix for unchecked boxes index warning
+		$value = '';
+		if ( isset( $_POST[$postkey] ) ) {
+			$value = $_POST[$postkey];
+		}
+		if ( !in_array( $value, array( '', 'on' ) ) ) {
+			$value = '';
+		}
+	} elseif ( in_array( $key, $user_keys ) ) {
+
+		if ( isset( $_POST[$postkey] ) ) {
+			$value = $_POST[$postkey];
+		}
+		if ( !isset( $value ) || !is_array( $value ) ) {
+			$value = array();
+		} else {
+			foreach ( $value as $i => $userid ) {
+				if ( !empty( $userid ) ) {
+					$user = get_user_by( 'ID', $userid );
+					if ( !$user ) {
+						unset( $value[$i] );
+					}
+				}
+			}
+		}
+	}
+	
+	
+	return $value;
+}
+
 // -------------------------
 // Sanitize Shortcode Values
 // -------------------------
@@ -4411,6 +4681,41 @@ function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
 			'instance'  => 'integer',
 			'for_time'  => 'integer',
 		);
+	} elseif ( 'master-schedule' == $type ) {
+	
+		// --- master schedule attribute keys ---
+		// 2.3.3.9: added for AJAX schedule loading
+		$keys = array(
+	
+			// --- schedule display options ---
+			'time'              => 'text',
+			'show_times'        => 'boolean',
+			'show_link'         => 'boolean',
+			'view'              => 'text',
+			'days'              => 'text',
+			'start_day'         => 'text',
+			'start_date'        => 'text',
+			'display_day'       => 'text',
+			'display_date'      => 'text',
+			'display_month'	    => 'text',
+
+			// --- show display options ---
+			'show_image'        => 'boolean',
+			'show_desc'         => 'boolean',
+			'show_hosts'        => 'boolean',
+			'link_hosts'        => 'boolean',
+			'show_genres'       => 'boolean',
+			'show_encore'       => 'boolean',
+			'show_file'         => 'boolean',
+			
+			// --- view specific options ---
+			'divheight'         => 'integer',
+			'gridwidth'         => 'integer',
+			'hide_past_shows'   => 'boolean',
+			'image_position'    => 'text',
+	
+		);
+
 	}
 
 	// --- handle extra keys ---
@@ -4441,6 +4746,42 @@ function radio_station_delete_transients_with_prefix( $prefix ) {
 		$key = ltrim( $option['option_name'], '_transient_' );
 		delete_transient( $key );
 	}
+}
+
+// -----------------
+// Clear Cached Data
+// -----------------
+// 2.3.3.9: made into separate function
+function radio_station_clear_cached_data( $post_id = false ) {
+
+	// --- clear main schedule transients ---
+	// 2.3.3: remove current show transient
+	// 2.3.4: add previous show transient
+	delete_transient( 'radio_station_current_schedule' );
+	delete_transient( 'radio_station_next_show' );
+	delete_transient( 'radio_station_previous_show' );
+
+	// --- clear time-based schedule transients ---
+	// 2.3.4: delete all prefixed transients (for times)
+	radio_station_delete_transients_with_prefix( 'radio_station_current_schedule' );
+	radio_station_delete_transients_with_prefix( 'radio_station_next_show' );
+	radio_station_delete_transients_with_prefix( 'radio_station_previous_show' );
+
+	// --- maybe clear show meta data ---
+	if ( $post_id ) {
+		do_action( 'radio_station_clear_data', 'show', $post_id );
+		do_action( 'radio_station_clear_data', 'show_meta', $post_id );
+	}
+
+	// --- maybe send directory ping ---
+	// 2.3.1: added directory update ping option
+	// 2.3.2: queue directory ping
+	radio_station_queue_directory_ping();
+
+	// --- set last updated schedule time ---
+	// 2.3.2: added for data API use
+	update_option( 'radio_station_schedule_updated', time() );
+
 }
 
 
@@ -4586,7 +4927,6 @@ function radio_station_replace_month( $string ) {
 // 2.2.7: added meridiem translation function
 function radio_station_translate_meridiem( $meridiem ) {
 	global $wp_locale;
-
 	return $wp_locale->get_meridiem( $meridiem );
 }
 

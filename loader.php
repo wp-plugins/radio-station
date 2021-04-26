@@ -1390,8 +1390,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						'support'    => $args['support'],
 						'account'    => $args['account'],
 					),
-				);
-
+				);		
+				
 				// --- maybe add plugin submenu to parent menu ---
 				if ( isset( $args['parentmenu'] ) ) {
 					$settings['menu']['parent'] = array( 'slug' => $args['parentmenu'] );
@@ -1414,6 +1414,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 				// --- add Freemius connect message filter ---
 				$this->freemius_connect();
+				
+				// --- fire Freemius loaded action ---
+				do_action( $args['namespace'] . '_loaded' );
 			}
 		}
 
