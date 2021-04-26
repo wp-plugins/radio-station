@@ -1794,9 +1794,10 @@ function radio_station_show_images_save() {
 // --------------------
 // 2.3.2: added AJAX show save shifts action
 // 2.3.3.9: added AJAX show save shift action
+// 2.3.3.9: change save action priority (to be after taxonomy updates)
 add_action( 'wp_ajax_radio_station_show_save_shift', 'radio_station_show_save_data' );
 add_action( 'wp_ajax_radio_station_show_save_shifts', 'radio_station_show_save_data' );
-add_action( 'save_post', 'radio_station_show_save_data' );
+add_action( 'save_post', 'radio_station_show_save_data', 11 );
 function radio_station_show_save_data( $post_id ) {
 
 	// --- verify if this is an auto save routine ---
@@ -2105,6 +2106,40 @@ function radio_station_show_save_data( $post_id ) {
 			// 2.3.0: fix to clear data if all shifts removed
 			delete_post_meta( $post_id, 'show_sched' );
 			$show_shifts_changed = true;
+		}
+	}
+
+	// 2.3.3.9: maybe sync to linked override taxonomies
+	$overrides = radio_station_get_linked_overrides( $post_id );
+	if ( $overrides && is_array( $overrides ) && ( count( $overrides ) > 0 ) ) {
+		
+		// --- get genre and language terms ---
+		$genre_terms = wp_get_object_terms( $post_id, RADIO_STATION_GENRES_SLUG );
+		if ( count( $genre_terms ) > 0 ) {
+			foreach ( $genre_terms as $genre_term ) {
+				$genre_term_ids[] = $genre_term->term_id;
+			}
+		}
+		$language_terms = wp_get_object_terms( $post_id, RADIO_STATION_LANGUAGES_SLUG );
+		if ( count( $language_terms ) > 0 ) {
+			foreach ( $language_terms as $language_term ) {
+				$language_term_ids[] = $language_term->term_id;
+			}
+		}
+
+		// --- maybe set these terms to linked overrides ---
+		foreach ( $overrides as $override_id ) {
+			$sync_genres = get_post_meta( $override_id, 'sync_genres', true );
+			if ( 'yes' == $sync_genres ) {
+				wp_set_post_terms( $override_id, $genre_term_ids, RADIO_STATION_GENRES_SLUG );
+			}
+			$sync_languages = get_post_meta( $override_id, 'sync_languages', true );
+			if ( 'yes' == $sync_languages ) {
+				wp_set_post_terms( $override_id, $language_term_ids, RADIO_STATION_LANGUAGES_SLUG );
+			}
+			if ( ( 'yes' == $sync_genres ) || ( 'yes' == $sync_languages ) ) {
+				radio_station_clear_cached_data( $override_id );
+			}
 		}
 	}
 
@@ -3794,14 +3829,13 @@ function radio_station_override_save_data( $post_id ) {
 					}
 				}
 				$genre_terms = wp_get_object_terms( $linked_id, RADIO_STATION_GENRES_SLUG );
-				print_r( $genre_terms );
 				if ( count( $genre_terms ) > 0 ) {
 					foreach ( $genre_terms as $genre_term ) {
 						$term_ids[] = $genre_term->term_id;
 					}
 				}
 				wp_set_post_terms( $post_id, $term_ids, RADIO_STATION_GENRES_SLUG );
-				if ( array_diff( $prev_term_ids, $term_ids ) === array_diff( $term_ids, $prev_term_ids ) ) {
+				if ( array_diff( $prev_term_ids, $term_ids ) != array_diff( $term_ids, $prev_term_ids ) ) {
 					$meta_changed = true;
 				}
 			}
@@ -3813,28 +3847,29 @@ function radio_station_override_save_data( $post_id ) {
 		$sync_languages = false;
 		if ( isset( $_POST['sync_languages'] ) && ( 'yes' == $_POST['sync_languages'] ) ) {
 
-			update_post_meta( $post_id, 'sync_languages', 'yes' );
+			if ( $linked_show ) {
 
-			// --- sync language terms ---
-			$prev_term_ids = $term_ids = array();
-			$prev_terms = wp_get_object_terms( $linked_id, RADIO_STATION_LANGUAGES_SLUG );
-			if ( count( $prev_terms ) > 0 ) {
-				foreach( $prev_terms as $prev_term ) {
-					$prev_term_ids[] = $prev_term->term_id;
+				update_post_meta( $post_id, 'sync_languages', 'yes' );
+
+				// --- sync language terms ---
+				$prev_term_ids = $term_ids = array();
+				$prev_terms = wp_get_object_terms( $post_id, RADIO_STATION_LANGUAGES_SLUG );
+				if ( count( $prev_terms ) > 0 ) {
+					foreach( $prev_terms as $prev_term ) {
+						$prev_term_ids[] = $prev_term->term_id;
+					}
+				}
+				$language_terms = wp_get_object_terms( $linked_id, RADIO_STATION_LANGUAGES_SLUG );
+				if ( count( $language_terms ) > 0 ) {
+					foreach ( $language_terms as $language_term ) {
+						$term_ids[] = $language_term->term_id;
+					}
+				}
+				wp_set_post_terms( $post_id, $term_ids, RADIO_STATION_LANGUAGES_SLUG );
+				if ( array_diff( $prev_term_ids, $term_ids ) != array_diff( $term_ids, $prev_term_ids ) ) {
+					$meta_changed = true;
 				}
 			}
-			$language_terms = wp_get_object_terms( $linked_id, RADIO_STATION_LANGUAGES_SLUG );
-			print_r( $language_terms );
-			if ( count( $language_terms ) > 0 ) {
-				foreach ( $language_terms as $language_term ) {
-					$term_ids[] = $language_term->term_id;
-				}
-			}
-			wp_set_post_terms( $post_id, $term_ids, RADIO_STATION_LANGUAGES_SLUG );
-			if ( array_diff( $prev_term_ids, $term_ids ) === array_diff( $term_ids, $prev_term_ids ) ) {
-				$meta_changed = true;
-			}
-
 		} else {
 			delete_post_meta( $post_id, 'sync_languages' );
 		}

@@ -1154,7 +1154,7 @@ function radio_station_get_show_override( $override_id, $meta_key ) {
 // -----------------------------
 // Get Linked Overrides for Show
 // -----------------------------
-// 2.3.3.9: added for show page display
+// 2.3.3.9: added for getting linked show overrides 
 function radio_station_get_linked_overrides( $post_id ) {
 
 	// -- get show ID for override or show post ---
@@ -1165,31 +1165,52 @@ function radio_station_get_linked_overrides( $post_id ) {
 		$show_id = $post_id;
 	}
 
-	// --- get linked overrides via show ID ---
+	// --- get linked override IDs via show ID ---
 	global $wpdb;
 	$query = "SELECT post_id FROM " . $wpdb->prefix . "postmeta WHERE meta_key = 'linked_show_id' AND meta_value = %d";
 	$query = $wpdb->prepare( $query, $show_id );
 	$results = $wpdb->get_results( $query, ARRAY_A );
-	$overrides = false;
+	$override_ids = array();
 	if ( $results && is_array( $results ) && ( count( $results ) > 0 ) ) {
 		foreach ( $results as $result ) {
 			$override_id = $result['post_id'];
-			$schedule = get_post_meta( $override_id, 'show_override_sched', true );
-			if ( $schedule ) {
-				if ( !is_array( $overrides ) ) {
-					$override = array();
-				}
-				if ( !is_array( $schedule ) ) {
-					$schedule = array( $schedule );
-				}
-				foreach ( $schedule as $override ) {
-					$overrides[] = $override;
-				}
-			}
+			$override_ids[] = $override_id;
 		}	
-	}	
+	}
+
+	// --- filter and return ---
+	$override_ids = apply_filters( 'radio_station_linked_overrides', $override_ids, $post_id );
+	return $override_ids;
+}
+
+// -------------------------
+// Get Linked Override Times
+// -------------------------
+// 2.3.3.9: added for show page display
+function radio_station_get_linked_override_times( $post_id ) {
+
+	$override_ids = radio_station_get_linked_overrides( $post_id );
+	$overrides = array();
+	foreach ( $override_ids as $override_id ) {
+		$schedule = get_post_meta( $override_id, 'show_override_sched', true );
+		if ( $schedule ) {
+			if ( !is_array( $overrides ) ) {
+				$override = array();
+			}
+			if ( !is_array( $schedule ) ) {
+				$schedule = array( $schedule );
+			}
+			foreach ( $schedule as $override ) {
+				$overrides[] = $override;
+			}
+		}
+	}
+	
+	// --- filter and return ---
+	$overrides = apply_filters( 'radio_station_linked_override_times', $overrides, $post_id );
 	return $overrides;
 }
+
 
 // --------------------
 // Get Current Schedule

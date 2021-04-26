@@ -668,7 +668,7 @@ if ( !$active || !$shifts ) {
 
 // 2.3.3.9: maybe output linked override times
 $date_format = apply_filters( 'radio_station_override_date_format', 'j F' );
-$overrides = radio_station_get_linked_overrides( $post_id );
+$overrides = radio_station_get_linked_override_times( $post_id );
 if ( $overrides && is_array( $overrides ) && ( count( $overrides ) > 0 ) ) {
 	$blocks['show_times'] .= '<h5>' . esc_html( __( 'Special Times', 'radio-station' ) ) . '</h5>';
 	foreach ( $overrides as $override ) {
