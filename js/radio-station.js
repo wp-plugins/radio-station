@@ -112,7 +112,7 @@ function radio_convert_times() {
 		startdisplay = radio_user_time(starttime, startformat);
 		enddisplay = radio_user_time(endtime, endformat);
 		if ((starthtml != startdisplay) || (endhtml != enddisplay)) {
-			if (radio.debug) {console.log('Start Display: '+startdisplay+' - End Display: '+enddisplay);}
+			if (radio.debug) {console.log('Start: '+starthtml+' => '+startdisplay+' - End: '+endhtml+' => '+enddisplay);}
 			showusertime = jQuery(this).parent().find('.show-user-time').show();
 			showusertime.find('.rs-start-time').html(startdisplay);
 			showusertime.find('.rs-end-time').html(enddisplay);
@@ -122,6 +122,7 @@ function radio_convert_times() {
 			datehtml = date.html(); datetime = date.attr('data'); dateformat = date.attr('data-format');
 			datedisplay = radio_user_time(datetime, dateformat);
 			if (datehtml == datedisplay) {datedisplay = '';}
+			if (radio.debug) {console.log('Date: '+datehtml+' => '+datedisplay);}
 			showusertime = jQuery(this).parent().find('.show-user-time');
 			showusertime.find('.rs-start-date').html(datedisplay);
 		}

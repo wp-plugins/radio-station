@@ -644,7 +644,8 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 						$end_time = radio_station_convert_shift_time( $end );
 						$shift_start_time = radio_station_to_time( $override_time['day'] . ' ' . $start_time );
 						$shift_end_time = radio_station_to_time( $override_time['day'] . ' ' . $end_time );
-						if ( $shift_start_time > $shift_end_time ) {
+						// 2.3.3.9: added or equals to operator
+						if ( $shift_end_time <= $shift_start_time ) {
 							$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 						}
 
@@ -1977,7 +1978,8 @@ function radio_station_current_show_shortcode( $atts ) {
 					$shift_start_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $start_time );
 				}
 				$shift_end_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $end_time );
-				if ( $shift_start_time > $shift_end_time ) {
+				// 2.3.3.9: added or equals to operator
+				if ( $shift_end_time <= $shift_start_time ) {
 					$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 				}
 
@@ -2653,7 +2655,8 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 					$shift_start_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $shift_start );
 				}
 				$shift_end_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $shift_end );
-				if ( $shift_end_time < $shift_start_time ) {
+				// 2.3.3.9: added or equals to operator
+				if ( $shift_end_time <= $shift_start_time ) {
 					$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 				}
 
@@ -3155,7 +3158,8 @@ function radio_station_current_playlist_shortcode( $atts ) {
 				}
 				$shift_end_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $end_time );
 				// 2.3.3.9: fix to overnight check variables
-				if ( $shift_start_time > $shift_end_time ) {
+				// 2.3.3.9: added or equals to operator
+				if ( $shift_end_time <= $shift_start_time ) {
 					$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 				}
 

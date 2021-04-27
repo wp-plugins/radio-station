@@ -568,7 +568,8 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 							$override_start_time = radio_station_to_time( $date . ' ' . $start_time );
 							$override_end_time = radio_station_to_time( $date . ' ' . $end_time );
 							// 2.3.2: fix for overrides ending at midnight
-							if ( '12:00 am' == $end ) {
+							// 2.3.3.9: fix to use standardized operator check
+							if ( $override_end_time <= $override_start_time ) {
 								$override_end_time = $override_end_time + ( 24 * 60 * 60 );
 							}
 							// TODO: allow for multiday overrides ?
@@ -1336,7 +1337,8 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 									$override_end_time = $override_end_time + 60;
 								}
 								// 2.3.2: fix for non-split overrides ending on midnight
-								if ( $override_end_time < $override_start_time ) {
+								// 2.3.3.9: added or equals to operator
+								if ( $override_end_time <= $override_start_time ) {
 									$override_end_time = $override_end_time + ( 24 * 60 * 60 );
 								}
 
@@ -1357,7 +1359,8 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 											$end_time = $end_time + 60;
 										}
 										// 2.3.2: fix for non-split shifts ending on midnight
-										if ( $end_time < $start_time ) {
+										// 2.3.3.9: added or equals to operator
+										if ( $end_time <= $start_time ) {
 											$end_time = $end_time + ( 24 * 60 * 60 );
 										}
 
@@ -1577,7 +1580,8 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 						// }
 
 						// - adjust for shifts ending past midnight -
-						if ( $shift_start_time > $shift_end_time ) {
+						// 2.3.3.9: added or equals to operator
+						if ( $shift_end_time <=  $shift_start_time ) {
 							$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 						}
 
@@ -1666,7 +1670,8 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 						$end_time = radio_station_convert_shift_time( $shift['end'] );
 						$shift_start_time = radio_station_to_time( $weekdates[$day] . ' ' . $shift_start );
 						$shift_end_time = radio_station_to_time( $weekdates[$day] . ' ' . $shift_end );
-						if ( $shift_start_time > $shift_end_time ) {
+						// 2.3.3.9: added or equals to operator
+						if ( $shift_end_time <= $shift_start_time ) {
 							$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 						}
 
@@ -1842,7 +1847,8 @@ function radio_station_get_current_show( $time = false ) {
 				$shift_start_time = radio_station_to_time( $weekdates[$day] . ' ' . $shift_start );
 				$shift_end_time = radio_station_to_time( $weekdates[$day] . ' ' . $shift_end );
 				// 2.3.3: fix for shifts split over midnight
-				if ( $shift_start_time > $shift_end_time ) {
+				// 2.3.3.9: added or equals to operator
+				if ( $shift_end_time <= $shift_start_time ) {
 					$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 				}
 
@@ -2793,7 +2799,8 @@ function radio_station_check_shift( $show_id, $shift, $context = 'all' ) {
 	$shift_end_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $end_time );
 	// $shift_start_time = radio_station_to_time( '+2 weeks ' . $shift['day'] . ' ' . $start_time );
 	// $shift_end_time = radio_station_to_time( '+2 weeks ' . $shift['day'] . ' ' . $end_time );
-	if ( $shift_end_time < $shift_start_time ) {
+	// 2.3.3.9: added or equals to operator
+	if ( $shift_end_time <= $shift_start_time ) {
 		$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 	}
 
@@ -2827,7 +2834,8 @@ function radio_station_check_shift( $show_id, $shift, $context = 'all' ) {
 				// $day_shift_start_time = radio_station_to_time( '+2 weeks ' . $day_shift['day'] . ' ' . $shift_start );
 				// $day_shift_end_time = radio_station_to_time( '+2 weeks ' . $day_shift['day'] . ' ' . $shift_end );
 				// 2.3.2: adjust for midnight with change to use non-split shifts
-				if ( $day_shift_end_time < $day_shift_start_time ) {
+				// 2.3.3.9: added or equals to operator
+				if ( $day_shift_end_time <= $day_shift_start_time ) {
 					$day_shift_end_time = $day_shift_end_time + ( 24 * 60 * 60 );
 				}
 
@@ -3001,7 +3009,8 @@ function radio_station_check_new_shifts( $new_shifts ) {
 			$shift_a_end_time = radio_station_to_time( $weekdates[$shift_a['day']] . ' ' . $shift_a_end );
 			// $shift_a_start_time = radio_station_to_time( '+2 weeks ' . $shift_a['day'] . ' ' . $shift_a_start );
 			// $shift_a_end_time = radio_station_to_time( '+2 weeks ' . $shift_a['day'] . ' ' . $shift_a_end );
-			if ( $shift_a_end_time < $shift_a_start_time ) {
+			// 2.3.3.9: added or equals to operator
+			if ( $shift_a_end_time <= $shift_a_start_time ) {
 				$shift_a_end_time = $shift_a_end_time + ( 24 * 60 * 60 );
 			}
 
@@ -3034,7 +3043,8 @@ function radio_station_check_new_shifts( $new_shifts ) {
 						$shift_b_end_time = radio_station_to_time( $weekdates[$shift_b['day']] . ' ' . $shift_b_end );
 						// $shift_b_start_time = radio_station_to_time( '+2 weeks ' . $shift_b['day'] . ' ' . $shift_b_start );
 						// $shift_b_end_time = radio_station_to_time( '+2 weeks ' . $shift_b['day'] . ' ' . $shift_b_end );
-						if ( $shift_b_end_time < $shift_b_start_time ) {
+						// 2.3.3.9: added or equals to operator
+						if ( $shift_b_end_time <= $shift_b_start_time ) {
 							$shift_b_end_time = $shift_b_end_time + ( 24 * 60 * 60 );
 						}
 

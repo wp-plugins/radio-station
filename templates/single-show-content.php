@@ -594,7 +594,8 @@ if ( !$active || !$shifts ) {
 					$end_time = radio_station_convert_shift_time( $end );
 					$shift_start_time = radio_station_to_time( $start_time );
 					$shift_end_time = radio_station_to_time( $end_time );
-					if ( $shift_end_time < $shift_start_time ) {
+					// 2.3.3.9: added or equals to operator
+					if ( $shift_end_time <= $shift_start_time ) {
 						$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 					}
 
@@ -670,7 +671,7 @@ if ( !$active || !$shifts ) {
 $date_format = apply_filters( 'radio_station_override_date_format', 'j F' );
 $overrides = radio_station_get_linked_override_times( $post_id );
 if ( $overrides && is_array( $overrides ) && ( count( $overrides ) > 0 ) ) {
-	$blocks['show_times'] .= '<h5>' . esc_html( __( 'Special Times', 'radio-station' ) ) . '</h5>';
+	$blocks['show_times'] .= '<h5>' . esc_html( __( 'Scheduled Dates', 'radio-station' ) ) . '</h5>';
 	foreach ( $overrides as $override ) {
 		if ( 'yes' != $override['disabled'] ) {
 			
@@ -678,7 +679,7 @@ if ( $overrides && is_array( $overrides ) && ( count( $overrides ) > 0 ) ) {
 			$end = $override['date'] . ' ' . $override['end_hour'] . ':' . $override['end_min'] . ' ' . $override['end_meridian'];
 			$override_start_time = radio_station_to_time( $start );
 			$override_end_time = radio_station_to_time( $end );
-			if ( $override_end_time < $override_start_time ) {
+			if ( $override_end_time <= $override_start_time ) {
 				$override_end_time = $override_end_time + ( 24 * 60 * 60 );
 			}
 			$start_display = radio_station_get_time( $start_data_format, $override_start_time );
