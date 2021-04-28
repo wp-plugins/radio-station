@@ -15,6 +15,17 @@ You can find the base styles in the `/css` directory of the plugin, prefixed wit
 You may wish to add your own styles to suit your site's look and feel. One easy way to do this is to add your own `rs-custom.css` to your Child Theme's directory, and add more specific style rules that modify or override the existing styles. Radio Station will automatically detect the presence of this file and enqueue it. This is preferable to modifying the base style files, as your changes will be overwritten in a plugin update.
 
 
+## Timezone Conversions
+
+#### Automatic Display
+
+Radio Station will now display a shift time converted to the users timezone under every shift time displayed. This conversion is based on the selected Timezone in your plugin settings and the default timezone detected in the users browser. This feature is on by default but can be disabled in the Plugin Settings.
+
+#### [Pro] User Timezone Switching
+
+In [Radio Station Pro](https://radiostation.pro), there is an additional interface displayed in the Clock/Timezone shortcode (automatically displayed above schedules and also in the Radio Clock widget.) This allows your visitors/listeners to select a specific timezone other than what is in their browser. This can be useful for travellers especially, for keeping up with their home Shows, or tuning into a new local station without needing to update their computer clock.
+
+
 ## Automatic Pages
 
 ### Master Schedule Page
@@ -122,7 +133,7 @@ This means you do not have to retranslate common strings for days of the week, m
 
 #### Using a Translation Plugin
 
-
+If you wish to use a translation plugin instead, you can find the relevant language filed in the /languages/ directory of the plugin. Follow the translation plugin documentation on how to use these files. We welcome submissions of updated language files. Please contact us via email or submit a pull request via the [Github repository](https://github.com/netmix/radio-station/).
 
 
 

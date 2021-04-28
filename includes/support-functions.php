@@ -528,9 +528,23 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 		$override_shifts = get_post_meta( $override['ID'], 'show_override_sched', true );
 		if ( array_key_exists( 'date', $override_shifts ) ) {
 			$override_shifts = array( $override_shifts );
+			update_post_meta( $override['ID'], 'show_override_sched', $override_shifts );
 		}
 		
 		if ( $override_shifts && is_array( $override_shifts ) && ( count( $override_shifts ) > 0 ) )  {
+
+			// 2.2.3.9: loop to add unique shift IDs and maybe resave
+			$update_override_shifts = false;
+			foreach ( $override_shifts as $j => $data ) {
+				if ( !isset( $data['id'] ) ) {
+					$data['id'] = radio_station_unique_shift_id();
+					$override_shifts[$j] = $data;
+					$update_override_shifts = true;
+				}
+			}
+			if ( $update_override_shifts ) {
+				update_post_meta( $override['ID'], 'show_override_sched', $override_shifts );
+			}
 
 			// --- loop override shifts ---
 			// 2.3.3.9: loop to allow for multiple overrides
@@ -584,6 +598,7 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 								// --- add the override as is ---
 								$override_data = array(
 									'override' => $override['ID'],
+									'id'       => $data['id'],
 									'name'     => $title,
 									'slug'     => $override['post_name'],
 									'date'     => $date,
@@ -601,6 +616,7 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 								// --- split the override overnight ---
 								$override_data = array(
 									'override' => $override['ID'],
+									'id'       => $data['id'],
 									'name'     => $title,
 									'slug'     => $override['post_name'],
 									'date'     => $date,
@@ -624,6 +640,7 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 
 								$override_data = array(
 									'override'   => $override['ID'],
+									'id'         => $data['id'],
 									'name'       => $title,
 									'slug'       => $override['post_name'],
 									'date'       => $nextdate,
@@ -1175,7 +1192,14 @@ function radio_station_get_linked_overrides( $post_id ) {
 	if ( $results && is_array( $results ) && ( count( $results ) > 0 ) ) {
 		foreach ( $results as $result ) {
 			$override_id = $result['post_id'];
-			$override_ids[] = $override_id;
+			
+			// --- check for published post status ---
+			$query = "SELECT post_status FROM " . $wpdb->prefix . "posts WHERE ID = %d";
+			$query = $wpdb->prepare( $query, $override_id );
+			$status = $wpdb->get_var( $query );
+			if ( 'publish' == $status ) {
+				$override_ids[] = $override_id;
+			}
 		}	
 	}
 

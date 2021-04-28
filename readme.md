@@ -188,6 +188,13 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 ## Upgrade Notices
 
+#### 2.3.3.9
+* Multiple Dates and Times for Schedule Overrides!
+* Link Override to Show with Selective Fields
+* Language Archive Shortcode for Shows
+* Various Bugfixes and Improvements
+* Updated Freemius SDK and Plugin Loader
+
 #### 2.3.3.8
 * Updated Plugin Panel Library
 * Added Stream Format selection setting

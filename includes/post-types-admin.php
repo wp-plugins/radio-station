@@ -1972,6 +1972,7 @@ function radio_station_show_save_data( $post_id ) {
 			$shifts = $_POST['show_sched'];
 		}
 		$prev_shifts = radio_station_get_show_schedule( $post_id );
+		$new_ids = array();
 		$days = array( '', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday' );
 		if ( $shifts && is_array( $shifts ) && ( count( $shifts ) > 0 ) ) {
 			foreach ( $shifts as $i => $shift ) {
@@ -1984,6 +1985,7 @@ function radio_station_show_save_data( $post_id ) {
 				if ( 'new-' == substr( $i, 0, 4 ) ) {
 					$i = radio_station_unique_shift_id();
 				}
+				$new_ids[] = $i;
 
 				// --- loop shift keys ---
 				foreach ( $shift as $key => $value ) {
@@ -2106,6 +2108,25 @@ function radio_station_show_save_data( $post_id ) {
 			// 2.3.0: fix to clear data if all shifts removed
 			delete_post_meta( $post_id, 'show_sched' );
 			$show_shifts_changed = true;
+		}
+		
+		// 2.3.3.9: clear out old unique shift IDs from prev_shifts
+		if ( $show_shifts_changed && is_array( $prev_shifts ) && ( count( $prev_shifts ) > 0 ) ) {
+			$prev_ids = array();
+			foreach ( $prev_shifts as $i => $shift ) {
+				if ( !in_array( $i, $new_ids ) ) {
+					$prev_ids[] = $i;
+				}
+			}
+			if ( count( $prev_ids ) > 0 ) {
+				$unique_ids = get_option( 'radio_station_shifts_ids' );
+				foreach ( $unique_ids as $i => $unique_id ) {
+					if ( in_array( $unique_id, $prev_ids ) ) {
+						unset( $unique_ids[$i] );
+					}
+				}
+				update_option( 'radio_station_shifts_ids', $unique_ids );
+			}
 		}
 	}
 
@@ -2258,6 +2279,37 @@ function radio_station_show_delete( $post_id, $post ) {
 
 	// --- clear all cached schedule data ---
 	radio_station_clear_cached_data( $post_id );
+	
+	// --- clear from unique shift IDs list ---
+	// 2.3.3.9: added to keep unique ID list from bloating over time
+	$shift_ids = get_option( 'radio_station_shifts_ids' );
+	$ids_changed = false;
+	if ( $shift_ids && is_array( $shift_ids ) && ( count( $shift_ids ) > 0 ) ) {
+		if ( RADIO_STATION_SHOW_SLUG == $post->post_type ) {
+			$shifts = get_post_meta( $post_id, 'show_sched', true );
+			if ( $shifts && is_array( $shifts ) && ( count( $shifts ) > 0 ) ) {
+				foreach ( $shifts as $id => $shift ) {
+					if ( 8 == strlen( $id ) ) {
+						$key = array_search( $id, $shift_ids );
+						unset( $shift_ids[$key] );
+					}
+				}
+			}
+		} elseif ( RADIO_STATION_OVERRIDE_SLUG == $post->post_type ) {
+			$shifts = get_post_meta( $post_id, 'show_override_sched', true );
+			if ( $shifts && is_array( $shifts ) && ( count( $shifts ) > 0 ) ) {
+				foreach ( $shifts as $shift ) {
+					if ( isset( $shift['id'] ) && ( 8 == strlen( $shift['id'] ) ) ) {
+						$key = array_search( $shift['id'], $shift_ids );
+						unset( $shift_ids[$key] );
+					}
+				}
+			}
+		}
+	}
+	if ( $ids_changed ) {
+		update_option( 'radio_station_shift_ids', $shift_ids );
+	}
 
 }
 
@@ -3197,7 +3249,24 @@ function radio_station_overrides_table( $post_id ) {
 	$overrides = get_post_meta( $post_id, 'show_override_sched', true );
 	if ( array_key_exists( 'date', $overrides ) ) {
 		$overrides = array( $overrides );
+		update_post_meta( $post_id, 'show_override_sched', $overrides );
 	}
+
+	// 2.2.3.9: loop to add unique shift IDs and maybe resave
+	if ( $overrides && is_array( $overrides ) && ( count( $overrides ) > 0 ) )  {
+		$update_overrides = false;
+		foreach ( $overrides as $j => $data ) {
+			if ( !isset( $data['id'] ) ) {
+				$data['id'] = radio_station_unique_shift_id();
+				$overrides[$j] = $data;
+				$update_overrides = true;
+			}
+		}
+		if ( $update_overrides ) {
+			update_post_meta( $post_id, 'show_override_sched', $overrides );
+		}
+	}
+
 	echo '<span style="display:none;">Current Overrides: ' . print_r( $overrides, true ) . '</span>';
 
 	if ( !$overrides ) {
@@ -3279,8 +3348,13 @@ function radio_station_overrides_table( $post_id ) {
 	$list = '';
 	foreach ( $overrides as $i => $override ) {
 
-		$list .= '<div id="override-wrapper-' . esc_attr( $i ) . '" class="override-wrapper">';
+		// 2.3.3.9: use override shift ID for override wrapper ID ---
+		$id = $override['id'];
+		$list .= '<div id="override-wrapper-' . esc_attr( $id ) . '" class="override-wrapper">';
 			$list .= '<ul id="override-' . esc_attr( $i ) . '" class="override-list">';
+
+				// 2.3.3.9: add hidden input for unique override time ID
+				$list .= '<input id="override-' . esc_attr( $i ) . '-id" type="hidden" name="show_sched[' . esc_attr( $i ) . '][id]" value="' . esc_attr( $id ) . '">';
 
 				// --- Override (Start) Date ---
 				$list .= '<li class="override-item first-item">';
@@ -3745,7 +3819,7 @@ function radio_station_override_edit_script() {
 // Update Schedule Override
 // ------------------------
 add_action( 'wp_ajax_radio_station_override_save', 'radio_station_override_save_data' );
-add_action( 'save_post', 'radio_station_override_save_data' );
+add_action( 'save_post', 'radio_station_override_save_data', 11 );
 function radio_station_override_save_data( $post_id ) {
 
 	// --- verify if this is an auto save routine ---
@@ -3914,6 +3988,7 @@ function radio_station_override_save_data( $post_id ) {
 				// 2.2.2: added to set default keys
 				// 2.3.3.9: just set new schedule array here
 				$new_sched = array(
+					'id'             => '',
 					'date'           => '',
 					'start_hour'     => '',
 					'start_min'      => '',
@@ -3970,12 +4045,22 @@ function radio_station_override_save_data( $post_id ) {
 						if ( 'yes' == $value ) {
 							$isvalid = true;
 						}			
+					} elseif ( 'id' == $key ) {
+						// 2.3.3.9: validate unique shift ID
+						if ( preg_match( '/^[a-zA-Z0-9_]+$/', $value ) ) {
+							$isvalid = true;
+						}
 					}
 
 					// --- if valid add to new schedule setting ---
 					if ( $isvalid ) {
 						$new_sched[$key] = $value;
 					}
+				}
+
+				// 2.3.3.9: add unique override shift ID
+				if ( !isset( $new_sched['id'] ) ) {
+					$new_sched['id'] = radio_station_unique_shift_id();
 				}
 
 				// --- add to new schedule array ---
@@ -3996,8 +4081,10 @@ function radio_station_override_save_data( $post_id ) {
 			$sched_changed = true;
 			$current_scheds = get_post_meta( $post_id, 'show_override_sched', true );
 			if ( array_key_exists( 'date', $current_scheds ) ) {
+				$current_scheds['id'] = radio_station_unique_shift_id();
 				$current_scheds = array( $current_scheds );
 			}
+			$prev_scheds = $current_scheds;
 			if ( count( $current_scheds ) == count( $new_scheds ) ) {
 				foreach ( $current_scheds as $i => $current_sched ) {
 					foreach ( $new_scheds as $j => $new_sched ) {
@@ -4051,7 +4138,33 @@ function radio_station_override_save_data( $post_id ) {
 			// 2.3.0: check if changed before saving
 			if ( $sched_changed ) {
 				update_post_meta( $post_id, 'show_override_sched', $new_scheds );
+
+				// 2.3.3.9: clear out old unique shift IDs from prev_scheds
+				$new_ids = array();
+				if ( is_array( $prev_scheds ) && ( count( $prev_scheds ) > 0 ) ) {
+					if ( is_array( $new_scheds ) && ( count( $new_scheds ) > 0 ) ) {
+						foreach ( $new_scheds as $i => $new_sched ) {
+							$new_ids[] = $new_sched['id'];
+						}
+					}
+					$prev_ids = array();
+					foreach ( $prev_scheds as $i => $shift ) {
+						if ( isset( $shift['id'] ) && !in_array( $shift['id'], $new_ids ) ) {
+							$prev_ids[] = $shift['id'];
+						}
+					}
+					if ( count( $prev_ids ) > 0 ) {
+						$unique_ids = get_option( 'radio_station_shifts_ids' );
+						foreach ( $unique_ids as $i => $unique_id ) {
+							if ( in_array( $unique_id, $prev_ids ) ) {
+								unset( $unique_ids[$i] );
+							}
+						}
+						update_option( 'radio_station_shifts_ids', $unique_ids );
+					}
+				}
 			}
+
 		}
 	}
 

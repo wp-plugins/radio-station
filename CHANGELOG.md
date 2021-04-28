@@ -10,8 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 2.3.3.9
 * Update: Plugin Panel (1.1.8) with Number Step Min/Max fix
 * Update: Freemius SDK (2.4.2)
+* Improved: Allow for Multiple Override Times (with AJAX Saving)
+* Added: Link Override to Show Data with selectable Show Fields
+* Added: Language Archive Shortcode (similar to Genre Archive)
+* Fixed: Current Show highlighting timer interval cycling
+* Fixed: Before and After Show classes when no current Show
 * Fixed: Shows Data Endpoint 24 Hour Shift Format and Encore Switch
 * Fixed: Multiple host separator display in Current Show Widget
+* Fixed: Playlist Widget playlist ended label when no next playlist
+* Fixed: Conflicting duplicate filter name for Show Avatar
+* Fixed: time conversions where start/finish Show/Override is equal
 
 ### 2.3.3.8
 * Update: Plugin Panel (1.1.7) with Image and Color Picker fields
