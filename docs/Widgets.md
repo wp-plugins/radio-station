@@ -13,7 +13,7 @@ Note Widgets are displayed via their corresponding Shortcodes to prevent code du
 Displays the currently playing Show - if there is one scheduled to play right now.
 
 ### Current Show Shortcode
-`[current-show]` (legacy supported name `[dj-widget]`)
+`[current-show]` (legacy supported name: `[dj-widget]`)
 
 The following attributes are available for this shortcode:
 
@@ -28,6 +28,7 @@ The following attributes are available for this shortcode:
 * *show_playlist* : Display a link to the show's current playlist, if any. 0 or 1.  Default is 1.
 * *show_all_sched* : Displays all schedules for a show if it airs on multiple days. 0 or 1. Default is 0.
 * *show_desc* : Display an excerpt of the show's description. 0 or 1. Default is 0.
+* *show_encore* : Display encore presentation text (when set for Show). 0 or 1. Default is 1.
 * *title_position* : Relative to Avatar. 'above', 'below', 'left' or 'right'. Default is 'right'.
 * *avatar_width* : Set a width style in pixels for Show Avatars. Default is not to set.
 * *countdown* : Display a Countdown until the current Show ends. 0 or 1. Default is 0.
@@ -41,7 +42,7 @@ Displays a limited list of Upcoming Shows - if there are Shows scheduled.
 
 
 ### Upcoming Shows Shortcode
-`[upcoming-shows]` (legacy supported name `[dj-coming-up-widget]`)
+`[upcoming-shows]` (legacy supported name: `[dj-coming-up-widget]`)
 
 The following attributes are available for this shortcode:
 
@@ -53,6 +54,7 @@ The following attributes are available for this shortcode:
 * *link_hosts* : Link Show hosts to their profile pages. 0 or 1. Default is 0.
 * *time* : The time format used for displaying schedules. 12 or 24. Default is global Plugin Setting.
 * *show_sched* : Display the show's schedules. 0 or 1.  Default is 1.
+* *show_encore* : Display encore presentation text (when set for Show). 0 or 1. Default is 1.
 * *default_name* : The text you would like to display when no upcoming show is scheduled. Default is none.
 * *title_position* : Relative to Avatar. 'above', 'below', 'left' or 'right'. Default is 'right'.
 * *avatar_width* : Set a width style in pixels for Show Avatars. Default is not to set.
@@ -71,6 +73,7 @@ Displays the Playlist assigned to the currently playing Show - if there is one a
 The following attributes are available for this shortcode:
 
 * *title* : The title you would like to appear over the Playlist display block
+* *link* : Link to the Playlist's page. 0 or 1. Default is 1.
 * *artist* : Display artist name. 0 or 1  Default is 1.
 * *song* : Display song name. 0 or 1. Default is 1.
 * *album* : Display album name. 0 or 1. Default is 0.
@@ -83,8 +86,9 @@ Example: `[current-playlist title="Current Song" artist="1" song="1" album="1" l
 [Demo Site Example Output](https://radiostationdemo.com/extra-shortcodes/current-playlist-widget/)
 
 ## Radio Clock Widget
+`[radio-clock]` (see [Radio Clock Shortcode](./Shortcodes.md#radio-clock-widget)
 
-A future version of Radio Station will include a Radio Clock Widget which will display the current Radio Station time in your selected Radio Station Timezone (via the Plugin Settings page.)
+As of 2.3.2, Radio Station now includes a Radio Clock Widget which will display the current Radio Station time in your selected Radio Station Timezone (via the Plugin Settings page) alongside the site visitor's current time (via browser detection.)
 
 ### [Pro] Timezone Switcher
 A future version of Radio Station Pro will include a user Timezone Switcher in the which will allow your listener's to select a timezone and display adjusted Schedule and Show times.

@@ -26,6 +26,7 @@ The following attributes are available for the shortcode:
 
 * *view* : Which View to use for display output. 'table', 'tabbed', 'list', 'divs', 'legacy'. Default 'table'.
 * *time* : Display time format you with to use. 12 and 24. Default is the Plugin Setting.
+* *clock* : Display Radio Clock above schedule. 0 or 1. Default is the Plugin Setting.
 * *show_link* : Display the title of the show as a link to its profile page. 0 or 1.  Default 1.
 * *show_times* : Whether to display the show shift's start and end times. 0 or 1. Default 1.
 * *show_image* : Whether the display the show's avatar. 0 or 1. Default 0 (1 for Tabbed View.)
@@ -35,8 +36,14 @@ The following attributes are available for the shortcode:
 * *link_hosts* : Whether to link each show host to their profile page. 0 or 1. Default 0.
 * *show_encore* : Whether to display 'encore airing' for a show shift. 0 or 1. Default 1.
 * *show_file* : Whether to add a link to the latest audio file. 0 or 1. Default 0.
-* *days* : Display schedule for single day or multiple days, comma separated. Default all.
-* *divheight* : Set the height, in pixels, of the individual divs. For 'divs' view only. Default 45.
+* *days* : Display for single day or multiple days (string or 0-6, comma separated.) Default all.
+* *start_day* : day of the week to start schedule (string or 0-6, or 'today') Default WordPress setting.
+* *display_day* : Full or short day heading ('full' or 'short') Default short for Table, full for Tabs/List.
+* *display_date* : Date format for date subheading. 0 for none. Default 'jS' for Table/List, 0 for Tabs.
+* *display_month* : Full or short month subheading ('full', 'short') Default 'short'.
+* *image_position* : Show image position for Tabs view. 'right', 'left' or 'alternate'. Default 'left'.
+* *hide_past_shows* : Hide shows that are finished in the Schedule for Tabs view. 0 or 1. Default 0.
+* *divheight* : Set the height, in pixels, of the individual divs. For legacy 'divs' view only. Default 45.
 
 Example: Display the schedule in 24-hour time format, use `[master-schedule time="24"]`.  
 
@@ -44,8 +51,24 @@ Example: Display the schedule in 24-hour time format, use `[master-schedule time
 
 `[radio-timezone]`
 
-Displays the Radio Station Timezone selected via Plugin Settings. There are no attributes for this shortcode.
+Displays the Radio Station Timezone selected via Plugin Settings. There are no attributes for this shortcode. This is the default display above the Master Schedule when the Radio Clock is turned off in the Plugin Settings.
 
+#### Radio Clock Shortcode
+
+`[radio-clock]`
+
+Added in 2.3.2. Displays the current server time and user time. Also available as a Widget.
+
+The following attributes are available for this shortcode:
+
+* *time* : Display time format you with to use. 12 and 24. Default is the Plugin Setting.
+* *seconds* : Display seconds with current times. 0 or 1. Default 0.
+* *day* : Display day after current times. 'full', 'short' or 'none'. Default 'full'.
+* *date* : Display date after current times. 0 or 1. Default 1.
+* *month* : Display months after current times. 'full', 'short' or 'none'. Default 'full'.
+* *zone* : Display timezone after current times. 0 or 1. Default 1.
+
+The Radio Clock can also be displayed by default above the Master Schedule by enabling this in the Plugin Settings. (It's display attributes there can changed via the `radio_station_schedule_clock` filter.)
 
 ## Archive Shortcodes
 

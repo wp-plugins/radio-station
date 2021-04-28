@@ -39,21 +39,27 @@ function radio_station_create_post_types() {
 	// $icon = WP_PLUGIN_URL.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__)) . 'images/show-menu-icon.png';
 	// $icon = plugins_url( 'images/show-menu-icon.png', RADIO_STATION_FILE );
 	$post_type = array(
-		'labels'            => array(
-			'name'          => __( 'Shows', 'radio-station' ),
-			'singular_name' => __( 'Show', 'radio-station' ),
-			'add_new'       => __( 'Add Show', 'radio-station' ),
-			'add_new_item'  => __( 'Add Show', 'radio-station' ),
-			'edit_item'     => __( 'Edit Show', 'radio-station' ),
-			'new_item'      => __( 'New Show', 'radio-station' ),
-			'view_item'     => __( 'View Show', 'radio-station' ),
+		'labels'                 => array(
+			'name'               => __( 'Shows', 'radio-station' ),
+			'singular_name'      => __( 'Show', 'radio-station' ),
+			'add_new'            => __( 'Add Show', 'radio-station' ),
+			'add_new_item'       => __( 'Add Show', 'radio-station' ),
+			'edit_item'          => __( 'Edit Show', 'radio-station' ),
+			'new_item'           => __( 'New Show', 'radio-station' ),
+			'view_item'          => __( 'View Show', 'radio-station' ),
 			// 2.3.0: added archive title label
-			'archive_title' => __( 'Shows', 'radio-station' ),
+			'archive_title'      => __( 'Shows', 'radio-station' ),
+			// 2.3.2: added missing post type labels
+			'search_items'       => __( 'Search Shows', 'radio-station' ),
+			'not_found'          => __( 'No Shows found', 'radio-station' ),
+			'not_found_in_trash' => __( 'No Shows found in Trash', 'radio-station' ),
+			'all_items'          => __( 'All Shows', 'radio-station' ),
 		),
 		'show_ui'           => true,
 		'show_in_menu'      => false, // now added to main menu
 		'show_in_admin_bar' => false, // this is done manually
-		'description'       => __( 'Post type for Show descriptions', 'radio-station' ),
+		'show_in_rest'      => true,
+		'description'       => __( 'Post type for Shows', 'radio-station' ),
 		'public'            => true,
 		'taxonomies'        => array( RADIO_STATION_GENRES_SLUG, RADIO_STATION_LANGUAGES_SLUG ),
 		'hierarchical'      => false,
@@ -81,20 +87,26 @@ function radio_station_create_post_types() {
 	// $icon = plugins_url( 'images/playlist-menu-icon.png', RADIO_STATION_FILE );
 	$post_type = array(
 		'labels'            => array(
-			'name'          => __( 'Playlists', 'radio-station' ),
-			'singular_name' => __( 'Playlist', 'radio-station' ),
-			'add_new'       => __( 'Add Playlist', 'radio-station' ),
-			'add_new_item'  => __( 'Add Playlist', 'radio-station' ),
-			'edit_item'     => __( 'Edit Playlist', 'radio-station' ),
-			'new_item'      => __( 'New Playlist', 'radio-station' ),
-			'view_item'     => __( 'View Playlist', 'radio-station' ),
+			'name'               => __( 'Playlists', 'radio-station' ),
+			'singular_name'      => __( 'Playlist', 'radio-station' ),
+			'add_new'            => __( 'Add Playlist', 'radio-station' ),
+			'add_new_item'       => __( 'Add Playlist', 'radio-station' ),
+			'edit_item'          => __( 'Edit Playlist', 'radio-station' ),
+			'new_item'           => __( 'New Playlist', 'radio-station' ),
+			'view_item'          => __( 'View Playlist', 'radio-station' ),
 			// 2.3.0: added archive title label
-			'archive_title' => __( 'Playlists', 'radio-station' ),
+			'archive_title'      => __( 'Playlists', 'radio-station' ),
+			// 2.3.2: added missing post type labels
+			'search_items'       => __( 'Search Playlists', 'radio-station' ),
+			'not_found'          => __( 'No Playlists found', 'radio-station' ),
+			'not_found_in_trash' => __( 'No Playlists found in Trash', 'radio-station' ),
+			'all_items'          => __( 'All Playlists', 'radio-station' ),
 		),
 		'show_ui'           => true,
 		'show_in_menu'      => false, // now added to main menu
 		'show_in_admin_bar' => false, // this is done manually
-		'description'       => __( 'Post type for Playlist descriptions', 'radio-station' ),
+		'show_in_rest'      => true,
+		'description'       => __( 'Post type for Playlists', 'radio-station' ),
 		'public'            => true,
 		'hierarchical'      => false,
 		// 2.3.0: added thumbnail, custom field and revision support
@@ -121,18 +133,25 @@ function radio_station_create_post_types() {
 	// $icon = plugins_url( 'images/show-menu-icon.png', RADIO_STATION_FILE );
 	$post_type = array(
 		'labels'            => array(
-			'name'          => __( 'Schedule Overrides', 'radio-station' ),
-			'singular_name' => __( 'Schedule Override', 'radio-station' ),
-			'add_new'       => __( 'Add Schedule Override', 'radio-station' ),
-			'add_new_item'  => __( 'Add Schedule Override', 'radio-station' ),
-			'edit_item'     => __( 'Edit Schedule Override', 'radio-station' ),
-			'new_item'      => __( 'New Schedule Override', 'radio-station' ),
-			'view_item'     => __( 'View Schedule Override', 'radio-station' ),
+			'name'               => __( 'Schedule Overrides', 'radio-station' ),
+			'singular_name'      => __( 'Schedule Override', 'radio-station' ),
+			'add_new'            => __( 'Add Schedule Override', 'radio-station' ),
+			'add_new_item'       => __( 'Add Schedule Override', 'radio-station' ),
+			'edit_item'          => __( 'Edit Schedule Override', 'radio-station' ),
+			'new_item'           => __( 'New Schedule Override', 'radio-station' ),
+			'view_item'          => __( 'View Schedule Override', 'radio-station' ),
+			// 2.3.2: added missing post type labels
+			'search_items'       => __( 'Search Overrides', 'radio-station' ),
+			'not_found'          => __( 'No Overrides found', 'radio-station' ),
+			'not_found_in_trash' => __( 'No Overrides found in Trash', 'radio-station' ),
+			'all_items'          => __( 'All Overrides', 'radio-station' ),
+			'archive_title'      => __( 'Overrides', 'radio-station' ),
 		),
 		'show_ui'           => true,
 		'show_in_menu'      => false, // now added to main menu
 		'show_in_admin_bar' => false, // this is done manually
-		'description'       => __( 'Post type for Schedule Override', 'radio-station' ),
+		'show_in_rest'      => true,
+		'description'       => __( 'Post type for Schedule Overrides', 'radio-station' ),
 		'public'            => true,
 		// 2.3.0: added taxonomies to overrides
 		'taxonomies'        => array( RADIO_STATION_GENRES_SLUG, RADIO_STATION_LANGUAGES_SLUG ),
@@ -162,19 +181,25 @@ function radio_station_create_post_types() {
 	$ui = apply_filters( 'radio_station_host_interface', false );
 	$post_type = array(
 		'labels'              => array(
-			'name'          => __( 'Host Profiles', 'radio-station' ),
-			'singular_name' => __( 'Host Profile', 'radio-station' ),
-			'add_new'       => __( 'New Host Profile', 'radio-station' ),
-			'add_new_item'  => __( 'Add Host Profile', 'radio-station' ),
-			'edit_item'     => __( 'Edit Host Profile', 'radio-station' ),
-			'new_item'      => __( 'New Host Profile', 'radio-station' ),
-			'view_item'     => __( 'View Host Profile', 'radio-station' ),
-			'archive_title' => __( 'Show Hosts', 'radio-station' ),
+			'name'               => __( 'Host Profiles', 'radio-station' ),
+			'singular_name'      => __( 'Host Profile', 'radio-station' ),
+			'add_new'            => __( 'New Host Profile', 'radio-station' ),
+			'add_new_item'       => __( 'Add Host Profile', 'radio-station' ),
+			'edit_item'          => __( 'Edit Host Profile', 'radio-station' ),
+			'new_item'           => __( 'New Host Profile', 'radio-station' ),
+			'view_item'          => __( 'View Host Profile', 'radio-station' ),
+			'archive_title'      => __( 'Show Hosts', 'radio-station' ),
+			// 2.3.2: added missing post type labels
+			'search_items'       => __( 'Search Hosts', 'radio-station' ),
+			'not_found'          => __( 'No Hosts found', 'radio-station' ),
+			'not_found_in_trash' => __( 'No Hosts found in Trash', 'radio-station' ),
+			'all_items'          => __( 'All Hosts', 'radio-station' ),
 		),
 		'show_ui'             => $ui,
 		'show_in_menu'        => false,
 		'show_in_admin_bar'   => false,
 		'show_in_nav_menus'   => false,
+		'show_in_rest'        => true,
 		'description'         => __( 'Post type for DJ / Host Profiles', 'radio-station' ),
 		'exclude_from_search' => false,
 		'public'              => true,
@@ -202,19 +227,25 @@ function radio_station_create_post_types() {
 	$ui = apply_filters( 'radio_station_producer_interface', false );
 	$post_type = array(
 		'labels'              => array(
-			'name'          => __( 'Producer Profiles', 'radio-station' ),
-			'singular_name' => __( 'Producer Profile', 'radio-station' ),
-			'add_new'       => __( 'New Producer Profile', 'radio-station' ),
-			'add_new_item'  => __( 'Add Producer Profile', 'radio-station' ),
-			'edit_item'     => __( 'Edit Producer Profile', 'radio-station' ),
-			'new_item'      => __( 'New Producer Profile', 'radio-station' ),
-			'view_item'     => __( 'View Producer Profile', 'radio-station' ),
-			'archive_title' => __( 'Show Producers Profile', 'Hosts' ),
+			'name'               => __( 'Producer Profiles', 'radio-station' ),
+			'singular_name'      => __( 'Producer Profile', 'radio-station' ),
+			'add_new'            => __( 'New Producer Profile', 'radio-station' ),
+			'add_new_item'       => __( 'Add Producer Profile', 'radio-station' ),
+			'edit_item'          => __( 'Edit Producer Profile', 'radio-station' ),
+			'new_item'           => __( 'New Producer Profile', 'radio-station' ),
+			'view_item'          => __( 'View Producer Profile', 'radio-station' ),
+			'archive_title'      => __( 'Show Producers Profile', 'Hosts' ),
+			// 2.3.2: added missing post type labels
+			'search_items'       => __( 'Search Producers', 'radio-station' ),
+			'not_found'          => __( 'No Producers found', 'radio-station' ),
+			'not_found_in_trash' => __( 'No Producers found in Trash', 'radio-station' ),
+			'all_items'          => __( 'All Producers', 'radio-station' ),
 		),
 		'show_ui'             => $ui,
 		'show_in_menu'        => false,
 		'show_in_admin_bar'   => false,
 		'show_in_nav_menus'   => false,
+		'show_in_rest'        => true,
 		'description'         => __( 'Post type for Producer Profiles', 'radio-station' ),
 		'exclude_from_search' => false,
 		'public'              => true,
@@ -248,7 +279,14 @@ function radio_station_create_post_types() {
 add_filter( 'gutenberg_can_edit_post_type', 'radio_station_post_type_editor', 20, 2 );
 add_filter( 'use_block_editor_for_post_type', 'radio_station_post_type_editor', 20, 2 );
 function radio_station_post_type_editor( $can_edit, $post_type ) {
-	$post_types = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_PLAYLIST_SLUG, RADIO_STATION_OVERRIDE_SLUG );
+	// 2.3.2: added host and producer slugs
+	$post_types = array(
+		RADIO_STATION_SHOW_SLUG, 
+		RADIO_STATION_PLAYLIST_SLUG, 
+		RADIO_STATION_OVERRIDE_SLUG,
+		RADIO_STATION_HOST_SLUG.
+		RADIO_STATION_PRODUCER_SLUG,
+	);
 	// 2.2.8: removed strict in_array checking
 	if ( in_array( $post_type, $post_types ) ) {
 		return false;
@@ -268,11 +306,18 @@ function radio_station_add_featured_image_support() {
 	// 2.3.0: add override thumbnail to theme support declaration
 	$supported_types = get_theme_support( 'post-thumbnails' );
 	if ( false === $supported_types ) {
-		$post_types = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG );
+		$post_types = array(
+			RADIO_STATION_SHOW_SLUG, 
+			RADIO_STATION_OVERRIDE_SLUG,
+			RADIO_STATION_HOST_SLUG,
+			RADIO_STATION_PRODUCER_SLUG,
+		);
 		add_theme_support( 'post-thumbnails', $post_types );
 	} elseif ( is_array( $supported_types ) ) {
 		$supported_types[0][] = RADIO_STATION_SHOW_SLUG;
 		$supported_types[0][] = RADIO_STATION_OVERRIDE_SLUG;
+		$supported_types[0][] = RADIO_STATION_HOST_SLUG;
+		$supported_types[0][] = RADIO_STATION_PRODUCER_SLUG;
 		add_theme_support( 'post-thumbnails', $supported_types[0] );
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 
-/* Sidebar Widget - Upcoming DJ
+/* Upcoming Shows Widget - (Upcoming DJ)
  * Displays the the next show(s)/DJ(s) in the schedule
  * Since 2.1.1
  */
@@ -22,25 +22,42 @@ class DJ_Upcoming_Widget extends WP_Widget {
 	public function form( $instance ) {
 
 		$instance = wp_parse_args( (array) $instance, array( 'title' => '' ) );
+
+		// 2.3.3: set time format default to empty (plugin setting)
 		$title = $instance['title'];
 		$display_djs = isset( $instance['display_djs'] ) ? $instance['display_djs'] : false;
 		$djavatar = isset( $instance['djavatar'] ) ? $instance['djavatar'] : false;
 		$default = isset( $instance['default'] ) ? $instance['default'] : '';
 		$link = isset( $instance['link'] ) ? $instance['link'] : false;
 		$limit = isset( $instance['limit'] ) ? $instance['limit'] : 1;
-		$time = isset( $instance['time'] ) ? $instance['time'] : 12;
+		$time = isset( $instance['time'] ) ? $instance['time'] : '';
 		$show_sched = isset( $instance['show_sched'] ) ? $instance['show_sched'] : false;
 
 		// 2.2.4: added title position, avatar width and DJ link options
+		// 2.3.0: added countdown field option
+		// 2.3.2: added AJAX load option
 		$title_position = isset( $instance['title_position'] ) ? $instance['title_position'] : 'right';
 		$avatar_width = isset( $instance['avatar_width'] ) ? $instance['avatar_width'] : '75';
 		$link_djs = isset( $instance['link_djs'] ) ? $instance['link_djs'] : '';
-		// 2.3.0: added countdown field option
+		$show_encore = isset( $instance['show_encore'] ) ? $instance['show_encore'] : true;
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : '';
+		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : '';
 
 		// 2.3.0: convert template style code to straight php echo
+		// 2.3.2: added AJAX load option field
 		$fields = '
 		<p>
+			<label for="' . esc_attr( $this->get_field_id( 'ajax' ) ) . '">
+				<select id="' .esc_attr( $this->get_field_id( 'ajax' ) ) . '" name="' . esc_attr( $this->get_field_name( 'ajax' ) ) . '">
+					<option value="" ' . selected( $ajax, '', false ) . '>' . esc_html( __( 'Default', 'radio-station' ) ) . '</option>
+					<option value="on" ' . selected( $ajax, 'on', false ) . '>' . esc_html( __( 'On', 'radio-station' ) ) . '</option>
+					<option value="off" ' . selected( $ajax, 'off', false ) . '>' . esc_html( __( 'Off', 'radio-station' ) ) . '</option>
+				</select>
+				' . esc_html( __( 'AJAX Load Widget?', 'radio-station' ) ) . '
+			</label>
+        </p>
+
+        <p>
 			<label for="' . esc_attr( $this->get_field_id( 'title' ) ) . '">
 				' . esc_html( __( 'Title', 'radio-station' ) ) . ':
 				<input class="widefat" id="' . esc_attr( $this->get_field_id( 'title' ) ) . '" name="' . esc_attr( $this->get_field_name( 'title' ) ) . '" type="text" value="' . esc_attr( $title ) . '" />
@@ -127,6 +144,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		<p>
 			<label for="' . esc_attr( $this->get_field_id( 'time' ) ) . '">' . esc_html( __( 'Time Format', 'radio-station' ) ) . ':<br />
 				<select id="' . esc_attr( $this->get_field_id( 'time' ) ) . '" name="' . esc_attr( $this->get_field_name( 'time' ) ) . '">
+					<option value="" ' . selected( $time, '', false ) . '>' . esc_html( __( 'Default', 'radio-station' ) ) . '</option>
 					<option value="12" ' . selected( $time, 12, false ) . '>' . esc_html( __( '12 Hour', 'radio-station' ) ) . '</option>
 					<option value="24" ' . selected( $time, 24, false ) . '>' . esc_html( __( '24 Hour', 'radio-station' ) ) . '</option>
 				</select>
@@ -134,7 +152,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			<br />
 			<small>' . esc_html( __( 'Choose time format for displayed schedules.', 'radio-station' ) ) . '	</small>
 		</p>
-		
+
 		<p>
 			<label for="' . esc_attr( $this->get_field_id( 'countdown' ) ) . '">
 			<input id="' .esc_attr( $this->get_field_id( 'countdown' ) ) . '" name="' . esc_attr( $this->get_field_name( 'countdown' ) ) . '" type="checkbox" ' . checked( $countdown, true, false ) . '/>
@@ -151,6 +169,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 	public function update( $new_instance, $old_instance ) {
 
 		$instance = $old_instance;
+
 		$instance['title'] = $new_instance['title'];
 		$instance['display_djs'] = isset( $new_instance['display_djs'] ) ? 1 : 0;
 		$instance['djavatar'] = isset( $new_instance['djavatar'] ) ? 1 : 0;
@@ -162,10 +181,13 @@ class DJ_Upcoming_Widget extends WP_Widget {
 
 		// 2.2.4: added title position, avatar width and DJ link settings
 		// 2.3.0: added countdown display option
+		// 2.3.2: added AJAX load option
 		$instance['title_position'] = $new_instance['title_position'];
 		$instance['avatar_width'] = $new_instance['avatar_width'];
 		$instance['link_djs'] = isset( $new_instance['link_djs'] ) ? 1 : 0;
+		$instance['show_encore'] = isset( $new_instance['show_encore'] ) ? 1 : 0;
 		$instance['countdown'] = isset( $new_instance['countdown'] ) ? 1 : 0;
+		$instance['ajax'] = isset( $new_instance['ajax'] ) ? $new_instance['ajax'] : 0;
 
 		// 2.3.0: added widget filter instance to update
 		$instance = apply_filters( 'radio_station_upcoming_shows_widget_update', $instance, $new_instance, $old_instance );
@@ -198,14 +220,18 @@ class DJ_Upcoming_Widget extends WP_Widget {
 
 		// 2.2.4: added title position, avatar width and DJ link settings
 		// 2.3.0: added countdown display option
+		// 2.3.2: added AJAX load option
 		$position = empty( $instance['title_position'] ) ? 'right' : $instance['title_position'];
 		$width = empty( $instance['avatar_width'] ) ? '75' : $instance['avatar_width'];
 		$link_djs = isset( $instance['link_djs'] ) ? $instance['link_djs'] : '';
+		$encore = isset( $instance['encore'] ) ? $instnace['encore'] : 0;
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : 0;
 		$dynamic = isset( $instance['dynamic'] ) ? $instance['dynamic'] : 0;
+		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : 0;
 
 		// --- set shortcode attributes ---
 		// 2.3.0: map widget options to shortcode attributes
+		// 2.3.2: added AJAX load option
 		$atts = array(
 			// --- legacy widget options ---
 			'title'          => $title,
@@ -222,11 +248,17 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			'title_position' => $position,
 			'avatar_width'   => $width,
 			'link_djs'       => $link_djs,
+			'show_encore'    => $encore,
 			'countdown'      => $countdown,
 			'dynamic'        => $dynamic,
 			'widget'         => 1,
 			'id'             => $id,
 		);
+
+		// 2.3.2: only set AJAX attribute if overriding default
+		if ( in_array( $ajax, array( 'on', 'off' ) ) ) {
+			$atts['ajax'] = $ajax;
+		}
 
 		// --- before widget ---
 		// phpcs:ignore WordPress.Security.OutputNotEscaped
@@ -234,8 +266,9 @@ class DJ_Upcoming_Widget extends WP_Widget {
 
 		// --- open widget container ---
 		// 2.3.0: add unique id to widget
+		// 2.3.2: add class to widget
 		$id = 'upcoming-shows-widget-' . $id;
-		echo '<div id="' . esc_attr( $id ) . '" class="widget">';
+		echo '<div id="' . esc_attr( $id ) . '" class="upcoming-shows-wrap widget">';
 
 		// --- output widget title ---
 		// phpcs:ignore WordPress.Security.OutputNotEscaped

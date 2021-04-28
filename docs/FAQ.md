@@ -91,3 +91,15 @@ Right now:
 ### Can the plugin be translated into my language? 
 
 You may translate the plugin into another language. Please visit our [WordPress Translate project page](https://translate.wordpress.org/locale/en-gb/default/wp-plugins/radio-station/) for this plugin for further instruction. The `radio-station.pot` file is located in the `/languages` directory of the plugin. Please send the finished translation to `info@netmix.com`. We'd love to include it.
+
+### How do I install the latest Development version for testing?
+
+If you are having issues with the plugin, we may recommend you install the development version for further bugix testing, as it may contain fixes that are not yet released into the next stable WordPress version. It is recommended you do this on a staging site. Instructions:
+
+1. Download the `develop` branch zip from the Github repository at: 
+`https://github.com/netmix/radio-station/tree/develop/`
+2. Unzip the downloaded file on your computer and upload it via FTP to the subdirectory of your WordPress install on your web server: `/wp-content/plugins/radio-station-dev/`
+3. Rename the subdirectory `/wp-content/plugins/radio-station/` to `/wp-content/plugins/radio-station-old`
+4. Rename the subdirectory `/wp-content/plugins/radio-station-dev/` to `/wp-content/plugins/radio-station/`
+
+You can now visit your site to make sure nothing is broken. If you experience issues you can reverse the folder renaming process to activate the old copy of the plugin. If the new development version works fine, at your convenience you can delete the `/wp-content/plugins/radio-station-old/` directory.

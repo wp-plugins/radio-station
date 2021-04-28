@@ -1,10 +1,10 @@
 === Radio Station ===
-Contributors: tonyzeoli, majick, nourma
+Contributors: tonyzeoli, majick
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
-Tested up to: 5.4.0
-Stable tag: trunk
+Tested up to: 5.6.2
+Stable tag: 2.3.3.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Radio Station let's you build and manage a Show Schedule for a radio station or 
 
 == Description ==
 
-Radio Station by NetMix is a plugin to build and manage a Show Schedule for a radio station or internet broadcaster's WordPress website, including podcasters. It's functionality was originally based on Drupal 6's Station plugin, reworked for use in Wordpress and then extended.
+Radio Station by NetMix is a plugin to build and manage a Show Schedule for a radio station or internet broadcaster's WordPress website. If you're a podcaster with scheduled releases or a Clubhouse app moderator who schedule rooms, you could use this plugin to announce your schedule on your website. It's functionality was originally based on Drupal 6's Station plugin, reworked for use in Wordpress and then extended.
 
 The plugin adds a new "Show" post type, schedulable blocks of time that contain a Show description, a Show shifts repeater field, assignable images and other meta information. You can also create Playlists associated with those shows, or assign standard blog posts to relate to a Show. It also supports adding Schedule Overrides for specific dates and times, and adds the ability to associate users (given a role of "Host" or "Producer") to Shows, so they can be displayed for that Show and to give them edit access.
 
@@ -22,7 +22,7 @@ The plugin contains a widget to display the on-air Current Show linked to the Sh
 
 As there is a lot you can do with Radio Station, we've made an effort to provide complete [Radio Station Plugin Documentation](https://netmix.com/radio-station/docs/). You can also find a Quickstart Guide there, as well as in the section below. You can see some example displays from the plugin via the Screenshots section, and full live examples are available on the [Radio Station Plugin Demo Site](https://radiostationdemo.com).
 
-We are actively seeking Radio Station partners and supporters to fund further development of the free, open source version of this plugin via [Patreon](https://www.patreon.com/radiostation) and are also in the process of developing more exciting features and functionality for a future [Radio Station Pro](https://netmix.com/radio-station-pro/) upgrade.
+We are actively seeking Radio Station partners and supporters to fund further development of the free, open source version of this plugin via [Patreon](https://www.patreon.com/radiostation) and are also in the process of developing more exciting features and functionality for a future [Radio Station Pro](https://netmix.com/radio-station-pro/) upgrade. Enter your [email address on the Radio Station Pro website] (https://radiostation.pro) to add yourself to the cue to be able to download the be notified when PRO is released.
 
 = Updating from Prior to 2.3.0 =
 
@@ -66,7 +66,7 @@ This plugin is under active development and we are continuously working to enhan
 
 = Upgrading to Radio Station Pro =
 
-Love Radio Station and ready for more? As the free version develops, we have also been working hard to introduce new features to create a Professional version that will "level up" the plugin to make your Station's site even more useable and accessible for your listeners! [Click here to learn more about Radio Station Pro](https://netmix.com/radio-station-pro/).
+Love Radio Station and ready for more? As the free version develops, we have also been working hard to introduce new features to create a Professional version that will "level up" the plugin to make your Station's site even more useable and accessible for your listeners! [Click here to learn more about Radio Station Pro](https://netmix.com/radio-station-pro/). Add your email address at [RadioStation.pro](https://radiostation.pro) to get in the cue so you can receive an invite to download the release when it's ready.
 
 
 == Installation ==
@@ -172,6 +172,20 @@ Right now:
 
 You may translate the plugin into another language. Please visit our [WordPress Translate project page](https://translate.wordpress.org/locale/en-gb/default/wp-plugins/radio-station/) for this plugin for further instruction. The `radio-station.pot` file is located in the `/languages` directory of the plugin. Please send the finished translation to `info@netmix.com`. We'd love to include it.
 
+= Can I use this plugin for Podcasts? =
+
+While the plugin is not specifically geared toward Podcasting, which is not live programming, some podcaster's have used Radio Station to let their subscribers know when they publish new shows.
+
+= Can I use this plugin for TWitchTV, Facebook Live, or Clubhouse shows? =
+
+Sure, there's no reason why you couldn't use the plugin to display a show schedule on a WordPress site for those services. Unfortunately, we are not currently syncing events from these platforms, but may do so in the future. While there may be APIs available from the larger services, Clubhouse does not yet have a public API, so scheduled rooms can't be automated to the Radio Station show scheduling system.
+
+= I use Google Calendar to print a show schedule online. Can I import/sync my Google Calendar with Radio Station? =
+
+We haven't built an interface between Google Calendar and Radio Station just yet, but it's on our radar to do so in the foreseeable future.
+
+
+
 == Screenshots ==
 1. Table Schedule View
 2. Tabbed Schedule View
@@ -183,6 +197,127 @@ You may translate the plugin into another language. Please visit our [WordPress 
 8. Show Conflict Display
 
 == Changelog ==
+
+= 2.3.3.8 =
+* Update: Plugin Panel (1.1.7) with Image and Color Picker fields
+* Added: Stream Format and Fallback/Format selection setting
+* Added: Station Email Address setting with default display option
+* Added: Section order filtering for Master Schedule Views
+* Added: Section display filtering for Master Schedule Views
+* Added: Section display filtering for Widget sections
+* Added: Show image alignment attribute to Schedule Tabs View
+* Added: Show Description/Excerpt to Show Data Endpoint (via querystring)
+* Added: Reduced opacity for past Shows on Schedule Tab/Table Views
+* Added: Screen Reader text for Show icons on Show Page
+* Fixed: Display Widget Countdown when no Current Show/Playlist
+* Fixed: Check for explicit singular.php template usage setting
+* Fixed: Access to Shows Data via querystring of Show ID/name
+* Fixed: Shows Data for Genres/Languages querystring of ID/name
+* Fixed: Changed stable tag from trunk to version number to fix translations issue
+
+= 2.3.3.7 =
+* Fixed: Schedule Overrides overlapping multiple Show shifts
+* Fixed: Bulk Edit field repetition and possible jQuery conflict
+* Fixed: Related Posts check producing error output
+* Fixed: WordPress Readme Parser deprecated errors for PHP7
+
+= 2.3.3.6 =
+* Update: Freemius SDK (2.4.1)
+* Update: Plugin Loader (1.1.6) with phone number and CSV validation
+* Added: Station phone number setting with default display option
+* Added: Schedule classes for Shows before and after current Show
+* Improved: current Show highlighting on Schedule for overnight shifts
+* Improved: info section reordering filters on single Show template
+* Fixed: Edit permissions checks for Related to Show post assignments
+* Fixed: Main Language option value for WordPress Setting
+* Fixed: make Date on Tab clickable on Tabbed Schedule View
+* Fixed: prevent possible conflicts with changes not saved reload message
+* Fixed: do not conflict check Shift against itself for last shift check
+* Fixed: link back to Show posts for related Show posts (allow multiple)
+* Fixed: filter next/previous post link for (multiple) related Show posts
+* Fixed: automatic pages conflict where themes filter the_content early
+
+= 2.3.3.5 =
+* Fixed: use schedule based on start_day if specified for Schedule view
+* Fixed: day left/right shifting on Schedule table/tab mobile views
+* Added: past/today/future filter for Schedule Override List 
+* Added: filter for Schedule display start day (and to accept today)
+* Added: current playlist (if any) to Broadcast Data endpoint
+
+= 2.3.3.4 =
+* Improved: auto-match show description to info height on Show pages
+* Improved: allow multiple Related Show selection for single post
+* Improved: ability to assign Post to relate to multiple Shows
+* Added: Related Show Post List column and Quick Edit field
+* Added: Related Show selection Bulk Edit Action for Post List
+* Added: filters for label texts and title attributes on Show Page
+* Added: filter for label text above Show Player (default empty)
+
+= 2.3.3.3 =
+* Fixed: improved Current Show and Upcoming Shows calculations
+* (Display showtimes when show starts before and ends after midnight)
+
+= 2.3.3.2 =
+* Update: Freemius SDK (2.4.0)
+* Update: Plugin Loader (1.1.4) with weird isset glitch fix
+* Fixed: Current Show for Shows ending at midnight
+* Fixed: incorrect AJAX Widget plugin setting value
+* Fixed: use pageload data for schedules before transients
+
+= 2.3.3 =
+* Update: Plugin Loader (1.1.3) with non-strict select match fix
+* Improved: width responsiveness for table/tabbed Schedule views
+* Improved: show shifts interface background colors
+* Added: navigate away from page on shift change check
+* Added: default time format option to Widgets
+* Removed: current show transients (intermittant unreliability)
+* Fixed: AJAX call causing plugin conflicts via save_post action
+* Fixed: calculation of Upcoming Shows near end of the week
+* Fixed: remove and duplicate actions on new shifts
+
+= 2.3.2 =
+* Update: Plugin Loader (1.1.2) with settings link fix
+* Improved: use plugin timezone setting for all times
+* Improved: show shift conflict checker logic
+* Added: Radio Clock Widget for user/server time display
+* Added: AJAX widget load option (to bypass page caches)
+* Added: automated show schedule highlighting (table/tabs/list)
+* Added: playlist track arrows for re-ordering tracks
+* Added: AJAX save of show shifts and playlist tracks
+* Added: post type editing metabox position filtering
+* Added: more display attributes to Master Schedule shortcode
+* Added: time format filters for time output displays
+* Added: javascript user timezone display on Master Schedule
+* Fixed: handling of UTC only timezone settings
+* Fixed: added check for empty role capabilities
+* Fixed: added settings submenu redirection fix
+* Fixed: show and override midnight end conflict
+* Fixed: calculate next shows at end of schedule week
+* Fixed: metaboxes disappearing on position sorting
+* Fixed: move tracks marked New to end of Playlist on update
+* Fixed: override shift array output showing above schedule
+* Fixed: master schedule specify days attribute bug
+* Fixed: display real end time of overnight split shifts
+* Fixed: master schedule display with days attribute
+* Fixed: logic for Affected Shifts in override list
+* Fixed: removed auto-tab selection change on tab view resize
+* Fixed: Current Show widget schedule/countdown for Overrides
+* Fixed: multiple overrides in schedule range variable conflict
+
+= 2.3.1 =
+* Update: Plugin Loader (1.1.1) with Freemius first path fix
+* Fixed: conditions for Schedule Override time calculations
+* Fixed: schedule table view - 12 hour format with translations
+* Fixed: schedule table view hour column width style
+* Fixed: javascript table/tab arrows to prevent default click
+* Fixed: undefined index warning when saving show with no shifts
+* Fixed: append not echo override date to shortcode archive list
+* Fixed: compatibility with multiple the_content calls (Yoast)
+* Fixed: reset to showcontinued flag in Schedule (table view)
+* Added: show avatar and featured image URLs to Data API output
+* Added: option to ping Netmix directory on show updates
+* Added: option to clear transients on every pageload
+* Added: filters for widget section display order
 
 = 2.3.0 =
 * Include: Plugin Loader (1.1.0) with plugin options and settings
@@ -231,7 +366,7 @@ You may translate the plugin into another language. Please visit our [WordPress 
 * Fix to not 404 author pages for DJs without blog posts
 
 = 2.2.7 =
-* Dutch translation added (Thank you to AndrÃ© Dortmont for the file!)
+* Dutch translation added (Thank you to André Dortmont for the file!)
 * Added Tabbed Display for Master Schedule Shortcode (via Tutorial)
 * Add Show list columns with active, shift, DJs and show image displays
 * Add Schedule Override list columns with date sorting and filtering
@@ -525,6 +660,60 @@ You may translate the plugin into another language. Please visit our [WordPress 
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.3.3.8 =
+* Updated Plugin Panel Library
+* Added Stream Format selection setting
+* Added Station email address setting with default display option
+* Added Section order filtering for Master Schedules and Widgets
+* Added Show image alignment attribute to Schedule Tabs View
+
+= 2.3.3.7 =
+* Updated Freemius SDK and Plugin Loader libraries
+* Added Station phone number setting with default display option
+* Added Schedule classes for Shows before and after current Show
+* Multiple Related Show Post assignment edit and link fixes
+* Bugfixes for permissions, main language and shift checker
+
+= 2.3.3.6 =
+* Updated Freemius SDK and Plugin Loader libraries
+* Added Station phone number setting with default display option
+* Added Schedule classes for Shows before and after current Show
+* Multiple Related Show Post assignment edit and link fixes
+* Bugfixes for permissions, main language and shift checker
+
+= 2.3.3.5 =
+* Ability to assign Post to relate to multiple Shows
+* Added Admin Filtering, Bulk Edit and Quick Edit interfaces
+* Fixes for Schedule display left/right shifting on mobiles
+* Fixes for starting Schedule display on different day
+
+= 2.3.3.3 =
+* Current and Upcoming Shows Widget Fix
+
+= 2.3.3.2 =
+* Minor Bugfix Update
+
+= 2.3.3 =
+* Important Bugfix Update
+* Fix to conflict with plugins using AJAX save_post calls
+* Improved accuracy for responsive table/tab Schedule views
+* Added colour improvements to Show Shift interface
+* Fix to calculate Current Show (transient no longer used)
+
+= 2.3.2 =
+* Improved Times, AJAX Loading and Bugfix Update 
+* https://netmix.com/radio-station-2-3-2-release/
+* Radio Clock Widget and Widget AJAX Loading
+* AJAX Saving of Show Shifts and Playlist Tracks
+* Automated current Show schedule highlighting
+* Improved timezones, overrides, shift checking and more
+
+= 2.3.1 =
+* Bugfix Update and Announcing New Netmix Station Directory!
+* https://netmix.com/announcing-new-netmix-directory/
+* Including minor fixes to major update release
+* Option to ping Netmix Directory on show updates
 
 = 2.3.0 =
 * Major Update including many new features, enhancements and fixes!

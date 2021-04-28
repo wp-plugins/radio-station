@@ -1,6 +1,6 @@
 <?php
 
-/* Sidebar Widget - Now Playing
+/* Current Playlist Widget - (Now Playing)
  * Displays the currently playing song according to the entered playlists
  * Since 2.1.1
  */
@@ -21,10 +21,14 @@ class Playlist_Widget extends WP_Widget {
 	// --- widget instance form ---
 	public function form( $instance ) {
 
+		$instance = wp_parse_args( (array) $instance, array( 'title' => '' ) );
+
 		// 2.3.0: added hide widget if empty option
 		// 2.3.0: added countdown display option
-		$instance = wp_parse_args( (array) $instance, array( 'title' => '' ) );
+		// 2.3.2: added AJAX load option
+		// 2.3.3.8: added playlist link option
 		$title = $instance['title'];
+		$link = isset( $instance['link'] ) ? $instance['link'] : true;
 		$artist = isset( $instance['artist'] ) ? $instance['artist'] : true;
 		$song = isset( $instance['song'] ) ? $instance['song'] : true;
 		$album = isset( $instance['album'] ) ? $instance['album'] : false;
@@ -32,13 +36,34 @@ class Playlist_Widget extends WP_Widget {
 		$comments = isset( $instance['comments'] ) ? $instance['comments'] : false;
 		$hide_empty = isset( $instance['hide_empty'] ) ? $instance['hide_empty'] : true;
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : false;
+		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : '';
 
 		// 2.3.0: convert template style code to strings
+		// 2.3.2: added AJAX load option field
+		// 2.3.3.8: added playlist link field
 		$fields = '
+		<p>
+			<label for="' . esc_attr( $this->get_field_id( 'ajax' ) ) . '">
+				<select id="' .esc_attr( $this->get_field_id( 'ajax' ) ) . '" name="' . esc_attr( $this->get_field_name( 'ajax' ) ) . '">
+					<option value="" ' . selected( $ajax, '', false ) . '>' . esc_html( __( 'Default', 'radio-station' ) ) . '</option>
+					<option value="on" ' . selected( $ajax, 'on', false ) . '>' . esc_html( __( 'On', 'radio-station' ) ) . '</option>
+					<option value="off" ' . selected( $ajax, 'off', false ) . '>' . esc_html( __( 'Off', 'radio-station' ) ) . '</option>
+				</select>
+				' . esc_html( __( 'AJAX Load Widget?', 'radio-station' ) ) . '
+			</label>
+        </p>
+
 		<p>
 			<label for="' . esc_attr( $this->get_field_id( 'title' ) ) . '">
 				' . esc_html( __( 'Title', 'radio-station' ) ) . ':
 				<input class="widefat" id="' . esc_attr( $this->get_field_id( 'title' ) ) . '" name="' . esc_attr( $this->get_field_name( 'title' ) ) . '" type="text" value="' . esc_attr( $title ) . '">
+			</label>
+		</p>
+
+		<p>
+			<label for="' . esc_attr( $this->get_field_id( 'link' ) ) . '">
+			<input id="' . esc_attr( $this->get_field_id( 'link' ) ) . '" name="' . esc_attr( $this->get_field_name( 'link' ) ) . '" type="checkbox" ' . checked( $link, true, false ) . '>
+				' . esc_html( __( 'Link to Playlist?', 'radio-station' ) ) . '
 			</label>
 		</p>
 
@@ -83,7 +108,7 @@ class Playlist_Widget extends WP_Widget {
 				' . esc_html( __( 'Hide Widget if Empty', 'radio-station' ) ) . '
 			</label>
 		</p>
-		
+
 		<p>
 			<label for="' . esc_attr( $this->get_field_id( 'countdown' ) ) . '">
 			<input id="' .esc_attr( $this->get_field_id( 'countdown' ) ) . '" name="' . esc_attr( $this->get_field_name( 'countdown' ) ) . '" type="checkbox" ' . checked( $countdown, true, false ) . '>
@@ -100,10 +125,14 @@ class Playlist_Widget extends WP_Widget {
 	// --- update widget instance ---
 	public function update( $new_instance, $old_instance ) {
 
+		$instance = $old_instance;
+
 		// 2.3.0: added hide widget if empty option
 		// 2.3.0: added countdown display option
-		$instance = $old_instance;
+		// 2.3.2: added AJAX load option
+		// 2.3.3.8: added playlist link option
 		$instance['title'] = $new_instance['title'];
+		$instance['link'] = isset( $new_instance['link'] ) ? 1 : 0;
 		$instance['artist'] = isset( $new_instance['artist'] ) ? 1 : 0;
 		$instance['song'] = isset( $new_instance['song'] ) ? 1 : 0;
 		$instance['album'] = isset( $new_instance['album'] ) ? 1 : 0;
@@ -111,6 +140,7 @@ class Playlist_Widget extends WP_Widget {
 		$instance['comments'] = isset( $new_instance['comments'] ) ? 1 : 0;
 		$instance['hide_empty'] = isset( $new_instance['hide_empty'] ) ? 1 : 0;
 		$instance['countdown'] = isset( $new_instance['countdown'] ) ? 1 : 0;
+		$instance['ajax'] = isset( $new_instance['ajax'] ) ? $new_instance['ajax'] : 0;
 
 		// 2.3.0: apply filters to widget instance update
 		$instance = apply_filters( 'radio_station_playlist_widget_update', $instance, $new_instance, $old_instance );
@@ -133,20 +163,25 @@ class Playlist_Widget extends WP_Widget {
 		// 2.3.0: filter widget_title whether empty or not
 		// 2.3.0: added hide widget if empty option
 		// 2.3.0: added countdown display option
+		// 2.3.2: set fallback options to numeric for shortcode
+		// 2.3.2: added AJAX load option
 		$title = empty( $instance['title'] ) ? '' : $instance['title'];
 		$title = apply_filters( 'widget_title', $title );
+		$link = isset( $instance['link'] ) ? $instance['link'] : 1;
 		$artist = $instance['artist'];
 		$song = $instance['song'];
 		$album = $instance['album'];
 		$label = $instance['label'];
 		$comments = $instance['comments'];
-		$hide_empty = isset( $instance['hide_empty'] ) ? $instance['hide_empty'] : true;
-		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : false;
-		$dynamic = isset( $instance['dynamic'] ) ? $instance['dynamic'] : false;
+		$hide_empty = isset( $instance['hide_empty'] ) ? $instance['hide_empty'] : 1;
+		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : 0;
+		$dynamic = isset( $instance['dynamic'] ) ? $instance['dynamic'] : 1;
+		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : 0;
 
 		// --- set shortcode attributes for display ---
 		$atts = array(
 			'title'     => $title,
+			'link'      => $link,
 			'artist'    => $artist,
 			'song'      => $song,
 			'album'     => $album,
@@ -157,6 +192,11 @@ class Playlist_Widget extends WP_Widget {
 			'widget'    => 1,
 			'id'        => $id,
 		);
+
+		// 2.3.2: only set AJAX attribute if overriding default
+		if ( in_array( $ajax, array( 'on', 'off' ) ) ) {
+			$atts['ajax'] = $ajax;
+		}
 
 		// --- get default display output ---
 		// 2.3.0: use shortcode to generate default widget output
@@ -175,8 +215,9 @@ class Playlist_Widget extends WP_Widget {
 
 			// --- open widget container ---
 			// 2.3.0: add unique id to widget
+			// 2.3.2: add class to widget
 			$id = 'current-playlist-widget-' . $id;
-			echo '<div id="' . esc_attr( $id ) . '" class="widget">';
+			echo '<div id="' . esc_attr( $id ) . '" class="current-playlist-wrap widget">';
 
 			// --- output widget title ---
 			// phpcs:ignore WordPress.Security.OutputNotEscaped

@@ -12,9 +12,9 @@ Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 
 Requires at least: 3.3.1
 
-Tested up to: 5.3.2
+Tested up to: 5.6.2
 
-Stable tag: trunk
+Stable tag: 2.3.3.8
 
 License: GPLv2 or later
 
@@ -187,6 +187,60 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 
 ## Upgrade Notices
+
+#### 2.3.3.8
+* Updated Plugin Panel Library
+* Added Stream Format selection setting
+* Added Station email address setting with default display option
+* Added Section order filtering for Master Schedules and Widgets
+* Added Show image alignment attribute to Schedule Tabs View
+
+#### 2.3.3.7
+* Updated Freemius SDK and Plugin Loader libraries
+* Added Station phone number setting with default display option
+* Added Schedule classes for Shows before and after current Show
+* Multiple Related Show Post assignment edit and link fixes
+* Bugfixes for permissions, main language and shift checker
+
+#### 2.3.3.6
+* Updated Freemius SDK and Plugin Loader libraries
+* Added Station phone number setting with default display option
+* Added Schedule classes for Shows before and after current Show
+* Multiple Related Show Post assignment edit and link fixes
+* Bugfixes for permissions, main language and shift checker
+
+#### 2.3.3.5
+* Ability to assign Post to relate to multiple Shows
+* Added Admin Filtering, Bulk Edit and Quick Edit interfaces
+* Fixes for Schedule display left/right shifting on mobiles
+* Fixes for starting Schedule display on different day
+
+#### 2.3.3.3
+* Current and Upcoming Shows Widget Fix
+
+#### 2.3.3.2
+* Minor Bugfix Update
+
+#### 2.3.3 =
+* Important Bugfix Update
+* Fix to conflict with plugins using AJAX save_post calls
+* Improved accuracy for responsive table/tab Schedule views
+* Added colour improvements to Show Shift interface
+* Fix to calculate Current Show (transient no longer used)
+
+#### 2.3.2 =
+* Improved Times, AJAX Loading and Bugfix Update 
+* https://netmix.com/radio-station-2-3-2-release/
+* Radio Clock Widget and Widget AJAX Loading
+* AJAX Saving of Show Shifts and Playlist Tracks
+* Automated current Show schedule highlighting
+* Improved timezones, overrides, shift checking and more
+
+#### 2.3.1 =
+* Bugfix Update and Announcing New Netmix Station Directory!
+* https://netmix.com/announcing-new-netmix-directory/
+* Including minor fixes to major update release
+* Option to ping Netmix Directory on show updates
 
 #### 2.3.0
 * Major Update including many new features, enhancements and fixes!

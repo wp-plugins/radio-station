@@ -19,13 +19,13 @@ get_header(); ?>
 				<header class="page-header">
 					<h1 class="page-title"><?php echo esc_html( get_the_title( $show_id ) ); ?> <?php esc_html_e( 'Blog Archive', 'radio-station' ); ?></h1>
 				</header>
-				<?php // this is the important part... be careful when you're changing this ?>
 				<?php
 
 				// filter to allow for custom show-related post types
 				$post_types = apply_filters( 'radio_station_show_related_post_types', array( 'post' ) );
 
 				// since this is a custom query, we have to do a little trickery to get pagination to work
+				// 2.3.3.6: add compare LIKE to allow for possible multiple show assignments
 				$args          = array(
 					'post_type'      => $post_types,
 					'posts_per_page' => 10,
@@ -33,13 +33,15 @@ get_header(); ?>
 					'order'          => 'desc',
 					'meta_query'     => array(
 						array(
-							'key'   => 'post_showblog_id',
-							'value' => $show_id,
+							'key'     => 'post_showblog_id',
+							'value'   => '"' . $show_id . '"',
+							'compare' => 'LIKE',
 						),
 					),
 					'paged'          => $paged,
 				);
 				$archive_query = new WP_Query( $args );
+
 				while ( $archive_query->have_posts() ) :
 					$archive_query->the_post();
 					?>

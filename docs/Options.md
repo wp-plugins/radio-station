@@ -156,6 +156,6 @@ Default: On. Allow users with WordPress Editor role to edit all Radio Station po
 Allows you to assign any of the Radio Station plugin Roles directly to any user.
 
 
-## Value Filters
+## Setting Value Filters
 
-For custom flexibility, all Plugin Settings can also be filtered via their respective option key. Use `add_filter` to add a filter to `radio_station_{settings_key}`, check your desired conditions to modify the value and return the value.
+For custom flexibility, all Plugin Settings can also be filtered via their respective option key. Use `add_filter` to add a filter to `radio_station_{settings_key}`, then check your desired conditions to modify the value before returning it. eg: 

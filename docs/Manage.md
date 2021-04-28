@@ -4,7 +4,7 @@ Radio Station Plugin Management
 
 ## Admin Lists
 
-Shows, Overrides and Playlists each have their own standard list page via the WordPress admin area, which you can find via the Radio Station admin menu. Each list has relevent columns added so you can see more information about each record at a glance without having to Edit an individual page to see them, including Show Shifts, Show Override Dates, and Playlist Tracks. Also displayed are Show Hosts, Genres and Language terms, and the Show Avatar.
+Shows, Overrides and Playlists each have their own standard list page via the WordPress admin area, which you can find via the Radio Station admin menu. Each list has relevant columns added so you can see more information about each record at a glance without having to Edit an individual page to see them, including Show Shifts, Show Override Dates, and Playlist Tracks. Also displayed are Show Hosts, Genres and Language terms, and the Show Avatar.
 
 ## Shift Editing
 

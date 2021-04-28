@@ -7,6 +7,129 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### 2.3.3.8
+* Update: Plugin Panel (1.1.7) with Image and Color Picker fields
+& Documentation: Full Plugin Filter List added to docs/Filters.md
+* Added: Stream Format and Fallback/Format selection setting
+* Added: Station Image and Station Title for future Player Display
+* Added: Station Email Address setting with default display option
+* Added: Section order filtering for Master Schedule Views
+* Added: Section display filtering for Master Schedule Views
+* Added: Section display filtering for Widget sections
+* Added: Show image alignment attribute to Schedule Tabs View
+* Added: Show Description/Excerpt to Show Data Endpoint (via querystring)
+* Added: Reduced opacity for past Shows on Schedule Tab/Table Views
+* Added: Screen Reader text for Show icons on Show Page
+* Fixed: Display Widget Countdown when no Current Show/Playlist
+* Fixed: Check for explicit singular.php template usage setting
+* Fixed: Access to Shows Data via querystring of Show ID/name
+* Fixed: Shows Data for Genres/Languages querystring of ID/name
+* Fixed: Override Display order output for Tab/List Views
+
+### 2.3.3.7
+* Fixed: Schedule Overrides overlapping multiple Show shifts
+* Fixed: Bulk Edit field repetition and possible jQuery conflict
+* Fixed: Related Posts check producing error output
+* Fixed: WordPress Readme Parser deprecated errors for PHP7
+
+### 2.3.3.6
+* Update: Freemius SDK (2.4.1)
+* Update: Plugin Loader (1.1.6) with phone number and CSV validation
+* Added: Station phone number setting with default display option
+* Added: Schedule classes for Shows before and after current Show
+* Improved: current Show highlighting on Schedule for overnight shifts
+* Improved: info section reordering filters on single Show template
+* Fixed: Edit permissions checks for Related to Show post assignments
+* Fixed: Main Language option value for WordPress Setting
+* Fixed: make Date on Tab clickable on Tabbed Schedule View
+* Fixed: prevent possible conflicts with changes not saved reload message
+* Fixed: do not conflict check Shift against itself for last shift check
+* Fixed: link back to Show posts for related Show posts (allow multiple)
+* Fixed: filter next/previous post link for (multiple) related Show posts
+* Fixed: automatic pages conflict where themes filter the_content early
+
+### 2.3.3.5
+* Fixed: use schedule based on start_day if specified for Schedule view
+* Fixed: day left/right shifting on Schedule table/tab mobile views
+* Added: past/today/future filter for Schedule Override List 
+* Added: filter for Schedule display start day (and to accept today)
+* Added: current playlist (if any) to Broadcast Data endpoint
+
+### 2.3.3.4
+* Improved: auto-match show description to info height on Show pages
+* Improved: allow multiple Related Show selection for single post
+* Improved: ability to assign Post to relate to multiple Shows
+* Added: Related Show Post List column and Quick Edit field
+* Added: Related Show selection Bulk Edit Action for Post List
+* Added: filters for label texts and title attributes on Show Page
+* Added: filter for label text above Show Player (default empty)
+
+### 2.3.3.3
+* Fixed: improved Current Show and Upcoming Shows calculations
+* (Display showtimes when show starts before and ends after midnight)
+
+### 2.3.3.2
+* Update: Freemius SDK (2.4.0)
+* Update: Plugin Loader (1.1.4) with weird isset glitch fix
+* Fixed: Current Show for Shows ending at midnight
+* Fixed: incorrect AJAX Widget plugin setting value
+* Fixed: use pageload data for schedules before transients
+
+### 2.3.3
+* Update: Plugin Loader (1.1.3) with non-strict select match fix
+* Improved: width responsiveness for table/tabbed Schedule views
+* Improved: show shifts interface background colors
+* Added: navigate away from page on shift change check
+* Added: default time format option to Widgets
+* Removed: current show transients (intermittant unreliability)
+* Fixed: AJAX call causing plugin conflicts via save_post action
+* Fixed: calculation of Upcoming Shows near end of the week
+* Fixed: remove and duplicate actions on new shifts
+
+### 2.3.2
+* Update: Plugin Loader (1.1.2) with settings link fix
+* Improved: use plugin timezone setting for all times
+* Improved: show shift conflict checker logic
+* Added: Radio Clock Widget for user/server time display
+* Added: AJAX widget load option (to bypass page caches)
+* Added: automated show schedule highlighting (table/tabs/list)
+* Added: playlist track arrows for re-ordering tracks
+* Added: AJAX save of show shifts and playlist tracks
+* Added: post type editing metabox position filtering
+* Added: more display attributes to Master Schedule shortcode
+* Added: time format filters for time output displays
+* Added: javascript user timezone display on Master Schedule
+* Fixed: handling of UTC only timezone settings
+* Fixed: added check for empty role capabilities
+* Fixed: added settings submenu redirection fix
+* Fixed: show and override midnight end conflict
+* Fixed: calculate next shows at end of schedule week
+* Fixed: metaboxes disappearing on position sorting
+* Fixed: move tracks marked New to end of Playlist on update
+* Fixed: override shift array output showing above schedule
+* Fixed: master schedule specify days attribute bug
+* Fixed: display real end time of overnight split shifts
+* Fixed: master schedule display with days attribute
+* Fixed: logic for Affected Shifts in override list
+* Fixed: removed auto-tab selection change on tab view resize
+* Fixed: Current Show widget schedule/countdown for Overrides
+* Fixed: multiple overrides in schedule range variable conflict
+
+### 2.3.1
+* Update: Plugin Loader (1.1.1) with Freemius first path fix
+* Fixed: conditions for Schedule Override time calculations
+* Fixed: schedule table view - 12 hour format with translations
+* Fixed: schedule table view hour column width style
+* Fixed: javascript table/tab arrows to prevent default click
+* Fixed: undefined index warning when saving show with no shifts
+* Fixed: append not echo override date to shortcode archive list
+* Fixed: compatibility with multiple the_content calls (Yoast)
+* Fixed: reset to showcontinued flag in Schedule (table view)
+* Added: option to clear transients on every pageload
+* Added: show avatar and featured image URLs to Data API output
+* Added: option to ping Netmix directory on show updates
+* Added: filters for widget section display order
+
 ### 2.3.0
 * Include: Plugin Loader (1.1.0) with plugin options and settings
 * Include: Freemius SDK (2.3.0) and Freemius integration

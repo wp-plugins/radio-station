@@ -54,12 +54,3 @@ A flexible taxonomy allowing for the addition of Genre terms that can be assigne
 
 A fixed taxonomy allowing for assigning of Language terms to a Show (or Override.) In a Show does not have a Language assigned, it is assumed to be in the main Language selected in the Plugin Settings. Languages are displayed on a Show's page, and discoverable via the plugin's data [API](./API.md) Languages Endpoint, and in future will be displayable in widgets and other shortcodes also. There will also be an addition of a Languages Archive Shortcode that will work similar to the Genre Archive Shortcode.
 
-
-## Data Filters
-
-There are filters throughout the plugin that allow you to override data values and plugin output. We employ the practice of adding as many of these as possible to allow users of the plugin to customize it's behaviour without needing to modify the plugin's code - as these kind of modifications are overwritten with plugin updates.
-
-You can add your own custom filters via a Code Snippets plugin (which has the advantage of checking syntax for you), or in your Child Theme's `functions.php`, or in a file with a PHP extension in your `/wp-content/mu-plugins/` directory. 
-
-Currently you can find these filters by searching the plugin code for `apply_filters`. We will be gradually adding to the list of available filters here in future documentation.
-
