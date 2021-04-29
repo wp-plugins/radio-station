@@ -81,7 +81,8 @@
 // - Trim Excerpt
 // - Shorten String
 // - Sanitize Values
-// - Sanitize Input Values
+// - Sanitize Input Value
+// - Get Meta Input Types
 // - Sanitize Shortcode Values
 // === Translations ===
 // - Translate Weekday
@@ -3534,6 +3535,10 @@ function radio_station_patreon_button_styles() {
 // --------------------
 // 2.3.2: queue directory ping on saving
 function radio_station_queue_directory_ping() {
+	// 2.3.3.9: maybe bug out on activation
+	if ( !function_exists( 'radio_station_get_setting' ) ) {
+		return;
+	}
 	$do_ping = radio_station_get_setting( 'ping_netmix_directory' );
 	if ( 'yes' != $do_ping ) {return;}
 	update_option( 'radio_station_ping_directory', '1' );
@@ -4594,18 +4599,17 @@ function radio_station_sanitize_values( $data, $keys ) {
 function radio_station_sanitize_input( $prefix, $key ) {
 
 	$postkey = $prefix . '_' . $key;
-	$numeric_keys = array( 'avatar', 'image' );
-	$checkbox_keys = array( 'active', 'download' );
-	$user_keys = array( 'user_list', 'producer_list' );
-	if ( 'file' == $key ) {
+	$types = radio_station_get_meta_input_types();
+
+	if ( in_array( $key, $types['file'] ) ) {
 		$value = wp_strip_all_tags( trim( $_POST[$postkey] ) );
-	} elseif ( 'email' == $key ) {
+	} elseif ( in_array( $key, $types['email'] ) ) {
 		$value = sanitize_email( trim( $_POST[$postkey] ) );
-	} elseif ( 'link' == $key ) {
+	} elseif ( in_array( $key, $types['url'] ) ) {
 		$value = filter_var( trim( $_POST[$postkey] ), FILTER_SANITIZE_URL );
-	} elseif ( 'patreon' == $key ) {
+	} elseif ( in_array( $key, $types['slug'] ) ) {
 		$value = sanitize_title( $_POST[$postkey] );
-	} elseif ( 'phone' == $key ) {
+	} elseif ( in_array( $key, $types['phone'] ) ) {
 		// 2.3.3.6: added phone number with character filter validation
 		$value = trim( $_POST[$postkey] );
 		if ( strlen( $value ) > 0 ) {
@@ -4617,24 +4621,29 @@ function radio_station_sanitize_input( $prefix, $key ) {
 				$value = '';
 			}
 		}
-	} elseif ( in_array( $key, $numeric_keys ) ) {
+	} elseif ( in_array( $key, $types['numeric'] ) ) {
+
 		$value = absint( $_POST[$postkey] );
 		if ( $value < 0 ) {
 			$value = '';
-		}		
-	} elseif ( in_array( $key, $checkbox_keys ) ) {
-	
+		}
+
+	} elseif ( in_array( $key, $types['checkbox'] ) ) {
+
+		// --- checkbox inputs ---	
 		// 2.2.8: removed strict in_array checking
 		// 2.3.2: fix for unchecked boxes index warning
 		$value = '';
 		if ( isset( $_POST[$postkey] ) ) {
 			$value = $_POST[$postkey];
 		}
-		if ( !in_array( $value, array( '', 'on' ) ) ) {
+		if ( !in_array( $value, array( '', 'on', 'yes' ) ) ) {
 			$value = '';
 		}
-	} elseif ( in_array( $key, $user_keys ) ) {
 
+	} elseif ( in_array( $key, $types['user'] ) ) {
+
+		// --- user selection inputs ---
 		if ( isset( $_POST[$postkey] ) ) {
 			$value = $_POST[$postkey];
 		}
@@ -4650,10 +4659,44 @@ function radio_station_sanitize_input( $prefix, $key ) {
 				}
 			}
 		}
+
+	} elseif ( in_array( $key, $types['date'] ) ) {
+
+		// --- datepicker date field ---	
+		$date = $_POST[$postkey];
+		$parts = explode( '-', $date );
+		if ( 3 == count( $parts ) ) {
+			if ( checkdate( (int) $parts[1], (int) $parts[2], (int) $parts[0] ) ) {
+				$value = $date;
+			}
+		}
+	
 	}
 	
-	
 	return $value;
+}
+
+// --------------------
+// Get Meta Input Types
+// --------------------
+// 2.3.3.9: added for meta input type mapping
+function radio_station_get_meta_input_types() {
+
+	$types = array(
+		'numeric'  => array( 'avatar', 'image' ),
+		'checkbox' => array( 'active', 'download' ),
+		'user'     => array( 'user_list', 'producer_list' ),
+		'file'     => array( 'file' ),
+		'email'    => array( 'email' ),
+		'url'      => array( 'link', 'url' ),
+		'slug'     => array( 'slug', 'patreon' ),
+		'phone'    => array( 'phone' ),
+		'date'     => array( 'date' ),
+	);
+
+	// --- filter and return ---
+	$types = apply_filters( 'radio_station_meta_input_types', $types );
+	return $types;
 }
 
 // -------------------------

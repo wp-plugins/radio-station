@@ -148,7 +148,7 @@ function radio_station_add_admin_menus() {
 	// --- import / export shows feature ---
 	// note: not yet implemented in free version
 	if ( file_exists( RADIO_STATION_DIR . '/includes/import-export.php' ) ) {
-		add_submenu_page( 'radio-station', 	$rs . ' ' . __( 'Import/Export Shows', 'radio-station' ), __( 'Import/Export', 'radio-station' ), 'manage_options', 'import-export-shows', 'radio_station_import_export_show_page' );
+		add_submenu_page( 'radio-station', $rs . ' ' . __( 'Import/Export Shows', 'radio-station' ), __( 'Import/Export', 'radio-station' ), 'manage_options', 'import-export-shows', 'radio_station_import_export_show_page' );
 	}
 	
 	add_submenu_page( 'radio-station', $rs . ' ' . __( 'Settings', 'radio-station' ), __( 'Settings', 'radio-station' ), $settingscap, 'radio-station', 'radio_station_settings_page' );	
@@ -281,7 +281,7 @@ function radio_station_role_editor() {
 	echo '<br>' . esc_html( __( 'Radio Station Pro will include a Role Assignment Interface so you can easily assign Radio Station roles to any user.', 'radio-station' ) ) . '<br>';
 	
 	// --- find out about Pro link ---
-	// TODO: change this text/link when Pro version becomes available
+	// TODO: change this text/link when Pro version becomes available and remove target blank
 	$upgrade_url = radio_station_get_upgrade_url();
 	echo "<br><a href='" . esc_url( $upgrade_url ) . "' target='_blank'>";
 		// echo esc_html( __( 'Upgrade to Radio Station Pro', 'radio-station' ) );
@@ -583,21 +583,27 @@ function radio_station_get_upgrade_notice() {
 		foreach ( $pluginupdates->response as $file => $update ) {
 			if ( $update->slug == $pluginslug ) {
 				if ( property_exists( $update, 'upgrade_notice' ) ) {
-					// --- parse upgrade notice ---
-					$notice = $update->upgrade_notice;
-					$notice = radio_station_parse_upgrade_notice( $notice );
+
+					// 2.3.3.9: compare new version with installed version
 					$new_version = $update->new_version;
-					$notice['update_id'] = str_replace( '.', '', $new_version );
-					if ( property_exists( $update, 'icons' ) && isset( $update->icons['1x'] ) ) {
-						$notice['icon_url'] = $update->icons['1x'];
+					$version = radio_station_plugin_version();
+					if ( version_compare( $version, $new_version, '<' ) ) {
+
+						// --- parse upgrade notice ---
+						$notice = $update->upgrade_notice;
+						$notice = radio_station_parse_upgrade_notice( $notice );
+						$notice['update_id'] = str_replace( '.', '', $new_version );
+						if ( property_exists( $update, 'icons' ) && isset( $update->icons['1x'] ) ) {
+							$notice['icon_url'] = $update->icons['1x'];
+						}
+						$notice['plugin_file'] = $file;
+						break;
 					}
-					$notice['plugin_file'] = $file;
-					break;
 				}
 			}
 		}
 	}
-	if ( RADIO_STATION_DEBUG ) {
+	if ( RADIO_STATION_DEBUG && $notice ) {
 		echo '<span style="display:none;">Update Notice: ' . print_r( $notice, true ) . '</span>';
 	}	
 	return $notice;
