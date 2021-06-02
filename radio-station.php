@@ -70,6 +70,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // - Schedule Override Filters
 // === User Roles ===
 // - Set Roles and Capabilities
+// - Admin Fix for DJ / Host Role Label
 // - maybe Revoke Edit Show Capability
 // === Debugging ===
 // - Set Debug Mode Constant
@@ -89,9 +90,9 @@ define( 'RADIO_STATION_FILE', __FILE__ );
 define( 'RADIO_STATION_DIR', dirname( __FILE__ ) );
 define( 'RADIO_STATION_BASENAME', plugin_basename( __FILE__ ) );
 define( 'RADIO_STATION_HOME_URL', 'https://netmix.com/radio-station/' );
-define( 'RADIO_STATION_DOCS_URL', 'https://netmix.com/radio-station/docs/' );
-define( 'RADIO_STATION_API_DOCS_URL', 'https://netmix.com/radio-station/docs/api/' );
-define( 'RADIO_STATION_PRO_URL', 'https://netmix.com/radio-station-pro/' );
+define( 'RADIO_STATION_DOCS_URL', 'https://radiostation.pro/docs/' );
+define( 'RADIO_STATION_API_DOCS_URL', 'https://radiostation.pro/docs/api/' );
+define( 'RADIO_STATION_PRO_URL', 'https://radiostation.pro/' );
 define( 'RADIO_STATION_NETMIX_DIR', 'https://netmix.com/' );
 
 // ------------------------
@@ -103,7 +104,6 @@ define( 'RADIO_STATION_PRODUCER_SLUG', 'rs-producer' );
 
 // --- check and define CPT slugs ---
 // TODO: prefix original slugs and update post/taxonomy data
-// ... and then add new slugs to template hierarchy ...
 if ( get_option( 'radio_show_cpts_prefixed' ) ) {
 	define( 'RADIO_STATION_SHOW_SLUG', 'rs-show' );
 	define( 'RADIO_STATION_PLAYLIST_SLUG', 'rs-playlist' );
@@ -743,14 +743,14 @@ $options = array(
 		'type'    => 'multicheck',
 		'label'   => __( 'Available Views', 'radio-station' ),
 		// note: unstyled list view not included in defaults
-		'default' => array( 'table', 'tabs' ),
+		'default' => array( 'table', 'calendar' ),
 		'value'		=> 'yes',
 		'options'	=> array(
-			'table' => __( 'Table View', 'radio-station' ),
-			'tabs'  => __( 'Tabbed View', 'radio-station' ),
-			'list'  => __( 'List View', 'radio-station' ),
-			'grid'  => __( 'Grid View', 'radio-station' ),
-			// 'calendar' => __( 'Calendar View', 'radio-station' );
+			'table'    => __( 'Table View', 'radio-station' ),
+			'tabs'     => __( 'Tabbed View', 'radio-station' ),
+			'list'     => __( 'List View', 'radio-station' ),
+			'grid'     => __( 'Grid View', 'radio-station' ),
+			'calendar' => __( 'Calendar View', 'radio-station' ),
 		),
 		'helper'  => __( 'Switcher Views available on automatic Master Schedule page.', 'radio-station' ),
 		'tab'     => 'pages',
@@ -758,7 +758,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// === Show Page ===
+	// === Show Pages ===
 
 	// --- Show Blocks Position ---
 	'show_block_position' => array(
@@ -809,7 +809,7 @@ $options = array(
 	// 	'min'     => 0,
 	// 	'max'     => 100,
 	// 	'default' => 3,
-	// 	'helper'  => __( 'Number of Latest Blog Posts to Show above Show Page tabs.', 'radio-station' ),
+	// 	'helper'  => __( 'Number of Latest Blog Posts to display above Show Page tabs.', 'radio-station' ),
 	// 	'tab'     => 'pages',
 	// 	'section' => 'show',
 	// ),
@@ -853,6 +853,75 @@ $options = array(
 	 	'section' => 'show',
 	 	'pro'     => true,
 	),
+
+	// === Profile Pages ===
+	// 2.3.3.9: added proflie page settings
+
+	// --- [Pro] Profile Blocks Position ---
+	'profile_block_position' => array(
+		'type'    => 'select',
+		'label'   => __( 'Info Blocks Position', 'radio-station' ),
+		'options' => array(
+			'left'  => __( 'Float Left', 'radio-station' ),
+			'right' => __( 'Float Right', 'radio-station' ),
+			'top'   => __( 'Float Top', 'radio-station' ),
+		),
+		'default' => 'left',
+		'helper'  => __( 'Where to position Profile info blocks relative to Profile Page content.', 'radio-station' ),
+		'tab'     => 'pages',
+		'section' => 'profile',
+		'pro'     => true,
+	),
+
+	// ---- [Pro] Profile Section Layout ---
+	'profile_section_layout' => array(
+		'type'    => 'select',
+		'label'   => __( 'Profile Content Layout', 'radio-station' ),
+		'options' => array(
+			'tabbed'   => __( 'Tabbed', 'radio-station' ),
+			'standard' => __( 'Standard', 'radio-station' ),
+		),
+		'default' => 'tabbed',
+		'helper'  => __( 'How to display extra sections below Profile description. In content tabs or standard layout down the page.', 'radio-station' ),
+		'tab'     => 'pages',
+		'section' => 'profile',
+		'pro'     => true,
+	),
+
+	// === Episode Pages ===
+	// 2.3.3.9: added proflie page settings
+
+	// --- [Pro] Profile Blocks Position ---
+	'episode_block_position' => array(
+		'type'    => 'select',
+		'label'   => __( 'Info Blocks Position', 'radio-station' ),
+		'options' => array(
+			'left'  => __( 'Float Left', 'radio-station' ),
+			'right' => __( 'Float Right', 'radio-station' ),
+			'top'   => __( 'Float Top', 'radio-station' ),
+		),
+		'default' => 'left',
+		'helper'  => __( 'Where to position Episode info blocks relative to Episode Page content.', 'radio-station' ),
+		'tab'     => 'pages',
+		'section' => 'episode',
+		'pro'     => true,
+	),
+
+	// ---- [Pro] Profile Section Layout ---
+	'episode_section_layout' => array(
+		'type'    => 'select',
+		'label'   => __( 'Episode Content Layout', 'radio-station' ),
+		'options' => array(
+			'tabbed'   => __( 'Tabbed', 'radio-station' ),
+			'standard' => __( 'Standard', 'radio-station' ),
+		),
+		'default' => 'tabbed',
+		'helper'  => __( 'How to display extra sections below Episode description. In content tabs or standard layout down the page.', 'radio-station' ),
+		'tab'     => 'pages',
+		'section' => 'episode',
+		'pro'     => true,
+	),
+
 
 	// ==== Archives ===
 
@@ -984,6 +1053,41 @@ $options = array(
 	//	'value'   => 'yes',
 	//	'default' => '',
 	//	'helper'  => __( 'Redirect Taxonomy Archive for Genres to Genres Archive Page.', 'radio-station' ),
+	//	'tab'     => 'pages',
+	//	'section' => 'archives',
+	// ),
+
+	// --- Languages Archive Page ---
+	// 2.3.3.9: added language archive page
+	'language_archive_page' => array(
+		'label'   => __( 'Languages Archive Page', 'radio-station' ),
+		'type'    => 'select',
+		'options' => 'PAGEID',
+		'default' => '',
+		'helper'  => __( 'Select the Page for displaying the Language archive list.', 'radio-station' ),
+		'tab'     => 'pages',
+		'section' => 'archives',
+	),
+
+	// --- Automatic Display ---
+	// 2.3.3.9: added language archive automatic page
+	'language_archive_auto'         => array(
+		'label'   => __( 'Automatic Display', 'radio-station' ),
+		'type'    => 'checkbox',
+		'value'   => 'yes',
+		'default' => 'yes',
+		'helper'  => __( 'Replaces selected page content with default Language Archive. Alternatively customize display using the shortcode:', 'radio-station' ) . ' [languages-archive]',
+		'tab'     => 'pages',
+		'section' => 'archives',
+	),
+
+	// ? --- Redirect Languages Archives --- ?
+	// 'language_archive_override' => array(
+	//  'label'   => __( 'Redirect Genres Archive', 'radio-station' ),
+	//	'type'    => 'checkbox',
+	//	'value'   => 'yes',
+	//	'default' => '',
+	//	'helper'  => __( 'Redirect Taxonomy Archive for Languages to Languages Archive Page.', 'radio-station' ),
 	//	'tab'     => 'pages',
 	//	'section' => 'archives',
 	// ),
@@ -1166,8 +1270,8 @@ $options = array(
 	// 2.3.3.8: move templates section onto pages tab
 	'tabs'                    => array(
 		'general'   => __( 'General', 'radio-station' ),
-		'player'    => __( 'Player', 'radio-station' ),
 		'pages'     => __( 'Pages', 'radio-station' ),
+		'player'    => __( 'Player', 'radio-station' ),
 		// 'templates' => __( 'Templates', 'radio-station' ),
 		'widgets'   => __( 'Widgets', 'radio-station' ),
 		'roles'     => __( 'Roles', 'radio-station' ),
@@ -1175,6 +1279,7 @@ $options = array(
 
 	// --- Section Labels ---
 	// 2.3.2: add widget loading section
+	// 2.3.3.9: added profile pages section
 	'sections'                => array(
 		'broadcast'   => __( 'Broadcast', 'radio-station' ),
 		'station'     => __( 'Station', 'radio-station' ),
@@ -1187,6 +1292,8 @@ $options = array(
 		'archive'     => __( 'Archive Templates', 'radio-station' ),
 		'schedule'    => __( 'Schedule Page', 'radio-station' ),
 		'show'        => __( 'Show Pages', 'radio-station' ),
+		'profile'     => __( 'Profile Pages', 'radio-station' ),
+		'episode'     => __( 'Episode Pages', 'radio-station' ),
 		'archives'    => __( 'Archives', 'radio-station' ),
 		'loading'     => __( 'Widget Loading', 'radio-station' ),
 		'permissions' => __( 'Permissions', 'radio-station' ),
@@ -1217,7 +1324,7 @@ $settings = array(
 	'title'        => 'Radio Station',
 	'parentmenu'   => 'radio-station',
 	'home'         => RADIO_STATION_HOME_URL,
-	'docs'		   => RADIO_STATION_DOCS_URL,
+	'docs'         => RADIO_STATION_DOCS_URL,
 	'support'      => 'https://github.com/netmix/radio-station/issues/',
 	'ratetext'     => __( 'Rate on WordPress.org', 'radio-station' ),
 	'share'        => RADIO_STATION_HOME_URL . '?share',
@@ -1888,8 +1995,10 @@ function radio_station_automatic_pages_content_set( $content ) {
 			$automatic = radio_station_get_setting( 'show_archive_auto' );
 			if ( 'yes' === (string) $automatic ) {
 				$atts = array();
-				$view = radio_station_get_setting( 'show_archive_view' );
-				if ( $view ) {$atts['view'] = $view;}
+				// $view = radio_station_get_setting( 'show_archive_view' );
+				// if ( $view ) {
+				// 	$atts['view'] = $view;
+				// }
 				$atts = apply_filters( 'radio_station_automatic_show_archive_atts', $atts );
 				$atts_string = '';
 				if ( is_array( $atts ) && ( count( $atts ) > 0 ) ) {
@@ -1910,8 +2019,10 @@ function radio_station_automatic_pages_content_set( $content ) {
 			$automatic = radio_station_get_setting( 'override_archive_auto' );
 			if ( 'yes' === (string) $automatic ) {
 				$atts = array();
-				$view = radio_station_get_setting( 'override_archive_view' );
-				if ( $view ) {$atts['view'] = $view;}
+				// $view = radio_station_get_setting( 'override_archive_view' );
+				// if ( $view ) {
+				// 	$atts['view'] = $view;
+				// }
 				$atts = apply_filters( 'radio_station_automatic_override_archive_atts', $atts );
 				$atts_string = '';
 				if ( is_array( $atts ) && ( count( $atts ) > 0 ) ) {
@@ -1932,8 +2043,10 @@ function radio_station_automatic_pages_content_set( $content ) {
 			$automatic = radio_station_get_setting( 'playlist_archive_auto' );
 			if ( 'yes' == $automatic ) {
 				$atts = array();
-				$view = radio_station_get_setting( 'playlist_archive_view' );
-				if ( $view ) {$atts['view'] = $view;}
+				// $view = radio_station_get_setting( 'playlist_archive_view' );
+				// if ( $view ) {
+				// 	$atts['view'] = $view;
+				// }
 				$atts = apply_filters( 'radio_station_automatic_playlist_archive_atts', $atts );
 				$atts_string = '';
 				if ( is_array( $atts ) && ( count( $atts ) > 0 ) ) {
@@ -1954,8 +2067,10 @@ function radio_station_automatic_pages_content_set( $content ) {
 			$automatic = radio_station_get_setting( 'genre_archive_auto' );
 			if ( 'yes' === (string) $automatic ) {
 				$atts = array();
-				$view = radio_station_get_setting( 'genre_archive_view' );
-				if ( $view ) {$atts['view'] = $view;}
+				// $view = radio_station_get_setting( 'genre_archive_view' );
+				// if ( $view ) {
+				// 	$atts['view'] = $view;
+				// }
 				$atts = apply_filters( 'radio_station_automatic_genre_archive_atts', $atts );
 				$atts_string = '';
 				if ( is_array( $atts ) && ( count( $atts ) > 0 ) ) {
@@ -1968,7 +2083,29 @@ function radio_station_automatic_pages_content_set( $content ) {
 		}
 	}
 	
-	// TODO: languages archive page ?
+	// --- languages archive page ---
+	// 2.3.3.9: added automatic display of language archive page
+	$language_archive_page = radio_station_get_setting( '' );
+	if ( !is_null( $language_archive_page ) && !empty( $language_archive_page ) ) {
+		if ( is_page( $language_archive_page ) ) {
+			$automatic = radio_station_get_setting( 'language_archive_auto' );
+			if ( 'yes' === (string) $automatic ) {
+				$atts = array();
+				// $view = radio_station_get_setting( 'language_archive_view' );
+				// if ( $view ) {
+				// 	$atts['view'] = $view;
+				// }
+				$atts = apply_filters( 'radio_station_automatic_languagee_archive_atts', $atts );
+				$atts_string = '';
+				if ( is_array( $atts ) && ( count( $atts ) > 0 ) ) {
+					foreach ( $atts as $key => $value ) {
+						$atts_string = ' ' . $key . '="' . $value . '"';
+					}
+				}
+				$shortcode = '[languages-archive' . $atts_string. ']';
+			}
+		}
+	}
 
 	// 2.3.3.6: moved out to reduce repetitive code
 	if ( isset( $shortcode ) ) {
@@ -2012,17 +2149,27 @@ function radio_station_single_content_template( $content, $post_type ) {
 	}
 
 	// --- check for user content templates ---
+	// 2.3.3.9: allow for prefixed and unprefixed post types
 	$theme_dir = get_stylesheet_directory();
-	$templates = array(
-		$theme_dir . '/templates/single-' . $post_type . '-content.php',
-		$theme_dir . '/single-' . $post_type . '-content.php',
-		RADIO_STATION_DIR . '/templates/single-' . $post_type . '-content.php',
-	);
+	$templates = array();
+	$templates[] = $theme_dir . '/templates/single-' . $post_type . '-content.php';
+	$templates[] = $theme_dir . '/single-' . $post_type . '-content.php';
+	$templates[] = RADIO_STATION_DIR . '/templates/single-' . $post_type . '-content.php';
+	$unprefixed_post_type = str_replace( 'rs-', '', $post_type );
+	if ( $post_type != $unprefixed_post_type ) {
+		$templates[] = $theme_dir . '/templates/single-' . $unprefixed_post_type . '-content.php';
+		$templates[] = $theme_dir . '/single-' . $unprefixed_post_type . '-content.php';
+		$templates[] = RADIO_STATION_DIR . '/templates/single-' . $unprefixed_post_type . '-content.php';
+	}
+
 	// 2.3.0: fallback to show content template for overrides
 	if ( RADIO_STATION_OVERRIDE_SLUG == $post_type ) {
-		$templates[] = $theme_dir . '/templates/single-' . RADIO_STATION_SHOW_SLUG . '-content.php';
-		$templates[] = $theme_dir . '/single-' . RADIO_STATION_SHOW_SLUG . '-content.php';
-		$templates[] = RADIO_STATION_DIR . '/templates/single-' . RADIO_STATION_SHOW_SLUG . '-content.php';
+		// $templates[] = $theme_dir . '/templates/single-rs-show-content.php';
+		// $templates[] = $theme_dir . '/single-rs-show-content.php';
+		// $templates[] = RADIO_STATION_DIR . '/templates/single-rs-show-content.php';
+		$templates[] = $theme_dir . '/templates/single-show-content.php';
+		$templates[] = $theme_dir . '/single-show-content.php';
+		$templates[] = RADIO_STATION_DIR . '/templates/single-show-content.php';
 	}
 	$templates = apply_filters( 'radio_station_' . $post_type . '_content_templates', $templates, $post_type );
 	foreach ( $templates as $template ) {
@@ -2036,7 +2183,13 @@ function radio_station_single_content_template( $content, $post_type ) {
 	}
 
 	// --- enqueue template styles ---
-	radio_station_enqueue_style( 'templates' );
+	// 2.3.3.9: check post type for page template style enqueue
+	$page_templates = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG, RADIO_STATION_PLAYLIST_SLUG );
+	if ( in_array( $post_type, $page_templates ) ) {
+		radio_station_enqueue_style( 'templates' );
+	}
+	// 2.3.3.9: fire action for enqueueing other template styles
+	do_action( 'radio_station_enqueue_template_styles', $post_type );
 
 	// --- enqueue dashicons for frontend ---
 	wp_enqueue_style( 'dashicons' );
@@ -2077,14 +2230,12 @@ function radio_station_override_linked_show_data( $post, $post_type ) {
 				if ( $linked_fields ) {
 					foreach ( $linked_fields as $key => $switch ) {
 						if ( !$switch ) {
-							// echo $key . ' - ';
 							if ( 'show_title' == $key ) {
 								$post->post_title = $show_post->post_title;
 							} elseif ( 'show_excerpt' == $key ) {
 								$post->post_excerpt = $show_post->post_excerpt;
 							} elseif ( 'show_content' == $key ) {
 								$post->post_content = $show_post->post_content;
-								// print_r( $post->post_content );
 							}
 						}
 					}
@@ -2148,7 +2299,6 @@ function radio_station_override_content( $content ) {
 	$override = radio_station_get_show_override( $post->ID, 'show_content' );
 	if ( false !== $override ) {
 		$override = radio_station_override_linked_show_data( $post, RADIO_STATION_OVERRIDE_SLUG );
-		// print_r( $override );
 		$content = $override->post_content;			
 	}
 	add_filter( 'the_content', 'radio_station_override_content', 0 );
@@ -2895,6 +3045,9 @@ function radio_station_set_roles() {
 			$wp_roles->add_cap( 'dj', $cap, true );
 		}
 	}
+	// 2.3.3.9: fix for existing DJ role old name
+	$wp_roles->roles['dj']['name'] = __( 'DJ / Host', 'radio_station' );
+	$wp_roles->role_names['dj'] = __( 'DJ / Host', 'radio_station' );
 
 	// --- add Show Producer role ---
 	// 2.3.0: add equivalent capability role for Show Producer
@@ -3093,6 +3246,19 @@ function radio_station_set_roles() {
 		}
 	}
 
+}
+
+// ----------------------------------
+// Admin Fix for DJ / Host Role Label
+// ----------------------------------
+// 2.3.3.9: added for user edit screen crackliness
+add_filter( 'editable_roles', 'radio_station_role_check_test', 9 );
+function radio_station_role_check_test( $roles ) {
+	if ( RADIO_STATION_DEBUG && is_admin() ) {
+		echo "DJ Role: " . print_r( $roles['dj'], true );
+	}
+	$roles['dj']['name'] = __( 'DJ / Host', 'radio-station' );
+	return $roles;
 }
 
 // ---------------------------------

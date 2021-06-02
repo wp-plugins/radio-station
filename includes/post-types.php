@@ -184,20 +184,21 @@ function radio_station_create_post_types() {
 	// (so that rewrite rules and query vars are added for it)
 	$ui = apply_filters( 'radio_station_host_interface', false );
 	$post_type = array(
+		// 2.3.3.9: fix to labels for template output
 		'labels'              => array(
-			'name'               => __( 'Host Profiles', 'radio-station' ),
-			'singular_name'      => __( 'Host Profile', 'radio-station' ),
-			'add_new'            => __( 'New Host Profile', 'radio-station' ),
+			'name'               => __( 'Hosts', 'radio-station' ),
+			'singular_name'      => __( 'Host', 'radio-station' ),
+			'add_new'            => __( 'Add New Host Profile', 'radio-station' ),
 			'add_new_item'       => __( 'Add Host Profile', 'radio-station' ),
 			'edit_item'          => __( 'Edit Host Profile', 'radio-station' ),
 			'new_item'           => __( 'New Host Profile', 'radio-station' ),
 			'view_item'          => __( 'View Host Profile', 'radio-station' ),
 			'archive_title'      => __( 'Show Hosts', 'radio-station' ),
 			// 2.3.2: added missing post type labels
-			'search_items'       => __( 'Search Hosts', 'radio-station' ),
-			'not_found'          => __( 'No Hosts found', 'radio-station' ),
-			'not_found_in_trash' => __( 'No Hosts found in Trash', 'radio-station' ),
-			'all_items'          => __( 'All Hosts', 'radio-station' ),
+			'search_items'       => __( 'Search Host Profiles', 'radio-station' ),
+			'not_found'          => __( 'No Host Profiles found', 'radio-station' ),
+			'not_found_in_trash' => __( 'No Host Profiles found in Trash', 'radio-station' ),
+			'all_items'          => __( 'All Host Profiles', 'radio-station' ),
 		),
 		'show_ui'             => $ui,
 		'show_in_menu'        => false,
@@ -233,20 +234,21 @@ function radio_station_create_post_types() {
 	// (so that rewrite rules and query vars are added for it)
 	$ui = apply_filters( 'radio_station_producer_interface', false );
 	$post_type = array(
+		// 2.3.3.9: fix to labels for template output
 		'labels'              => array(
-			'name'               => __( 'Producer Profiles', 'radio-station' ),
-			'singular_name'      => __( 'Producer Profile', 'radio-station' ),
-			'add_new'            => __( 'New Producer Profile', 'radio-station' ),
+			'name'               => __( 'Producers', 'radio-station' ),
+			'singular_name'      => __( 'Producer', 'radio-station' ),
+			'add_new'            => __( 'Add New Producer Profile', 'radio-station' ),
 			'add_new_item'       => __( 'Add Producer Profile', 'radio-station' ),
 			'edit_item'          => __( 'Edit Producer Profile', 'radio-station' ),
 			'new_item'           => __( 'New Producer Profile', 'radio-station' ),
 			'view_item'          => __( 'View Producer Profile', 'radio-station' ),
 			'archive_title'      => __( 'Show Producers Profile', 'Hosts' ),
 			// 2.3.2: added missing post type labels
-			'search_items'       => __( 'Search Producers', 'radio-station' ),
-			'not_found'          => __( 'No Producers found', 'radio-station' ),
-			'not_found_in_trash' => __( 'No Producers found in Trash', 'radio-station' ),
-			'all_items'          => __( 'All Producers', 'radio-station' ),
+			'search_items'       => __( 'Search Producer Profiles', 'radio-station' ),
+			'not_found'          => __( 'No Producer Profiles found', 'radio-station' ),
+			'not_found_in_trash' => __( 'No Producer Profiles found in Trash', 'radio-station' ),
+			'all_items'          => __( 'All Producer Profiles', 'radio-station' ),
 		),
 		'show_ui'             => $ui,
 		'show_in_menu'        => false,
@@ -342,10 +344,15 @@ function radio_station_add_featured_image_support() {
 add_action( 'admin_bar_menu', 'radio_station_modify_admin_bar_menu', 71 );
 function radio_station_modify_admin_bar_menu( $wp_admin_bar ) {
 
-	// 2.3.0: loop post types to add post type items
+	// 2.3.3.9: add filter for admin bar post types
 	$post_types = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_PLAYLIST_SLUG, RADIO_STATION_OVERRIDE_SLUG );
+	$post_types = apply_filters( 'radio_station_admin_bar_post_types', $post_types, 'new' );
+
+	// 2.3.0: loop post types to add post type items
 	foreach ( $post_types as $post_type ) {
-		if ( current_user_can( 'publish_' . $post_type . 's' ) ) {
+		// 2.3.3.9: strip post type prefix for permission check
+		$type = str_replace( 'rs-', '', $post_type );
+		if ( current_user_can( 'publish_' . $type . 's' ) ) {
 			$post_type_object = get_post_type_object( $post_type );
 			$args = array(
 				'id'     => 'new-' . $post_type,
@@ -367,14 +374,19 @@ function radio_station_modify_admin_bar_menu( $wp_admin_bar ) {
 add_action( 'admin_bar_menu', 'radio_station_admin_bar_view_edit_links', 81 );
 function radio_station_admin_bar_view_edit_links( $wp_admin_bar ) {
 
+	global $pagenow, $post;
 	$post_types = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_PLAYLIST_SLUG, RADIO_STATION_OVERRIDE_SLUG );
 
 	// --- loop to check for plugin post types ---
-	if ( ! is_admin() && is_singular() ) {
-		foreach ( $post_types as $post_type ) {
+	if ( !is_admin() && is_singular() ) {
+		// 2.3.3.9: added filter for admin bar post types
+		$edit_post_types = apply_filters( 'radio_station_admin_bar_post_types', $post_types, 'edit' );
+		foreach ( $edit_post_types as $post_type ) {
 			if ( is_singular( $post_type ) ) {
 				// --- add post type edit link ---
-				if ( current_user_can( 'edit_' . $post_type . 's' ) ) {
+				// 2.3.3.9: strip post type prefix for permission check
+				$type = str_replace( 'rs-', '', $post_type );
+				if ( current_user_can( 'edit_' . $type . 's' ) ) {
 					$post_type_object = get_post_type_object( $post_type );
 					$post_id = get_the_ID();
 					$args = array(
@@ -390,10 +402,9 @@ function radio_station_admin_bar_view_edit_links( $wp_admin_bar ) {
 
 	// --- check edit post match for view link ---
 	// 2.3.0: add view links for admin
-	global $pagenow;
 	if ( is_admin() && ( 'post.php' == $pagenow ) ) {
-		global $post;
-		foreach ( $post_types as $post_type ) {
+		$view_post_types = apply_filters( 'radio_station_admin_bar_post_types', $post_types, 'view' );
+		foreach ( $view_post_types as $post_type ) {
 			if ( $post->post_type == $post_type ) {
 				$post_type_object = get_post_type_object( $post_type );
 				if ( 'draft' == $post->post_status ) {

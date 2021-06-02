@@ -281,12 +281,13 @@ function radio_station_role_editor() {
 	echo '<br>' . esc_html( __( 'Radio Station Pro will include a Role Assignment Interface so you can easily assign Radio Station roles to any user.', 'radio-station' ) ) . '<br>';
 	
 	// --- find out about Pro link ---
-	// TODO: change this text/link when Pro version becomes available and remove target blank
+	// [Pro Blurb]
+	// TODO: add go Por link when Pro available
 	$upgrade_url = radio_station_get_upgrade_url();
-	echo "<br><a href='" . esc_url( $upgrade_url ) . "' target='_blank'>";
+	echo '<br><a href="' . esc_url( $upgrade_url ) . '" target="_blank">';
 		// echo esc_html( __( 'Upgrade to Radio Station Pro', 'radio-station' ) );
 	 	echo esc_html( __( 'Find out more about Radio Station Pro', 'radio-station' ) );
-	echo " &rarr;</a>.";
+	echo ' &rarr;</a>.';
 }
 
 // -------------------------------
@@ -1275,7 +1276,8 @@ function radio_station_shift_conflict_notice() {
 
 		echo '<ul style="list-style:none;">';
 
-		echo '<li style="display:inline-block; text-align:center; vertical-align:top; margin-left:40px;">';
+		// 2.3.3.9: remove unnecessary left margin on first list item
+		echo '<li style="display:inline-block; text-align:center; vertical-align:top;">';
 		echo '<b>' . esc_html( __( 'Radio Station', 'radio-station' ) ) . '</b><br>';
 		echo esc_html( __( 'has detected', 'radio-station' ) ) . '<br>';
 		echo esc_html( __( 'Schedule conflicts!', 'radio-station' ) );

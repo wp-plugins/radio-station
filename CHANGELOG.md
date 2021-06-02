@@ -19,7 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed: Multiple host separator display in Current Show Widget
 * Fixed: Playlist Widget playlist ended label when no next playlist
 * Fixed: Conflicting duplicate filter name for Show Avatar
-* Fixed: time conversions where start/finish Show/Override is equal
+* Fixed: Time conversions where start/finish Show/Override is equal
+* Fixed: Show page subarchive lists pagination button arrow display
 
 ### 2.3.3.8
 * Update: Plugin Panel (1.1.7) with Image and Color Picker fields

@@ -74,7 +74,8 @@
 // - Convert Show Shifts
 // - Convert Schedule Shifts
 // === Helper Functions ===
-// - Get Profile ID
+// - Get Icon Colors
+// - Encode URI Component
 // - Get Languages
 // - Get Language Options
 // - Get Language
@@ -697,6 +698,12 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array() ) {
 		$metakey = 'playlist_show_id';
 	} elseif ( 'episodes' == $datatype ) {
 		$metakey = 'episode_show_id';
+	} elseif ( 'hosts' == $datatype ) {
+		$metakey = 'show_user_list';
+		$userkey = 'host_user_id';
+	} elseif ( 'producers' == $datatype ) {
+		$metakey = 'show_producer_list';
+		$userkey = 'producer_user_id';
 	} else {
 		return false;
 	}
@@ -784,7 +791,29 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array() ) {
 			}
 		}
 
+	} elseif ( ( 'hosts' == $datatype ) || ( 'producers' == $datatype ) ) {
+		
+		// 2.3.3.9; added get host/producer profile posts
+		$user_ids = get_post_meta( $show_id, $metakey, true );
+		if ( !$user_ids ) {
+			return false;
+		}
+		$post_ids = $no_profile_ids = array();
+		foreach ( $user_ids as $user_id ) {
+			$query = "SELECT post_id FROM " . $wpdb->prefix . "postmeta"
+				 . " WHERE meta_key = '" . $userkey . "' AND meta_value = %d";
+			$query = $wpdb->prepare( $query, $user_id );
+			$profile_id = $wpdb->get_var( $query );
+			if ( $profile_id ) {
+				$post_ids[] = $profile_id;
+			} else {
+				$no_profile_ids[] = $user_id;
+			}
+		}
+
 	} else {
+
+		// --- other types (episodes/playlists) ---
 		$query = "SELECT post_id FROM " . $wpdb->prefix . "postmeta"
 		         . " WHERE meta_key = '" . $metakey . "' AND meta_value = %d";
 		$query = $wpdb->prepare( $query, $show_id );
@@ -818,6 +847,14 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array() ) {
 		$query .= $wpdb->prepare( " LIMIT %d", $args['limit'] );
 	}
 	$results = $wpdb->get_results( $query, ARRAY_A );
+
+	// --- non-post (user) IDS ---
+	if ( isset( $no_profile_ids ) && ( count( $no_profile_ids ) > 0 ) ) {
+		foreach ( $no_profile_ids as $user_id ) {
+			$user = get_user_by( 'ID', $user_id );
+			$results[] = $user;
+		}
+	}
 
 	// --- maybe cache default show data ---
 	if ( $default ) {
@@ -2427,8 +2464,10 @@ function radio_station_check_shifts( $all_shifts ) {
 
 	// TODO: check for start of week and end of week shift conflicts?
 
+	// 2.3.3.9: fix weekday/dates code to match radio_station_get_show_shifts
 	$now = radio_station_get_now();
-	$weekdays = radio_station_get_schedule_weekdays();
+	$today = radio_station_get_time( 'l', $now );
+	$weekdays = radio_station_get_schedule_weekdays( $today );
 	$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 
 	$conflicts = $checked_shifts = array();
@@ -2453,6 +2492,7 @@ function radio_station_check_shifts( $all_shifts ) {
 					if ( !isset( $first_shift ) ) {
 						$first_shift = $shift;
 					}
+					$last_shift = $shift;
 
 					// --- reset shift switches ---
 					$set_shift = true;
@@ -2670,28 +2710,40 @@ function radio_station_check_shifts( $all_shifts ) {
 
 	// --- check last shift against first shift ---
 	// 2.3.2: added for possible overlap (split by weekly schedule dates)
-	if ( isset( $shift ) && ( $shift != $first_shift ) ) {
+	if ( isset( $last_shift ) && ( $last_shift != $first_shift ) ) {
 
-		// --- use days for next week to compare ---
-		$shift_start = radio_station_convert_shift_time( $shift['start'] );
-		$shift_end = radio_station_convert_shift_time( $shift['end'] );
-		$last_shift_start = radio_station_to_time( 'next ' . $shift['day'] . ' ' . $shift_start );
-		$last_shift_end = radio_station_to_time( 'next ' . $shift['day'] . ' ' . $shift_end );
-		$shift_start = radio_station_convert_shift_time( $first_shift['start'] );
-		$shift_end = radio_station_convert_shift_time( $first_shift['end'] );
-		$first_shift_start = radio_station_to_time( 'next ' . $first_shift['day'] . ' ' . $shift_start );
-		$first_shift_end = radio_station_to_time( 'next ' . $first_shift['day'] . ' ' . $shift_end );
-
-		if ( RADIO_STATION_DEBUG ) {
-			echo 'Last Shift Start: ' . $shift['day'] . ' ' . $shift_start . ' - (' . $last_shift_start . ')' . PHP_EOL;
-			echo 'First Shift End: ' . $first_shift['day'] . ' ' . $shift_end . ' - (' . $first_shift_end . ')' . PHP_EOL;
+		// --- use days for different weeks to compare ---
+		$l_shift_start = radio_station_convert_shift_time( $last_shift['start'] );
+		$l_shift_end = radio_station_convert_shift_time( $last_shift['end'] );
+		$last_shift_start = radio_station_to_time( $last_shift['day'] . ' ' . $l_shift_start );
+		$last_shift_end = radio_station_to_time( $last_shift['day'] . ' ' . $l_shift_end );
+		if ( $last_shift_end < $last_shift_start ) {
+			$last_shift_end = $last_shift_end + ( 24 * 60 * 60 );
 		}
 
-		if ( $last_shift_start < $first_shift_end ) {
+		$f_shift_start = radio_station_convert_shift_time( $first_shift['start'] );
+		$f_shift_end = radio_station_convert_shift_time( $first_shift['end'] );
+		$first_shift_start = radio_station_to_time( 'next ' . $first_shift['day'] . ' ' . $f_shift_start );
+		$first_shift_end = radio_station_to_time( 'next ' . $first_shift['day'] . ' ' . $f_shift_end );
+		if ( $first_shift_end < $first_shift_start ) {
+			$first_shift_end = $first_shift_end + ( 24 * 60 * 60 );
+		}
+
+		if ( RADIO_STATION_DEBUG ) {
+			echo 'Last Shift End: ' . $last_shift['day'] . ' ' . $l_shift_end . ' - (' . $last_shift_end . ')' . PHP_EOL;
+			echo 'First Shift Start: ' . $first_shift['day'] . ' ' . $f_shift_start . ' - (' . $first_shift_start . ')' . PHP_EOL;
+		}
+
+		// --- end of the week overlap check ---
+		// 2.3.3.9: fix to incorrect overlap logic
+		if ( $last_shift_end > $first_shift_start ) {
+		// if ( $last_shift_start < $first_shift_end ) {
 
 			// --- record a conflict ---
 			if ( RADIO_STATION_DEBUG ) {
 				echo "First/Last Shift Overlap Conflict" . PHP_EOL;
+				echo "First Shift: " . print_r( $first_shift, true );
+				echo "Last Shift: " . print_r( $last_shift, true );
 			}
 
 			/*
@@ -2782,8 +2834,10 @@ function radio_station_check_shift( $show_id, $shift, $context = 'all' ) {
 	}
 
 	// --- convert days to dates for checking ---
+	// 2.3.3.9: fix weekday/dates code to match radio_station_get_show_shifts
 	$now = radio_station_get_now();
-	$weekdays = radio_station_get_schedule_weekdays();
+	$today = radio_station_get_time( 'l', $now );
+	$weekdays = radio_station_get_schedule_weekdays( $today );
 	$weekdates = radio_station_get_schedule_weekdates( $weekdays, $now );
 
 	// --- get shows to check against via context ---
@@ -2822,8 +2876,6 @@ function radio_station_check_shift( $show_id, $shift, $context = 'all' ) {
 	// 2.3.2: use next week day instead of date
 	$shift_start_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $start_time );
 	$shift_end_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $end_time );
-	// $shift_start_time = radio_station_to_time( '+2 weeks ' . $shift['day'] . ' ' . $start_time );
-	// $shift_end_time = radio_station_to_time( '+2 weeks ' . $shift['day'] . ' ' . $end_time );
 	// 2.3.3.9: added or equals to operator
 	if ( $shift_end_time <= $shift_start_time ) {
 		$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
@@ -2850,14 +2902,12 @@ function radio_station_check_shift( $show_id, $shift, $context = 'all' ) {
 
 				// 2.3.2: replace strtotime with to_time for timezones
 				// 2.3.2: fix to convert to 24 hour times first
-				$shift_start = radio_station_convert_shift_time( $day_shift['start'] );
-				$shift_end = radio_station_convert_shift_time( $day_shift['end'] );
+				$day_shift_start = radio_station_convert_shift_time( $day_shift['start'] );
+				$day_shift_end = radio_station_convert_shift_time( $day_shift['end'] );
 
 				// 2.3.2: use next week day instead of date
-				$day_shift_start_time = radio_station_to_time( $day_shift['date'] . ' ' . $shift_start );
-				$day_shift_end_time = radio_station_to_time( $day_shift['date'] . ' ' . $shift_end );
-				// $day_shift_start_time = radio_station_to_time( '+2 weeks ' . $day_shift['day'] . ' ' . $shift_start );
-				// $day_shift_end_time = radio_station_to_time( '+2 weeks ' . $day_shift['day'] . ' ' . $shift_end );
+				$day_shift_start_time = radio_station_to_time( $day_shift['date'] . ' ' . $day_shift_start );
+				$day_shift_end_time = radio_station_to_time( $day_shift['date'] . ' ' . $day_shift_end );
 				// 2.3.2: adjust for midnight with change to use non-split shifts
 				// 2.3.3.9: added or equals to operator
 				if ( $day_shift_end_time <= $day_shift_start_time ) {
@@ -3452,32 +3502,22 @@ function radio_station_get_show_rss_url( $show_id ) {
 // -------------------------
 // Get DJ / Host Profile URL
 // -------------------------
-// 2.3.0: added to get DJ / Host profile permalink
+// 2.3.0: added to get DJ / Host author/profile permalink
+// 2.3.3.9: moved get possible profile ID to Pro filter
 function radio_station_get_host_url( $host_id ) {
-	$post_id = radio_station_get_profile_id( RADIO_STATION_HOST_SLUG, $host_id );
-	if ( $post_id ) {
-		$host_url = get_permalink( $post_id );
-	} else {
-		$host_url = get_author_posts_url( $host_id );
-	}
+	$host_url = get_author_posts_url( $host_id );
 	$host_url = apply_filters( 'radio_station_host_url', $host_url, $host_id );
-
 	return $host_url;
 }
 
 // ------------------------
 // Get Producer Profile URL
 // ------------------------
-// 2.3.0: added to get Producer profile permalink
+// 2.3.0: added to get Producer author/profile permalink
+// 2.3.3.9: moved get possible profile ID to Pro filter
 function radio_station_get_producer_url( $producer_id ) {
-	$post_id = radio_station_get_profile_id( RADIO_STATION_PRODUCER_SLUG, $producer_id );
-	if ( $post_id ) {
-		$producer_url = get_permalink( $post_id );
-	} else {
-		$producer_url = get_author_posts_url( $producer_id );
-	}
+	$producer_url = get_author_posts_url( $producer_id );
 	$producer_url = apply_filters( 'radio_station_producer_url', $producer_url, $producer_id );
-
 	return $producer_url;
 }
 
@@ -3535,13 +3575,14 @@ function radio_station_patreon_button_styles() {
 // --------------------
 // 2.3.2: queue directory ping on saving
 function radio_station_queue_directory_ping() {
-	// 2.3.3.9: maybe bug out on activation
+	// 2.3.3.9: fix to bug out during plugin activation
 	if ( !function_exists( 'radio_station_get_setting' ) ) {
 		return;
 	}
-	$do_ping = radio_station_get_setting( 'ping_netmix_directory' );
-	if ( 'yes' != $do_ping ) {return;}
-	update_option( 'radio_station_ping_directory', '1' );
+	$queue_ping = radio_station_get_setting( 'ping_netmix_directory' );
+	if ( 'yes' == $queue_ping ) {
+		update_option( 'radio_station_ping_directory', '1' );
+	}
 }
 
 // -------------------
@@ -4205,7 +4246,8 @@ function radio_station_convert_hour( $hour, $timeformat = 24, $suffix = true ) {
 function radio_station_convert_shift_time( $time, $timeformat = 24 ) {
 
 	// note: timezone can be ignored here as just getting hours and minutes
-	$timestamp = strtotime( date( 'Y-m-d' ) . $time );
+	// 2.3.3.9: added space between date and time
+	$timestamp = strtotime( date( 'Y-m-d' ) . ' ' . $time );
 	if ( 12 == (int) $timeformat ) {
 		$time = date( 'g:i a', $timestamp );
 		str_replace( 'am', radio_station_translate_meridiem( 'am' ), $time );
@@ -4287,6 +4329,22 @@ function radio_station_convert_schedule_shifts( $schedule ) {
 // === Helper Functions ===
 // ------------------------
 
+// ---------------
+// Get Icon Colors
+// ---------------
+// 2.3.3.9: moved out from single-show-content.php template
+function radio_station_get_icon_colors( $context = false ) {
+	$icon_colors = array(
+		'website'  => '#A44B73',
+		'email'    => '#0086CC',
+		'phone'    => '#008000',
+		'download' => '#7DBB00',
+		'rss'      => '#FF6E01',
+	);
+	$icon_colors = apply_filters( 'radio_station_icon_colors', $icon_colors, $context );
+	return $icon_colors;
+}
+
 // --------------------
 // Encode URI Component
 // --------------------
@@ -4295,44 +4353,6 @@ function radio_station_convert_schedule_shifts( $schedule ) {
 function radio_station_encode_uri_component( $string ) {
     $revert = array( '%21' => '!', '%2A' => '*', '%27' => "'", '%28' => '(', '%29' => ')' );
     return strtr( rawurlencode( $string ), $revert);
-}
-
-// --------------
-// Get Profile ID
-// --------------
-// 2.3.0: added to get host or producer profile post ID
-function radio_station_get_profile_id( $type, $user_id ) {
-
-	global $radio_station_data;
-
-	if ( isset( $radio_station_data[$type . '-' . $user_id] ) ) {
-		$post_id = $radio_station_data[$type . '-' . $user_id];
-		return $post_id;
-	}
-
-	// --- get the post ID(s) for the profile ---
-	global $wpdb;
-	$query = "SELECT post_id FROM " . $wpdb->prefix . "postmeta
-			  WHERE meta_key = '" . $type . "_user_id' AND meta_value = %d";
-	$query = $wpdb->prepare( $query, $user_id );
-	$results = $wpdb->get_results( $query, ARRAY_A );
-
-	// --- check for and return published profile ID ---
-	if ( $results && is_array( $results ) && ( count( $results ) > 0 ) ) {
-		foreach ( $results as $result ) {
-			$query = "SELECT ID FROM " . $wpdb->prefix . "posts
-					  WHERE post_status = 'publish' AND post_id = %d";
-			$query = $wpdb->prepare( $query, $result['ID'] );
-			$post_id = $wpdb->get_var( $query );
-			if ( $post_id ) {
-				$radio_station_data[$type . '-' . $user_id] = $post_id;
-
-				return $post_id;
-			}
-		}
-	}
-
-	return false;
 }
 
 // ------------------
@@ -4671,6 +4691,39 @@ function radio_station_sanitize_input( $prefix, $key ) {
 			}
 		}
 	
+	} elseif ( in_array( $key, $types['hour'] ) ) {
+
+		// --- hours (24) ---
+		$value = absint( $_POST[$postkey] );
+		if ( ( $value < 0 ) || ( $value > 23 ) ) {
+			$value = '00';
+		} elseif ( $value < 10 ) {
+			$value = '0' . $value;
+		} else {
+			$value = (string) $value;
+		}
+
+	} elseif ( in_array( $key, $types['mins'] ) ) {
+
+		// --- minutes (or seconds) ---
+		$value = absint( $_POST[$postkey] );
+		if ( ( $value < 0 ) || ( $value > 60 ) ) {
+			$value = '00';
+		} elseif ( $value < 10 ) {
+			$value = '0' . $value;
+		} else {
+			$value = (string) $value;
+		}
+
+	} elseif ( in_array( $key, $types['meridiem'] ) ) {
+
+		// --- meridiems ---
+		$valid = array( '', 'am', 'pm' );
+		$value = $_POST[$postkey];
+		if ( !in_array( $value, $valid ) ) {
+			$value = '';
+		}
+
 	}
 	
 	return $value;
@@ -4683,7 +4736,7 @@ function radio_station_sanitize_input( $prefix, $key ) {
 function radio_station_get_meta_input_types() {
 
 	$types = array(
-		'numeric'  => array( 'avatar', 'image' ),
+		'numeric'  => array( 'avatar', 'image', 'number' ),
 		'checkbox' => array( 'active', 'download' ),
 		'user'     => array( 'user_list', 'producer_list' ),
 		'file'     => array( 'file' ),
@@ -4692,12 +4745,59 @@ function radio_station_get_meta_input_types() {
 		'slug'     => array( 'slug', 'patreon' ),
 		'phone'    => array( 'phone' ),
 		'date'     => array( 'date' ),
+		'hour'     => array( 'hour' ),
+		'mins'     => array( 'mins', 'minutes', 'seconds' ),
+		'meridiem' => array( 'meridian', 'meridiem' ),
 	);
 
 	// --- filter and return ---
 	$types = apply_filters( 'radio_station_meta_input_types', $types );
 	return $types;
 }
+
+// -----------------------
+// Sanitize Playlist Entry
+// -----------------------
+// 2.3.3.9: added for entry validation
+function radio_station_sanitize_playlist_entry( $entry ) {
+
+	// --- set playlist entry keys ---
+	$entry_keys = array(
+		'playlist_entry_artist',
+		'playlist_entry_song',
+		'playlist_entry_album',
+		'playlist_entry_label',
+		'playlist_entry_minutes',
+		'playlist_entry_seconds',
+		'playlist_entry_comments',
+		'playlist_entry_new',
+		'playlist_entry_status',
+	);
+	$text_keys = array( 'artist', 'song', 'album', 'label', 'comments' );
+	$numeric_keys = array( 'minutes', 'seconds' );
+	foreach ( $entry_keys as $entry_key ) {
+		if ( isset( $entry[$entry_key] ) ) {
+			$value = $entry[$entry_key];
+			$key = str_replace( 'playlist_entry_', '', $entry_key );
+			if ( in_array( $key, $text_keys ) ) {
+				$value = sanitize_text_field( $value );
+			} elseif ( in_array( $key, $numeric_keys ) ) {
+				$value = absint( $value );
+				if ( ( 'seconds' == $key ) && ( $value < 10 ) ) {
+				
+				}
+			} elseif ( 'status' == $key ) {
+				if ( $value != 'played' ) {
+					$value = 'queued';
+				}
+			}		
+			$entry[$entry_key] = $value;
+		}					
+	}
+	
+	return $entry;
+}
+
 
 // -------------------------
 // Sanitize Shortcode Values

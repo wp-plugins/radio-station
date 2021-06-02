@@ -483,6 +483,9 @@ function radio_station_master_schedule_loader_js( $atts ) {
 
 	// --- schedule loader function ---
 	$js = "function radio_load_schedule(direction,view) {
+		if (document.getElementById('schedule-loader-frame')) {
+			view = radio_cookie.get('admin_schedule_view'); radio_load_view(view); return;
+		}
 		startdate = document.getElementById('schedule-start-date').value;
 		activedate = document.getElementById('schedule-active-date').value;
 		if (!view) {
@@ -494,10 +497,10 @@ function radio_station_master_schedule_loader_js( $atts ) {
 				else if (jQuery('#master-schedule-list').length) {view = 'list';}
 				else if (jQuery('#master-schedule-grid').length) {view = 'grid';}
 				else if (jQuery('#master-schedule-calendar').length) {view = 'calendar';}
-				else {return;}
 			}
 		}
 		if (radio.debug) {console.log('Reloading Schedule View: '+view);}
+		if (!view) {return;}
 		if (!direction) {offset = 0;}
 		else if (direction == 'previous') {offset = -(7 * 24 * 60 * 60 * 1000);}
 		else if (direction == 'next') {offset = (7 * 24 * 60 * 60 * 1000);}
@@ -505,7 +508,10 @@ function radio_station_master_schedule_loader_js( $atts ) {
 		url = '" . $loader_url . "&view='+view;
 		timestamp = Math.floor((new Date()).getTime() / 1000);
 		url += '&timestamp='+timestamp+'&start_date='+newdate+'&active_date='+activedate;
-		document.getElementById('schedule-'+view+'-loader').src = url;
+		if (radio.debug) {console.log('Reload View URL: '+url);}
+		if (document.getElementById('schedule-'+view+'-loader').src != url) {
+			document.getElementById('schedule-'+view+'-loader').src = url;
+		}
 	}" . PHP_EOL;
 
 	// --- filter and return ---
@@ -593,8 +599,12 @@ function radio_station_ajax_schedule_loader() {
 					$js .= "parent.radio_list_highlight();" . PHP_EOL;
 					$js .= "clearInterval(schedule_loader);" . PHP_EOL;
 			}
-			$js .= "parent.radio_convert_times();" . PHP_EOL;
+			$js .= "if (typeof parent.radio_convert_times == 'function') {parent.radio_convert_times();}" . PHP_EOL;
+
+			// --- placeholder for extra loader functions ---
+			// (do not remove or modify this line)
 			$js .= "/* LOADER PLACEHOLDER */";
+
 		$js .= "}, 2000);" . PHP_EOL;
 	}
 

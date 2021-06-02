@@ -511,6 +511,6 @@ foreach ( $weekdays as $weekday ) {
 $list .= '</ul>' . $newline;
 
 // --- hidden iframe for schedule reloading ---
-$list .= '<iframe src="javascript:void(0);" id="schedule-grid-loader" name="schedule-grid-loader" style="display:none;"></iframe>' . $newline;
+$list .= '<iframe src="javascript:void(0);" id="schedule-list-loader" name="schedule-list-loader" style="display:none;"></iframe>' . $newline;
 
 echo $list;

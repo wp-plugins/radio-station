@@ -22,6 +22,9 @@
 // - Assign Producers to Show Metabox
 // - Add Show Shifts Metabox
 // - Show Shifts Metabox
+// - Shifts List Styles
+// - Shift Edit Script
+// - Shifts Oonflict Message
 // - Show Shift Table
 // - Add Show Description Helper Metabox
 // - Show Description Helper Metabox
@@ -38,6 +41,7 @@
 // - Override Show Data Script
 // - Add Schedule Override Metabox
 // - Schedule Override Metabox
+// - Overrides List Styles
 // - Overrides Table List
 // - Override List Edit Script
 // - Update Schedule Override
@@ -84,6 +88,7 @@
 // (shows metaboxes above Editor area for Radio Station CPTs)
 add_action( 'edit_form_after_title', 'radio_station_top_meta_boxes' );
 function radio_station_top_meta_boxes() {
+
 	global $post, $wp_meta_boxes;
 	$current_screen = get_current_screen();
 
@@ -188,7 +193,7 @@ function radio_station_show_language_metabox() {
 	// --- get all language options ---
 	$languages = radio_station_get_languages();
 
-	echo '<div style="margin-bottom: 5px;">';
+	echo '<div style="margin-bottom: 5px;">' . PHP_EOL;
 
 	// --- get main language ---
 	$main_language = radio_station_get_language();
@@ -206,9 +211,9 @@ function radio_station_show_language_metabox() {
 		echo esc_html( $label ) . '<br>';
 	}
 
-	echo '<div style="font-size:11px;">' . esc_html( __( 'Select below if Show language(s) differ.', 'radio-station' ) ) . '</div>';
+	echo '<div style="font-size:11px;">' . esc_html( __( 'Select below if Show language(s) differ.', 'radio-station' ) ) . '</div>' . PHP_EOL;
 
-	echo '<ul id="' . esc_attr( RADIO_STATION_LANGUAGES_SLUG ) . '_taxradiolist" data-wp-lists="list:' . esc_attr( RADIO_STATION_LANGUAGES_SLUG ) . '_tax" class="categorychecklist form-no-clear">';
+	echo '<ul id="' . esc_attr( RADIO_STATION_LANGUAGES_SLUG ) . '_taxradiolist" data-wp-lists="list:' . esc_attr( RADIO_STATION_LANGUAGES_SLUG ) . '_tax" class="categorychecklist form-no-clear">' . PHP_EOL;
 
 	// --- loop existing terms ---
 	$term_slugs = array();
@@ -221,25 +226,26 @@ function radio_station_show_language_metabox() {
 			$label .= ' (' . $term->description . ')';
 		}
 
-		echo '<li id="' .  esc_attr( RADIO_STATION_LANGUAGES_SLUG ) . '_tax-' . esc_attr( $slug ) . '">';
+		echo '<li id="' .  esc_attr( RADIO_STATION_LANGUAGES_SLUG ) . '_tax-' . esc_attr( $slug ) . '">' . PHP_EOL;
 
 		// --- hidden input for term saving ---
 		// echo '<input value="' . esc_attr( $name ) . '" type="checkbox" style="display: none;" name="tax_input[' . esc_attr( RADIO_STATION_LANGUAGES_SLUG ) . '][]" id="in-' . RADIO_STATION_LANGUAGES_SLUG . '_tax-' . esc_attr( $name ) . '" checked="checked">';
-		echo '<input value="' . esc_attr( $slug ) . '" type="hidden" name="' . esc_attr( RADIO_STATION_LANGUAGES_SLUG ) . '[]" id="in-' . esc_attr( RADIO_STATION_LANGUAGES_SLUG ) . '_tax-' . esc_attr( $slug ) . '">';
+		echo '<input value="' . esc_attr( $slug ) . '" type="hidden" name="' . esc_attr( RADIO_STATION_LANGUAGES_SLUG ) . '[]" id="in-' . esc_attr( RADIO_STATION_LANGUAGES_SLUG ) . '_tax-' . esc_attr( $slug ) . '">' . PHP_EOL;
 
 		// --- language term label ---
-		echo '<label>' . esc_html( $label ) . '</label>';
+		echo '<label>' . esc_html( $label ) . '</label>' . PHP_EOL;
 
 		// --- remove term button ---
-		echo '<input type="button" class="button button-secondary" onclick="radio_remove_language(\'' . esc_attr( $slug ) . '\');" value="x" title="' . esc_attr( __( 'Remove Language', 'radio-station' ) ) . '">';
+		echo '<input type="button" class="button button-secondary" onclick="radio_remove_language(\'' . esc_attr( $slug ) . '\');" value="x" title="' . esc_attr( __( 'Remove Language', 'radio-station' ) ) . '">' . PHP_EOL;
 
-		echo '</li>';
+ 		echo '</li>' . PHP_EOL;
 	}
-	echo '</ul>';
+
+	echo '</ul>' . PHP_EOL;
 
 	// --- new language selection list ---
-	echo '<select id="rs-add-language-selection" onchange="radio_add_language();">';
-	echo '<option selected="selected">' . esc_html( __( 'Select Language', 'radio-station' ) ) . '</option>';
+	echo '<select id="rs-add-language-selection" onchange="radio_add_language();">' . PHP_EOL;
+	echo '<option selected="selected">' . esc_html( __( 'Select Language', 'radio-station' ) ) . '</option>' . PHP_EOL;
 	foreach ( $languages as $i => $language ) {
 		$code = $language['language'];
 		echo '<option value="' . esc_attr( $code ) . '"';
@@ -250,14 +256,14 @@ function radio_station_show_language_metabox() {
 		if ( $language['native_name'] != $language['english_name'] ) {
 			echo ' (' . esc_html( $language['english_name'] ) . ')';
 		}
-		echo '</option>';
+		echo '</option>' . PHP_EOL;
 	}
-	echo '</select><br>';
+	echo '</select><br>' . PHP_EOL;
 
 	// --- add language term button ---
-	echo '<div style="font-size:11px;">' . esc_html( __( 'Click on a Language to Add it.', 'radio-station' ) ) . '</div>';
+	echo '<div style="font-size:11px;">' . esc_html( __( 'Click on a Language to Add it.', 'radio-station' ) ) . '</div>' . PHP_EOL;
 
-	echo '</div>';
+	echo '</div>' . PHP_EOL;
 
 	// --- language selection javascript ---
 	$js = "function radio_add_language() {
@@ -308,13 +314,20 @@ function radio_station_show_language_metabox() {
 		}
 	}";
 
+	// --- language input style fixes ---
+	$css = "#". RADIO_STATION_LANGUAGES_SLUG . "_taxradiolist input.button {
+		margin-left: 10px; padding: 0 7px; color: #E00; border-radius: 7px;
+	}";
+	// 2.3.3.9: added language edit styles filter
+	$css = apply_filters( 'radio_station_language_edit_styles', $css );
+	// phpcs:ignore WordPress.Security.OutputNotEscaped
+	echo '<style>' . $css . '</style>';
+
 	// --- add script inline ---
+	// 2.3.3.9: added language edit script filter
+	$js = apply_filters( 'radio_station_language_edit_script', $js );
 	wp_add_inline_script( 'radio-station-admin', $js );
 
-	// --- language input style fixes ---
-	echo "<style>#". RADIO_STATION_LANGUAGES_SLUG . "_taxradiolist input.button {
-		margin-left: 10px; padding: 0 7px; color: #E00; border-radius: 7px;
-	}</style>";
 }
 
 // ----------------------------
@@ -325,11 +338,17 @@ add_action( 'save_post', 'radio_station_language_term_filter', 11 );
 function radio_station_language_term_filter( $post_id ) {
 
 	// ---- check permissions ---
-	if ( !isset( $_POST[RADIO_STATION_LANGUAGES_SLUG] ) ) {return;}
+	if ( !isset( $_POST[RADIO_STATION_LANGUAGES_SLUG] ) ) {
+		return;
+	}
 	$check = wp_verify_nonce( $_POST['taxonomy_noncename'], 'taxonomy_' . RADIO_STATION_LANGUAGES_SLUG );
-	if ( !$check ) {return;}
+	if ( !$check ) {
+		return;
+	}
 	$taxonomy_obj = get_taxonomy( RADIO_STATION_LANGUAGES_SLUG );
-	if ( !current_user_can( $taxonomy_obj->cap->assign_terms ) ) {return;}
+	if ( !current_user_can( $taxonomy_obj->cap->assign_terms ) ) {
+		return;
+	}
 
 	// --- loop and set posted terms ---
 	$terms = $_POST[RADIO_STATION_LANGUAGES_SLUG];
@@ -372,7 +391,6 @@ function radio_station_language_term_filter( $post_id ) {
 
 	// --- set the language terms ---
 	wp_set_post_terms( $post_id, $term_ids, RADIO_STATION_LANGUAGES_SLUG );
-	// error_log( print_r( $term_ids, true ) , 3, WP_CONTENT_DIR . '/tax-debug.log' );
 
 }
 
@@ -386,6 +404,7 @@ function radio_station_language_term_filter( $post_id ) {
 // ---------------------
 add_action( 'add_meta_boxes', 'radio_station_add_show_info_metabox' );
 function radio_station_add_show_info_metabox() {
+
 	// 2.2.2: change context to show at top of edit screen
 	// 2.3.2: filter top metabox position
 	$position = apply_filters( 'radio_station_metabox_position', 'rstop', 'shows' );
@@ -405,7 +424,10 @@ function radio_station_add_show_info_metabox() {
 function radio_station_show_info_metabox() {
 
 	global $post;
-	$post_id = $post->ID;
+	$post_id = 0;
+	if ( property_exists( $post, 'ID' ) ) {
+		$post_id = $post->ID;
+	}
 
 	// 2.3.0: added missing nonce field
 	wp_nonce_field( 'radio-station', 'show_meta_nonce' );
@@ -424,38 +446,93 @@ function radio_station_show_info_metabox() {
 	// 2.3.0: removed new lines between labels and fields and changed widths
 	// 2.3.2: increase label width to 120px for disable download field label
 	// 2.3.3.9: move meta_inner ID to class
-	echo '<div class="meta_inner">';
+	// 2.3.3.9: change input paragraphs to list style
+	echo '<div class="meta_inner">' . PHP_EOL;
 
-		echo '<p><div style="width:120px; display:inline-block;"><label>' . esc_html( __( 'Active', 'radio-station' ) ) . '?</label></div>
-		<input type="checkbox" name="show_active" ' . checked( $active, 'on', false ) . '>
-		<em>' . esc_html( __( 'Check this box if show is currently active (Show will not appear on programming schedule if unchecked.)', 'radio-station' ) ) . '</em></p>';
+		echo '<ul class="show-input-list">' . PHP_EOL;
 
-		echo '<p><div style="width:120px; display:inline-block;"><label>' . esc_html( __( 'Website Link', 'radio-station' ) ) . ':</label></div>
-		<input type="text" name="show_link" size="100" style="max-width:80%;" value="' . esc_url( $link ) . '" /></p>';
+			// --- show active switch ---
+			echo '<li class="show-item">' . PHP_EOL;
+				echo '<div class="input-label"><label>' . PHP_EOL; 
+				echo esc_html( __( 'Active', 'radio-station' ) ) . '?' . PHP_EOL;
+				echo '</label></div>' . PHP_EOL;
+				echo '<div class="input-field">' . PHP_EOL;
+				echo '<input type="checkbox" name="show_active" ' . checked( $active, 'on', false ) . '>' . PHP_EOL;
+				echo '</div><div class="input-helper">' . PHP_EOL;
+				echo '<i>' . esc_html( __( 'Check this box if show is currently active (Show will not appear on programming schedule if unchecked.)', 'radio-station' ) ) . '</i>' . PHP_EOL;
+				echo '</div>' . PHP_EOL;
+			echo '</li>' . PHP_EOL;
 
-		// 2.3.3.6: change text string from DJ / Host email (as maybe multiple hosts)
-		echo '<p><div style="width:120px; display:inline-block;"><label>' . esc_html( __( 'Show Email', 'radio-station' ) ) . ':</label></div>
-		<input type="text" name="show_email" size="100" style="max-width:80%;" value="' . esc_attr( $email ) . '" /></p>';
+			// --- show website link ---
+			echo '<li class="show-item">' . PHP_EOL;
+				echo '<div class="input-label"><label>';
+				echo esc_html( __( 'Website Link', 'radio-station' ) ) . ':' . PHP_EOL;
+				echo '</label></div>';
+				echo '<div class="input-field">' . PHP_EOL;			
+				echo '<input type="text" name="show_link" size="100" style="max-width:80%;" value="' . esc_url( $link ) . '">' . PHP_EOL;
+				echo '</div>' . PHP_EOL;
+			echo '</li>' . PHP_EOL;
 
-		// 2.3.3.6: added Show phone number input field
-		echo '<p><div style="width:120px; display:inline-block;"><label>' . esc_html( __( 'Show Phone', 'radio-station' ) ) . ':</label></div>
-		<input type="text" name="show_phone" size="100" style="max-width:80%;" value="' . esc_attr( $phone ) . '" /></p>';
+			// --- show email address ---
+			// 2.3.3.6: change text string from DJ / Host email (as maybe multiple hosts)
+			echo '<li class="show-item">' . PHP_EOL;
+				echo '<div class="input-label"><label>';
+				echo esc_html( __( 'Show Email', 'radio-station' ) ) . ':' . PHP_EOL;
+				echo '</label></div>' . PHP_EOL;
+				echo '<div class="input-field">' . PHP_EOL;
+				echo '<input type="text" name="show_email" size="100" style="max-width:80%;" value="' . esc_attr( $email ) . '">' . PHP_EOL;
+				echo '</div>'. PHP_EOL;
+			echo '</li>' . PHP_EOL;
 
-		echo '<p><div style="width:120px; display:inline-block;"><label>' . esc_html( __( 'Latest Audio File', 'radio-station' ) ) . ':</label></div>
-		<input type="text" name="show_file" size="100" style="max-width:80%;" value="' . esc_attr( $file ) . '" /></p>';
+			// --- show phone number ---
+			// 2.3.3.6: added Show phone number input field
+			echo '<li class="show-item">' . PHP_EOL;
+				echo '<div class="input-label"><label>' . PHP_EOL;
+				echo esc_html( __( 'Show Phone', 'radio-station' ) ) . ':' . PHP_EOL;
+				echo '</label></div>' . PHP_EOL;
+				echo '<div class="input-field">' . PHP_EOL;
+				echo '<input type="text" name="show_phone" size="100" style="max-width:80%;" value="' . esc_attr( $phone ) . '">' . PHP_EOL;
+				echo '</div>' . PHP_EOL;
+			echo '</li>' . PHP_EOL;
 
-		// 2.3.2: added show download disable field
-		echo '<p><div style="width:120px; display:inline-block;"><label>' . esc_html( __( 'Disable Download', 'radio-station' ) ) . '?</label></div>
-		<input type="checkbox" name="show_download" ' . checked( $download, 'on', false ) . '></p>';
+			// --- show latest audio ---
+			echo '<li class="show-item">' . PHP_EOL;
+				echo '<div class="input-label"><label>' . PHP_EOL;
+				echo esc_html( __( 'Latest Audio File', 'radio-station' ) ) . ':' . PHP_EOL;
+				echo '</label></div>' . PHP_EOL;
+				echo '<div class="input-field">' . PHP_EOL;
+				echo '<input type="text" name="show_file" size="100" style="max-width:80%;" value="' . esc_attr( $file ) . '">' . PHP_EOL;
+				echo '</div>' . PHP_EOL;
+			echo '</li>' . PHP_EOL;
 
-		// 2.3.0: added patreon page field
-		echo '<p><div style="width:120px; display:inline-block;"><label>' . esc_html( __( 'Patreon Page ID', 'radio-station' ) ) . ':</label></div>';
-		echo ' https://patreon.com/<input type="text" name="show_patreon" size="80" style="max-width:50%;" value="' . esc_attr( $patreon_id ) . '" /></p>';
+			// --- disable download switch ---
+			// 2.3.2: added show download disable field
+			echo '<li class="show-item">' . PHP_EOL;
+				echo '<div class="input-label"><label>' . PHP_EOL;
+				echo esc_html( __( 'Disable Download', 'radio-station' ) ) . '?' . PHP_EOL;
+				echo '</label></div>' . PHP_EOL;
+				echo '<div class="input-field">' . PHP_EOL;
+				echo '<input type="checkbox" name="show_download" ' . checked( $download, 'on', false ) . '>' . PHP_EOL;
+				echo '</div>';
+			echo '</li>' . PHP_EOL;
 
-		// 2.3.3.5: added action for further custom fields
-		do_action( 'radio_station_show_fields', $post_id, 'show' );
+			// 2.3.0: added patreon page field
+			echo '<li class="show-item">' . PHP_EOL;
+				echo '<div class="input-label"><label>' . PHP_EOL;
+				echo esc_html( __( 'Patreon Page ID', 'radio-station' ) ) . ':' . PHP_EOL;
+				echo '</label></div>' . PHP_EOL;
+				echo '<div class="input-field">' . PHP_EOL;
+				echo ' https://patreon.com/<input type="text" name="show_patreon" size="80" style="max-width:50%;" value="' . esc_attr( $patreon_id ) . '">' . PHP_EOL;
+				echo '</div>' . PHP_EOL;
+			echo '</li>' . PHP_EOL;
 
-	echo '</div>';
+			// 2.3.3.5: added action for further custom fields
+			do_action( 'radio_station_show_fields', $post_id, 'show' );
+		
+		echo '</ul>' . PHP_EOL;
+
+	// --- close meta inner box ---
+	echo '</div>' . PHP_EOL;
 
 	// --- inside show metaboxes ---
 	// 2.3.0: move metaboxes together inside meta
@@ -475,7 +552,7 @@ function radio_station_show_info_metabox() {
 	);
 
 	// --- display inside metaboxes ---
-	echo '<div id="show-inside-metaboxes">';
+	echo '<div id="show-inside-metaboxes">' . PHP_EOL;
 	$i = 1;
 	foreach ( $inside_metaboxes as $key => $metabox ) {
 
@@ -505,14 +582,26 @@ function radio_station_show_info_metabox() {
 
 		$i++;
 	}
-	echo '</div>';
+	echo '</div>' . PHP_EOL;
 
-	// --- output inside metabox styles ---
+	// --- set metabox styles ---
 	// 2.3.3.9: remove !important from display inline-block rule
-	echo "<style>#show-inside-metaboxes .postbox {display: inline-block; min-width: 230px; max-width: 250px; vertical-align: top;}
+	// 2.3.3.9: added show input list styles
+	$css = ".show-input-list, .show-item {list-style: none;}
+	.show-item .input-label, .show-item .input-field, .show-item .input-helper {display: inline-block;}
+	.show-item .input-label {width: 120px;}
+	.show-item .input-field, .show-item .input-helper {margin-left: 20px;}
+	.show-item .input-field {max-width: 80%;}
+	#show-inside-metaboxes .postbox {display: inline-block; min-width: 230px; max-width: 250px; vertical-align: top;}
 	#show-inside-metaboxes .postbox.first {margin-right: 20px;}
 	#show-inside-metaboxes .postbox.last {margin-left: 20px;}
-	#show-inside-metaboxes .postbox select {max-width: 200px;}</style>";
+	#show-inside-metaboxes .postbox select {max-width: 200px;}";
+	
+	// --- filter and output styles ---
+	// 2.3.3.9: added edit styles filter
+	$css = apply_filters( 'radio_station_show_edit_styles', $css );
+	// phpcs:ignore WordPress.Security.OutputNotEscaped
+	echo '<style>' . $css . '</style>';
 }
 
 // ------------------------------
@@ -585,14 +674,15 @@ function radio_station_show_hosts_metabox() {
 				if ( in_array( $host->ID, $current ) ) {
 					echo ' selected="selected"';
 				}
-				echo '>' . esc_html( $display_name ) . '</option>';
+				echo '>' . esc_html( $display_name ) . '</option>' . PHP_EOL;
 			}
-        echo '</select>';
+        echo '</select>' . PHP_EOL;
 
-	    // --- multiple selection helper text ---
-		// 2.3.0: added multiple selection helper text
-		echo '<div style="font-size: 10px;">' . esc_html( __( 'Ctrl-Click selects multiple.', 'radio-station' ) ) . '</div>';
-	echo '</div>';
+	// --- multiple selection helper text ---
+	// 2.3.0: added multiple selection helper text
+	echo '<div style="font-size: 10px;">' . esc_html( __( 'Ctrl-Click selects multiple.', 'radio-station' ) ) . '</div>' . PHP_EOL;
+
+	echo '</div>' . PHP_EOL;
 }
 
 // ------------------------------------
@@ -638,16 +728,18 @@ function radio_station_show_producers_metabox() {
 	// --- move any selected DJs to the top of the list ---
 	foreach ( $producers as $i => $producer ) {
 		if ( in_array( $producer->ID, $current ) ) {
-			unset( $producers[$i] ); // unset first, or prepending will change the index numbers and cause you to delete the wrong item
-			array_unshift( $producers, $producer ); // prepend the user to the beginning of the array
+			// unset first, or prepending will change the index numbers and cause you to delete the wrong item
+			unset( $producers[$i] );
+			// prepend the user to the beginning of the array
+			array_unshift( $producers, $producer );
 		}
 	}
 
 	// --- Producer Selection Input ---
 	// 2.3.3.9: move meta_inner ID to class
-	echo '<div class="meta_inner">';
-		echo '<select name="show_producer_list[]" multiple="multiple" style="height: 120px; width: 100%;">';
-			echo '<option value=""></option>';
+	echo '<div class="meta_inner">' . PHP_EOL;
+		echo '<select name="show_producer_list[]" multiple="multiple" style="height: 120px; width: 100%;">' . PHP_EOL;
+			echo '<option value=""></option>' . PHP_EOL;
 			foreach ( $producers as $producer ) {
 				$display_name = $producer->display_name;
 				if ( $producer->display_name !== $producer->user_login ) {
@@ -657,12 +749,15 @@ function radio_station_show_producers_metabox() {
 				if ( in_array( $producer->ID, $current ) ) {
 					echo ' selected="selected"';
 				}
-				echo '>' . esc_html( $display_name ) . '</option>';
+				echo '>' . esc_html( $display_name ) . '</option>' . PHP_EOL;
 			}
-		echo '</select>';
+		echo '</select>' . PHP_EOL;
 
 		// --- multiple selection helper text ---
-		echo '<div style="font-size: 10px;">' . esc_html( __( 'Ctrl-Click selects multiple.', 'radio-station' ) ) . '</div>';
+		echo '<div style="font-size: 10px;">';
+		esc_html( __( 'Ctrl-Click selects multiple.', 'radio-station' ) );
+		echo '</div>' . PHP_EOL;
+
 	echo '</div>';
 }
 
@@ -705,13 +800,13 @@ function radio_station_show_shifts_metabox() {
 	wp_nonce_field( 'radio-station', 'show_shifts_nonce' );
 
 	// 2.3.3.9: move meta_inner ID to class
-	echo '<div class="meta_inner">';
+	echo '<div class="meta_inner">' . PHP_EOL;
 
-	echo '<div id="shifts-list">';
+	echo '<div id="shifts-list">' . PHP_EOL;
 
 	// 2.3.2: added to bypass shift check on add (for debugging)
 	if ( isset( $_REQUEST['check-bypass'] ) && ( '1' == $_REQUEST['check-bypass'] ) ) {
-		echo '<input type="hidden" name="check-bypass" value="1">';
+		echo '<input type="hidden" name="check-bypass" value="1">' . PHP_EOL;
 	}
 
 	// --- output show shifts table ---
@@ -721,10 +816,11 @@ function radio_station_show_shifts_metabox() {
 	// --- show inactive message ---
 	// 2.3.0: added show inactive reminder message
 	if ( !$table['active'] ) {
-		echo '<div class="shift-conflicts-message">';
+		// 2.3.3.9: change to mismatched div class 
+		echo '<div class="show-inactive-message">' . PHP_EOL;
 		echo '<b style="color:#EE0000;">' . esc_html( __( 'This Show is inactive!', 'radio-station' ) ) . '</b> ';
 		echo esc_html( __( 'All Shifts are inactive also until Show is activated.', 'radio-station' ) );
-		echo '</div>';
+		echo '</div>' . PHP_EOL;
 	}
 
 	// --- shift conflicts message ---
@@ -739,7 +835,7 @@ function radio_station_show_shifts_metabox() {
 		// phpcs:ignore WordPress.Security.OutputNotEscaped
 		echo $table['list'];
 	}
-	echo '</div>';
+	echo '</div>' . PHP_EOL;
 
 	// --- shift save/add buttons ---
 	// 2.3.0: center add shift button
@@ -748,25 +844,25 @@ function radio_station_show_shifts_metabox() {
 	// 2.3.2: added table and shifts saved message
 	// 2.3.2: fix centering by removing span wrapper
 	// 2.3.2: change from button-primary to button-secondary
+	// 2.3.3.9: change shift-table-buttons ID to shift-buttons class
 	// echo '<a class="shift-add button-secondary" style="margin-top: 10px;">' . esc_html( __( 'Add Shift', 'radio-station' ) ) . '</a>';
-	echo '<center>';
-	echo '<table id="shifts-table-buttons" width="100%"><tr><td width="33%" align="center">';
-	echo '<input type="button" class="shifts-clear button-secondary" value="' . esc_attr( __( 'Clear Shifts', 'radio-station' ) ) . '" onclick="radio_shifts_clear();">';
-	echo '</td><td width="33%" align="center">';
+	echo '<center><table class="shift-buttons" width="100%"><tr>' . PHP_EOL;
+	echo '<td width="33%" align="center">' . PHP_EOL;
+	echo '<input type="button" class="shifts-clear button-secondary" value="' . esc_attr( __( 'Clear Shifts', 'radio-station' ) ) . '" onclick="radio_shifts_clear();">' . PHP_EOL;
+	echo '</td><td width="33%" align="center">' . PHP_EOL;
 	if ( !is_object( $current_screen ) || ( 'add' != $current_screen->action ) ) {
-		echo '<input type="button" class="shifts-save button-primary" value="' . esc_attr( __( 'Save Shifts', 'radio-station' ) ) . '" onclick="radio_shifts_save();">';
+		echo '<input type="button" class="shifts-save button-primary" value="' . esc_attr( __( 'Save Shifts', 'radio-station' ) ) . '" onclick="radio_shifts_save();">' . PHP_EOL;
 	}
-	echo '</td><td width="33%" align="center">';
-	echo '<input type="button" class="shift-add button-secondary" value="' . esc_attr( __( 'Add Shift', 'radio-station' ) ) . '" onclick="radio_shift_new();">';
-	echo '</td></tr>';
+	echo '</td><td width="33%" align="center">' . PHP_EOL;
+	echo '<input type="button" class="shift-add button-secondary" value="' . esc_attr( __( 'Add Shift', 'radio-station' ) ) . '" onclick="radio_shift_new();">' . PHP_EOL;
+	echo '</td></tr>' . PHP_EOL;
 
 	// 2.3.3.9: change to single cell spanning 3 columns
-	echo '<tr><td colspan="3" align="center">';
-	echo '<div id="shifts-saving-message" style="display:none;">' . esc_html( __( 'Saving Show Shifts...', 'radio-station' ) ) . '</div>';
-	echo '<div id="shifts-saved-message" style="display:none;">' . esc_html( __( 'Show Shifts Saved.', 'radio-station' ) ) . '</div>';
-	echo '<div id="shifts-error-message" style="display:none;"></div>';
-	echo '</td></tr></table>';
-	echo '</center>';
+	echo '<tr><td colspan="3" align="center">' . PHP_EOL;
+	echo '<div id="shifts-saving-message" style="display:none;">' . esc_html( __( 'Saving Show Shifts...', 'radio-station' ) ) . '</div>' . PHP_EOL;
+	echo '<div id="shifts-saved-message" style="display:none;">' . esc_html( __( 'Show Shifts Saved.', 'radio-station' ) ) . '</div>' . PHP_EOL;
+	echo '<div id="shifts-error-message" style="display:none;"></div>' . PHP_EOL;
+	echo '</td></tr></table></center>' . PHP_EOL;
 
 	// --- get shift edit javascript ---
 	// 2.3.3.9: moved to separate function
@@ -778,7 +874,22 @@ function radio_station_show_shifts_metabox() {
 
 	// --- shift display styles ---
 	// 2.3.2: added dashed border to new shift
-	echo '<style>#new-shifts .show-shift {border: 2px dashed green; background-color: #FFFFDD;}
+	// 2.3.3.9: moved styles to separate function
+	$css = radio_station_shifts_list_styles();
+	echo '<style>' . $css . '</style>' . PHP_EOL;
+
+	// --- close meta inner ---
+	echo '</div>' . PHP_EOL;
+}
+
+// ------------------
+// Shifts List Styles
+// ------------------
+// 2.3.3.9: moved to separate function
+function radio_station_shifts_list_styles() {
+
+	// 2.3.3.9: change shift-table-buttons ID to shift-buttons class
+	$css = "#new-shifts .show-shift {border: 2px dashed green; background-color: #FFFFDD;}
 	.show-shift {list-style: none; margin-bottom: 10px; border: 2px solid green; background-color: #EEFFEE;}
 	.show-shift select.changed, .show-shift input[checkbox].changed {background-color: #FFFFCC;}
 	.show-shift select option.original {font-weight: bold;}
@@ -791,15 +902,15 @@ function radio_station_show_shifts_metabox() {
 	.show-shift.conflicts {outline: 2px solid red;}
 	.show-shift.disabled.conflicts {border: 2px dashed red;	outline: none;}
 	.show-shift select.incomplete {border: 2px solid orange;}
-	#shifts-table-buttons .shifts-clear, #shifts-table-buttons .shifts-save, #shifts-table-buttons .shift-add {
+	.shift-buttons .shifts-clear, .shift-buttons .shifts-save, .shift-buttons .shift-add {
 		cursor: pointer; display:block; width: 150px; padding: 8px; text-align: center; line-height: 1em;}
 	.shift-duplicate, .shift-remove {cursor: pointer;}
 	#shifts-saving-message, #shifts-saved-message {
-		background-color: lightYellow; border: 1px solid #E6DB55; margin-top: 10px; font-weight: bold; max-width: 300px; padding: 5px 0;}
-	</style>';
+		background-color: lightYellow; border: 1px solid #E6DB55; margin-top: 10px; font-weight: bold; max-width: 300px; padding: 5px 0;}" . PHP_EOL;
 
-	// --- close meta inner ---
-	echo '</div>';
+	// 2.3.3.9: added shift edit styles filter
+	$css = apply_filters( 'radio_station_shift_list_edit_styles', $css );
+	return $css;
 }
 
 // -----------------
@@ -981,8 +1092,8 @@ function radio_station_shift_edit_script() {
 			var count = jQuery('#new-shifts').children().length + 1;
 			output = '<div id=\"shift-wrapper-new' + count + '\" class=\"shift-wrapper\">';
 			output += '<ul id=\"shift-' + count + '\" class=\"show-shift new-shift\">';
-				output += '<li class=\"first-item\">';
-					output += '" . esc_js( __( 'Day', 'radio-station' ) ) . ": ';
+				output += '<li class=\"shift-item first-item\">';
+					output += '<label>" . esc_js( __( 'Day', 'radio-station' ) ) . "</label>: ';
 					output += '<select id=\"shift-new' + count + '-day\" name=\"show_sched[new-' + count + '][day]\" id=\"shift-new-' + count +'-day\">';";
 
 	// - shift day -
@@ -993,11 +1104,12 @@ function radio_station_shift_edit_script() {
 			output += '>" . esc_js( radio_station_translate_weekday( $day ) ) . "</option>';";
 	}
 	$js .= "output += '</select>';
-			output += '</li>';
+			output += '</li>';" . PHP_EOL;
 
-			output += '<li>';
-				output += '" . esc_js( __( 'Start Time', 'radio-station' ) ) . ": ';
-				output += '<select name=\"show_sched[new-' + count + '][start_hour]\" id=\"shift-new-' + count + '-start-hour\" style=\"min-width:35px;\">';";
+	// --- start time ---
+	$js.= "output += '<li class=\"shift-item\">';
+			output += '<label>" . esc_js( __( 'Start Time', 'radio-station' ) ) . "</label>: ';
+			output += '<select name=\"show_sched[new-' + count + '][start_hour]\" id=\"shift-new-' + count + '-start-hour\" style=\"min-width:35px;\">';";
 
 	// - start hour -
 	foreach ( $hours as $hour ) {
@@ -1026,10 +1138,10 @@ function radio_station_shift_edit_script() {
 				if (values.start_meridian == '" . esc_js( $pm ) . "') {output += ' selected=\"selected\"';}
 				output += '>" . esc_js( $pm ) . "</option>';
 			output += '</select> ';
-		output += '</li>';";
+		output += '</li>';" . PHP_EOL;
 
-	$js .= "output += '<li>';
-			output += '" . esc_js( __( 'End Time', 'radio-station' ) ) . ": ';
+	$js .= "output += '<li class=\"shift-item\">';
+			output += '<label>" . esc_js( __( 'End Time', 'radio-station' ) ) . "</label>: ';
 			output += '<select name=\"show_sched[new-' + count + '][end_hour]\" id=\"shift-new-' + count + '-end-hour\" style=\"min-width:35px;\">';";
 
 	// - end hour -
@@ -1038,7 +1150,7 @@ function radio_station_shift_edit_script() {
 				if (values.end_hour == '" . esc_js( $hour ) . "') {output += ' selected=\"selected\"';}
 				output += '>" . esc_js( $hour ) . "</option>';";
 	}
-	$js .= "output += '</select> ';";
+	$js .= "output += '</select> ';" . PHP_EOL;
 
 
 	// - end min -
@@ -1049,7 +1161,7 @@ function radio_station_shift_edit_script() {
 				if (values.end_min == '" . esc_js( $min ) . "') {output += ' selected=\"selected\"';}
 				output += '>" . esc_js( $min ) . "</option>';";
 	}
-	$js .= "output += '</select> ';";
+	$js .= "output += '</select> ';" . PHP_EOL;
 
 	// - end meridian -
 	$js .= "output += '<select name=\"show_sched[new-' + count + '][end_meridian]\" id=\"shift-new-' + count + '-end-meridian\" style=\"min-width:35px;\">';
@@ -1060,31 +1172,31 @@ function radio_station_shift_edit_script() {
 				if (values.end_meridian == '" . esc_js( $pm ) . "') {output += ' selected=\"selected\"';}
 				output += '>" . esc_js( $pm ) . "</option>';
 			output += '</select> ';
-		output += '</li>';";
+		output += '</li>';" . PHP_EOL;
 
 	// - encore -
-	$js .= "output += '<li>';
+	$js .= "output += '<li class=\"shift-item shift-encore\">';
 			output += '<input type=\"checkbox\" value=\"on\" name=\"show_sched[new-' + count + '][encore]\" id=\"shift-new-' + count + '-encore\"';
 			if (values.encore == 'on') {output += ' checked=\"checked\"';}
-			output += '> " . esc_js( __( 'Encore', 'radio-station' ) ) . "';
-		output += '</li>';";
+			output += '> <label>" . esc_js( __( 'Encore', 'radio-station' ) ) . "</label>';
+		output += '</li>';" . PHP_EOL;
 
 	// - disabled shift -
-	$js .= "output += '<li>';
+	$js .= "output += '<li class=\"shift-item shift-disable\">';
 			output += '<input type=\"checkbox\" value=\"yes\" name=\"show_sched[new-' + count + '][disabled]\" id=\"shift-new-' + count + '-disabled\"';
 			if (values.disabled != '') {output += ' checked=\"checked\"';}
-			output += '> " . esc_js( __( 'Disabled', 'radio-station' ) ) . "';
-		output += '</li>';";
+			output += '> <label>" . esc_js( __( 'Disabled', 'radio-station' ) ) . "</label>';
+		output += '</li>';" . PHP_EOL;
 
 	// - duplicate shift -
-	$js .= "output += '<li>';
+	$js .= "output += '<li class=\"shift-item\">';
 			output += '<span id=\"shift-new' + count + '-duplicate\" class=\"shift-duplicate dashicons dashicons-admin-page\" title=\"" . esc_js( __( 'Duplicate Shift', 'radio-station' ) ) . "\" onclick=\"radio_shift_duplicate(this);\"></span>';
-		output += '</li>';";
+		output += '</li>';" . PHP_EOL;
 
 	// - remove shift -
-	$js .= "output += '<li class=\"last-item\">';
+	$js .= "output += '<li class=\"shift-item last-item\">';
 			output += '<span id=\"shift-new' + count + '-remove\" class=\"shift-remove dashicons dashicons-no\" title=\"" . esc_js( __( 'Remove Shift', 'radio-station' ) ) . "\" onclick=\"radio_shift_remove(this);\"></span>';
-		output += '</li>';";
+		output += '</li>';" . PHP_EOL;
 
 	// --- append new shift list item ---
 	$js .= "output += '</ul></div>';
@@ -1099,14 +1211,16 @@ function radio_station_shift_edit_script() {
 // -----------------------
 // Shifts Oonflict Message
 // -----------------------
-function radio_station_shifts_conflict_message() {
-	echo '<div class="shift-conflicts-message">';
-	echo '<b style="color:#EE0000;">' . esc_html( __( 'Warning! Show Shift Conflicts were detected!', 'radio-station' ) ) . '</b><br>';
-	echo esc_html( __( 'Please note that Shifts with conflicts are automatically disabled upon saving.', 'radio-station' ) ) . '<br>';
-	echo esc_html( __( 'Fix the Shift and/or the Shift on the conflicting Show and Update them both.', 'radio-station' ) ) . '<br>';
-	echo esc_html( __( 'Then you can uncheck the shift Disable box and Update to re-enable the Shift.', 'radio-station' ) ) . '<br>';
+// 2.3.3.9: add hidden argument
+function radio_station_shifts_conflict_message( $hidden = false ) {
+
+	echo '<div class="shift-conflicts-message" style="display:none;">' . PHP_EOL;
+	echo '<b style="color:#EE0000;">' . esc_html( __( 'Warning! Show Shift Conflicts were detected!', 'radio-station' ) ) . '</b><br>' . PHP_EOL;
+	echo esc_html( __( 'Please note that Shifts with conflicts are automatically disabled upon saving.', 'radio-station' ) ) . PHP_EOL;
+	echo esc_html( __( 'Fix the Shift and/or the Shift on the conflicting Show and Update them both.', 'radio-station' ) ) . PHP_EOL;
+	echo esc_html( __( 'Then you can uncheck the shift Disable box and Save again to re-enable the Shift.', 'radio-station' ) ) . '<br>' . PHP_EOL;
 	// TODO: add more information blog post / documentation link ?
-	// echo '<a href="' . RADIO_STATION_DOC_URL . '/manage/#" target="_blank">' . esc_html( __( 'Show Documentation', 'radio-station' ) ) . '</a>';
+	// echo '<a href="' . RADIO_STATION_DOC_URL . '/manage/#shift-conflict-checking" target="_blank">' . esc_html( __( 'Show Documentation', 'radio-station' ) ) . '</a>';
 	echo '</div><br>';
 }
 
@@ -1299,145 +1413,149 @@ function radio_station_show_shifts_table( $post_id ) {
 			}
 			$classlist = implode( " ", $classes );
 
-			$list .= '<div id="shift-wrapper-' . esc_attr( $unique_id ) . '" class="shift-wrapper">';
-				$list .= '<ul id="shift-' . esc_attr( $unique_id ) . '" class="' . esc_attr( $classlist ) . '">';
+			$list .= '<div id="shift-wrapper-' . esc_attr( $unique_id ) . '" class="shift-wrapper">' . PHP_EOL;
+
+				$list .= '<ul id="shift-' . esc_attr( $unique_id ) . '" class="' . esc_attr( $classlist ) . '">' . PHP_EOL;
 
 				// --- shift day selection ---
-				$list .= '<li class="first-item">';
-				$list .= esc_html( __( 'Day', 'radio-station' ) ) . ': ';
+				$list .= '<li class="shift-item first-item">' . PHP_EOL;
+				$list .= '<label>' . esc_html( __( 'Day', 'radio-station' ) ) . '</label>: ';
 
 				$class = ( '' == $shift['day'] ) ? 'incomplete' : '';
-				$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-day" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][day]" onchange="radio_check_select(this);">';
-					// 2.3.0: simplify by looping days
-					foreach ( $days as $day ) {
-						// 2.3.0: add weekday translation to display
-						$list .= '<option value="' . esc_attr( $day ) . '" ' . selected( $day, $shift['day'], false ) . '>';
-						$list .= esc_html( radio_station_translate_weekday( $day ) ) . '</option>';
-					}
-				$list .= '</select>';
-				$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-day" value="' . esc_attr( $shift['day'] ) . '">';
-				$list .= '</li>';
+				$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-day" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][day]" onchange="radio_check_select(this);">' . PHP_EOL;
+				// 2.3.0: simplify by looping days
+				foreach ( $days as $day ) {
+					// 2.3.0: add weekday translation to display
+					$list .= '<option value="' . esc_attr( $day ) . '" ' . selected( $day, $shift['day'], false ) . '>' . PHP_EOL;
+					$list .= esc_html( radio_station_translate_weekday( $day ) ) . '</option>' . PHP_EOL;
+				}
+				$list .= '</select>' . PHP_EOL;
+				$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-day" value="' . esc_attr( $shift['day'] ) . '">' . PHP_EOL;
+				$list .= '</li>' . PHP_EOL;
 
 				// --- shift start time ---
-				$list .= '<li>';
-					$list .= esc_html( __( 'Start Time', 'radio-station' ) ) . ': ';
+				$list .= '<li class="shift-item">' . PHP_EOL;
+
+					$list .= '<label>' . esc_html( __( 'Start Time', 'radio-station' ) ) . '</label>: ' . PHP_EOL;
 
 					// --- start hour selection ---
 					$class = ( '' == $shift['start_hour'] ) ? 'incomplete' : '';
-					$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-start-hour" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][start_hour]" onchange="radio_check_select(this);" style="min-width:35px;">';
+					$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-start-hour" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][start_hour]" onchange="radio_check_select(this);" style="min-width:35px;">' . PHP_EOL;
 					foreach ( $hours as $hour ) {
 						$class = ( $hour == $shift['start_hour'] ) ? 'original' : '';
-						$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $hour ) . '" ' . selected( $hour, $shift['start_hour'], false ) . '>' . esc_html( $hour ) . '</option>';
+						$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $hour ) . '" ' . selected( $hour, $shift['start_hour'], false ) . '>' . esc_html( $hour ) . '</option>' . PHP_EOL;
 					}
-					$list .= '</select>';
-					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-start-hour" value="' . esc_attr( $shift['start_hour'] ) . '">';
+					$list .= '</select>' . PHP_EOL;
+					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-start-hour" value="' . esc_attr( $shift['start_hour'] ) . '">' . PHP_EOL;
 
 					// --- start minute selection ---
-					$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-start-min" name="show_sched[' . esc_attr( $unique_id ) . '][start_min]" onchange="radio_check_select(this);" style="min-width:35px;">';
-						$list .= '<option value=""></option>';
-						$list .= '<option value="00">00</option>';
-						$list .= '<option value="15">15</option>';
-						$list .= '<option value="30">30</option>';
-						$list .= '<option value="45">45</option>';
+					$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-start-min" name="show_sched[' . esc_attr( $unique_id ) . '][start_min]" onchange="radio_check_select(this);" style="min-width:35px;">' . PHP_EOL;
+						$list .= '<option value=""></option>' . PHP_EOL;
+						$list .= '<option value="00">00</option>' . PHP_EOL;
+						$list .= '<option value="15">15</option>' . PHP_EOL;
+						$list .= '<option value="30">30</option>' . PHP_EOL;
+						$list .= '<option value="45">45</option>' . PHP_EOL;
 						foreach ( $mins as $min ) {
 							$class = ( $min == $shift['start_min'] ) ? 'original' : '';
-							$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $min ) . '" ' . selected( $min, $shift['start_min'], false ) . '>' . esc_html( $min ) . '</option>';
+							$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $min ) . '" ' . selected( $min, $shift['start_min'], false ) . '>' . esc_html( $min ) . '</option>' . PHP_EOL;
 						}
-					$list .= '</select>';
-					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-start-min" value="' . esc_attr( $shift['start_min'] ) . '">';
+					$list .= '</select>' . PHP_EOL;
+					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-start-min" value="' . esc_attr( $shift['start_min'] ) . '">' . PHP_EOL;
 
 					// --- start meridiem selection ---
 					$class = ( '' == $shift['start_meridian'] ) ? 'incomplete' :  '';
-					$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-start-meridian" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][start_meridian]" onchange="radio_check_select(this);" style="min-width:35px;">';
+					$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-start-meridian" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][start_meridian]" onchange="radio_check_select(this);" style="min-width:35px;">' . PHP_EOL;
 						$class = ( 'am' == $shift['start_meridian'] ) ? 'original' : '';
-						$list .= '<option class="' . esc_attr( $class ) . '" value="am" ' . selected( $shift['start_meridian'], 'am', false ) . '>' . esc_html( $am ) . '</option>';
+						$list .= '<option class="' . esc_attr( $class ) . '" value="am" ' . selected( $shift['start_meridian'], 'am', false ) . '>' . esc_html( $am ) . '</option>' . PHP_EOL;
 						$class = ( 'pm' == $shift['start_meridian'] ) ? 'original' : '';
-						$list .= '<option class="' . esc_attr( $class ) . '" value="pm" ' . selected( $shift['start_meridian'], 'pm', false ) . '>' . esc_html( $pm ) . '</option>';
-					$list .= '</select>';
-					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-start-meridian" value="' . esc_attr( $shift['start_meridian'] ) . '">';
+						$list .= '<option class="' . esc_attr( $class ) . '" value="pm" ' . selected( $shift['start_meridian'], 'pm', false ) . '>' . esc_html( $pm ) . '</option>' . PHP_EOL;
+					$list .= '</select>' . PHP_EOL;
+					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-start-meridian" value="' . esc_attr( $shift['start_meridian'] ) . '">' . PHP_EOL;
 
-				$list .= '</li>';
+				$list .= '</li>' . PHP_EOL;
 
 				// --- shift end time ---
-				$list .= '<li>';
-					$list .= esc_html( __( 'End Time', 'radio-station' ) ) . ': ';
+				$list .= '<li class="shift-item">' . PHP_EOL;
+
+					$list .= '<label>' . esc_html( __( 'End Time', 'radio-station' ) ) . '</label>: ';
 
 					// --- end hour selection ---
 					$class = ( '' == $shift['end_hour'] ) ? 'incomplete' : '';
-					$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-end-hour" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][end_hour]" onchange="radio_check_select(this);" style="min-width:35px;">';
+					$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-end-hour" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][end_hour]" onchange="radio_check_select(this);" style="min-width:35px;">' . PHP_EOL;
 						foreach ( $hours as $hour ) {
 							$class = ( $hour == $shift['end_hour'] ) ? 'original' : '';
-							$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $hour ) . '" ' . selected( $shift['end_hour'], $hour, false ) . '>' . esc_html( $hour ) . '</option>';
+							$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $hour ) . '" ' . selected( $shift['end_hour'], $hour, false ) . '>' . esc_html( $hour ) . '</option>' . PHP_EOL;
 						}
-					$list .= '</select>';
-					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-end-hour" value="' . esc_attr( $shift['end_hour'] ) . '">';
+					$list .= '</select>' . PHP_EOL;
+					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-end-hour" value="' . esc_attr( $shift['end_hour'] ) . '">' . PHP_EOL;
 
 				// --- end minute selection ---
-				$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-end-min" name="show_sched[' . esc_attr( $unique_id ) . '][end_min]" onchange="radio_check_select(this);" style="min-width:35px;">';
-					$list .= '<option value=""></option>';
-					$list .= '<option value="00">00</option>';
-					$list .= '<option value="15">15</option>';
-					$list .= '<option value="30">30</option>';
-					$list .= '<option value="45">45</option>';
+				$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-end-min" name="show_sched[' . esc_attr( $unique_id ) . '][end_min]" onchange="radio_check_select(this);" style="min-width:35px;">' . PHP_EOL;
+					$list .= '<option value=""></option>' . PHP_EOL;
+					$list .= '<option value="00">00</option>' . PHP_EOL;
+					$list .= '<option value="15">15</option>' . PHP_EOL;
+					$list .= '<option value="30">30</option>' . PHP_EOL;
+					$list .= '<option value="45">45</option>' . PHP_EOL;
 					foreach ( $mins as $min ) {
 						$class = ( $min == $shift['end_min'] ) ? 'original' : '';
-						$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $min ) . '" ' . selected( $shift['end_min'], $min, false ) . '>' . esc_html( $min ) . '</option>';
+						$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $min ) . '" ' . selected( $shift['end_min'], $min, false ) . '>' . esc_html( $min ) . '</option>' . PHP_EOL;
 					}
-				$list .= '</select>';
-				$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-end-min" value="' . esc_attr( $shift['end_min'] ) . '">';
+				$list .= '</select>' . PHP_EOL;
+				$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-end-min" value="' . esc_attr( $shift['end_min'] ) . '">' . PHP_EOL;
 
 				// --- end meridiem selection ---
 				$class = ( '' == $shift['end_meridian'] ) ? 'incomplete' : '';
-					$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-end-meridian" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][end_meridian]" onchange="radio_check_select(this);" style="min-width:35px;">';
+					$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-end-meridian" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][end_meridian]" onchange="radio_check_select(this);" style="min-width:35px;">' . PHP_EOL;
 					$class = ( 'am' == $shift['end_meridian'] ) ? 'original' : '';
-					$list .= '<option class="' . esc_attr( $class ) . '" value="am" ' . selected( $shift['end_meridian'], 'am', false ) . '>' . esc_html( $am ) . '</option>';
+					$list .= '<option class="' . esc_attr( $class ) . '" value="am" ' . selected( $shift['end_meridian'], 'am', false ) . '>' . esc_html( $am ) . '</option>' . PHP_EOL;
 					$class = ( 'pm' == $shift['end_meridian'] ) ? 'original' : '';
-					$list .= '<option class="' . esc_attr( $class ) . '" value="pm" ' . selected( $shift['end_meridian'], 'pm', false ) . '>' . esc_html( $pm ) . '</option>';
-					$list .= '</select>';
-					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-end-meridian" value="' . esc_attr( $shift['end_meridian'] ) . '">';
-				$list .= '</li>';
+					$list .= '<option class="' . esc_attr( $class ) . '" value="pm" ' . selected( $shift['end_meridian'], 'pm', false ) . '>' . esc_html( $pm ) . '</option>' . PHP_EOL;
+					$list .= '</select>' . PHP_EOL;
+					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-end-meridian" value="' . esc_attr( $shift['end_meridian'] ) . '">' . PHP_EOL;
+				$list .= '</li>' . PHP_EOL;
 
 				// --- encore presentation ---
 				if ( !isset( $shift['encore'] ) ) {
 					$shift['encore'] = '';
 				}
-				$list .= '<li>';
-					$list .= '<input id="' . esc_attr( $unique_id ) . '-encore" type="checkbox" value="on" name="show_sched[' . esc_attr( $unique_id ) . '][encore]" id="shift-' . esc_attr( $unique_id ) . '-encore"' . checked( $shift['encore'], 'on', false ) . ' onchange="radio_check_checkbox(this);">';
-					$list .= ' ' . esc_html( __( 'Encore', 'radio-station' ) );
-					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-encore" value="' . esc_attr( $shift['encore'] ) . '">';
-				$list .= '</li>';
+				$list .= '<li class="shift-item shift-encore">' . PHP_EOL;
+					$list .= '<input id="' . esc_attr( $unique_id ) . '-encore" type="checkbox" value="on" name="show_sched[' . esc_attr( $unique_id ) . '][encore]" id="shift-' . esc_attr( $unique_id ) . '-encore"' . checked( $shift['encore'], 'on', false ) . ' onchange="radio_check_checkbox(this);">' . PHP_EOL;
+					$list .= ' <label>' . esc_html( __( 'Encore', 'radio-station' ) ) . '</label>' . PHP_EOL;
+					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-encore" value="' . esc_attr( $shift['encore'] ) . '">' . PHP_EOL;
+				$list .= '</li>' . PHP_EOL;
 
 				// --- shift disabled ---
 				// 2.3.0: added disabled checkbox to shift row
 				if ( !isset( $shift['disabled'] ) ) {
 					$shift['disabled'] = '';
 				}
-				$list .= '<li>';
-					$list .= '<input id="' . esc_attr( $unique_id ) . '-disabled" type="checkbox" value="yes" name="show_sched[' . esc_attr( $unique_id ) . '][disabled]" id="shift-' . esc_attr( $unique_id ) . '-disabled"' . checked( $shift['disabled'], 'yes', false ) . ' onchange="radio_check_checkbox(this);">';
-					$list .= ' ' . esc_html( __( 'Disabled', 'radio-station' ) );
-					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-disabled" value="' . esc_attr( $shift['disabled'] ) . '">';
-				$list .= '</li>';
+				$list .= '<li class="shift-item shift-disable">' . PHP_EOL;
+					$list .= '<input id="' . esc_attr( $unique_id ) . '-disabled" type="checkbox" value="yes" name="show_sched[' . esc_attr( $unique_id ) . '][disabled]" id="shift-' . esc_attr( $unique_id ) . '-disabled"' . checked( $shift['disabled'], 'yes', false ) . ' onchange="radio_check_checkbox(this);">' . PHP_EOL;
+					$list .= ' <label>' . esc_html( __( 'Disabled', 'radio-station' ) ) . '</label>' . PHP_EOL;
+					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-disabled" value="' . esc_attr( $shift['disabled'] ) . '">' . PHP_EOL;
+				$list .= '</li>' . PHP_EOL;
 
 				// --- duplicate shift icon ---
 				// 2.3.0: added duplicate shift icon
-				$list .= '<li>';
-					$title = __( 'Duplicate Shift', 'radio-station' );
-					$list .= '<span id="shift-' . esc_attr( $unique_id ) . '-duplicate" class="shift-duplicate dashicons dashicons-admin-page" title="' . esc_attr( $title ) . '" onclick="radio_shift_duplicate(this);"></span>';
-				$list .= '</li>';
+				$list .= '<li class="shift-item">' . PHP_EOL;
+					$title = __( 'Duplicate Shift', 'radio-station' ) . PHP_EOL;
+					$list .= '<span id="shift-' . esc_attr( $unique_id ) . '-duplicate" class="shift-duplicate dashicons dashicons-admin-page" title="' . esc_attr( $title ) . '" onclick="radio_shift_duplicate(this);"></span>' . PHP_EOL;
+				$list .= '</li>' . PHP_EOL;
 
 				// --- remove shift icon ---
 				// 2.3.0: change remove button to icon
-				$list .= '<li class="last-item">';
-					$title = __( 'Remove Shift', 'radio-station' );
-					$list .= '<span id="shift-' . esc_attr( $unique_id ) . '-remove" class="shift-remove dashicons dashicons-no" title="' . esc_attr( $title ) . '" onclick="radio_shift_remove(this);"></span>';
-				$list .= '</li>';
+				$list .= '<li class="shift-item last-item">' . PHP_EOL;
+					$title = __( 'Remove Shift', 'radio-station' ) . PHP_EOL;
+					$list .= '<span id="shift-' . esc_attr( $unique_id ) . '-remove" class="shift-remove dashicons dashicons-no" title="' . esc_attr( $title ) . '" onclick="radio_shift_remove(this);"></span>' . PHP_EOL;
+				$list .= '</li>' . PHP_EOL;
 
-			$list .= '</ul>';
+			$list .= '</ul>' . PHP_EOL;
 
 			// --- output any shift conflicts found ---
 			if ( $conflicts && is_array( $conflicts ) && ( count( $conflicts ) > 0 ) ) {
-				$list .= '<div class="shift-conflicts">';
-				$list .= '<b>' . esc_html( __( 'Shift Conflicts', 'radio-station' ) ) . '</b>: ';
+
+				$list .= '<div class="shift-conflicts">' . PHP_EOL;
+				$list .= '<b>' . esc_html( __( 'Shift Conflicts', 'radio-station' ) ) . '</b>: ' . PHP_EOL;
 				foreach ( $conflicts as $j => $conflict ) {
 					if ( $j > 0 ) {
 						$list .= ', ';
@@ -1453,18 +1571,22 @@ function radio_station_show_shifts_table( $post_id ) {
 					$conflict_end = esc_html( $conflict['shift']['end_hour'] ) . ':' . esc_html( $conflict['shift']['end_min'] ). ' ' . esc_html( $conflict['shift']['end_meridian'] );
 					$list .= ' - ' . esc_html( $conflict['shift']['day'] ) . ' ' . $conflict_start . ' - ' . $conflict_end;
 				}
-				$list .= '</div><br>';
+				$list .= '</div><br>' . PHP_EOL;
 			}
 
 			// --- close shift wrapper ---
-			$list .= '</div>';
+			$list .= '</div>' . PHP_EOL;
 
 		}
 	}
 
 	// 2.3.2: moved into function and changed ID
 	// 2.3.3.9: change element from span to div
-	$list .= '<div id="new-shifts"></div>';
+	$list .= '<div id="new-shifts"></div>' . PHP_EOL;
+
+	if ( RADIO_STATION_DEBUG ) {
+		$list .= 'Conflict List: ' . print_r( $conflict_list, true ) . '<br>' . PHP_EOL;
+	}
 
 	// --- set return data ---
 	// 2.3.2: added for separated function
@@ -1502,14 +1624,15 @@ function radio_station_add_show_helper_box() {
 function radio_station_show_helper_box() {
 
 	// --- show description helper text ---
-	echo '<p>';
-	echo esc_html( __( "The text field below is for your Show Description. It will display in the About section of your Show page.", 'radio-station' ) );
-	echo ' ' . esc_html( __( "It is not recommended to include your past show content or archives in this area, as it will affect the Show page layout your visitors see.", 'radio-station' ) );
-	echo esc_html( __( "It may also impact SEO, as archived content won't have their own pages and thus their own SEO and Social meta rules.", 'radio-station' ) ) . "<br>";
-	echo esc_html( __( "We recommend using WordPress Posts to add new posts and assign them to your Show(s) using the Related Show metabox on the Post Edit screen so they display on the Show page.", 'radio-station' ) );
-	echo ' ' . esc_html( __( "You can then assign them to a relevant Post Category for display on your site also.", 'radio-station' ) );
-	echo '</p>';
+	echo '<p>' . PHP_EOL;
+	echo esc_html( __( 'The text field below is for your Show Description. It will display in the About section of your Show page.', 'radio-station' ) );
+	echo ' ' . esc_html( __( 'It is not recommended to include your past show content or archives in this area, as it will affect the Show page layout your visitors see.', 'radio-station' ) );
+	echo esc_html( __( "It may also impact SEO, as archived content won't have their own pages and thus their own SEO and Social meta rules.", 'radio-station' ) ) . '<br>';
+	echo esc_html( __( 'We recommend using WordPress Posts to add new posts and assign them to your Show(s) using the Related Show metabox on the Post Edit screen so they display on the Show page.', 'radio-station' ) );
+	echo ' ' . esc_html( __( 'This way you can then assign them to a relevant Post Category for display on your site also.', 'radio-station' ) );
+	echo '</p>' . PHP_EOL;
 
+	// [Pro Blurb]
 	// TODO: upgrade to Pro for upcoming Show Episodes blurb
 	// echo '<br>' . esc_html( 'In future, Radio Station Pro will include an Episodes post type', 'radio-station' ) );
 	// TODO: change this text/link when Pro Episodes become available
@@ -1580,41 +1703,42 @@ function radio_station_show_images_metabox() {
 	$has_show_avatar = is_array( $show_avatar_src );
 
 	// --- show avatar image ---
-	echo '<div id="show-avatar-image">';
+	echo '<div id="show-avatar-image">' . PHP_EOL;
 
 	// --- image container ---
-	echo '<div class="custom-image-container">';
+	echo '<div class="custom-image-container">' . PHP_EOL;
 	if ( $has_show_avatar ) {
-		echo '<img src="' . esc_url( $show_avatar_src[0] ) . '" alt="" style="max-width:100%;">';
+		echo '<img src="' . esc_url( $show_avatar_src[0] ) . '" alt="" style="max-width:100%;">' . PHP_EOL;
 	}
-	echo '</div>';
+	echo '</div>' . PHP_EOL;
 
 	// --- add and remove links ---
-	echo '<p class="hide-if-no-js">';
+	echo '<p class="hide-if-no-js">' . PHP_EOL;
 	$hidden = '';
 	if ( $has_show_avatar ) {
 		$hidden = ' hidden';
 	}
-	echo '<a class="upload-custom-image' . esc_attr( $hidden ) . '" href="' . esc_url( $upload_link ) . '">';
-	echo esc_html( __( 'Set Show Avatar Image', 'radio-station' ) );
-	echo '</a>';
+	echo '<a class="upload-custom-image' . esc_attr( $hidden ) . '" href="' . esc_url( $upload_link ) . '">' . PHP_EOL;
+	echo esc_html( __( 'Set Show Avatar Image', 'radio-station' ) ) . PHP_EOL;
+	echo '</a>' . PHP_EOL;
 	$hidden = '';
 	if ( !$has_show_avatar ) {
 		$hidden = ' hidden';
 	}
-	echo '<a class="delete-custom-image' . esc_attr( $hidden ) . '" href="#">';
-	echo esc_html( __( 'Remove Show Avatar Image', 'radio-station' ) );
-	echo '</a>';
-	echo '</p>';
+	echo '<a class="delete-custom-image' . esc_attr( $hidden ) . '" href="#">' . PHP_EOL;
+	echo esc_html( __( 'Remove Show Avatar Image', 'radio-station' ) ) . PHP_EOL;
+	echo '</a>' . PHP_EOL;
+	echo '</p>' . PHP_EOL;
 
 	// --- hidden input for image ID ---
-	echo '<input class="custom-image-id" name="show_avatar" type="hidden" value="' . esc_attr( $show_avatar ) . '">';
+	echo '<input class="custom-image-id" name="show_avatar" type="hidden" value="' . esc_attr( $show_avatar ) . '">' . PHP_EOL;
 
-	echo '</div>';
+	echo '</div>' . PHP_EOL;
 
 	// --- check if show content header image is enabled ---
+	// 2.3.3.9: fix to match yes string value
 	$header_image = radio_station_get_setting( 'show_header_image' );
-	if ( $header_image ) {
+	if ( 'yes' == $header_image ) {
 
 		// --- get show header image info
 		$show_header = get_post_meta( $post->ID, 'show_header', true );
@@ -1622,107 +1746,115 @@ function radio_station_show_images_metabox() {
 		$has_show_header = is_array( $show_header_src );
 
 		// --- show header image ---
-		echo '<div id="show-header-image">';
+		echo '<div id="show-header-image">' . PHP_EOL;
 
 		// --- image container ---
-		echo '<div class="custom-image-container">';
+		echo '<div class="custom-image-container">' . PHP_EOL;
 		if ( $has_show_header ) {
-			echo '<img src="' . esc_url( $show_header_src[0] ) . '" alt="" style="max-width:100%;">';
+			echo '<img src="' . esc_url( $show_header_src[0] ) . '" alt="" style="max-width:100%;">' . PHP_EOL;
 		}
-		echo '</div>';
+		echo '</div>' . PHP_EOL;
 
 		// --- add and remove links ---
-		echo '<p class="hide-if-no-js">';
+		echo '<p class="hide-if-no-js">' . PHP_EOL;
 		$hidden = '';
 		if ( $has_show_header ) {
 			$hidden = ' hidden';
 		}
-		echo '<a class="upload-custom-image' . esc_attr( $hidden ) . '" href="' . esc_url( $upload_link ) . '">';
-		echo esc_html( __( 'Set Show Header Image', 'radio-station' ) );
-		echo '</a>';
+		echo '<a class="upload-custom-image' . esc_attr( $hidden ) . '" href="' . esc_url( $upload_link ) . '">' . PHP_EOL;
+		echo esc_html( __( 'Set Show Header Image', 'radio-station' ) ) . PHP_EOL;
+		echo '</a>' . PHP_EOL;
 		$hidden = '';
 		if ( !$has_show_header ) {
 			$hidden = ' hidden';
 		}
-		echo '<a class="delete-custom-image' . esc_attr( $hidden ) . '" href="#">';
-		echo esc_html( __( 'Remove Show Header Image', 'radio-station' ) );
-		echo '</a>';
-		echo '</p>';
+		echo '<a class="delete-custom-image' . esc_attr( $hidden ) . '" href="#">' . PHP_EOL;
+		echo esc_html( __( 'Remove Show Header Image', 'radio-station' ) ) . PHP_EOL;
+		echo '</a>' . PHP_EOL;
+		echo '</p>' . PHP_EOL;
 
 		// --- hidden input for image ID ---
-		echo '<input class="custom-image-id" name="show_header" type="hidden" value="' . esc_attr( $show_header ) . '">';
+		echo '<input class="custom-image-id" name="show_header" type="hidden" value="' . esc_attr( $show_header ) . '">' . PHP_EOL;
 
-		echo '</div>';
+		echo '</div>' . PHP_EOL;
 
 	}
 
 	// --- set images autosave nonce and iframe ---
 	$images_autosave_nonce = wp_create_nonce( 'show-images-autosave' );
-	echo '<input type="hidden" id="show-images-save-nonce" value="' . esc_attr( $images_autosave_nonce ) . '">';
-	echo '<iframe src="javascript:void(0);" name="show-images-save-frame" id="show-images-save-frame" style="display:none;"></iframe>';
+	echo '<input type="hidden" id="show-images-save-nonce" value="' . esc_attr( $images_autosave_nonce ) . '">' . PHP_EOL;
+	echo '<iframe src="javascript:void(0);" name="show-images-save-frame" id="show-images-save-frame" style="display:none;"></iframe>' . PHP_EOL;
+
+	// --- script text strings ---
+	$image_confirm_remove = __( 'Are you sure you want to remove this image?', 'radio-station' );
+	$media_title_text = __( 'Select or Upload Image' ,'radio-station' );
+	$media_button_text = __( 'Use this Image', 'radio-station' );
 
 	// --- image selection script ---
-	$confirm_remove = __( 'Are you sure you want to remove this image?', 'radio-station' );
-	$js = "jQuery(function(){
+	// 2.3.3.9: add library argument to wp.media load
+	$js = "	var mediaframe, parentdiv,
+	imagesmetabox = jQuery('#radio-station-show-images-metabox'),
+	addimagelink = imagesmetabox.find('.upload-custom-image'),
+	deleteimagelink = imagesmetabox.find('.delete-custom-image'),
+	imageconfirmremove = '" . esc_js( $image_confirm_remove ) . "',
+	wpmediatitletext = '" . esc_js( $media_title_text ). "',
+	wpmediabuttontext = '" . esc_js( $media_button_text ) . "';
 
-		var mediaframe, parentdiv,
-			imagesmetabox = jQuery('#radio-station-show-images-metabox'),
-			addimagelink = imagesmetabox.find('.upload-custom-image'),
-			deleteimagelink = imagesmetabox.find('.delete-custom-image');
+	/* Add Image on Click */
+	addimagelink.on( 'click', function( event ) {
 
-		/* Add Image on Click */
-		addimagelink.on( 'click', function( event ) {
+		event.preventDefault();
+		parentdiv = jQuery(this).parent().parent();
 
-			event.preventDefault();
-			parentdiv = jQuery(this).parent().parent();
-
-			if (mediaframe) {mediaframe.open(); return;}
-			mediaframe = wp.media({
-				title: 'Select or Upload Image',
-				button: {text: 'Use this Image'},
-				multiple: false
-			});
-
-			mediaframe.on( 'select', function() {
-				var attachment = mediaframe.state().get('selection').first().toJSON();
-				image = '<img src=\"'+attachment.url+'\" alt=\"\" style=\"max-width:100%;\"/>';
-				parentdiv.find('.custom-image-container').append(image);
-				parentdiv.find('.custom-image-id').val(attachment.id);
-				parentdiv.find('.upload-custom-image').addClass('hidden');
-				parentdiv.find('.delete-custom-image').removeClass('hidden');
-
-				/* auto-save image via AJAX */
-				postid = '" . $post->ID . "'; imgid = attachment.id;
-				if (parentdiv.attr('id') == 'show-avatar-image') {imagetype = 'avatar';}
-				if (parentdiv.attr('id') == 'show-header-image') {imagetype = 'header';}
-				imagessavenonce = jQuery('#show-images-save-nonce').val();
-				framesrc = ajaxurl+'?action=radio_station_show_images_save';
-				framesrc += '&post_id='+postid+'&image_type='+imagetype;
-				framesrc += '&image_id='+imgid+'&_wpnonce='+imagessavenonce;
-				jQuery('#show-images-save-frame').attr('src', framesrc);
-			});
-
-			mediaframe.open();
+		if (mediaframe) {mediaframe.open(); return;}
+		mediaframe = wp.media({
+			title: wpmediatitletext,
+			button: {text: wpmediabuttontext},
+			library: {order: 'DESC', orderby: 'date', type: 'image', search: null, uploadedTo: null},
+			multiple: false
 		});
 
-		/* Delete Image on Click */
-		deleteimagelink.on( 'click', function( event ) {
-			event.preventDefault();
-			agree = confirm('" . esc_js( $confirm_remove ) . "');
-			if (!agree) {return;}
-			parentdiv = jQuery(this).parent().parent();
-			parentdiv.find('.custom-image-container').html('');
-			parentdiv.find('.custom-image-id').val('');
-			parentdiv.find('.upload-custom-image').removeClass('hidden');
-			parentdiv.find('.delete-custom-image').addClass('hidden');
+		mediaframe.on( 'select', function() {
+			var attachment = mediaframe.state().get('selection').first().toJSON();
+			image = '<img src=\"'+attachment.url+'\" alt=\"\" style=\"max-width:100%;\"/>';
+			parentdiv.find('.custom-image-container').append(image);
+			parentdiv.find('.custom-image-id').val(attachment.id);
+			parentdiv.find('.upload-custom-image').addClass('hidden');
+			parentdiv.find('.delete-custom-image').removeClass('hidden');
+
+			/* auto-save image via AJAX */
+			postid = jQuery('#post_ID').val(); imgid = attachment.id;
+			if (parentdiv.attr('id') == 'show-avatar-image') {imagetype = 'avatar';}
+			if (parentdiv.attr('id') == 'show-header-image') {imagetype = 'header';}
+			imagessavenonce = jQuery('#show-images-save-nonce').val();
+			framesrc = ajaxurl+'?action=radio_station_show_images_save';
+			framesrc += '&post_id='+postid+'&image_type='+imagetype;
+			framesrc += '&image_id='+imgid+'&nonce='+imagessavenonce;
+			jQuery('#show-images-save-frame').attr('src', framesrc);
 		});
 
-	});";
+		mediaframe.open();
+	});
+
+	/* Delete Image on Click */
+	deleteimagelink.on( 'click', function( event ) {
+		event.preventDefault();
+		agree = confirm(imageconfirmremove);
+		if (!agree) {return;}
+		parentdiv = jQuery(this).parent().parent();
+		parentdiv.find('.custom-image-container').html('');
+		parentdiv.find('.custom-image-id').val('');
+		parentdiv.find('.upload-custom-image').removeClass('hidden');
+		parentdiv.find('.delete-custom-image').addClass('hidden');
+	});
+	" . PHP_EOL;
 
 	// --- enqueue script inline ---
 	// 2.3.0: enqueue instead of echoing
 	wp_add_inline_script( 'radio-station-admin', $js );
 
+	// 2.3.3.9: add media modal close button style fix
+	echo '<style>.media-modal-close {z-index: 1001 !important;</style>';
 }
 
 // ---------------------------------
@@ -1753,7 +1885,7 @@ function radio_station_show_images_save() {
 	}
 
 	// --- verify nonce value ---
-	if ( !isset( $_GET['_wpnonce'] ) || !wp_verify_nonce( $_GET['_wpnonce'], 'show-images-autosave' ) ) {
+	if ( !isset( $_GET['nonce'] ) || !wp_verify_nonce( $_GET['nonce'], 'show-images-autosave' ) ) {
 		exit;
 	}
 
@@ -1808,19 +1940,20 @@ function radio_station_show_save_data( $post_id ) {
 	// --- make sure we have a post ID for AJAX save ---
 	// 2.3.2: added AJAX shift saving checks
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+		if ( !isset( $_REQUEST['action'] ) ) {
+			return;
+		}
 		// 2.3.3: added double check for AJAX action match
-		if ( isset( $_REQUEST['action'] ) ) {
-		 	// 2.3.3.9: check for single or multiple shift save action
-			if ( 'radio_station_show_save_shift' == $_REQUEST['action'] ) {
-				$selection = 'single';
-				if ( preg_match( '/^[a-zA-Z0-9_]+$/', $_REQUEST['shift_id'] ) ) {
-					$shift_id = $_REQUEST['shift_id'];
-				}
-			} elseif ( 'radio_station_show_save_shifts' == $_REQUEST['action'] ) {
-				$selection = 'multiple';
-			} else {
-				return;
+		// 2.3.3.9: check for single or multiple shift save action
+		if ( 'radio_station_show_save_shift' == $_REQUEST['action'] ) {
+			$selection = 'single';
+			if ( preg_match( '/^[a-zA-Z0-9_]+$/', $_REQUEST['shift_id'] ) ) {
+				$shift_id = $_REQUEST['shift_id'];
 			}
+		} elseif ( 'radio_station_show_save_shifts' == $_REQUEST['action'] ) {
+			$selection = 'multiple';
+		} elseif ( 'radio_station_add_show_shift' == $_REQUEST['action'] ) {
+			$selection = 'add';
 		} else {
 			return;
 		}
@@ -1847,7 +1980,9 @@ function radio_station_show_save_data( $post_id ) {
 			echo "<script>parent.document.getElementById('shifts-saving-message').style.display = 'none';
 			parent.document.getElementById('shifts-error-message').style.display = '';
 			parent.document.getElementById('shifts-error-message').innerHTML = '" . esc_js( $error ) . "';
-			form = parent.document.getElementById('shift-save-form'); form.parentNode.removeChild(form);
+			if (parent.document.getElementById('shift-save-form')) {
+				form = parent.document.getElementById('shift-save-form'); form.parentNode.removeChild(form);
+			}
 			</script>";
 			exit;
 		}
@@ -1967,11 +2102,20 @@ function radio_station_show_save_data( $post_id ) {
 
 		// --- loop posted show shift times ---
 		// 2.3.1: added check if any shifts are set (fix undefined index warning)
+		$prev_shifts = radio_station_get_show_schedule( $post_id );
 		$shifts = $new_shifts = array();
-		if ( isset( $_POST['show_sched'] ) ) {
+		// 2.3.3.9: allow for posting of just new shift
+		if ( isset( $_POST['new_shift'] ) ) {
+			$new_shift = $_POST['new_shift'];
+			// print_r( $new_shift );
+			$new_id = $shift_id = radio_station_unique_shift_id();
+			$shifts = $prev_shifts;
+			$shifts[$new_id] = $new_shift;
+			$_POST['show_sched'] = $shifts;
+		} else {
 			$shifts = $_POST['show_sched'];
 		}
-		$prev_shifts = radio_station_get_show_schedule( $post_id );
+		
 		$new_ids = array();
 		$days = array( '', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday' );
 		if ( $shifts && is_array( $shifts ) && ( count( $shifts ) > 0 ) ) {
@@ -2176,7 +2320,7 @@ function radio_station_show_save_data( $post_id ) {
 
 		// 2.3.3.9: removed check of AJAX action as done earlier
 
-		// --- (hidden) debug information ---
+		// --- debug information ---
 		echo "Posted Shifts: " . print_r( $_POST['show_sched'], true ) . PHP_EOL;
 		echo "New Shifts: " . print_r( $new_shifts, true ) . PHP_EOL;
 
@@ -2187,7 +2331,7 @@ function radio_station_show_save_data( $post_id ) {
 		parent.document.getElementById('shifts-saved-message').style.display = '';
 		if (typeof parent.jQuery == 'function') {parent.jQuery('#shifts-saved-message').fadeOut(3000);}
 		else {setTimeout(function() {parent.document.getElementById('shifts-saved-message').style.display = 'none';}, 3000);}
-		form = parent.document.getElementById('shift-save-form'); form.parentNode.removeChild(form);
+		/* form = parent.document.getElementById('shift-save-form'); form.parentNode.removeChild(form); */
 		parent.document.getElementById('show_shifts_nonce').value = '" . esc_js( $show_shifts_nonce ) . "';
 		</script>";
 
@@ -2200,42 +2344,14 @@ function radio_station_show_save_data( $post_id ) {
 				echo '<input type="hidden" name="check-bypass" value="1">';
 			}
 			$table = radio_station_show_shifts_table( $post_id );
-			// 2.3.3.9: check conflict count instead of boolean test
-			if ( count( $table['conflicts'] ) > 0 ) {
-				radio_station_shifts_conflict_message();
-			}
 
-			// phpcs:ignore WordPress.Security.OutputNotEscaped
-			echo $table['list'];
-
-			echo '<div id="updated-div"></div>';
-			echo '</div>';
-
-			// --- refresh show shifts list ---
-			echo "<script>showslist = parent.document.getElementById('shifts-list');
-			showslist.innerHTML = document.getElementById('shifts-list').innerHTML;</script>";
-
-			// 2.3.3.9: trigger action for single or multiple shift save
-			if ( isset( $selection ) ) {
-				if ( 'single' == $selection ) {
-					do_action( 'radio_station_show_save_shift' );
-				} else {
-					do_action( 'radio_station_show_save_shifts' );
-				}
-			}
-
-			// 2.3.3.6: clear changes may not have been saved window reload message
-			echo "<script>if (parent.window.onbeforeunloadset) {
-				parent.window.onbeforeunload = parent.storedonbeforeunload;
-				parent.window.onbeforeunloadset = false;
-			}</script>";
-
-			// --- alert on conflicts ---
+			// --- check for shift conflicts ---
+			$display_warning = false;
 			// 2.3.3.9: check conflict count instead of boolean test
 			if ( count( $table['conflicts'] ) > 0 ) {
 				// 2.3.3.9: maybe skip conflict message if single shift save has no conflict
 				$display_warning = true;
-				if ( isset( $selection ) && ( 'single' == $selection ) && isset( $shift_id ) ) {
+				if ( isset( $selection ) && ( 'multiple' != $selection ) && isset( $shift_id ) ) {
 					$display_warning = $found_conflict = false;
 					foreach ( $table['conflicts'] as $unique_id => $conflict ) {
 						if ( $shift_id == $unique_id ) {
@@ -2246,15 +2362,53 @@ function radio_station_show_save_data( $post_id ) {
 						$display_warning = true;
 					}
 				}
-				if ( $display_warning ) {
-					$warning = __( 'Warning! Shift conflicts detected.', 'radio-station' );
-					echo "<script>alert('" . esc_js( $warning ) . "');</script>";
+				$hidden = !$display_warning;
+				radio_station_shifts_conflict_message( $hidden );
+			}
+
+			// phpcs:ignore WordPress.Security.OutputNotEscaped
+			echo $table['list'];
+
+			// echo '<div id="updated-div"></div>';
+			echo '</div>';
+
+			// --- refresh show shifts list ---
+			$js = "shiftslist = parent.document.getElementById('shifts-list');
+			shiftslist.innerHTML = document.getElementById('shifts-list').innerHTML;
+			shiftslist.style.display = '';" . PHP_EOL;
+
+			// --- reload the current schedule view ---
+			$js .= "parent.radio_load_schedule(false,false);" . PHP_EOL;
+
+			// 2.3.3.6: clear changes may not have been saved window reload message
+			$js .= "if (parent.window.onbeforeunloadset) {
+				parent.window.onbeforeunload = parent.storedonbeforeunload;
+				parent.window.onbeforeunloadset = false;
+			}" . PHP_EOL;
+
+			// --- alert on conflicts ---
+			if ( $display_warning ) {
+				$warning = __( 'Warning! Shift conflicts detected.', 'radio-station' );
+				$js .= "alert('" . esc_js( $warning ) . "');" . PHP_EOL;
+			}
+
+			// --- output the scripts ---			
+			echo '<script>' . $js . '</script>';
+
+			// 2.3.3.9: trigger action for single or multiple shift save
+			if ( isset( $selection ) ) {
+				if ( 'single' == $selection ) {
+					do_action( 'radio_station_show_save_shift', $shift_id );
+				} else {
+					do_action( 'radio_station_show_save_shifts' );
 				}
 			}
-			
-			// --- reload the current schedule view ---
-			echo "<script>parent.radio_load_schedule(false,false);</script>";
+		}
 
+		// --- return early when adding single shift ---
+		// 2.3.3.9: added for single shift action
+		if ( 'radio_station_add_show_shift' == $_REQUEST['action'] ) {
+			return;
 		}
 
 		exit;
@@ -2410,9 +2564,9 @@ function radio_station_show_column_data( $column, $post_id ) {
 		$content = $wpdb->get_var( $query );
 		if ( !$content || ( trim( $content ) == '' ) ) {
 			// 2.3.3.9: change bold emphasis to italics
-			echo '<i>' . esc_html( __( 'No', 'radio-station' ) ) . '</i>';
+			echo '<i>' . esc_html( __( 'No', 'radio-station' ) ) . '</i>' . PHP_EOL;
 		} else {
-			echo esc_html( __( 'Yes', 'radio-station' ) );
+			echo esc_html( __( 'Yes', 'radio-station' ) ) . PHP_EOL;
 		}
 
 	} elseif ( 'shifts' == $column ) {
@@ -2479,7 +2633,7 @@ function radio_station_show_column_data( $column, $post_id ) {
 				}
 				$classlist = implode( ' ', $classes );
 
-				echo "<div class='" . esc_attr( $classlist ) . "' title='" . esc_attr( $title ) . "'>";
+				echo '<div class="' . esc_attr( $classlist ) . '" title="' . esc_attr( $title ) . '">' . PHP_EOL;
 
 				// --- get shift start and end times ---
 				// 2.3.2: fix to convert to 24 hour time
@@ -2498,17 +2652,17 @@ function radio_station_show_column_data( $column, $post_id ) {
 					$nextday = radio_station_get_next_day( $weekday );
 					// 2.3.0: handle shifts that go overnight for weekday filter
 					if ( ( $weekday == $shift['day'] ) || ( ( $shift['day'] == $nextday ) && ( $end_time < $start_time ) ) ) {
-						echo "<b>";
+						echo '<b>';
 						$bold = true;
 					}
 				}
 
 				echo esc_html( radio_station_translate_weekday( $shift['day'] ) );
-				echo " " . esc_html( $start ) . " - " . esc_html( $end );
+				echo ' ' . esc_html( $start ) . ' - ' . esc_html( $end );
 				if ( $bold ) {
-					echo "</b>";
+					echo '</b>';
 				}
-				echo "</div>";
+				echo '</div>';
 			}
 
 			// --- dayless shifts ---
@@ -2516,11 +2670,11 @@ function radio_station_show_column_data( $column, $post_id ) {
 			if ( count( $dayless_shifts ) > 0 ) {
 				foreach ( $dayless_shifts as $shift ) {
 					$title = __( 'This shift is disabled as no day is set.', 'radio-station' );
-					echo "<div class='show-shift disabled' title='" . esc_attr( $title ) . "'>";
-					$start = $shift['start_hour'] . ":" . $shift['start_min'] . $shift['start_meridian'];
-					$end = $shift['end_hour'] . ":" . $shift['end_min'] . $shift['end_meridian'];
-					echo esc_html( $start ) . " - " . esc_html( $end );
-					echo "</div>";
+					echo '<div class="show-shift disabled" title="' . esc_attr( $title ) . '">' . PHP_EOL;
+					$start = $shift['start_hour'] . ':' . $shift['start_min'] . $shift['start_meridian'];
+					$end = $shift['end_hour'] . ':' . $shift['end_min'] . $shift['end_meridian'];
+					echo esc_html( $start ) . ' - ' . esc_html( $end );
+					echo '</div>';
 				}
 			}
 		}
@@ -2531,7 +2685,7 @@ function radio_station_show_column_data( $column, $post_id ) {
 		if ( $hosts && ( count( $hosts ) > 0 ) ) {
 			foreach ( $hosts as $host ) {
 				$user_info = get_userdata( $host );
-				echo esc_html( $user_info->display_name ) . "<br>";
+				echo esc_html( $user_info->display_name ) . '<br>';
 			}
 		}
 
@@ -2542,7 +2696,7 @@ function radio_station_show_column_data( $column, $post_id ) {
 		if ( $producers && ( count( $producers ) > 0 ) ) {
 			foreach ( $producers as $producer ) {
 				$user_info = get_userdata( $producer );
-				echo esc_html( $user_info->display_name ) . "<br>";
+				echo esc_html( $user_info->display_name ) . '<br>';
 			}
 		}
 
@@ -2551,7 +2705,8 @@ function radio_station_show_column_data( $column, $post_id ) {
 		// 2.3.0: get show avatar (with fallback to thumbnail)
 		$image_url = radio_station_get_show_avatar_url( $post_id );
 		if ( $image_url ) {
-			echo "<div class='show-image'><img src='" . esc_url( $image_url ) . "' alt='" . esc_html( __( 'Show Avatar', 'radio-station' ) ) . "'></div>";
+			// 2.3.3.9: fix to use esc_attr instead of esc_attr
+			echo '<div class="show-image"><img src="' . esc_url( $image_url ) . '" alt="' . esc_attr( __( 'Show Avatar', 'radio-station' ) ) . '"></div>';
 		}
 
 	}
@@ -2563,6 +2718,7 @@ function radio_station_show_column_data( $column, $post_id ) {
 // 2.2.7: added show column styles
 add_action( 'admin_footer', 'radio_station_show_column_styles' );
 function radio_station_show_column_styles() {
+
 	$current_screen = get_current_screen();
 	if ( 'edit-' . RADIO_STATION_SHOW_SLUG !== $current_screen->id ) {
 		return;
@@ -2592,15 +2748,15 @@ function radio_station_show_day_filter( $post_type, $which ) {
 	// --- show day selector ---
 	$days = array( 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' );
 
-	echo '<label for="filter-by-show-day" class="screen-reader-text">' . esc_html( __( 'Filter by show day', 'radio-station' ) ) . '</label>';
-	echo '<select name="weekday" id="filter-by-show-day">';
-	echo '<option value="0" ' . selected( $d, 0, false ) . '>' . esc_html( __( 'All show days', 'radio-station' ) ) . '</option>';
+	echo '<label for="filter-by-show-day" class="screen-reader-text">' . esc_html( __( 'Filter by show day', 'radio-station' ) ) . '</label>' . PHP_EOL;
+	echo '<select name="weekday" id="filter-by-show-day">' . PHP_EOL;
+	echo '<option value="0" ' . selected( $d, 0, false ) . '>' . esc_html( __( 'All show days', 'radio-station' ) ) . '</option>' . PHP_EOL;
 
 	foreach ( $days as $day ) {
 		$label = esc_attr( radio_station_translate_weekday( $day ) );
-		echo '<option value="' . esc_attr( $day ) . '" ' . selected( $d, $day, false ) . '>' . esc_html( $label ) . '</option>';
+		echo '<option value="' . esc_attr( $day ) . '" ' . selected( $d, $day, false ) . '>' . esc_html( $label ) . '</option>' . PHP_EOL;
 	}
-	echo '</select>';
+	echo '</select>' . PHP_EOL;
 }
 
 
@@ -2646,11 +2802,14 @@ function radio_station_override_show_metabox() {
 		);
 		$shows = get_posts( $args );
 
-		// --- link to Show field ---
+		// --- link to Show fields ---
 		$linked_id = get_post_meta( $post->ID, 'linked_show_id', true );
-		echo '<table><tr id="override-show"><td>' . PHP_EOL;
+
+		echo '<ul id="override-link-list">' . PHP_EOL;
+			echo '<li><div class="input-label"><label>' . PHP_EOL;
 			echo '<b>' . esc_html( __( 'Link to Show', 'radio-station' ) ) . ': </b>' . PHP_EOL;
-		echo '</td><td width="10"></td><td>' . PHP_EOL;
+			echo '</label></div>';
+			echo '<div class="input-field">' . PHP_EOL;
 			echo '<select id="override-link" onchange="radio_link_check();" name="linked_show_id">' . PHP_EOL;
 			echo '<option value=""';
 			if ( !$linked_id || ( '' == $linked_id ) ) {
@@ -2675,40 +2834,49 @@ function radio_station_override_show_metabox() {
 				}
 				echo '</option>' . PHP_EOL;
 			}
-			echo '</select>' . PHP_EOL;
-		echo '</td><td width="10"></td><td>' . PHP_EOL;
+			echo '</select></div>' . PHP_EOL;
+			echo '<div class="input-helper">' . PHP_EOL;
 			echo '<i>' . esc_html( __( 'If selected, Override data will be used from the Linked Show.', 'radio-station' ) ) . '</i>' . PHP_EOL;
-		echo '</td></tr>';
+			echo '</div>' . PHP_EOL;
+		echo '</li>' . PHP_EOL;
 	
 		// --- sync genre taxonomy ---
 		$sync_genres = get_post_meta( $post_id, 'sync_genres', true );
-		echo '<tr id="override-genres"><td>' . PHP_EOL;
-			echo '<b>' . esc_html( 'Sync Genres?', 'radio-station' ) . '</b>' . PHP_EOL;
-		echo '</td><td width="10"></td><td>' . PHP_EOL;
+		echo '<li id="override-genres">' . PHP_EOL;
+			echo '<div class="input-label">' . PHP_EOL;
+			echo '<label><b>' . esc_html( 'Sync Genres?', 'radio-station' ) . '</b></label>' . PHP_EOL;
+			echo '</div>' . PHP_EOL;
+			echo '<div class="input-field">' . PHP_EOL;
 			echo '<input id="override-genres-input" type="checkbox" name="sync_genres" value="yes" onclick="radio_sync_genres();"';
 			if ( 'yes' == $sync_genres ) {
 				echo ' checked="checked"';
 			}
-			echo '>' . PHP_EOL;
-		echo '</td><td width="10"></td><td>' . PHP_EOL;
+			echo '></div>' . PHP_EOL;
+			echo '<div class="input-helper">' . PHP_EOL;
 			echo '<i>' . esc_html( __( 'If checked, assigned Genre terms are synced from the Linked Show when Updating.', 'radio-station' ) ) . '</i> ' . PHP_EOL;
- 		echo '</td></tr>' . PHP_EOL;
+			echo '</div>' . PHP_EOL;
+ 		echo '</li>' . PHP_EOL;
 
 		// --- sync language taxonomy ---
 		$sync_languages = get_post_meta( $post_id, 'sync_languages', true );
 		echo '<tr id="override-languages"><td>' . PHP_EOL;
-			echo '<b>' . esc_html( 'Sync Languages?', 'radio-station' ) . '</b>' . PHP_EOL;
-		echo '</td><td width="10"></td><td>' . PHP_EOL;
+			echo '<div class="input-label">' . PHP_EOL;
+			echo '<label><b>' . esc_html( 'Sync Languages?', 'radio-station' ) . '</b></label>' . PHP_EOL;
+			echo '</div>' . PHP_EOL;
+			echo '<div class="input-field">' . PHP_EOL;
 			echo '<input id="override-languages-input" type="checkbox" name="sync_languages" value="yes" onclick="radio_sync_languages();"';
 			if ( 'yes' == $sync_languages ) {
 				echo ' checked="checked"';
 			}
 			echo '>' . PHP_EOL;
-		echo '</td><td width="10"></td><td>' . PHP_EOL;
+			echo '</div>' . PHP_EOL;
+			echo '<div class="input-helper">' . PHP_EOL;
 			echo '<i>' . esc_html( __( 'If checked, assigned Language terms are synced from the Linked Show when Updating.', 'radio-station' ) ) . '</i> ' . PHP_EOL;
- 		echo '</td></tr>' . PHP_EOL;
+			echo '</div>' . PHP_EOL;
+ 		echo '</li>' . PHP_EOL;
 		
-		echo '</table><br>';
+		// --- close linked show list ---
+		echo '</ul><br>' . PHP_EOL;
 		
 		// --- get show meta ---
 		// $active = get_post_meta( $post->ID, 'show_active', true );
@@ -2720,19 +2888,19 @@ function radio_station_override_show_metabox() {
 		$patreon_id = get_post_meta( $post_id, 'show_patreon', true );
 
 		$linked_fields = get_post_meta( $post_id, 'linked_show_fields', true );
-		echo '<div id="linked-show-fields">';
+		echo '<div id="linked-show-fields">' . PHP_EOL;
 
-		echo '<div id="linked-fields-message">';
-		echo '<b>' . esc_html( __( 'Usage Note', 'radio-station' ) ) . '</b>';
-		echo ': ' . esc_html( __( ' Unchecked boxes use Show data, checked boxes use Override data.', 'radio-station' ) );
-		echo '</div><br>';
+		echo '<div id="linked-fields-message">' . PHP_EOL;
+		echo '<b>' . esc_html( __( 'Usage Note', 'radio-station' ) ) . '</b>' . PHP_EOL;
+		echo ': ' . esc_html( __( ' Unchecked boxes use Show data, checked boxes use Override data.', 'radio-station' ) ) . PHP_EOL;
+		echo '</div><br>' . PHP_EOL;
 
 		// --- table headings ---		
-		echo '<table><tr><td class="override-label">';
-			echo '<b>' . esc_html( __( 'Override?', 'radio-station' ) ) . '</b>';
-		echo '</td><td width="30" class="override-label"></td><td class="override-label">';
-			echo '<b>' . esc_html( __( 'Override Data', 'radio-station' ) ) . '</b>';
-		echo '</td></tr>';
+		echo '<table><tr><td class="override-label">' . PHP_EOL;
+			echo '<b>' . esc_html( __( 'Override?', 'radio-station' ) ) . '</b>' . PHP_EOL;
+		echo '</td><td width="30" class="override-label"></td><td class="override-label">' . PHP_EOL;
+			echo '<b>' . esc_html( __( 'Override Data', 'radio-station' ) ) . '</b>' . PHP_EOL;
+		echo '</td></tr>' . PHP_EOL;
 
 		// TODO: show active ?
 		// echo '<p><div style="width:120px; display:inline-block;"><label>' . esc_html( __( 'Active', 'radio-station' ) ) . '?</label></div>
@@ -2745,14 +2913,14 @@ function radio_station_override_show_metabox() {
 			if ( isset( $linked_fields['show_content'] ) && $linked_fields['show_title'] ) {
 				echo ' checked="checked"';
 			}
-			echo '> <label>' . esc_html( __( 'Title', 'radio-station' ) ) . '</label>';
+			echo '> <label>' . esc_html( __( 'Title', 'radio-station' ) ) . '</label>' . PHP_EOL;
 		echo '</td><td width="30" class="override-label"></td><td class="override-label">' . PHP_EOL;
 			echo '<div id="override-input-title"';
 			if ( !isset( $linked_fields['show_title'] ) || !$linked_fields['show_title'] ) {
 				echo ' style="display:none;"';
 			}
 			echo '><i>' . esc_html( __( 'Use Title Editor metabox above.', 'radio-station' ) ) . '</i>' . PHP_EOL;
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
  		echo '</td></tr>' . PHP_EOL;
 
 		// --- content ---
@@ -2761,14 +2929,14 @@ function radio_station_override_show_metabox() {
 			if ( isset( $linked_fields['show_content'] ) && $linked_fields['show_content'] ) {
 				echo ' checked="checked"';
 			}
-			echo '> <label>' . esc_html( __( 'Description', 'radio-station' ) ) . '</label>';
+			echo '> <label>' . esc_html( __( 'Description', 'radio-station' ) ) . '</label>' . PHP_EOL;
 		echo '</td><td width="30" class="override-label"></td><td class="override-label">' . PHP_EOL;
 			echo '<div id="override-input-content"';
 			if ( !isset( $linked_fields['show_content'] ) || !$linked_fields['show_content'] ) {
 				echo ' style="display:none;"';
 			}
 			echo '><i>' . esc_html( __( 'Use Content Editor metabox below.', 'radio-station' ) ) . '</i>' . PHP_EOL;
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
  		echo '</td></tr>' . PHP_EOL;
 
 		// --- excerpt --- 
@@ -2777,14 +2945,14 @@ function radio_station_override_show_metabox() {
 			if ( isset( $linked_fields['show_excerpt'] ) && $linked_fields['show_excerpt'] ) {
 				echo ' checked="checked"';
 			}
-			echo '> <label>' . esc_html( __( 'Excerpt', 'radio-station' ) ) . '</label>';
+			echo '> <label>' . esc_html( __( 'Excerpt', 'radio-station' ) ) . '</label>' . PHP_EOL;
 		echo '</td><td width="30" class="override-label"></td><td class="override-label">' . PHP_EOL;
 			echo '<div id="override-input-excerpt"';
 			if ( !isset( $linked_fields['show_excerpt'] ) || !$linked_fields['show_excerpt'] ) {
 				echo ' style="display:none;"';
 			}
 			echo '><i>' . esc_html( __( 'Use Excerpt Editor metabox below.', 'radio-station' ) ) . '</i>' . PHP_EOL;
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
  		echo '</td></tr>' . PHP_EOL;
 		
 		// --- avatar ---
@@ -2793,19 +2961,19 @@ function radio_station_override_show_metabox() {
 			if ( isset( $linked_fields['show_avatar'] ) && $linked_fields['show_avatar'] ) {
 				echo ' checked="checked"';
 			}
-			echo '> <label>' . esc_html( __( 'Show Avatar', 'radio-station' ) ) . '</label>';
+			echo '> <label>' . esc_html( __( 'Show Avatar', 'radio-station' ) ) . '</label>' . PHP_EOL;
 		echo '</td><td width="30" class="override-label"></td><td class="override-label">' . PHP_EOL;
 			echo '<div id="override-input-avatar"';
 			if ( !isset( $linked_fields['show_avatar'] ) || !$linked_fields['show_avatar'] ) {
 				echo ' style="display:none;"';
 			}
 			echo '><i>' . esc_html( __( 'Use Show Images metabox.', 'radio-station' ) ) . '</i>' . PHP_EOL;
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
 			echo '<div id="override-data-avatar"';
 			if ( isset( $linked_fields['show_avatar'] ) && $linked_fields['show_avatar'] ) {
 				echo ' style="display:none;"';
 			}
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
  		echo '</td></tr>' . PHP_EOL;
 
 		// --- featured image ---
@@ -2814,19 +2982,19 @@ function radio_station_override_show_metabox() {
 			if ( isset( $linked_fields['show_image'] ) && $linked_fields['show_image'] ) {
 				echo ' checked="checked"';
 			}
-			echo '> <label>' . esc_html( __( 'Featured Image', 'radio-station' ) ) . '</label>';
+			echo '> <label>' . esc_html( __( 'Featured Image', 'radio-station' ) ) . '</label>' . PHP_EOL;
 		echo '</td><td width="30" class="override-label"></td><td class="override-label">' . PHP_EOL;
 			echo '<div id="override-input-image"';
 			if ( !isset( $linked_fields['show_image'] ) || !$linked_fields['show_image'] ) {
 				echo ' style="display:none;"';
 			}
 			echo '><i>' . esc_html( __( 'Use Feature Image metabox.', 'radio-station' ) ) . '</i>' . PHP_EOL;
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
 			echo '<div id="override-data-image"';
 			if ( isset( $linked_fields['show_image'] ) && $linked_fields['show_image'] ) {
 				echo ' style="display:none;"';
 			}
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
  		echo '</td></tr>' . PHP_EOL;
 
 		// --- hosts ---
@@ -2842,12 +3010,12 @@ function radio_station_override_show_metabox() {
 				echo ' style="display:none;"';
 			}
 			echo '><i>' . esc_html( __( 'Use Host assignment box below.', 'radio-station' ) ) . '</i>' . PHP_EOL;
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
 			echo '<div id="override-data-hosts"';
 			if ( isset( $linked_fields['show_user_list'] ) && $linked_fields['show_user_list'] ) {
 				echo ' style="display:none;"';
 			}
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
  		echo '</td></tr>' . PHP_EOL;
 
  		// --- producers ---
@@ -2856,19 +3024,19 @@ function radio_station_override_show_metabox() {
 			if ( isset( $linked_fields['show_producer_list'] ) && $linked_fields['show_producer_list'] ) {
 				echo ' checked="checked"';
 			}
-			echo '> <label>' . esc_html( __( 'Producers', 'radio-station' ) ) . '</label>';
+			echo '> <label>' . esc_html( __( 'Producers', 'radio-station' ) ) . '</label>' . PHP_EOL;
 		echo '</td><td width="30" class="override-label"></td><td class="override-label">' . PHP_EOL;
 			echo '<div id="override-input-producers"';
 			if ( !isset( $linked_fields['show_producer_list'] ) || !$linked_fields['show_producer_list'] ) {
 				echo ' style="display:none;"';
 			}
 			echo '><i>' . esc_html( __( 'Use Producer assignment box below.', 'radio-station' ) ) . '</i>' . PHP_EOL;
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
 			echo '<div id="override-data-producers"';
 			if ( isset( $linked_fields['show_producer_list'] ) && $linked_fields['show_producer_list'] ) {
 				echo ' style="display:none;"';
 			}
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
  		echo '</td></tr>' . PHP_EOL;
  		
 		// --- website ---
@@ -2889,7 +3057,7 @@ function radio_station_override_show_metabox() {
 			if ( isset( $linked_fields['show_link'] ) && $linked_fields['show_link'] ) {
 				echo ' style="display:none;"';
 			}
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
 		echo '</td></tr>' . PHP_EOL;
 
 		// --- email ---
@@ -2898,19 +3066,19 @@ function radio_station_override_show_metabox() {
 			if ( isset( $linked_fields['show_email'] ) && $linked_fields['show_email'] ) {
 				echo ' checked="checked"';
 			}			
-			echo '> <label>' . esc_html( __( 'Show Email', 'radio-station' ) ) . '</label>';
+			echo '> <label>' . esc_html( __( 'Show Email', 'radio-station' ) ) . '</label>' . PHP_EOL;
 		echo '</td><td width="30"></td><td>' . PHP_EOL;
 			echo '<div id="override-input-email" class="override-input"';
 			if ( !isset( $linked_fields['show_email'] ) || !$linked_fields['show_email'] ) {
 				echo ' style="display:none;"';
 			}
 			echo '><input type="text" name="show_email" size="100" value="' . esc_attr( $email ) . '" style="max-width:200px;">';
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
 			echo '<div id="override-data-email"';
 			if ( isset( $linked_fields['show_email'] ) && $linked_fields['show_email'] ) {
 				echo ' style="display:none;"';
 			}
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
 		echo '</td></tr>' . PHP_EOL;
 
 		// --- phone ---
@@ -2919,19 +3087,19 @@ function radio_station_override_show_metabox() {
 			if ( isset( $linked_fields['show_phone'] ) && $linked_fields['show_phone'] ) {
 				echo ' checked="checked"';
 			}
-			echo '> <label>' . esc_html( __( 'Show Phone', 'radio-station' ) ) . '</label>';
+			echo '> <label>' . esc_html( __( 'Show Phone', 'radio-station' ) ) . '</label>' . PHP_EOL;
 		echo '</td><td width="30"></td><td>' . PHP_EOL;
 			echo '<div id="override-input-phone" class="override-input"';
 			if ( !isset( $linked_fields['show_phone'] ) || !$linked_fields['show_phone'] ) {
 				echo ' style="display:none;"';
 			}
 			echo '><input type="text" name="show_phone" size="100" value="' . esc_attr( $phone ) . '" style="max-width:200px;">';
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
 			echo '<div id="override-data-phone"';
 			if ( isset( $linked_fields['show_phone'] ) && $linked_fields['show_phone'] ) {
 				echo ' style="display:none;"';
 			}
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
 		echo '</td></tr>' . PHP_EOL;
 
 		// --- audio file ---
@@ -2940,19 +3108,19 @@ function radio_station_override_show_metabox() {
 			if ( isset( $linked_fields['show_file'] ) && $linked_fields['show_file'] ) {
 				echo ' checked="checked"';
 			}
-			echo '> <label>' . esc_html( __( 'Latest Audio File', 'radio-station' ) ) . '</label>';
+			echo '> <label>' . esc_html( __( 'Latest Audio', 'radio-station' ) ) . '</label>' . PHP_EOL;
 		echo '</td><td width="30"></td><td>' . PHP_EOL;
 			echo '<div id="override-input-file" class="override-input"';
 			if ( !isset( $linked_fields['show_file'] ) || !$linked_fields['show_file'] ) {
 				echo ' style="display:none;"';
 			}
 			echo '><input type="text" name="show_file" size="100" value="' . esc_attr( $file ) . '" style="max-width:200px;">';
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
 			echo '<div id="override-data-file"';
 			if ( isset( $linked_fields['show_file'] ) && $linked_fields['show_file'] ) {
 				echo ' style="display:none;"';
 			}
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
 		echo '</td></tr>' . PHP_EOL;
 
 		// --- disable download ---
@@ -2961,20 +3129,20 @@ function radio_station_override_show_metabox() {
 			if ( isset( $linked_fields['show_download'] ) && $linked_fields['show_download'] ) {
 				echo ' checked="checked"';
 			}			
-			echo '> <label>' . esc_html( __( 'Disable Download', 'radio-station' ) ) . '</label>';
+			echo '> <label>' . esc_html( __( 'Disable Download', 'radio-station' ) ) . '</label>' . PHP_EOL;
 		echo '</td><td width="30"></td><td>' . PHP_EOL;
 			echo '<div id="override-input-download" class="override-input"';
 			if ( !isset( $linked_fields['show_download'] ) || !$linked_fields['show_download'] ) {
 				echo ' style="display:none;"';
 			}			
 			echo '><input type="checkbox" name="show_download" ' . checked( $download, 'on', false ) . '>';
-			echo ' <i>' . esc_html( __( 'Check to Disable', 'radio-station' ) ) . '</i>';
-			echo '</div>';
+			echo ' <i>' . esc_html( __( 'Check to Disable', 'radio-station' ) ) . '</i>' . PHP_EOL;
+			echo '</div>' . PHP_EOL;
 			echo '<div id="override-data-download"';
 			if ( isset( $linked_fields['show_download'] ) && $linked_fields['show_download'] ) {
 				echo ' style="display:none;"';
 			}
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
 		echo '</td></tr>' . PHP_EOL;
 
 		// --- patreon ---
@@ -2983,19 +3151,19 @@ function radio_station_override_show_metabox() {
 			if ( isset( $linked_fields['show_patreon'] ) && $linked_fields['show_patreon'] ) {
 				echo ' checked="checked"';
 			}
-			echo '> <label>' . esc_html( __( 'Patreon Page ID', 'radio-station' ) ) . '</label>';
+			echo '> <label>' . esc_html( __( 'Patreon Page ID', 'radio-station' ) ) . '</label>' . PHP_EOL;
 		echo '</td><td width="30"></td><td>' . PHP_EOL;
 			echo '<div id="override-input-patreon" class="override-input"';
 			if ( !isset( $linked_fields['show_patreon'] ) || !$linked_fields['show_patreon'] ) {
 				echo ' style="display:none;"';
 			}
-			echo '> https://patreon.com/<input type="text" name="show_patreon" size="80" value="' . esc_attr( $patreon_id ) . '" style="max-width:100px;">';
-			echo '</div>';
+			echo '> https://patreon.com/<input type="text" name="show_patreon" size="80" value="' . esc_attr( $patreon_id ) . '" style="max-width:100px;">' . PHP_EOL;
+			echo '</div>' . PHP_EOL;
 			echo '<div id="override-data-patreon"';
 			if ( isset( $linked_fields['show_patreon'] ) && $linked_fields['show_patreon'] ) {
 				echo ' style="display:none;"';
 			}
-			echo '</div>';
+			echo '</div>' . PHP_EOL;
 		echo '</td></tr>' . PHP_EOL;
 
 		do_action( 'radio_station_show_fields', $post_id, 'override' );
@@ -3032,6 +3200,7 @@ function radio_station_override_show_metabox() {
 		}
 		$class = implode( ' ', $classes );
 
+		// --- open inside metabox
 		echo '<div id="' . esc_attr( $key ) . '" class="' . esc_attr( $class ) . '"';
 		if ( $linked_id ) {
 			if ( ( 'hosts' == $key ) && ( !isset( $linked_fields['show_hosts'] ) || !$linked_fields['show_patreon'] ) ) {
@@ -3043,22 +3212,37 @@ function radio_station_override_show_metabox() {
 		}
 		echo '>' . PHP_EOL;
 			
+			// --- inside metabox contents ---
 			$widget_title = $metabox['title'];
 			echo '<h2><span>' . esc_html( $metabox['title'] ) . '</span></h2>' . PHP_EOL;
 			echo '<div class="inside">' . PHP_EOL;
 				call_user_func( $metabox['callback'] );
 			echo '</div>' . PHP_EOL;
+
+		// --- close inside metabox ---
 		echo '</div>' . PHP_EOL;
 
 		$i ++;
 	}
-	echo '</div>';
+	echo '</div>' . PHP_EOL;
+	
+	// --- input list field styles ---
+	// 2.3.3.9: add styles for table to list conversion
+	$css = '.input-label, .input-field, .input-helper {display: inline-block;}
+	.input-field {max-width: 120px;}
+	.input-field, .input-helper {margin-left: 20px;}
+	' . PHP_EOL;
 	
 	// --- output inside metabox styles ---
-	echo "<style>#show-inside-metaboxes .postbox {display: inline-block; min-width: 230px; max-width: 250px; vertical-align: top;}
+	$css .= '#show-inside-metaboxes .postbox {display: inline-block; min-width: 230px; max-width: 250px; vertical-align: top;}
 	#show-inside-metaboxes .postbox.first {margin-right: 20px;}
 	#show-inside-metaboxes .postbox.last {margin-left: 20px;}
-	#show-inside-metaboxes .postbox select {max-width: 200px;}</style>";
+	#show-inside-metaboxes .postbox select {max-width: 200px;}';
+
+	// 2.3.3.9: filter
+	$css = apply_filters( 'radio_station_override_edit_styles', $css );
+	// phpcs:ignore WordPress.Security.OutputNotEscaped
+	echo '<style>' . $css . '</style>';
 
 	// --- get override show script ---
 	$js = radio_station_override_show_script();
@@ -3177,39 +3361,30 @@ function radio_station_schedule_override_metabox() {
 
 		// --- override save/add buttons ---
 		// 2.3.3.9: added for AJAX save and multiple overrides
-		echo '<table id="override-table-buttons" width="100%"><tr><td width="33%" align="center">';
-		echo '<input type="button" class="overrides-clear button-secondary" value="' . esc_attr( __( 'Clear Overrides', 'radio-station' ) ) . '" onclick="radio_overrides_clear();">';
-		echo '</td><td width="33%" align="center">';
+		// 2.3.3.9: change override-table-buttons to override-buttons
+		echo '<center><table class="override-buttons" width="100%"><tr><td width="33%" align="center">' . PHP_EOL;
+		echo '<input type="button" class="overrides-clear button-secondary" value="' . esc_attr( __( 'Clear Overrides', 'radio-station' ) ) . '" onclick="radio_overrides_clear();">' . PHP_EOL;
+		echo '</td><td width="33%" align="center">' . PHP_EOL;
 		if ( !is_object( $current_screen ) || ( 'add' != $current_screen->action ) ) {
-			echo '<input type="button" class="overrides-save button-primary" value="' . esc_attr( __( 'Save Overrides', 'radio-station' ) ) . '" onclick="radio_overrides_save();">';
+			echo '<input type="button" class="overrides-save button-primary" value="' . esc_attr( __( 'Save Overrides', 'radio-station' ) ) . '" onclick="radio_overrides_save();">' . PHP_EOL;
 		}
-		echo '</td><td width="33%" align="center">';
-		echo '<input type="button" class="override-add button-secondary" value="' . esc_attr( __( 'Add Override', 'radio-station' ) ) . '" onclick="radio_override_new();">';
-		echo '</td></tr>';
+		echo '</td><td width="33%" align="center">' . PHP_EOL;
+		echo '<input type="button" class="override-add button-secondary" value="' . esc_attr( __( 'Add Override', 'radio-station' ) ) . '" onclick="radio_override_new();">' . PHP_EOL;
+		echo '</td></tr>' . PHP_EOL;
 		
 		// 2.3.3.9: change to single cell spanning 3 columns
-		echo '<tr><td colspan="3" align="center">';
-		echo '<div id="overrides-saving-message" style="display:none;">' . esc_html( __( 'Saving Overrides...', 'radio-station' ) ) . '</div>';
-		echo '<div id="overrides-saved-message" style="display:none;">' . esc_html( __( 'Overrides Saved.', 'radio-station' ) ) . '</div>';
-		echo '<div id="overrides-error-message" style="display:none;"></div>';
-		echo '</td></tr></table>';
-		echo '</center>';
+		echo '<tr><td colspan="3" align="center">' . PHP_EOL;
+		echo '<div id="overrides-saving-message" style="display:none;">' . esc_html( __( 'Saving Overrides...', 'radio-station' ) ) . '</div>' . PHP_EOL;
+		echo '<div id="overrides-saved-message" style="display:none;">' . esc_html( __( 'Overrides Saved.', 'radio-station' ) ) . '</div>' . PHP_EOL;
+		echo '<div id="overrides-error-message" style="display:none;"></div>' . PHP_EOL;
+		echo '</td></tr></table></center>' . PHP_EOL;
 
 		// --- override list styles ---
 		// 2.3.0: added datepicker z-index to fix conflict with editor buttons
 		// 2.3.3.9: apply class styles to override list
-		echo "<style>body.post-type-override #ui-datepicker-div {z-index: 1001 !important;}
-		.override-list {list-style: none;}
-		.override-list .override-item {display: inline-block; margin-left: 20px;}
-		.override-list .override-item.first-item {margin-left: 10px;}
-		.override-list .override-item.last-item {margin-right: 10px;}
-		.override-date {width: 100px; text-align: center;}
-		.override-select {min-width:35px;}
-		.overrides-clear, .overrides-save, .override-add {
-			cursor: pointer; display:block; width: 150px; padding: 8px; text-align: center; line-height: 1em;}
-		#overrides-saving-message, #overrides-saved-message {
-			background-color: lightYellow; border: 1px solid #E6DB55; margin-top: 10px; font-weight: bold; max-width: 300px; padding: 5px 0;}
-		</style>";
+		// 2.3.3.9: moved styles to separate function
+		$css = radio_station_overrides_list_styles();
+		echo '<style>' . $css . '</style>';
 
 		// --- enqueue datepicker script and styles ---
 		// 2.3.0: enqueue for override post type only
@@ -3234,6 +3409,31 @@ function radio_station_schedule_override_metabox() {
 	echo '</div>';
 
 }
+
+// ---------------------
+// Overrides List Styles
+// ---------------------
+// 2.3.3.9: moved to separate function
+function radio_station_overrides_list_styles() {
+
+	// 2.3.3.9: change override-table-buttons to override-buttons
+	$css = "body.post-type-override #ui-datepicker-div {z-index: 1001 !important;}
+	.override-list {list-style: none;}
+	.override-list .override-item {display: inline-block; margin-left: 20px;}
+	.override-list .override-item.first-item {margin-left: 10px;}
+	.override-list .override-item.last-item {margin-right: 10px;}
+	.override-date {width: 100px; text-align: center;}
+	.override-select {min-width:35px;}
+	.override-buttons .overrides-clear, .override-buttons .overrides-save, .override-buttons .override-add {
+		cursor: pointer; display:block; width: 150px; padding: 8px; text-align: center; line-height: 1em;}
+	#overrides-saving-message, #overrides-saved-message {
+		background-color: lightYellow; border: 1px solid #E6DB55; margin-top: 10px; font-weight: bold; max-width: 300px; padding: 5px 0;}" . PHP_EOL;
+
+	// 2.3.3.9: added override edit styles filter
+	$css = apply_filters( 'radio_station_override_list_edit_styles', $css );
+	return $css;
+}
+
 
 // --------------------
 // Overrides Table List
@@ -3267,7 +3467,7 @@ function radio_station_overrides_table( $post_id ) {
 		}
 	}
 
-	echo '<span style="display:none;">Current Overrides: ' . print_r( $overrides, true ) . '</span>';
+	echo '<span style="display:none;">Current Overrides: ' . print_r( $overrides, true ) . '</span>'  . PHP_EOL;
 
 	if ( !$overrides ) {
 
@@ -3350,165 +3550,166 @@ function radio_station_overrides_table( $post_id ) {
 
 		// 2.3.3.9: use override shift ID for override wrapper ID ---
 		$id = $override['id'];
-		$list .= '<div id="override-wrapper-' . esc_attr( $id ) . '" class="override-wrapper">';
-			$list .= '<ul id="override-' . esc_attr( $i ) . '" class="override-list">';
+		$list .= '<div id="override-wrapper-' . esc_attr( $id ) . '" class="override-wrapper">' . PHP_EOL;
+
+			$list .= '<ul id="override-' . esc_attr( $i ) . '" class="override-list">' . PHP_EOL;
 
 				// 2.3.3.9: add hidden input for unique override time ID
-				$list .= '<input id="override-' . esc_attr( $i ) . '-id" type="hidden" name="show_sched[' . esc_attr( $i ) . '][id]" value="' . esc_attr( $id ) . '">';
+				$list .= '<input id="override-' . esc_attr( $i ) . '-id" type="hidden" name="show_sched[' . esc_attr( $i ) . '][id]" value="' . esc_attr( $id ) . '">' . PHP_EOL;
 
 				// --- Override (Start) Date ---
-				$list .= '<li class="override-item first-item">';
+				$list .= '<li class="override-item first-item">' . PHP_EOL;
 
-					$list .= esc_html( __( 'Start Date', 'radio-station' ) ) . ':';
+					$list .= '<label>' . esc_html( __( 'Start Date', 'radio-station' ) ) . '</label>:' . PHP_EOL;
 					$date = ( !empty( $override['date'] ) ) ? trim( $override['date'] ) : '';
-					$list .= '<input type="text" id="override-' . esc_attr( $i ) . '-date" class="override-date" name="show_sched[' . $i . '][date]" value="' . esc_attr( $date ) . '">';
-					$list .= '<input type="hidden" id="override-date-' . esc_attr( $i ) . '" value="' . esc_attr( $date ) . '">';
+					$list .= '<input type="text" id="override-' . esc_attr( $i ) . '-date" class="override-date" name="show_sched[' . $i . '][date]" value="' . esc_attr( $date ) . '">' . PHP_EOL;
+					$list .= '<input type="hidden" id="override-date-' . esc_attr( $i ) . '" value="' . esc_attr( $date ) . '">' . PHP_EOL;
 
-				$list .= '</li>';
+				$list .= '</li>' . PHP_EOL;
 
 				// --- Override Start Time ---
-				$list .= '<li class="override-item">';
+				$list .= '<li class="override-item">' . PHP_EOL;
 
 					// --- start time label --
-					$list .= esc_html( __( 'Start Time', 'radio-station' ) ) . ':';
+					$list .= '<label>' . esc_html( __( 'Start Time', 'radio-station' ) ) . '</label>:' . PHP_EOL;
 
 					// --- start hour ---
-					$list .= '<select id="override-' . esc_attr( $i ) . '-start-hour" name="show_sched[' . esc_attr( $i ) . '][start_hour]" class="override-select">';
-						$list .= '<option value=""></option>';
+					$list .= '<select id="override-' . esc_attr( $i ) . '-start-hour" name="show_sched[' . esc_attr( $i ) . '][start_hour]" class="override-select">' . PHP_EOL;
+						$list .= '<option value=""></option>' . PHP_EOL;
 						for ( $j = 1; $j <= 12; $j ++ ) {
-							$list .= '<option value="' . esc_attr( $j ) . '" ' . selected( $override['start_hour'], $j, false ) . '>' . esc_html( $j ) . '</option>';
+							$list .= '<option value="' . esc_attr( $j ) . '" ' . selected( $override['start_hour'], $j, false ) . '>' . esc_html( $j ) . '</option>' . PHP_EOL;
 						}
-					$list .= '</select>';
-					$list .= '<input type="hidden" id="override-start-hour-' . esc_attr( $i ) . '" value="' . esc_attr( $override['start_hour'] ) . '">';
+					$list .= '</select>' . PHP_EOL;
+					$list .= '<input type="hidden" id="override-start-hour-' . esc_attr( $i ) . '" value="' . esc_attr( $override['start_hour'] ) . '">' . PHP_EOL;
 
 					// --- start minute ---
-					$list .= '<select id="override-' . esc_attr( $i ) . '-start-min" name="show_sched[' . esc_attr( $i ) . '][start_min]" class="override-select">';
-						$list .= '<option value=""></option>';
-						$list .= '<option value="00">00</option>';
-						$list .= '<option value="15">15</option>';
-						$list .= '<option value="30">30</option>';
-						$list .= '<option value="45">45</option>';
+					$list .= '<select id="override-' . esc_attr( $i ) . '-start-min" name="show_sched[' . esc_attr( $i ) . '][start_min]" class="override-select">' . PHP_EOL;
+						$list .= '<option value=""></option>' . PHP_EOL;
+						$list .= '<option value="00">00</option>' . PHP_EOL;
+						$list .= '<option value="15">15</option>' . PHP_EOL;
+						$list .= '<option value="30">30</option>' . PHP_EOL;
+						$list .= '<option value="45">45</option>' . PHP_EOL;
 						for ( $j = 0; $j < 60; $j++ ) {
 							$min = ( $j < 10 ) ? '0' . $j : $j;
-							$list .= '<option value="' . esc_attr( $min ) . '" ' . selected( $override['start_min'], $min, false ) . '>' . esc_html( $min ) . '</option>';
+							$list .= '<option value="' . esc_attr( $min ) . '" ' . selected( $override['start_min'], $min, false ) . '>' . esc_html( $min ) . '</option>' . PHP_EOL;
 						}
-					$list .= '</select>';
-					$list .= '<input type="hidden" id="override-start-min-' . esc_attr( $i ) . '" value="' . esc_attr( $override['start_min'] ) . '">';
+					$list .= '</select>' . PHP_EOL;
+					$list .= '<input type="hidden" id="override-start-min-' . esc_attr( $i ) . '" value="' . esc_attr( $override['start_min'] ) . '">' . PHP_EOL;
 
 					// --- start meridian ---
-					$list .= '<select id="override-' . esc_attr( $i ) . '-start-meridian" name="show_sched[' . esc_attr( $i ) . '][start_meridian]" class="override-select">';
-						$list .= '<option value=""></option>';
-						$list .= '<option value="am" ' . selected( $override['start_meridian'], 'am', false ) . '>' . esc_html( $am ) . '</option>';
-						$list .= '<option value="pm" ' . selected( $override['start_meridian'], 'pm', false ) . '>' . esc_html( $pm ) . '</option>';
+					$list .= '<select id="override-' . esc_attr( $i ) . '-start-meridian" name="show_sched[' . esc_attr( $i ) . '][start_meridian]" class="override-select">' . PHP_EOL;
+						$list .= '<option value=""></option>' . PHP_EOL;
+						$list .= '<option value="am" ' . selected( $override['start_meridian'], 'am', false ) . '>' . esc_html( $am ) . '</option>' . PHP_EOL;
+						$list .= '<option value="pm" ' . selected( $override['start_meridian'], 'pm', false ) . '>' . esc_html( $pm ) . '</option>' . PHP_EOL;
 					$list .= '</select>';
-					$list .= '<input type="hidden" id="override-start-meridian-' . esc_attr( $i ) . '" value="' . esc_attr( $override['start_meridian'] ) . '">';
+					$list .= '<input type="hidden" id="override-start-meridian-' . esc_attr( $i ) . '" value="' . esc_attr( $override['start_meridian'] ) . '">' . PHP_EOL;
 
-				$list .= '</li>';
+				$list .= '</li>' . PHP_EOL;
 
 				// --- Override End Time ---
 				// 2.3.4: add common end minutes to top of options
-				$list .= '<li class="override-item">';
+				$list .= '<li class="override-item">' . PHP_EOL;
 
 					// --- end time label ---
-					$list .= esc_html( __( 'End Time', 'radio-station' ) ) . ':';
+					$list .= '<label>' . esc_html( __( 'End Time', 'radio-station' ) ) . '</label>:' . PHP_EOL;
 
 					// --- end hour ---
-					$list .= '<select id="override-' . esc_attr( $i ) . '-end-hour" name="show_sched['. esc_attr( $i ) . '][end_hour]" class="override-select">';
-						$list .= '<option value=""></option>';
+					$list .= '<select id="override-' . esc_attr( $i ) . '-end-hour" name="show_sched['. esc_attr( $i ) . '][end_hour]" class="override-select">' . PHP_EOL;
+						$list .= '<option value=""></option>' . PHP_EOL;
 						for ( $j = 1; $j <= 12; $j ++ ) {
-							$list .= '<option value="' . esc_attr( $j ) . '" ' . selected( $override['end_hour'], $j, false ) . '>' . esc_html( $j ) . '</option>';
+							$list .= '<option value="' . esc_attr( $j ) . '" ' . selected( $override['end_hour'], $j, false ) . '>' . esc_html( $j ) . '</option>' . PHP_EOL;
 						}
-					$list .= '</select>';
-					$list .= '<input type="hidden" id="override-end-hour-' . esc_attr( $i ) . '" value="' . esc_attr( $override['end_hour'] ) . '">';
+					$list .= '</select>' . PHP_EOL;
+					$list .= '<input type="hidden" id="override-end-hour-' . esc_attr( $i ) . '" value="' . esc_attr( $override['end_hour'] ) . '">' . PHP_EOL;
 
 					// --- end minutes ---
-					$list .= '<select id="override-' . esc_attr( $i ) . '-end-min" name="show_sched[' . esc_attr( $i ) . '][end_min]" class="override-select">';
-						$list .= '<option value=""></option>';
-						$list .= '<option value="00">00</option>';
-							$list .= '<option value="15">15</option>';
-						$list .= '<option value="30">30</option>';
-						$list .= '<option value="45">45</option>';
+					$list .= '<select id="override-' . esc_attr( $i ) . '-end-min" name="show_sched[' . esc_attr( $i ) . '][end_min]" class="override-select">' . PHP_EOL;
+						$list .= '<option value=""></option>' . PHP_EOL;
+						$list .= '<option value="00">00</option>' . PHP_EOL;
+							$list .= '<option value="15">15</option>' . PHP_EOL;
+						$list .= '<option value="30">30</option>' . PHP_EOL;
+						$list .= '<option value="45">45</option>' . PHP_EOL;
 						for ( $j = 0; $j < 60; $j++ ) {
 							$min = ( $j < 10 ) ? '0' . $j : $j;
-							$list .= '<option value="' . esc_attr( $min ) . '"' . selected( $override['end_min'], $min, false ) . '>' . esc_html( $min ) . '</option>';
+							$list .= '<option value="' . esc_attr( $min ) . '"' . selected( $override['end_min'], $min, false ) . '>' . esc_html( $min ) . '</option>' . PHP_EOL;
 						}
-					$list .= '</select>';
-					$list .= '<input type="hidden" id="override-end-min-' . esc_attr( $i ) . '" value="' . esc_attr( $override['end_min'] ) . '">';
+					$list .= '</select>' . PHP_EOL;
+					$list .= '<input type="hidden" id="override-end-min-' . esc_attr( $i ) . '" value="' . esc_attr( $override['end_min'] ) . '">' . PHP_EOL;
 
 					// --- end meridian ---
-					$list .= '<select id="override-' . esc_attr( $i ) . '-end-meridian" name="show_sched[' . esc_attr( $i ) . '][end_meridian]" class="override-select">';
-						$list .= '<option value=""></option>';
-						$list .= '<option value="am" ' . selected( $override['end_meridian'], 'am', false ) . '>' . esc_html( $am ) . '</option>';
-						$list .= '<option value="pm" ' . selected( $override['end_meridian'], 'pm', false ) . '>' . esc_html( $pm ) . '</option>';
-					$list .= '</select>';
-					$list .= '<input type="hidden" id="override-end-meridian-' . esc_attr( $i ) . '" value="' . esc_attr( $override['end_meridian'] ) . '">';
+					$list .= '<select id="override-' . esc_attr( $i ) . '-end-meridian" name="show_sched[' . esc_attr( $i ) . '][end_meridian]" class="override-select">' . PHP_EOL;
+						$list .= '<option value=""></option>' . PHP_EOL;
+						$list .= '<option value="am" ' . selected( $override['end_meridian'], 'am', false ) . '>' . esc_html( $am ) . '</option>' . PHP_EOL;
+						$list .= '<option value="pm" ' . selected( $override['end_meridian'], 'pm', false ) . '>' . esc_html( $pm ) . '</option>' . PHP_EOL;
+					$list .= '</select>' . PHP_EOL;
+					$list .= '<input type="hidden" id="override-end-meridian-' . esc_attr( $i ) . '" value="' . esc_attr( $override['end_meridian'] ) . '">' . PHP_EOL;
 
-				$list .= '</li>';
+				$list .= '</li>' . PHP_EOL;
 
 				// - multiday switch -
 				// 2.3.3.9: added multiday checkbox prototype
-				$list .= '<li class="override-item" style="display:none;">';
+				/* $list .= '<li class="override-item" style="display:none;">' . PHP_EOL;
 					$list .= '<input id="override-' . esc_attr( $i ) . '-multiday" type="checkbox" value="yes" onchange="radio_check_multiday(' . esc_attr( $i ). ');" name="show_sched[' . esc_attr( $i ) . '][multiday]\"';
 					if ( isset( $override['multiday'] ) && ( 'yes' == $override['multiday'] ) ) {
 						$list .= ' checked="checked"';
 					}
-					$list .= '> ' . esc_html( __( 'Multiday', 'radio-station' ) );
+					$list .= '> <label>' . esc_html( __( 'Multiday', 'radio-station' ) ) . '</label>' . PHP_EOL;
 					$list .= '<input type="hidden" id="override-multiday-' . esc_attr( $i ) . '"';
 					if ( isset( $override['multiday'] ) && ( 'yes' == $override['multiday'] ) ) {
 						$list .= 'value="yes"';
 					} else {
 						$list .= 'value=""';
 					}
-					$list .= '>';
-				$list .= '</li>';
+					$list .= '>' . PHP_EOL;
+				$list .= '</li>' . PHP_EOL; */
 
 				// - multiday end date -
 				// 2.3.3.9: added multiday end date prototype
-				$list .= '<li class="override-item" id="override-' . esc_attr( $i ) . '-end-date"';
+				/* $list .= '<li class="override-item" id="override-' . esc_attr( $i ) . '-end-date"';
 				if ( !isset( $override['multiday'] ) || ( 'yes' != $override['multiday'] ) ) {
 					$list .= ' style="display:none;"';
 				}
-				$list .= '>';
-					$list .= esc_html( __( 'End Date', 'radio-station' ) ) . ': ';
-					$list .= '<input type="text" id="override-' . esc_attr( $i ) . '-end-date" name="show_sched[' . esc_attr( $i ) . '][end_date]" class="override-date">';
-				$list .= '</li>';
+				$list .= '>' . PHP_EOL;
+					$list .= '<label>' . esc_html( __( 'End Date', 'radio-station' ) ) . '</label>: ' . PHP_EOL;
+					$list .= '<input type="text" id="override-' . esc_attr( $i ) . '-end-date" name="show_sched[' . esc_attr( $i ) . '][end_date]" class="override-date">' . PHP_EOL;
+				$list .= '</li>' . PHP_EOL; */
 
 				// --- disabled ---
 				// 2.3.3.9: added disabled override checkox
-				$list .= '<li class="override-item">';
+				$list .= '<li class="override-item override-disable">' . PHP_EOL;
 					$list .= '<input id="override-' . esc_attr( $i ) . '-disabled" type="checkbox" value="yes" onchange="radio_check_disabled(' . esc_attr( $i ). ');" name="show_sched[' . esc_attr( $i ) . '][disabled]"';
 					if ( isset( $override['disabled'] ) && ( 'yes' == $override['disabled'] ) ) {
 						$list .= ' checked="checked"';
 					}
-					$list .= '> ' . esc_html( __( 'Disabled', 'radio-station' ) );
+					$list .= '> <label>' . esc_html( __( 'Disabled', 'radio-station' ) ) . '</label>' . PHP_EOL;
 					$list .= '<input type="hidden" id="override-disabled-' . esc_attr( $i ) . '"';
 					if ( isset( $override['disabled'] ) && ( 'yes' == $override['disabled'] ) ) {
 						$list .= 'value="yes"';
 					} else {
 						$list .= 'value=""';
 					}
-					$list .= '>';
-				$list .= '</li>';
+					$list .= '>' . PHP_EOL;
+				$list .= '</li>' . PHP_EOL;
 
 				// --- duplicate shift icon ---
-				$list .= '<li class="override-item">';
+				$list .= '<li class="override-item">' . PHP_EOL;
 					$title = __( 'Duplicate Override', 'radio-station' );
-					$list .= '<span id="override-' . esc_attr( $i ) . '-duplicate" class="shift-duplicate dashicons dashicons-admin-page" title="' . esc_attr( $title ) . '" onclick="radio_override_duplicate(this);"></span>';
-				$list .= '</li>';
+					$list .= '<span id="override-' . esc_attr( $i ) . '-duplicate" class="shift-duplicate dashicons dashicons-admin-page" title="' . esc_attr( $title ) . '" onclick="radio_override_duplicate(this);"></span>' . PHP_EOL;
+				$list .= '</li>' . PHP_EOL;
 
 				// --- remove shift icon ---
-				$list .= '<li class="override-item last-item">';
+				$list .= '<li class="override-item last-item">' . PHP_EOL;
 					$title = __( 'Remove Override', 'radio-station' );
-					$list .= '<span id="override-' . esc_attr( $i ) . '-remove" class="shift-remove dashicons dashicons-no" title="' . esc_attr( $title ) . '" onclick="radio_override_remove(this);"></span>';
-				$list .= '</li>';
+					$list .= '<span id="override-' . esc_attr( $i ) . '-remove" class="shift-remove dashicons dashicons-no" title="' . esc_attr( $title ) . '" onclick="radio_override_remove(this);"></span>' . PHP_EOL;
+				$list .= '</li>' . PHP_EOL;
 
-			$list .= '</ul>';
-		$list .= '</div>';
+			$list .= '</ul>' . PHP_EOL;
+		$list .= '</div>' . PHP_EOL;
 		
 	}
 
 	// --- new overrides div ---
-	$list .= '<div id="new-overrides"></div>';
+	$list .= '<div id="new-overrides"></div>' . PHP_EOL;
 
 	// --- set table output to return ---
 	$table = array(
@@ -3832,7 +4033,12 @@ function radio_station_override_save_data( $post_id ) {
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 
 		// 2.3.3: added double check for AJAX action match
-		if ( !isset( $_REQUEST['action'] ) || ( 'radio_station_override_save' != $_REQUEST['action'] ) ) {
+		if ( !isset( $_REQUEST['action'] ) ) {
+			return;
+		}
+		// 2.3.3.9: match to whitelisted actions
+		$actions = array( 'radio_station_override_save', 'radio_station_add_override_time' );
+		if ( !in_array( $_REQUEST['action'], $actions ) ) {
 			return;
 		}
 
@@ -3977,11 +4183,22 @@ function radio_station_override_save_data( $post_id ) {
 	if ( isset( $_POST['show_override_nonce'] ) && wp_verify_nonce( $_POST['show_override_nonce'], 'radio-station' ) ) {
 
 		// --- get the show override data ---
-		$show_sched = $_POST['show_sched'];
+		$current_scheds = get_post_meta( $post_id, 'show_override_sched', true );
+		if ( isset( $_POST['new_override'] ) ) {
+			$new_shift = $_POST['new_override'];
+			$new_shift['id'] = radio_station_unique_shift_id();
+			$show_sched = $current_scheds;
+			$show_sched[] = $new_shift;
+			$_POST['show_sched'] = $show_sched;
+		} else {
+			$show_sched = $_POST['show_sched'];
+		}
+		$new_scheds = array();
 		if ( is_array( $show_sched ) ) {
 
 			// 2.3.3.9: loop to save possible multiple override dates/times ---
-			$new_scheds = array();
+			print_r( $show_sched );
+			
 			foreach ( $show_sched as $sched ) {
 
 				// --- get/set current schedule for merging ---
@@ -4079,7 +4296,6 @@ function radio_station_override_save_data( $post_id ) {
 
 			// --- check if override schedule has changed ---
 			$sched_changed = true;
-			$current_scheds = get_post_meta( $post_id, 'show_override_sched', true );
 			if ( array_key_exists( 'date', $current_scheds ) ) {
 				$current_scheds['id'] = radio_station_unique_shift_id();
 				$current_scheds = array( $current_scheds );
@@ -4176,67 +4392,83 @@ function radio_station_override_save_data( $post_id ) {
 
 	// --- update overrides table when AJAX saving ---
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-		if ( isset( $_POST['action'] ) && ( 'radio_station_override_save' == $_POST['action'] ) ) {
 
-			// --- (hidden) debug information ---
-			echo "Previous Overrides: " . print_r( $current_scheds, true ) . PHP_EOL;
-			echo "New Overrides: " . print_r( $new_scheds, true ) . PHP_EOL;
+		// 2.3.3.9: remove duplicate action check
 
-			// --- display shifts saved message ---
-			// 2.3.3.9: fade out overrides saved message
-			$show_override_nonce = wp_create_nonce( 'radio-station' );
-			echo "<script>parent.document.getElementById('overrides-saving-message').style.display = 'none';
-			parent.document.getElementById('overrides-saved-message').style.display = '';
-			if (typeof parent.jQuery == 'function') {parent.jQuery('#overrides-saved-message').fadeOut(3000);}
-			else {setTimeout(function() {parent.document.getElementById('overrides-saved-message').style.display = 'none';}, 3000);}
-			form = parent.document.getElementById('override-save-form'); form.parentNode.removeChild(form);
-			parent.document.getElementById('show_override_nonce').value = '" . esc_js( $show_override_nonce ) . "';
-			</script>";
+		// --- (hidden) debug information ---
+		echo "Previous Overrides: " . print_r( $current_scheds, true ) . PHP_EOL;
+		echo "New Overrides: " . print_r( $new_scheds, true ) . PHP_EOL;
 
-			// 2.3.3.9: added check if override schedule changed
-			if ( $sched_changed ) {
+		// --- display shifts saved message ---
+		// 2.3.3.9: fade out overrides saved message
+		$show_override_nonce = wp_create_nonce( 'radio-station' );
+		echo "<script>parent.document.getElementById('overrides-saving-message').style.display = 'none';
+		parent.document.getElementById('overrides-saved-message').style.display = '';
+		if (typeof parent.jQuery == 'function') {parent.jQuery('#overrides-saved-message').fadeOut(3000);}
+		else {setTimeout(function() {parent.document.getElementById('overrides-saved-message').style.display = 'none';}, 3000);}
+		form = parent.document.getElementById('override-save-form'); form.parentNode.removeChild(form);
+		parent.document.getElementById('show_override_nonce').value = '" . esc_js( $show_override_nonce ) . "';
+		</script>";
 
-				// --- output new show shifts list ---
-				echo '<div id="overrides-list">';
-				$table = radio_station_overrides_table( $post_id );
-				// if ( $table['conflicts'] ) {
-				// 	radio_station_overrides_conflict_message();
-				// }
+		// 2.3.3.9: added check if override schedule changed
+		if ( $sched_changed ) {
 
-				// phpcs:ignore WordPress.Security.OutputNotEscaped
-				echo $table['list'];
+			// --- output new show shifts list ---
+			echo '<div id="overrides-list">';
+			$table = radio_station_overrides_table( $post_id );
+			// if ( $table['conflicts'] ) {
+			// 	radio_station_overrides_conflict_message();
+			// }
 
-				echo '<div id="updated-div"></div>';
+			// phpcs:ignore WordPress.Security.OutputNotEscaped
+			echo $table['list'];
 
-				echo '</div>';
+			// echo '<div id="updated-div"></div>';
+			echo '</div>';
 
-				// --- refresh show shifts list ---
-				echo "<script>overridelist = parent.document.getElementById('overrides-list');
-				overridelist.innerHTML = document.getElementById('overrides-list').innerHTML;</script>";
+			// --- refresh show shifts list ---
+			$js = "<script>overridelist = parent.document.getElementById('overrides-list');
+			overridelist.innerHTML = document.getElementById('overrides-list').innerHTML;
+			overridelist.style.display = '';" . PHP_EOL;
 
-				// echo "<script>if (parent.window.onbeforeunloadset) {
-				//	parent.window.onbeforeunload = parent.storedonbeforeunload;
-				//	parent.window.onbeforeunloadset = false;
-				// }</script>";
+			// --- reload the current schedule view ---
+			$js .= "console.log('? OH YEAH ?');";
+			$js .= "parent.radio_load_schedule(false,false);" . PHP_EOL;
 
-				// --- alert on conflicts ---
-				// if ( $table['conflicts'] ) {
-				// 	$warning = __( 'Warning! Overide conflicts detected.', 'radio-station' );
-				//	echo "<script>alert('" . esc_js( $warning ) . "');</script>";
-				// }
+			// $js .= "if (parent.window.onbeforeunloadset) {
+			//	parent.window.onbeforeunload = parent.storedonbeforeunload;
+			//	parent.window.onbeforeunloadset = false;
+			// }";
 
-				// --- re-initialize datepicker fields in parent window ---
-				$js .= "parent.jQuery('.override-date').each(function() {
-					jQuery(this).datepicker({dateFormat : 'yy-mm-dd'});
-				});" . PHP_EOL;
-				
-				// --- reload the current schedule view ---
-				echo "<script>parent.radio_load_schedule(false,false);</script>";
+			// --- alert on conflicts ---
+			// if ( $table['conflicts'] ) {
+			// 	$warning = __( 'Warning! Override conflicts detected.', 'radio-station' );
+			//	$js .= "alert('" . esc_js( $warning ) . "');";
+			// }
 
+			// --- re-initialize datepicker fields in parent window ---
+			$js .= "parent.jQuery('.override-date').each(function() {
+				jQuery(this).datepicker({dateFormat : 'yy-mm-dd'});
+			});" . PHP_EOL;
+		
+			// --- output the scripts ---
+			echo '<script>' . $js . '</script>';
+
+			// 2.3.3.9: trigger action for save or add override time
+			if ( 'radio_station_override_save' == $_REQUEST['action'] ) {
+				do_action( 'radio_station_override_save_time', $shift_id );
+			} elseif ( 'radio_station_add_override_time' == $_REQUEST['action'] ) {
+				do_action( 'radio_station_override_add_time' );
 			}
-
-			exit;
 		}
+
+		// --- return early when adding single override ---
+		// 2.3.3.9: added for single override action		
+		if ( 'radio_station_add_override_time' == $_REQUEST['action'] ) {
+			return;
+		}
+
+		exit;
 	}
 
 }
@@ -4301,12 +4533,12 @@ function radio_station_override_column_data( $column, $post_id ) {
 		foreach ( $overrides as $i => $override ) {
 	
 			if ( count( $overrides ) > 1 ) {
-				echo '<b>' . ( $i + 1 ) . '</b>: ';
+				echo '<b>' . ( $i + 1 ) . '</b>: ' . PHP_EOL;
 			}
 
 			// 2.3.3.9: maybe display disabled for this override time
 			if ( isset( $override['disabled'] ) && ( 'yes' == $override['disabled'] ) ) {
-				echo '<i>[Disabled]</i><br>';
+				echo '<i>[Disabled]</i><br>' . PHP_EOL;
 			}
 			
 			// 2.3.2: no need to apply timezone conversions here
@@ -4315,22 +4547,22 @@ function radio_station_override_column_data( $column, $post_id ) {
 			$month = radio_station_translate_month( $month, true );
 			$weekday = date( 'l', $datetime );
 			$weekday = radio_station_translate_weekday( $weekday );
-			echo esc_html( $weekday ) . ' ' . esc_html( date( 'j', $datetime ) ) . ' ' . esc_html( $month ) . ' ' . esc_html( date( 'Y', $datetime ) );
-			echo '<br>';
+			echo esc_html( $weekday ) . ' ' . esc_html( date( 'j', $datetime ) ) . ' ' . esc_html( $month ) . ' ' . esc_html( date( 'Y', $datetime ) ) . PHP_EOL;
+			echo '<br>' . PHP_EOL;
 
 			// 2.3.3.9: merge override times into this columns
 			// 2.3.3.9: display according to selected time format
 			$time_format = radio_station_get_setting( 'clock_time_format' );
 			if ( 12 == $time_format ) {
 				echo esc_html( $override['start_hour'] ) . ':' . esc_html( $override['start_min'] ) . esc_html( $override['start_meridian'] );
-				echo ' - ' . esc_html( $override['end_hour'] ) . ':' . esc_html( $override['end_min'] ) . esc_html( $override['end_meridian'] );
+				echo ' - ' . esc_html( $override['end_hour'] ) . ':' . esc_html( $override['end_min'] ) . esc_html( $override['end_meridian'] ) . PHP_EOL;
 			} elseif ( 24 == $time_format ) {
 				$start_hour = radio_station_convert_hour( $override['start_hour'] . ' ' . $override['start_meridian'] );
 				$end_hour = radio_station_convert_hour( $override['end_hour'] . ' ' . $override['end_meridian'] );
 				echo esc_html( $override['start_hour'] ) . ':' . esc_html( $override['start_min'] );
-				echo ' - ' . esc_html( $override['end_hour'] ) . ':' . esc_html( $override['end_min'] );
+				echo ' - ' . esc_html( $override['end_hour'] ) . ':' . esc_html( $override['end_min'] ) . PHP_EOL;
 			}
-			echo '<br>';
+			echo '<br>' . PHP_EOL;
 		}
 
 	} elseif ( 'shows_affected' == $column ) {
@@ -4423,13 +4655,13 @@ function radio_station_override_column_data( $column, $post_id ) {
 							if ( !isset( $last_show ) || ( $last_show != $show_shift['post_id'] ) ) {
 								$active = get_post_meta( $show_shift['post_id'], 'show_active', true );
 								if ( 'on' != $active ) {
-									$affected .= "[<i>" . esc_html( __( 'Inactive', 'radio-station' ) ) . "</i>] ";
+									$affected .= '[<i>' . esc_html( __( 'Inactive', 'radio-station' ) ) . '</i>] ';
 								}
-								$affected .= '<b>' . $show_shift['post_title'] . "</b><br>";
+								$affected .= '<b>' . $show_shift['post_title'] . '</b><br>';
 							}
 
 							if ( isset( $shift['disabled'] ) && $shift['disabled'] ) {
-								$affected .= "[<i>" . esc_html( __( 'Disabled', 'radio-station' ) ) . "</i>] ";
+								$affected .= '[<i>' . esc_html( __( 'Disabled', 'radio-station' ) ) . '</i>] ';
 							}
 							$affected .= radio_station_translate_weekday( $shift['day'] ) . ' ';
 							// 2.3.3.9: display according to time format setting
@@ -4443,7 +4675,7 @@ function radio_station_override_column_data( $column, $post_id ) {
 								$affected .= esc_html( $start_hour ) . ':' . esc_html( $shift['start_min'] );
 								$affected .= ' - ' . esc_html( $end_hour ) . ':' . esc_html( $shift['end_min'] );
 							}
-							$affected .= "<br>";
+							$affected .= '<br>';
 							
 							// 2.3.3.9: store affected shows by override index
 							$affected_shows[$i] = $affected;
@@ -4507,7 +4739,7 @@ function radio_station_override_column_data( $column, $post_id ) {
 		$thumbnail_url = radio_station_get_show_avatar_url( $post_id );
 		$thumbnail_url = apply_filters( 'radio_station_show_avatar', $thumbnail_url, $post_id );
 		if ( $thumbnail_url ) {
-			echo "<div class='override_image'><img src='" . esc_url( $thumbnail_url ) . "' alt='" . esc_attr( __( 'Override Logo', 'radio-station' ) ) . "'></div>";
+			echo '<div class="override_image"><img src="' . esc_url( $thumbnail_url ) . '" alt="' . esc_attr( __( 'Override Logo', 'radio-station' ) ) . '"></div>' . PHP_EOL;
 		}
 	}
 }
@@ -4581,16 +4813,16 @@ function radio_station_override_date_filter( $post_type, $which ) {
 	$m = isset( $_GET['month'] ) ? (int) $_GET['month'] : 0;
 
 	// --- month override selector ---
-	echo '<label for="filter-by-override-date" class="screen-reader-text">' . esc_html( __( 'Filter by override date', 'radio-station' ) ) . '</label>';
-	echo '<select name="month" id="filter-by-override-date">';
-	echo '<option value="0" ' . selected( $m, 0, false ) . '>' . esc_html( __( 'All Override Months', 'radio-station' ) ) . '</option>';
+	echo '<label for="filter-by-override-date" class="screen-reader-text">' . esc_html( __( 'Filter by override date', 'radio-station' ) ) . '</label>' . PHP_EOL;
+	echo '<select name="month" id="filter-by-override-date">' . PHP_EOL;
+	echo '<option value="0" ' . selected( $m, 0, false ) . '>' . esc_html( __( 'All Override Months', 'radio-station' ) ) . '</option>' . PHP_EOL;
 	if ( count( $months ) > 0 ) {
 		foreach ( $months as $key => $data ) {
 			$label = $wp_locale->get_month( $data['month'] ) . ' ' . $data['year'];
-			echo "<option value='" . esc_attr( $key ) . "' " . selected( $m, $key, false ) . ">" . esc_html( $label ) . "</option>\n";
+			echo '<option value="' . esc_attr( $key ) . '" ' . selected( $m, $key, false ) . '>' . esc_html( $label ) . '</option>' . PHP_EOL;
 		}
 	}
-	echo '</select>';
+	echo '</select>' . PHP_EOL;
 
 }
 
@@ -4611,13 +4843,13 @@ function radio_station_override_past_future_filter( $post_type, $which ) {
 
 	// --- past / future override selector ---
 	// 2.3.3.5: added option for today filtering
-	echo '<label for="filter-by-past-future" class="screen-reader-text">' . esc_html( __( 'Past and Future', 'radio-station' ) ) . '</label>';
-	echo '<select name="pastfuture" id="filter-by-past-future">';
-	echo '<option value="" ' . selected( $pastfuture, 0, false ) . '>' . esc_html( __( 'All Overrides', 'radio-station' ) ) . '</option>';
-	echo '<option value="past"' . selected( $pastfuture, 'past', false ) . '>' . esc_html( __( 'Past Overrides', 'radio-station' ) ) . '</option>';
-	echo '<option value="today"' . selected( $pastfuture, 'today', false ) . '>' . esc_html( __( 'Overrides Today', 'radio-station' ) ) . '</option>';
-	echo '<option value="future"' . selected( $pastfuture, 'future', false ) . '>' . esc_html( __( 'Future Overrides', 'radio-station' ) ) . '</option>';
- 	echo '</select>';
+	echo '<label for="filter-by-past-future" class="screen-reader-text">' . esc_html( __( 'Past and Future', 'radio-station' ) ) . '</label>' . PHP_EOL;
+	echo '<select name="pastfuture" id="filter-by-past-future">' . PHP_EOL;
+	echo '<option value="" ' . selected( $pastfuture, 0, false ) . '>' . esc_html( __( 'All Overrides', 'radio-station' ) ) . '</option>' . PHP_EOL;
+	echo '<option value="past"' . selected( $pastfuture, 'past', false ) . '>' . esc_html( __( 'Past Overrides', 'radio-station' ) ) . '</option>' . PHP_EOL;
+	echo '<option value="today"' . selected( $pastfuture, 'today', false ) . '>' . esc_html( __( 'Overrides Today', 'radio-station' ) ) . '</option>' . PHP_EOL;
+	echo '<option value="future"' . selected( $pastfuture, 'future', false ) . '>' . esc_html( __( 'Future Overrides', 'radio-station' ) ) . '</option>' . PHP_EOL;
+ 	echo '</select>' . PHP_EOL;
 
 }
 
@@ -4634,6 +4866,7 @@ function radio_station_override_past_future_filter( $post_type, $which ) {
 // Borrowed and adapted from http://wordpress.stackexchange.com/questions/19838/create-more-meta-boxes-as-needed/19852#19852
 add_action( 'add_meta_boxes', 'radio_station_add_playlist_metabox' );
 function radio_station_add_playlist_metabox() {
+
 	// 2.2.2: change context to show at top of edit screen
 	// 2.3.2: filter top metabox position
 	$position = apply_filters( 'radio_station_metabox_position', 'rstop', 'playlist' );
@@ -4657,10 +4890,6 @@ function radio_station_playlist_metabox() {
 	// --- add nonce field for verification ---
 	wp_nonce_field( 'radio-station', 'playlist_tracks_nonce' );
 
-	// --- get the saved meta as an array ---
-	// 2.3.2: set single argument to true
-	$entries = get_post_meta( $post->ID, 'playlist', true );
-
 	// --- set button titles ---
 	// 2.3.2: added titles for button icons
 	$move_up_title = __( 'Move Track Up', 'radio-station' );
@@ -4669,38 +4898,38 @@ function radio_station_playlist_metabox() {
 	$remove_title = __( 'Remove Track', 'radio-station' );
 
 	// 2.3.3.9: move meta_inner ID to class
-	echo '<div class="meta_inner">';
+	echo '<div class="meta_inner">' . PHP_EOL;
 
 	// 2.3.2: separate track list table
-	echo radio_station_playlist_track_table( $entries );
+	echo radio_station_playlist_track_table( $post->ID );
 
 	// --- track save/add buttons ---
 	// 2.3.2: change track save from button-primary to button-secondary
 	// 2.3.2: added playlist AJAX save button (for existing posts only)
 	// 2.3.2: added playlist tracks clear button
 	// 2.3.2: added table and track saved message
-	echo '<table id="track-table-buttons" width="100%"><tr><td width="33%" align="center">';
-	echo '<input type="button" class="clear-tracks button-secondary" value="' . esc_attr( __( 'Clear Tracks', 'radio-station' ) ) . '" onclick="radio_tracks_clear();">';
-	echo '</td><td width="33%" align="center">';
+	echo '<table id="track-table-buttons" width="100%"><tr><td width="33%" align="center">' . PHP_EOL;
+	echo '<input type="button" class="clear-tracks button-secondary" value="' . esc_attr( __( 'Clear Tracks', 'radio-station' ) ) . '" onclick="radio_tracks_clear();">' . PHP_EOL;
+	echo '</td><td width="33%" align="center">' . PHP_EOL;
 	if ( 'add' != $current_screen->action ) {
-	    echo '<input type="button" class="save-tracks button-primary" value="' . esc_attr( __( 'Save Tracks', 'radio-station' ) ) . '" onclick="radio_tracks_save();">';
+	    echo '<input type="button" class="save-tracks button-primary" value="' . esc_attr( __( 'Save Tracks', 'radio-station' ) ) . '" onclick="radio_tracks_save();">' . PHP_EOL;
 	}
-	echo '</td><td width="33%" align="center">';
-	echo '<input type="button" class="add-track button-secondary" value="' . esc_attr( __( 'Add Track', 'radio-station' ) ) . '" onclick="radio_track_add();">';
-	echo '</td></tr>';
+	echo '</td><td width="33%" align="center">' . PHP_EOL;
+	echo '<input type="button" class="add-track button-secondary" value="' . esc_attr( __( 'Add Track', 'radio-station' ) ) . '" onclick="radio_track_add();">' . PHP_EOL;
+	echo '</td></tr>' . PHP_EOL;
 	
 	// 2.3.3.9: change to single cell spanning 3 columns
-	echo '<tr><td colspan="3" align="center">';
-	echo '<div id="tracks-saving-message" style="display:none;">' . esc_html( __( 'Saving Playlist Tracks...', 'radio-station' ) ) . '</div>';
-	echo '<div id="tracks-saved-message" style="display:none;">' . esc_html( __( 'Playlist Tracks Saved.', 'radio-station' ) ) . '</div>';
-	echo '<div id="tracks-error-message" style="display:none;"></div>';
-	echo '</td></tr></table>';
+	echo '<tr><td colspan="3" align="center">' . PHP_EOL;
+	echo '<div id="tracks-saving-message" style="display:none;">' . esc_html( __( 'Saving Playlist Tracks...', 'radio-station' ) ) . '</div>' . PHP_EOL;
+	echo '<div id="tracks-saved-message" style="display:none;">' . esc_html( __( 'Playlist Tracks Saved.', 'radio-station' ) ) . '</div>' . PHP_EOL;
+	echo '<div id="tracks-error-message" style="display:none;"></div>' . PHP_EOL;
+	echo '</td></tr></table>' . PHP_EOL;
 
-	echo '<div style="clear: both;"></div>';
+	echo '<div style="clear: both;"></div>' . PHP_EOL;
 
 	// --- move new tracks message ---
 	// 2.3.2: added new track move message
-	echo '<center>' . __( 'Tracks marked New are moved to the end of Playlist on update.', 'radio-station' ) . '</center>';
+	echo '<center>' . __( 'Tracks marked New are moved to the end of Playlist on update.', 'radio-station' ) . '</center>' . PHP_EOL;
 
 	// --- clear all tracks function ---
 	$confirm_clear = __( 'Are you sure you want to clear the track list?', 'radio-station' );
@@ -4745,13 +4974,10 @@ function radio_station_playlist_metabox() {
 			m = n - 1;
 			jQuery('#track-'+n+'-rowa').insertBefore('#track-'+m+'-rowa');
 			jQuery('#track-'+n+'-rowb').insertAfter('#track-'+n+'-rowa');
-			/* jQuery('#track-'+n+'-rowc').insertAfter('#track-'+n+'-rowb'); */
-		}
-		if (updown == 'down') {
+		} else if (updown == 'down') {
 			m = n + 1;
 			jQuery('#track-'+n+'-rowa').insertAfter('#track-'+m+'-rowb');
 			jQuery('#track-'+n+'-rowb').insertAfter('#track-'+n+'-rowa');
-			/* jQuery('#track-'+n+'-rowc').insertAfter('#track-'+n+'-rowb'); */
 		}
 		/* reset track classes */
 		radio_track_classes();
@@ -4789,10 +5015,9 @@ function radio_station_playlist_metabox() {
 
 	// --- reset first and last track classes ---
 	$js .= "function radio_track_classes() {
-		jQuery('.track-rowa, .track-rowb, .track-rowc').removeClass('first-track').removeClass('last-track');
+		jQuery('.track-rowa, .track-rowb').removeClass('first-track').removeClass('last-track');
 		jQuery('.track-rowa').first().addClass('first-track'); jQuery('.track-rowa').last().addClass('last-track');
 		jQuery('.track-rowb').first().addClass('first-track'); jQuery('.track-rowb').last().addClass('last-track');
-		/* jQuery('.track-rowc').first().addClass('first-track'); jQuery('.track-rowc').last().addClass('last-track'); */
 	}" . PHP_EOL;
 
 	// --- add track function ---
@@ -4801,6 +5026,7 @@ function radio_station_playlist_metabox() {
 	// 2.3.2: added track move arrows
 	// 2.3.2: added first and last row classes
 	// 2.3.2: set to standalone onclick function
+	// 2.3.3.9: added track length select inputs
 	$js .= "function radio_track_add() {
 		if (trackcount == 1) {classes = 'first-track last-track';} else {classes = 'last-track';}
 		output = '<tr id=\"track-'+trackcount+'-rowa\" class=\"track-rowa '+classes+'\">';
@@ -4811,7 +5037,15 @@ function radio_station_playlist_metabox() {
 			output += '<td><input type=\"text\" name=\"playlist['+trackcount+'][playlist_entry_label]\" value=\"\" style=\"width:150px;\"></td>';
 		output += '</tr>';
 		output += '<tr id=\"track-'+trackcount+'-rowb\" class=\"track-rowb '+classes+'\">';
-			output += '<td colspan=\"3\">" . esc_js( __( 'Comments', 'radio-station' ) ) . ": <input type=\"text\" name=\"playlist['+trackcount+'][playlist_entry_comments]\" value=\"\" style=\"width:300px;\"></td>';
+			output += '<td></td><td colspan=\"2\"><div class=\"track-time\">" . esc_js( __( 'Length', 'radio-station' ) ) . ": ';
+			output += '<input type=\"text\" class=\"track-minutes\" name=\"playlist['+trackcount+'][playlist_entry_minutes]\" value=\"\">m : ';
+			output += '<select class=\"track-seconds\" name=\"playlist['+trackcount+'][playlist_entry_seconds]\" value=\"\">';
+			for ( i = 0; i < 60; i++ ) {
+				if (i < 10) {i = '0'+i;}
+				output += '<option value=\"'+i+'\">'+i+'</option>';
+			}
+			output += '</select>s</div> ';
+			output += '<div class=\"track-comments\">" . esc_js( __( 'Comments', 'radio-station' ) ) . ": <input type=\"text\" name=\"playlist['+trackcount+'][playlist_entry_comments]\" value=\"\"></div></td>';
 			output += '<td class=\"track-meta\"><div>" . esc_js( __( 'New', 'radio-station' ) ) . ":</div>';
 			output += '<div><input type=\"checkbox\" name=\"playlist['+trackcount+'][playlist_entry_new]\"></div>';
 			output += '<div style=\"margin-left:5px;\">" . esc_js( __( 'Status', 'radio-station' ) ) . ":</div>';
@@ -4827,9 +5061,6 @@ function radio_station_playlist_metabox() {
 				output += '<div class=\"track-duplicate dashicons dashicons-admin-page\" title=\"" . esc_js( $duplicate_title ) . "\" onclick=\"radio_track_duplicate('+trackcount+')\"></div>';
 			output += '</td>';
 		output += '</tr>';
-
-		/* output += '<tr id=\"track-'+trackcount+'-rowc\" class=\"track-rowc '+classes+'\">';
-		output += '</tr>'; */
 
 		jQuery('#track-table').append(output);
 		trackcount++;
@@ -4875,9 +5106,9 @@ function radio_station_playlist_metabox() {
 	// 2.3.2: reset first and last classes on remove
 	// 2.3.2: set to standalone onclick function
 	$js .= "function radio_track_remove(id) {
-		jQuery('#track-'+id+'-rowa, #track-'+id+'-rowb, #track-'+id+'-rowc').remove();
-		radio_track_classes(); trackcount--;
-
+		jQuery('#track-'+id+'-rowa, #track-'+id+'-rowb').remove();
+		radio_track_classes();
+		trackcount--;
 		/* renumber track count */
 		var tcount = 1;
 		jQuery('.track-rowa').each(function() {
@@ -4900,9 +5131,15 @@ function radio_station_playlist_metabox() {
 	// 2.3.2: added track move arrow styles
 	// 2.3.2: added table buttons styling
 	// 2.3.2: added track save message styling
-	echo '<style>.track-meta div {display: inline-block; margin-right: 3px;}
-	.track-meta select {font-size: 12px;}
-	.track-arrow-up, .track-arrow-down {font-size: 32px; line-height: 24px; cursor: pointer;}
+	// 2.3.3.9: margin top fixes for move arrows
+	// 2.3.3.9: added track time styling
+	$css = '.track-meta div {display: inline-block; margin-right: 3px;}
+	.track-time, .track-comments {display: inline-block;}
+	.track-comments {margin-left: 30px;}
+	.track-minutes, .track-seconds {width: 30px;}
+	.track-meta select, .track-time select, .track-time input {font-size: 12px;}
+	.track-move {margin-top: -5px;}
+	.track-arrow-up, .track-arrow-down {font-size: 36px; line-height: 24px; cursor: pointer; margin-top: -10px;}
 	tr.first-track .track-arrow-up, tr.last-track .track-arrow-down {display: none;}
 	tr.first-track .track-arrow-down {margin-left: 20px;}
 	.track-controls .track-arrow-up, .track-controls .track-arrow-down,
@@ -4912,8 +5149,13 @@ function radio_station_playlist_metabox() {
 	#track-table-buttons .clear-tracks, #track-table-buttons .save-tracks, #track-table-buttons .add-track {
 		cursor: pointer; display: block; width: 120px; padding: 8px; text-align: center; line-height: 1em;}
 	#tracks-saving-message, #tracks-saved-message {
-		background-color: lightYellow; border: 1px solid #E6DB55; margin-top: 10px; font-weight: bold; max-width: 300px; padding: 5px 0;}
-	</style>';
+		background-color: lightYellow; border: 1px solid #E6DB55; margin-top: 10px; font-weight: bold; max-width: 300px; padding: 5px 0;}' . PHP_EOL;
+
+	// --- filter and output ---
+	// 2.3.3.9: added track list style filter
+	$css = apply_filters( 'radio_station_tracks_list_styles', $css );
+	// phpcs:ignore WordPress.Security.OutputNotEscaped
+	echo '<style>' . $css . '</style>';	
 
 	// --- close meta inner ---
 	echo '</div>';
@@ -4926,16 +5168,21 @@ function radio_station_playlist_metabox() {
 // Track List Table
 // ----------------
 // 2.3.2: separated tracklist table (for AJAX)
-function radio_station_playlist_track_table( $entries ) {
+function radio_station_playlist_track_table( $playlist_id ) {
+
+	// --- get the saved meta as an array ---
+	// 2.3.2: set single argument to true
+	$entries = get_post_meta( $playlist_id, 'playlist', true );
 
 	// --- open track table ---
-	echo '<table id="track-table" class="widefat">';
-	echo '<tr>';
-	echo '<th></th><th><b>' . esc_html( __( 'Artist', 'radio-station' ) ) . '</b></th>';
-	echo '<th><b>' . esc_html( __( 'Song', 'radio-station' ) ) . '</b></th>';
-	echo '<th><b>' . esc_html( __( 'Album', 'radio-station' ) ) . '</b></th>';
-	echo '<th><b>' . esc_html( __( 'Record Label', 'radio-station' ) ) . '</th>';
-	echo '</tr>';
+	// TODO: convert track table to list ?
+	echo '<table id="track-table" class="widefat">' . PHP_EOL;
+	echo '<tr>' . PHP_EOL;
+	echo '<th></th><th><b>' . esc_html( __( 'Artist', 'radio-station' ) ) . '</b></th>' . PHP_EOL;
+	echo '<th><b>' . esc_html( __( 'Song', 'radio-station' ) ) . '</b></th>' . PHP_EOL;
+	echo '<th><b>' . esc_html( __( 'Album', 'radio-station' ) ) . '</b></th>' . PHP_EOL;
+	echo '<th><b>' . esc_html( __( 'Record Label', 'radio-station' ) ) . '</th>' . PHP_EOL;
+	echo '</tr>' . PHP_EOL;
 
 	// --- set button titles ---
 	// 2.3.2: added titles for icon buttons
@@ -4951,64 +5198,96 @@ function radio_station_playlist_track_table( $entries ) {
 		foreach ( $entries as $track ) {
 			if ( isset( $track['playlist_entry_artist'] ) || isset( $track['playlist_entry_song'] )
 			     || isset( $track['playlist_entry_album'] ) || isset( $track['playlist_entry_label'] )
+			     || isset( $track['playlist_entry_minutes'] ) || isset( $track['playlist_entry_seconds'] )
 			     || isset( $track['playlist_entry_comments'] ) || isset( $track['playlist_entry_new'] )
 			     || isset( $track['playlist_entry_status'] ) ) {
 
-				// --- track row a ---
+				// 2.3.3.9: set any unset keys to empty
+				$entry_keys = array(
+					'playlist_entry_artist',
+					'playlist_entry_song',
+					'playlist_entry_album',
+					'playlist_entry_label',
+					'playlist_entry_minutes',
+					'playlist_entry_seconds',
+					'playlist_entry_comments',
+					'playlist_entry_new',
+					'playlist_entry_status',
+				);
+				foreach ( $entry_keys as $entry_key ) {
+					if ( !isset( $track[$entry_key] ) ) {
+						$track[$entry_key] = '';
+					}
+				}
+
+				// --- track row A ---
 				$class = '';
 				if ( 1 == $c ) {
 					$class = 'first-track';
 				} elseif ( $c == count( $entries ) ) {
 					$class = 'last-track';
 				}
-				echo '<tr id="track-' . esc_attr( $c ) . '-rowa" class="track-rowa ' . esc_attr( $class ) . '">';
+				echo '<tr id="track-' . esc_attr( $c ) . '-rowa" class="track-rowa ' . esc_attr( $class ) . '">' . PHP_EOL;
 
 				// --- track count ---
-				echo '<td><span class="track-count">' . esc_html( $c ) . '</span></td>';
+				echo '<td><span class="track-count">' . esc_html( $c ) . '</span></td>' . PHP_EOL;
 
 				// --- track entry inputs ---
-				echo '<td><input type="text" name="playlist[' . esc_attr( $c ) . '][playlist_entry_artist]" value="' . esc_attr( $track['playlist_entry_artist'] ) . '" style="width:150px;"></td>';
-				echo '<td><input type="text" name="playlist[' . esc_attr( $c ) . '][playlist_entry_song]" value="' . esc_attr( $track['playlist_entry_song'] ) . '" style="width:150px;"></td>';
-				echo '<td><input type="text" name="playlist[' . esc_attr( $c ) . '][playlist_entry_album]" value="' . esc_attr( $track['playlist_entry_album'] ) . '" style="width:150px;"></td>';
-				echo '<td><input type="text" name="playlist[' . esc_attr( $c ) . '][playlist_entry_label]" value="' . esc_attr( $track['playlist_entry_label'] ) . '" style="width:150px;"></td>';
+				echo '<td><input type="text" name="playlist[' . esc_attr( $c ) . '][playlist_entry_artist]" value="' . esc_attr( $track['playlist_entry_artist'] ) . '" style="width:150px;"></td>' . PHP_EOL;
+				echo '<td><input type="text" name="playlist[' . esc_attr( $c ) . '][playlist_entry_song]" value="' . esc_attr( $track['playlist_entry_song'] ) . '" style="width:150px;"></td>' . PHP_EOL;
+				echo '<td><input type="text" name="playlist[' . esc_attr( $c ) . '][playlist_entry_album]" value="' . esc_attr( $track['playlist_entry_album'] ) . '" style="width:150px;"></td>' . PHP_EOL;
+				echo '<td><input type="text" name="playlist[' . esc_attr( $c ) . '][playlist_entry_label]" value="' . esc_attr( $track['playlist_entry_label'] ) . '" style="width:150px;"></td>' . PHP_EOL;
 				echo '</tr>';
 
-				// --- track row b ---
-				echo '<tr id="track-' . esc_attr( $c ) . '-rowb" class="track-rowb ' . esc_attr( $class ) . '">';
+				// --- track row B ---
+				echo '<tr id="track-' . esc_attr( $c ) . '-rowb" class="track-rowb ' . esc_attr( $class ) . '">' . PHP_EOL;
+
+				// --- track length ---
+				// 2.3.3.9: added track length inputs
+				// 2.3.3.9: add unit translation wrappers with notes
+				echo '<td></td><td colspan="2"><div class="track-time">' . esc_html( __( 'Length', 'radio-station' ) ) . ': ' . PHP_EOL;
+				echo '<input type="text" class="track-minutes" name="playlist[' . esc_attr( $c ) . '][playlist_entry_minutes]" value="' . esc_attr( $track['playlist_entry_minutes'] ) . '">';
+				echo _x( 'm', 'minutes unit', 'radio-station' ) . ' : ' . PHP_EOL;
+				echo '<select class="track-seconds" name="playlist[' . esc_attr( $c ) . '][playlist_entry_seconds]" value="' . esc_attr( $track['playlist_entry_seconds'] ) . '">' . PHP_EOL;
+				for ( $i = 0; $i < 60; $i++ ) {
+					if ( $i < 10 ) {
+						$i = '0' . $i;
+					}
+					echo '<option value="' . esc_attr( $i ) . '"';
+					if ( $i == $track['playlist_entry_seconds'] ) {
+						echo ' selected="selected"';
+					}
+					echo '>' . esc_html( $i ) . '</option>' . PHP_EOL;
+				}				
+				echo '</select>' . _x( 's', 'seconds unit', 'radio-station' ) . '</div>' . PHP_EOL;
 
 				// --- track comments ---
-				echo '<td colspan="3">' . esc_html__( 'Comments', 'radio-station' ) . ' ';
-				echo '<input type="text" name="playlist[' . esc_attr( $c ) . '][playlist_entry_comments]" value="' . esc_attr( $track['playlist_entry_comments'] ) . '" style="width:300px;"></td>';
+				echo '<div class="track-comments">' . esc_html( __( 'Comments', 'radio-station' ) ) . ': ' . PHP_EOL;
+				echo '<input type="text" name="playlist[' . esc_attr( $c ) . '][playlist_entry_comments]" value="' . esc_attr( $track['playlist_entry_comments'] ) . '"></div></td>' . PHP_EOL;
 
 				// --- track meta ---
-				echo '<td class="track-meta">';
-				echo '<div>' . esc_html( __( 'New', 'radio-station' ) ) . ':</div>';
+				echo '<td class="track-meta">' . PHP_EOL;
+				echo '<div>' . esc_html( __( 'New', 'radio-station' ) ) . ':</div>' . PHP_EOL;
 				// 2.3.2: remove new value checking as now used and cleared on save
 				// $track['playlist_entry_new'] = isset( $track['playlist_entry_new'] ) ? $track['playlist_entry_new'] : false;
 				// ' . checked( $track['playlist_entry_new'] ) . '
-				echo '<div><input type="checkbox" style="display:inline-block;" name="playlist[' . esc_attr( $c ) . '][playlist_entry_new]"></div>';
-				echo '<div style="margin-left:5px;">' . esc_html( __( 'Status', 'radio-station' ) ) . ':</div>';
-				echo '<div><select name="playlist[' . esc_attr( $c ) . '][playlist_entry_status]">';
-				echo '<option value="queued" ' . selected( $track['playlist_entry_status'], 'queued', false ) . '>' . esc_html__( 'Queued', 'radio-station' ) . '</option>';
-				echo '<option value="played" ' . selected( $track['playlist_entry_status'], 'played', false ) . '>' . esc_html__( 'Played', 'radio-station' ) . '</option>';
-				echo '</select></div></td>';
+				echo '<div><input type="checkbox" style="display:inline-block;" name="playlist[' . esc_attr( $c ) . '][playlist_entry_new]"></div>' . PHP_EOL;
+				echo '<div style="margin-left:5px;">' . esc_html( __( 'Status', 'radio-station' ) ) . ':</div>' . PHP_EOL;
+				echo '<div><select name="playlist[' . esc_attr( $c ) . '][playlist_entry_status]">' . PHP_EOL;
+				echo '<option value="queued" ' . selected( $track['playlist_entry_status'], 'queued', false ) . '>' . esc_html__( 'Queued', 'radio-station' ) . '</option>' . PHP_EOL;
+				echo '<option value="played" ' . selected( $track['playlist_entry_status'], 'played', false ) . '>' . esc_html__( 'Played', 'radio-station' ) . '</option>' . PHP_EOL;
+				echo '</select></div></td>' . PHP_EOL;
 
 				// 2.3.2: added move track arrows
-				echo '<td class="track-controls">';
-				echo '<div class="track-move">' . esc_html( __( 'Move', 'radio-station') ) . ': </div>';
-				echo '<div class="track-arrow-up" onclick="radio_track_move(\'up\', ' . esc_attr( $c ) . ');" title="' . esc_attr( $move_up_title ) . '">&#9652</div>';
-				echo '<div class="track-arrow-down" onclick="radio_track_move(\'down\', ' . esc_attr( $c ) . ');" title="' . esc_attr( $move_down_title ) . '">&#9662</div>';
+				echo '<td class="track-controls">' . PHP_EOL;
+				echo '<div class="track-move">' . esc_html( __( 'Move', 'radio-station') ) . ': </div>' . PHP_EOL;
+				echo '<div class="track-arrow-up" onclick="radio_track_move(\'up\', ' . esc_attr( $c ) . ');" title="' . esc_attr( $move_up_title ) . '">&#9652</div>' . PHP_EOL;
+				echo '<div class="track-arrow-down" onclick="radio_track_move(\'down\', ' . esc_attr( $c ) . ');" title="' . esc_attr( $move_down_title ) . '">&#9662</div>' . PHP_EOL;
 
 				// --- remove track button ---
-				echo '<div class="track-remove dashicons dashicons-no" title="' . esc_attr( $remove_title ) . '" onclick="radio_track_remove(' . esc_attr( $c ) . ');"></div>';
-				echo '<div class="track-duplicate dashicons dashicons-admin-page" title="' . esc_attr( $duplicate_title ) . '" onclick="radio_track_duplicate(' . esc_attr( $c ) . ');"></div>';
-				echo '</td>';
-				echo '</tr>';
-
-				// --- track row c ---
-				// TODO: add track time / start / end input fields ?
-				// echo '<tr id="track-' . esc_attr( $c ) . '-rowc" class="track-rowc ' . esc_attr( $class ) . '">';
-				// echo '</tr>';
+				echo '<div class="track-remove dashicons dashicons-no" title="' . esc_attr( $remove_title ) . '" onclick="radio_track_remove(' . esc_attr( $c ) . ');"></div>' . PHP_EOL;
+				echo '<div class="track-duplicate dashicons dashicons-admin-page" title="' . esc_attr( $duplicate_title ) . '" onclick="radio_track_duplicate(' . esc_attr( $c ) . ');"></div>' . PHP_EOL;
+				echo '</td></tr>' . PHP_EOL;
 
 				$c ++;
 			}
@@ -5045,13 +5324,14 @@ function radio_station_playlist_show_metabox() {
 
 	// --- check that we have at least one show ---
 	// 2.3.0: moved up to check for any shows
+	// 2.3.3.9: allow assignment to draft ahows
 	$args = array(
 		'numberposts' => - 1,
 		'offset'      => 0,
 		'orderby'     => 'post_title',
 		'order'       => 'ASC',
 		'post_type'   => RADIO_STATION_SHOW_SLUG,
-		'post_status' => 'publish',
+		'post_status' => array( 'publish', 'draft' )
 	);
 	$shows = get_posts( $args );
 	if ( count( $shows ) > 0 ) {
@@ -5093,13 +5373,14 @@ function radio_station_playlist_show_metabox() {
 			}
 		}
 
+		// 2.3.3.9: allow assignment to draft shows
 		$args = array(
 			'numberposts' => - 1,
 			'offset'      => 0,
 			'orderby'     => 'post_title',
 			'order'       => 'aSC',
 			'post_type'   => RADIO_STATION_SHOW_SLUG,
-			'post_status' => 'publish',
+			'post_status' => array( 'publish', 'draft' ),
 			'include'     => implode( ',', $allowed_shows ),
 		);
 
@@ -5107,27 +5388,27 @@ function radio_station_playlist_show_metabox() {
 	}
 
 	// 2.3.3.9: move meta_inner ID to class
-	echo '<div class="meta_inner">';
+	echo '<div class="meta_inner">' . PHP_EOL;
 	if ( !$have_shows ) {
-		echo esc_html( __( 'No Shows were found.', 'radio-station' ) );
+		echo esc_html( __( 'No Shows were found.', 'radio-station' ) ) . PHP_EOL;
 	} else {
 		if ( count( $shows ) < 1 ) {
-			echo esc_html( __( 'You are not assigned to any Shows.', 'radio-station' ) );
+			echo esc_html( __( 'You are not assigned to any Shows.', 'radio-station' ) ) . PHP_EOL;
 		} else {
 			// --- add nonce field for verification ---
 			wp_nonce_field( 'radio-station', 'playlist_show_nonce' );
 
 			// --- select show to assign playlist to ---
 			$current = get_post_meta( $post->ID, 'playlist_show_id', true );
-			echo '<select name="playlist_show_id">';
-			echo '<option value="" ' . selected( $current, false, false ) . '>' . esc_html__( 'Unassigned', 'radio-station' ) . '</option>';
+			echo '<select name="playlist_show_id">' . PHP_EOL;
+			echo '<option value="" ' . selected( $current, false, false ) . '>' . esc_html__( 'Unassigned', 'radio-station' ) . '</option>' . PHP_EOL;
 			foreach ( $shows as $show ) {
-				echo '<option value="' . esc_attr( $show->ID ) . '" ' . selected( $show->ID, $current, false ) . '>' . esc_html( $show->post_title ) . '</option>';
+				echo '<option value="' . esc_attr( $show->ID ) . '" ' . selected( $show->ID, $current, false ) . '>' . esc_html( $show->post_title ) . '</option>' . PHP_EOL;
 			}
-			echo '</select>';
+			echo '</select>' . PHP_EOL;
 		}
 	}
-	echo '</div>';
+	echo '</div>' . PHP_EOL;
 }
 
 // --------------------
@@ -5158,7 +5439,7 @@ function radio_station_playlist_save_data( $post_id ) {
 		} elseif ( !isset( $_POST['playlist_tracks_nonce'] ) || !wp_verify_nonce( $_POST['playlist_tracks_nonce'], 'radio-station' ) ) {
 			$error = __( 'Expired. Publish or Update instead.', 'radio-station' );
 		} elseif ( !isset( $_POST['playlist_id'] ) || ( '' == $_POST['playlist_id'] ) ) {
-			$error = __( 'Failed. Playlist ID provided.', 'radio-station' );		
+			$error = __( 'Failed. No Playlist ID provided.', 'radio-station' );		
 		} else {
 			$post_id = absint( $_POST['playlist_id'] );
 			$post = get_post( $post_id );
@@ -5190,18 +5471,26 @@ function radio_station_playlist_save_data( $post_id ) {
 			$prev_playlist = get_post_meta( $post_id, 'playlist', true );
 			$playlist = isset( $_POST['playlist'] ) ? $_POST['playlist'] : array();
 
-			// move songs that are still queued to the end of the list so that order is maintained
-			foreach ( $playlist as $i => $song ) {
-				// 2.3.2: move songs marked as new to the end instead of queued
-				// if ( 'queued' === $song['playlist_entry_status'] ) {
-				if ( $song['playlist_entry_new'] ) {
-					// 2.3.2: unset before adding to maintain (now ordered) track count
-					// 2.3.2: unset new flag from track record now it has been moved
-					unset( $playlist[$i] );
-					unset( $song['playlist_entry_new'] );
-					$playlist[] = $song;
+			if ( count( $playlist ) > 0 ) {
+				// move songs that are still queued to the end of the list so that order is maintained
+				foreach ( $playlist as $i => $entry ) {
+
+					// 2.3.3.9: sanitize entry key values
+					$entry = radio_station_sanitize_playlist_entry( $entry );
+
+					// 2.3.2: move songs marked as new to the end instead of queued
+					// if ( 'queued' === $song['playlist_entry_status'] ) {
+					if ( $entry['playlist_entry_new'] ) {
+						// 2.3.2: unset before adding to maintain (now ordered) track count
+						// 2.3.2: unset new flag from track record now it has been moved
+						unset( $playlist[$i] );
+						unset( $entry['playlist_entry_new'] );
+						$playlist[] = $entry;
+					}
 				}
 			}
+
+			// --- check if playlist is changed ---
 			if ( $prev_playlist != $playlist ) {
 				update_post_meta( $post_id, 'playlist', $playlist );
 				$playlist_changed = true;
@@ -5261,8 +5550,7 @@ function radio_station_playlist_save_data( $post_id ) {
 			// --- refresh track list table ---
 			// 2.3.3.9: added check if playlist changed
 			if ( $playlist_changed ) {
-				$entries = get_post_meta( $post_id, 'playlist', true );
-				echo radio_station_playlist_track_table( $entries );
+				echo radio_station_playlist_track_table( $post_id );
 				echo "<script>tracktable = parent.document.getElementById('track-table');
 				tracktable.innerHTML = document.getElementById('track-table').innerHTML;</script>";
 			}
@@ -5307,28 +5595,28 @@ function radio_station_playlist_column_data( $column, $post_id ) {
 	if ( 'show' == $column ) {
 		$show_id = get_post_meta( $post_id, 'playlist_show_id', true );
 		$post = get_post( $show_id );
-		echo "<a href='" . esc_url( get_edit_post_link( $post->ID ) ) . "'>" . esc_html( $post->post_title ) . "</a>";
+		echo '<a href="' . esc_url( get_edit_post_link( $post->ID ) ) . '">' . esc_html( $post->post_title ) . '</a>' . PHP_EOL;
 	} elseif ( 'trackcount' == $column ) {
-		echo count( $tracks );
+		echo count( $tracks ) . PHP_EOL;
 	} elseif ( 'tracklist' == $column ) {
-		echo '<a href="javascript:void(0);" onclick="showhidetracklist(\'' . esc_js( $post_id ) . '\')">';
-		echo esc_html( __( 'Show/Hide Tracklist', 'radio-station' ) ) . "</a><br>";
-		echo '<div id="tracklist-' . esc_attr( $post_id ) . '" style="display:none;">';
-		echo '<table class="tracklist-table" cellpadding="0" cellspacing="0">';
-		echo '<tr><td class="tracklist-heading"><b>#</b></td>';
-		echo '<td><b>' . esc_html( __( 'Song', 'radio-station' ) ) . '</b></td>';
-		echo '<td><b>' . esc_html( __( 'Artist', 'radio-station' ) ) . '</b></td>';
-		echo '<td><b>' . esc_html( __( 'Status', 'radio-station' ) ) . '</b></td></tr>';
+		echo '<a href="javascript:void(0);" onclick="showhidetracklist(\'' . esc_js( $post_id ) . '\')">' . PHP_EOL;
+		echo esc_html( __( 'Show/Hide Tracklist', 'radio-station' ) ) . '</a><br>' . PHP_EOL;
+		echo '<div id="tracklist-' . esc_attr( $post_id ) . '" style="display:none;">' . PHP_EOL;
+		echo '<table class="tracklist-table" cellpadding="0" cellspacing="0">' . PHP_EOL;
+		echo '<tr><td class="tracklist-heading"><b>#</b></td>' . PHP_EOL;
+		echo '<td><b>' . esc_html( __( 'Song', 'radio-station' ) ) . '</b></td>' . PHP_EOL;
+		echo '<td><b>' . esc_html( __( 'Artist', 'radio-station' ) ) . '</b></td>' . PHP_EOL;
+		echo '<td><b>' . esc_html( __( 'Status', 'radio-station' ) ) . '</b></td></tr>' . PHP_EOL;
 		foreach ( $tracks as $i => $track ) {
-			echo '<tr><td class="tracklist-count">' . $i . '</td>';
-			echo '<td class="tracklist-song">' . esc_html( $track['playlist_entry_song'] ) . '</td>';
-			echo '<td class="tracklist-artist">' . esc_html( $track['playlist_entry_artist'] ) . '</td>';
+			echo '<tr><td class="tracklist-count">' . esc_html( $i ) . '</td>' . PHP_EOL;
+			echo '<td class="tracklist-song">' . esc_html( $track['playlist_entry_song'] ) . '</td>' . PHP_EOL;
+			echo '<td class="tracklist-artist">' . esc_html( $track['playlist_entry_artist'] ) . '</td>' . PHP_EOL;
 			$status = $track['playlist_entry_status'];
 			$status = strtoupper( substr( $status, 0, 1 ) ) . substr( $status, 1, strlen( $status ) );
-			echo '</td>';
-			echo '<td class="tracklist-status">' . esc_html( $status ) . '</td></tr>';
+			echo '</td>' . PHP_EOL;
+			echo '<td class="tracklist-status">' . esc_html( $status ) . '</td></tr>' . PHP_EOL;
 		}
-		echo '</table></div>';
+		echo '</table></div>' . PHP_EOL;
 	}
 }
 
@@ -5343,11 +5631,15 @@ function radio_station_playlist_column_styles() {
 	}
 
 	// --- playlist list styles ---
-	echo "<style>#show {width: 100px;}
+	$css = "#show {width: 100px;}
 	#trackcount {width: 35px; font-size: 12px;}
 	#tracklist {width: 250px;}
 	.tracklist-table {width: 350px;}
-	.tracklist-table td {padding: 0px 10px;}</style>";
+	.tracklist-table td {padding: 0px 10px;}";
+	
+	// 2.3.3.9: add playlist list styles filter
+	$css = apply_filters( 'radio_station_playlist_list_styles', $css );
+	echo '<style>' . $css . '</style>';
 
 	// --- expand/collapse tracklist data ---
 	$js = "function showhidetracklist(postid) {
@@ -5358,6 +5650,8 @@ function radio_station_playlist_column_styles() {
 
 	// --- enqueue script inline ---
 	// 2.3.0: enqueue instead of echo
+	// 2.3.3.9: filter playlist list script
+	$js = apply_filters( 'radio_station_playlist_list_script', $css );
 	wp_add_inline_script( 'radio-station-admin', $js );
 }
 
@@ -5439,15 +5733,15 @@ function radio_station_post_show_metabox() {
 	}
 
 	// 2.3.3.9: move meta_inner ID to class
-	echo '<div class="meta_inner">';
+	echo '<div class="meta_inner">' . PHP_EOL;
 
 	if ( count( $shows ) > 0 ) {
 
 		// --- select related show input ---
 		// 2.2.3.4: allow for multiple selections
 		// 2.3.3.9: use metakey for post type
-		echo '<select multiple="multiple" name="' . esc_attr( $metakey ) . '[]">';
-		echo '<option value="">' . esc_html( __( 'Select Show(s)', 'radio-station') ) . '</option>';
+		echo '<select multiple="multiple" name="' . esc_attr( $metakey ) . '[]">' . PHP_EOL;
+		echo '<option value="">' . esc_html( __( 'Select Show(s)', 'radio-station') ) . '</option>' . PHP_EOL;
 
 		// --- loop shows for selection options ---
 		// 2.3.3.4: check for multiple selections
@@ -5472,14 +5766,14 @@ function radio_station_post_show_metabox() {
 			if ( 'draft' == $show->post_status ) {
 				echo ' (' . esc_html( __( 'Draft', 'radio-station' ) ) . ')';
 			}
-			echo '</option>';
+			echo '</option>' . PHP_EOL;
 		}
-		echo '</select>';
+		echo '</select>' . PHP_EOL;
 	} else {
 		// --- no shows message ---
-		echo esc_html( __( 'No Shows to Select.', 'radio-station' ) );
+		echo esc_html( __( 'No Shows to Select.', 'radio-station' ) ) . PHP_EOL;
 	}
-	echo '</div>';
+	echo '</div>' . PHP_EOL;
 
 	// --- related shows post box styles ---
 	// 2.3.3.6: add style for pre-selected option
@@ -5594,24 +5888,24 @@ function radio_station_quick_edit_post( $column_name, $post_type ) {
 	}
 
 	// --- get all shows ---
+	// 2.3.3.9: allow selection shows with draft status
 	$args = array(
 		'numberposts' => - 1,
 		'offset'      => 0,
 		'orderby'     => 'post_title',
 		'order'       => 'ASC',
 		'post_type'   => RADIO_STATION_SHOW_SLUG,
-		'post_status' => 'publish', // ???
+		'post_status' => array( 'publish', 'draft' ),
 	);
 	$shows = get_posts( $args );
 
-	echo '<fieldset class="inline-edit-col-right related-show-field">';
-		echo '<div class="inline-edit-col column-' . esc_attr( $column_name ) . '">';
+	echo '<fieldset class="inline-edit-col-right related-show-field">' . PHP_EOL;
+		echo '<div class="inline-edit-col column-' . esc_attr( $column_name ) . '">' . PHP_EOL;
 			wp_nonce_field( 'radio-station', 'post_show_nonce' );
-			echo '<label class="inline-edit-group">';
-				echo '<span class="title">' . esc_html( __( 'Related Show(s)', 'radio-station' ) ) . '</span>';
+			echo '<label class="inline-edit-group">' . PHP_EOL;
+				echo '<span class="title">' . esc_html( __( 'Related Show(s)', 'radio-station' ) ) . '</span>' . PHP_EOL;
 				if ( count( $shows ) > 0 ) {
-					echo '<select multiple="multiple" name="post_showblog_id[]" class="select-show">';
-					// echo '<option value="">' . esc_html( __( 'Select Show(s)...', 'radio-station' ) ) . '</option>';
+					echo '<select multiple="multiple" name="post_showblog_id[]" class="select-show">' . PHP_EOL;
 					foreach ( $shows as $show ) {
 						$post = $show;
 						echo '<option value="' . esc_attr( $show->ID ) . '"';
@@ -5619,20 +5913,20 @@ function radio_station_quick_edit_post( $column_name, $post_type ) {
 						if ( !current_user_can( 'edit_shows' ) ) {
 							echo ' disabled="disabled"';
 						}
-						echo '>' . esc_html( $show->post_title ) . '</option>';
+						echo '>' . esc_html( $show->post_title ) . '</option>' . PHP_EOL;
 					}
-					echo '</select>';
+					echo '</select>' . PHP_EOL;
 				} else {
 					// --- no shows message ---
-					echo esc_html( __( 'No Shows available to Select.', 'radio-station' ) );
+					echo esc_html( __( 'No Shows available to Select.', 'radio-station' ) ) . PHP_EOL;
 				}
-			echo '</label>';
-		echo '</div>';
-	echo '</fieldset>';
+			echo '</label>' . PHP_EOL;
+		echo '</div>' . PHP_EOL;
+	echo '</fieldset>' . PHP_EOL;
 
 	// --- related shows post box styles ---
 	// 2.3.3.6: add style for pre-selected option
-	echo "<style>.pre-selected {background-color:#BBB;}</style>";
+	echo "<style>.pre-selected {background-color:#BBB;}</style>" . PHP_EOL;
 
 	// 2.3.3.6: restore stored post object
 	$post = $stored_post;
@@ -5689,20 +5983,20 @@ function radio_station_post_column_data( $column, $post_id ) {
 					// 2.3.3.6: only link to Shows user can edit
 					$post = $show;
 					if ( current_user_can( 'edit_shows' ) ) {
-						echo '<a href="' . get_edit_post_link( $show_id ) . '" title="' . esc_attr( __( 'Edit Show', 'radio-station' ) ) . ' ' . $show_id . '">';
+						echo '<a href="' . get_edit_post_link( $show_id ) . '" title="' . esc_attr( __( 'Edit Show', 'radio-station' ) ) . ' ' . $show_id . '">' . PHP_EOL;
 					} else {
 						// 2.3.3.6: set disabled (uneditable) data
 						$disabled[] = $show_id;
 					}
 					echo esc_html( $show->post_title ) . '<br>';
 					if ( current_user_can( 'edit_shows' ) ) {
-						echo '</a>';
+						echo '</a>' . PHP_EOL;
 					}
 				}
 			}
 		}
-		echo '<span class="show-ids" style="display:none;">' . $data . '</span>';
-		echo '<span class="disabled-ids" style="display:none;">' . implode( ',', $disabled ) . '</span>';
+		echo '<span class="show-ids" style="display:none;">' . $data . '</span>' . PHP_EOL;
+		echo '<span class="disabled-ids" style="display:none;">' . implode( ',', $disabled ) . '</span>' . PHP_EOL;
 
 		// --- restore global post object ---
 		$post = $stored_post;
@@ -5888,35 +6182,33 @@ function radio_station_posts_bulk_edit_handler( $redirect_to, $action, $post_ids
 // 2.3.3.4: add notice for bulk edit result
 add_action( 'admin_notices', 'radio_station_posts_bulk_edit_notice' );
 function radio_station_posts_bulk_edit_notice() {
+
 	$updated = $failed = false;
-  	if ( isset( $_REQUEST['radio_station_related_show_updated'] ) ) {
-    	$updated_ = intval( $_REQUEST['radio_station_related_show_updated'] );
-    }
-    if ( isset( $_REQUEST['radio_station_related_show_failed'] ) ) {
-    	$failed = intval( $_REQUEST['radio_station_related_show_failed'] );
+	if ( isset( $_REQUEST['radio_station_related_show_updated'] ) ) {
+		$updated_ = intval( $_REQUEST['radio_station_related_show_updated'] );
+	}
+	if ( isset( $_REQUEST['radio_station_related_show_failed'] ) ) {
+		$failed = intval( $_REQUEST['radio_station_related_show_failed'] );
 	}
 	if ( $updated || $failed ) {
 
-    	echo '<div id="message" class="' . ( $updated_products_count > 0 ? 'updated' : 'error' ) . '">';
+		$class = ( $updated_products_count > 0 ) ? 'updated' : 'error';
+		echo '<div id="message" class="' . esc_attr( $class ) . '">' . PHP_EOL;
 
 		if ( $updated > 0 ) {
 			// --- number of posts updated message ---
-			echo '<p>';
-				$message = __( 'Updated Related Shows for %d Posts.', 'radio_station' );
-				$message = sprintf( $message, $updated );
-				echo esc_html( $message );
-			echo '</p>';
+			$message = __( 'Updated Related Shows for %d Posts.', 'radio_station' );
+			$message = sprintf( $message, $updated );
+			echo '<p>' . esc_html( $message ) . '</p>' . PHP_EOL;
 		}
 		if ( $failed > 0 ) {
 			// --- number of posts failed messsage ---
-			echo '<p>';
-				$message = __( 'Failed to Update Related Shows for %d Posts.', 'radio-station' );
-				$message = sprintf( $message, $failed );
-				esc_html( $message );
-			echo '</p>';
+			$message = __( 'Failed to Update Related Shows for %d Posts.', 'radio-station' );
+			$message = sprintf( $message, $failed );
+			echo '<p>' . esc_html( $message ) . '</p>' . PHP_EOL;
 		}
 
-		echo '</div>';
+		echo '</div>' . PHP_EOL;
   	}
 }
 
@@ -5933,10 +6225,13 @@ function radio_station_posts_list_styles() {
 
 	// --- post list styles ---
 	// 2.3.3.9: fix to column-show type (oclumn-show)
-	echo "<style>.wp-list-table .posts .column-show {max-width: 100px;}
+	$css = ".wp-list-table .posts .column-show {max-width: 100px;}
 	.inline-edit-col .select-show {min-width: 200px; min-height: 100px;}
-	.bulkactions .column-show .title {display: none;}
-	</style>";
+	.bulkactions .column-show .title {display: none;}";
+	
+	// 2.3.3.9: added posts list styles filter
+	$css = apply_filters( 'radio_station_posts_list_styles', $css );
+	echo '<style>' . $css . '</style>';
 }
 
 
@@ -6131,26 +6426,41 @@ add_action( 'wp_ajax_nopriv_radio_station_override_save', 'radio_station_relogin
 add_action( 'wp_ajax_nopriv_radio_station_playlist_save_tracks', 'radio_station_relogin_message' );
 function radio_station_relogin_message() {
 
+	// --- interim login thickbox ---
+	// 2.3.3.9: maybe close existing thickbox
+	$js = "if (parent && parent.tb_remove) {try {parent.tb_remove();} catch(e) {} }" . PHP_EOL;
+	// 2.3.3.9: trigger WP interim login screen thickbox
+	$js .= "if (parent) {parent.jQuery(document).trigger('heartbeat-tick.wp-auth-check', [{'wp-auth-check': false}]);}" . PHP_EOL;
+
 	// 2.3.3.9: fix to playlist action name prefix
 	// 2.3.3.9: added support for override times
 	// 2.3.3.9: add check for single shift action
+	$action = $_REQUEST['action'];
 	$save_shift_actions = array( 'radio_station_show_save_shift', 'radio_station_show_save_shifts' );
-	if ( in_array( $_REQUEST['action'], $save_shift_actions ) ) {
+	if ( in_array( $action, $save_shift_actions ) ) {
 		$type = 'shift';
-	} elseif ( 'radio_station_override_save' == $_REQUEST['action'] ) {
+	} elseif ( 'radio_station_override_save' == $action ) {
 		$type = 'override';
-	} elseif ( 'radio_station_playlist_save_tracks' == $_REQUEST['action'] ) {
+	} elseif ( 'radio_station_playlist_save_tracks' == $action ) {
 		$type = 'track';
 	}
 
-	// --- send relogin message ---
-	$error = __( 'Failed. Please relogin and try again.', 'radio-station' );
-	echo "<script>parent.document.getElementById('" . $type . "s-saving-message').style.display = 'none';
-	parent.document.getElementById('" . $type . "s-error-message').style.display = '';
-	parent.document.getElementById('" . $type . "s-error-message').innerHTML = '" . esc_js( $error ) . "';
-	form = parent.document.getElementById('" . $type . "-save-form'); form.parentNode.removeChild(form);
-	</script>";
+	// TODO: maybe cache the posted data so it can be restored ?
 
+	// --- send relogin message ---
+	if ( isset( $type ) ) {
+		$error = __( 'Failed. Please relogin and try again.', 'radio-station' );
+		$js .- "parent.document.getElementById('" . $type . "s-saving-message').style.display = 'none';
+		parent.document.getElementById('" . $type . "s-error-message').style.display = '';
+		parent.document.getElementById('" . $type . "s-error-message').innerHTML = '" . esc_js( $error ) . "';
+		form = parent.document.getElementById('" . $type . "-save-form');
+		form.parentNode.removeChild(form);" . PHP_EOL;
+	}
+
+	// --- filter and output ---
+	$js = apply_filters( 'radio_station_relogin_script', $js );
+	echo '<script>' . $js . '</script>';
 	exit;
+
 }
 

@@ -259,8 +259,11 @@ function radio_station_clock_shortcode( $atts = array() ) {
 // (handles Shows, Overrides, Playlists etc.)
 function radio_station_archive_list_shortcode( $type, $atts ) {
 
-	// --- merge defaults with passed attributes ---
+	// --- get clock time format ---
 	$time_format = radio_station_get_setting( 'clock_time_format' );
+
+	// --- merge defaults with passed attributes ---
+	// 2.3.3.9: add atts for specific posts
 	$defaults = array(
 		// --- shortcode display ----
 		'description'  => 'excerpt',
@@ -288,6 +291,10 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 		'thumbnails'   => 0,
 		// --- for playlists ---
 		// 'track_count' => 0,
+		// --- specific posts ---
+		'show'         => false,
+		'override'     => false,
+		'playlist'     => false,
 	);
 
 	// --- handle possible pagination offset ---
@@ -389,10 +396,24 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 		);
 	}
 
+	// 2.3.3.9: allow for selective post specifications
+	if ( ( RADIO_STATION_SHOW_SLUG == $type ) && isset( $atts['show'] ) ) {
+		$args['include'] = explode( ',', $atts['show'] );		
+	} elseif ( ( RADIO_STATION_OVERRIDE_SLUG == $type ) && isset( $atts['override'] ) ) {
+		$args['include'] = explode( ',', $atts['override'] );
+	} elseif ( ( RADIO_STATION_PLAYLIST_SLUG == $type ) && isset( $atts['playlist'] ) ) {
+		$args['include'] = explode( ',', $atts['playlist'] );
+	}
+
 	// --- get posts via query ---
 	$args = apply_filters( 'radio_station_' . $type . '_archive_post_args', $args );
 	$archive_posts = get_posts( $args );
 	$archive_posts = apply_filters( 'radio_station_' . $type . '_archive_posts', $archive_posts );
+	if ( RADIO_STATION_DEBUG ) {
+		echo '<span style="display:none;">Archive Shortcode: ' . PHP_EOL;
+		echo 'Args: ' . print_r( $args, true ) . PHP_EOL;
+		echo 'Posts: ' . print_r( $archive_posts, true ) . '</span>';
+	}
 	
 	// --- process playlist taxonomy query ---
 	if ( RADIO_STATION_PLAYLIST_SLUG == $type ) {
@@ -501,16 +522,20 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 	
 		// --- manually apply offset and perpage limit ---
 		// 2.3.3.9: added to enable pagination count
-		if ( $post_count > $atts['offset'] ) {
-			$offset_posts = array();
-			foreach ( $archive_posts as $i => $archive_post ) {
-				if ( ( $i > $atts['offset'] ) && ( count( $offset_posts ) < $atts['perpage'] ) ) {
-					$offset_posts[] = $archive_post;
+		if ( $atts['offset'] && ( $atts['perpage'] > 0 ) ) {
+			if ( $post_count > $atts['offset'] ) {
+				$offset_posts = array();
+				foreach ( $archive_posts as $i => $archive_post ) {
+					if ( ( $i > $atts['offset'] ) && ( count( $offset_posts ) < $atts['perpage'] ) ) {
+						$offset_posts[] = $archive_post;
+					}
 				}
+				$archive_posts = $offset_posts;
+				$post_count = count( $archive_posts );
+			} else {
+				$archive_posts = array();
+				$post_count = 0;
 			}
-			$archive_posts = $offset_posts;
-		} else {
-			$archive_posts = array();
 		}
 	}
 
@@ -740,8 +765,8 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 	$list .= '</div>';
 
  	// --- add archive_pagination ---
-	if ( $atts['pagination'] && ( $archive_count > 0 ) ) {
-		if ( $archive_count > $atts['perpage'] ) {
+	if ( $atts['pagination'] && ( $atts['perpage'] > 0 ) && ( $post_count > 0 ) ) {
+		if ( $post_count > $atts['perpage'] ) {
 			$list .= radio_station_archive_pagination( $type, $atts, $post_count );
 		}
 	}
@@ -1443,6 +1468,7 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 		}
 
 		// --- get related to show posts ---
+		// 2.3.3.9: also handle host or producer lists
 		$args = array();
 		if ( isset( $atts['limit'] ) ) {
 			$args['limit'] = $atts['limit'];
@@ -1451,17 +1477,27 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 			$posts = radio_station_get_show_posts( $show_id, $args );
 		} elseif ( RADIO_STATION_PLAYLIST_SLUG == $type ) {
 			$posts = radio_station_get_show_playlists( $show_id, $args );
+			$type = 'playlist';
+		} elseif ( RADIO_STATION_HOST_SLUG == $type ) {
+			$posts = apply_filters( 'radio_station_get_show_hosts', false, $show_id, $args );
+			$type = 'host';
+		} elseif ( RADIO_STATION_PRODUCER_SLUG == $type ) {
+			$posts = apply_filters( 'radio_station_get_show_producers', false, $show_id, $args );
+			$type = 'producer';
 		} elseif ( defined( 'RADIO_STATION_EPISODE_SLUG' ) && ( RADIO_STATION_EPISODE_SLUG == $type ) ) {
 			$posts = apply_filters( 'radio_station_get_show_episodes', false, $show_id, $args );			
+			$type = 'episode';
 		}
 		if ( RADIO_STATION_DEBUG ) {
 			echo '<span style="display:none;">Show Posts (' . $type . '):' . print_r( $posts, true ) . '</span>';
 		}
 	}
-	if ( !isset( $posts ) || !$posts || !is_array( $posts ) || ( count( $posts ) == 0 ) )  {return '';}
+	if ( !isset( $posts ) || !$posts || !is_array( $posts ) || ( count( $posts ) == 0 ) )  {
+		return '';
+	}
 
 	// --- filter excerpt length and more ---
-	$length = apply_filters( 'radio_station_show_' . $type. '_list_excerpt_length', false );
+	$length = apply_filters( 'radio_station_show_' . $type . '_list_excerpt_length', false );
 	$more = apply_filters( 'radio_station_show_' . $type . '_list_excerpt_more', '[&hellip;]' );
 
 	// --- show list div ---
@@ -1497,55 +1533,103 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 		$class = implode( ' ', $classes );
 		$list .= '<div class="' . esc_attr( $class ) . '">';
 
-		// --- post thumbnail ---
-		if ( $atts['thumbnails'] ) {
-			$has_thumbnail = has_post_thumbnail( $post['ID'] );
-			if ( $has_thumbnail ) {
-				$attr = array( 'class' => 'show-' . esc_attr( $type ) . '-thumbnail-image' );
-				$thumbnail = get_the_post_thumbnail( $post['ID'], 'thumbnail', $attr );
+		// 2.3.3.9: check if this object is instance of WP_User class
+		if ( is_a( $post, 'WP_User' ) ) {
+		
+			// --- this is a user without a profile post ---
+			$user = $post;
+			$user_id = $user->data->ID;
+
+			// TODO: check for user avatar ?
+		
+			$list .= '<div class="show-' . esc_attr( $type ) . '-info">';
+		
+			// --- link to author page ---
+			$list .= '<div class="show-' . esc_attr( $type ) . '-title">';
+			$permalink = get_author_posts_url( $user_id );
+			$title = __( 'View all posts by %s', 'radio-station' );
+			$title = sprintf( $title, $user->display_name );
+			$list .= '<a href="' . esc_url( $permalink ) . '" title="' . esc_attr( $title ) . '">';
+			$list .= esc_attr( $user->display_name );
+			$list .= '</a>';
+			$list .= '</div>';
+
+			// --- author bio/excerpt ---
+			$userdata = get_user_meta( $user_id );
+			$bio_content = $userdata->description[0];
+			if ( 'none' == $atts['content'] ) {
+				$list .= '';
+			} elseif ( 'full' == $atts['content'] ) {
+				$list .= '<div class="show-' . esc_attr( $type ) . '-content">';
+				$content = apply_filters( 'radio_station_show_' . $type . '_content', $bio_content, $user_id );
+				$list .= $bio_content;
+				$list .= '</div>';
+			} else {
+				$list .= '<div class="show-' . esc_attr( $type ) . '-excerpt">';
+				$permalink = get_author_posts_url( $user_id );
+				$excerpt = radio_station_trim_excerpt( $bio_content, $length, $more, $permalink );
+				$excerpt = apply_filters( 'radio_station_show_' . $type . '_excerpt', $excerpt, $user_id );
+				$list .= $excerpt;
+				$list .= '</div>';
+			}
+
+		
+			$list .= '</div>';
+		
+		} else {
+
+			// --- post thumbnail ---
+			if ( $atts['thumbnails'] ) {
+				$thumbnail = false;	
+				$has_thumbnail = has_post_thumbnail( $post['ID'] );
+				if ( $has_thumbnail ) {
+					$attr = array( 'class' => 'show-' . esc_attr( $type ) . '-thumbnail-image' );
+					$thumbnail = get_the_post_thumbnail( $post['ID'], 'thumbnail', $attr );
+				}
+				$thumbnail = apply_filters( 'radio_station_show_list_archive_avatar', $thumbnail, $post['ID'], $type );
 				if ( $thumbnail ) {
 					$list .= '<div class="show-' . esc_attr( $type ) . '-thumbnail">' . $thumbnail . '</div>';
 				}
 			}
-		}
 
-		$list .= '<div class="show-' . esc_attr( $type ) . '-info">';
+			$list .= '<div class="show-' . esc_attr( $type ) . '-info">';
 
-		// --- link to post ---
-		$list .= '<div class="show-' . esc_attr( $type ) . '-title">';
-		$permalink = get_permalink( $post['ID'] );
-		$timestamp = mysql2date( $dateformat . ' ' . $timeformat, $post['post_date'], false );
-		$title = __( 'Published on ', 'radio-station' ) . $timestamp;
-		$list .= '<a href="' . esc_url( $permalink ) . '" title="' . esc_attr( $title ) . '">';
-		$list .= esc_attr( $post['post_title'] );
-		$list .= '</a>';
-		$list .= '</div>';
-
-		// --- post excerpt ---
-		$post_content = $post['post_content'];
-		$post_id = $post['ID'];
-		if ( 'none' == $atts['content'] ) {
-			$list .= '';
-		} elseif ( 'full' == $atts['content'] ) {
-			$list .= '<div class="show-' . esc_attr( $type ) . '-content">';
-			$content = apply_filters( 'radio_station_show_' . $type . '_content', $post_content, $post_id );
-			// $list .= $content;
-			$list .= '</div>';
-		} else {
-			$list .= '<div class="show-' . esc_attr( $type ) . '-excerpt">';
+			// --- link to post ---
+			$list .= '<div class="show-' . esc_attr( $type ) . '-title">';
 			$permalink = get_permalink( $post['ID'] );
-			if ( !empty( $post['post_excerpt'] ) ) {
-				$excerpt = $post['post_excerpt'];
-				$excerpt .= ' <a href="' . esc_url( $permalink ) . '">' . $more . '</a>';
+			$timestamp = mysql2date( $dateformat . ' ' . $timeformat, $post['post_date'], false );
+			$title = __( 'Published on ', 'radio-station' ) . $timestamp;
+			$list .= '<a href="' . esc_url( $permalink ) . '" title="' . esc_attr( $title ) . '">';
+			$list .= esc_attr( $post['post_title'] );
+			$list .= '</a>';
+			$list .= '</div>';
+
+			// --- post excerpt ---
+			$post_content = $post['post_content'];
+			$post_id = $post['ID'];
+			if ( 'none' == $atts['content'] ) {
+				$list .= '';
+			} elseif ( 'full' == $atts['content'] ) {
+				$list .= '<div class="show-' . esc_attr( $type ) . '-content">';
+				$content = apply_filters( 'radio_station_show_' . $type . '_content', $post_content, $post_id );
+				$list .= $content;
+				$list .= '</div>';
 			} else {
-				$excerpt = radio_station_trim_excerpt( $post_content, $length, $more, $permalink );
+				$list .= '<div class="show-' . esc_attr( $type ) . '-excerpt">';
+				$permalink = get_permalink( $post['ID'] );
+				if ( !empty( $post['post_excerpt'] ) ) {
+					$excerpt = $post['post_excerpt'];
+					$excerpt .= ' <a href="' . esc_url( $permalink ) . '">' . $more . '</a>';
+				} else {
+					$excerpt = radio_station_trim_excerpt( $post_content, $length, $more, $permalink );
+				}
+				$excerpt = apply_filters( 'radio_station_show_' . $type . '_excerpt', $excerpt, $post_id );
+				$list .= $excerpt;
+				$list .= '</div>';
 			}
-			$excerpt = apply_filters( 'radio_station_show_' . $type . '_excerpt', $excerpt, $post_id );
-			$list .= $excerpt;
+
 			$list .= '</div>';
 		}
-
-		$list .= '</div>';
 
 		// --- close item div ---
 		$list .= '</div>';
@@ -1556,10 +1640,11 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 	$list .= '</div>';
 
 	// --- list pagination ---
+	// 2.3.3.9: fix to hide left arrow display on load
 	if ( $atts['pagination'] && ( $post_pages > 1 ) ) {
 		$list .= '<br><br>';
 		$list .= '<div id="show-' . esc_attr( $show_id ) . '-' . esc_attr( $type ) . 's-page-buttons" class="show-' . esc_attr( $type ) . 's-page-buttons">';
-		$list .= '<div class="show-pagination-button" onclick="radio_list_page(' . esc_js( $show_id ) . ', \'' . esc_js( $type ) . 's\', \'prev\');">';
+		$list .= '<div id="show-' . esc_attr( $type ) . 's-pagination-button-left" class="show-pagination-button arrow-button-left arrow-button" onclick="radio_list_page(\'show\', ' . esc_js( $show_id ) . ', \'' . esc_js( $type ) . 's\', \'prev\');" style="display:none;">';
 		$list .= '<a href="javascript:void(0);">&larr;</a>';
 		$list .= '</div>';
 		for ( $pagenum = 1; $pagenum < ( $post_pages + 1 ); $pagenum ++ ) {
@@ -1568,14 +1653,14 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 			} else {
 				$active = '';
 			}
-			$onclick = 'radio_list_page(' . esc_js( $show_id ) . ', \'' . esc_js( $type ) . 's\', ' . esc_js( $pagenum ) . ');';
+			$onclick = 'radio_list_page(\'show\', ' . esc_js( $show_id ) . ', \'' . esc_js( $type ) . 's\', ' . esc_js( $pagenum ) . ');';
 			$list .= '<div id="show-' . esc_attr( $show_id ) . '-' . esc_attr( $type ). 's-page-button-' . esc_attr( $pagenum ) . '" class="show-' . esc_attr( $show_id ) . '-' . esc_attr( $type ) . 's-page-button show-pagination-button' . esc_attr( $active ) . '" onclick="' . $onclick . '">';
 			$list .= '<a href="javascript:void(0);">';
 			$list .= esc_html( $pagenum );
 			$list .= '</a>';
 			$list .= '</div>';
 		}
-		$list .= '<div class="show-pagination-button" onclick="radio_list_page(' . esc_js( $show_id ) . ', \'' . esc_js( $type ). 's\', \'next\');">';
+		$list .= '<div id="show-' . esc_attr( $type ) . 's-pagination-button-right" class="show-pagination-button arrow-button" onclick="radio_list_page(\'show\', ' . esc_js( $show_id ) . ', \'' . esc_js( $type ). 's\', \'next\');">';
 		$list .= '<a href="javascript:void(0);">&rarr;</a>';
 		$list .= '</div>';
 		$list .= '<input type="hidden" id="show-' . esc_attr( $show_id ) . '-' . esc_attr( $type ) . 's-current-page" value="1">';
@@ -1637,11 +1722,13 @@ function radio_station_show_playlists_archive( $atts ) {
 function radio_station_list_pagination_javascript() {
 
 	// --- fade out current page and fade in selected page ---
-	$js = "function radio_list_page(id, types, pagenum) {
-		currentpage = document.getElementById('show-'+id+'-'+types+'-current-page').value;
+	// 2.3.3.9: added selector prefix as argument
+	// 2.3.3.9: fix to conditional arrow displays
+	$js = "function radio_list_page(prefix, id, types, pagenum) {
+		currentpage = document.getElementById(prefix+'-'+id+'-'+types+'-current-page').value;
+		pagecount = document.getElementById(prefix+'-'+id+'-'+types+'-page-count').value;
 		if (pagenum == 'next') {
-			pagenum = parseInt(currentpage) + 1;
-			pagecount = document.getElementById('show-'+id+'-'+types+'-page-count').value;
+			pagenum = parseInt(currentpage) + 1;	
 			if (pagenum > pagecount) {return;}
 		}
 		if (pagenum == 'prev') {
@@ -1649,20 +1736,26 @@ function radio_station_list_pagination_javascript() {
 			if (pagenum < 1) {return;}
 		}
 		if (typeof jQuery == 'function') {
-			jQuery('.show-'+id+'-'+types+'-page').fadeOut(500);
-			jQuery('#show-'+id+'-'+types+'-page-'+pagenum).fadeIn(1000);
-			jQuery('.show-'+id+'-'+types+'-page-button').removeClass('active');
-			jQuery('#show-'+id+'-'+types+'-page-button-'+pagenum).addClass('active');
-			jQuery('#show-'+id+'-'+types+'-current-page').val(pagenum);
+			jQuery('.'+prefix+'-'+id+'-'+types+'-page').fadeOut(500);
+			jQuery('#'+prefix+'-'+id+'-'+types+'-page-'+pagenum).fadeIn(1000);
+			jQuery('.'+prefix+'-'+id+'-'+types+'-page-button').removeClass('active');
+			jQuery('#'+prefix+'-'+id+'-'+types+'-page-button-'+pagenum).addClass('active');
+			jQuery('#'+prefix+'-'+id+'-'+types+'-current-page').val(pagenum);
 		} else {
-			pages = document.getElementsByClassName('show-'+id+'-'+types+'-page');
+			pages = document.getElementsByClassName(prefix+'-'+id+'-'+types+'-page');
 			for (i = 0; i < pages.length; i++) {pages[i].style.display = 'none';}
-			document.getElementById('show-'+id+'-'+types+'-page-'+pagenum).style.display = '';
-			buttons = document.getElementsByClassName('show-'+id+'-'+types+'-page-button');
+			document.getElementById(prefix+'-'+id+'-'+types+'-page-'+pagenum).style.display = '';
+			buttons = document.getElementsByClassName(prefix+'-'+id+'-'+types+'-page-button');
 			for (i = 0; i < buttons.length; i++) {buttons[i].classList.remove('active');}
-			document.getElementById('show-'+id+'-'+types+'-page-button-'+pagenum).classList.add('active');
-			document.getElementById('show-'+id+'-'+types+'-current-page').value = pagenum;
+			document.getElementById(prefix+'-'+id+'-'+types+'-page-button-'+pagenum).classList.add('active');
+			document.getElementById(prefix+'-'+id+'-'+types+'-current-page').value = pagenum;
 		}
+		larrow = document.getElementById(prefix+'-'+types+'-pagination-button-left');
+		rarrow = document.getElementById(prefix+'-'+types+'-pagination-button-right');
+		larrow.style.display = ''; rarrow.style.display = '';
+		if (pagenum == 1) {larrow.style.display = 'none';}
+		else if (pagenum == pagecount) {rarrow.style.display = 'none';}
+		console.log(pagenum+' - '+pagecount);
 	}";
 
 	// --- enqueue script inline ---
@@ -3128,69 +3221,73 @@ function radio_station_current_playlist_shortcode( $atts ) {
 			// --- loop shifts ---
 			foreach ( $playlist['shifts'] as $shift_id => $shift ) {
 
-				// --- set shift start and end ---
-				if ( isset( $shift['real_start'] ) ) {
-					$start = $shift['real_start'];
-				} elseif ( isset( $shift['start'] ) ) {
-					$start = $shift['start'];
-				} else {
-					$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
-				}
-				if ( isset( $shift['real_end'] ) ) {
-					$end = $shift['real_end'];
-				} elseif ( isset( $shift['end'] ) ) {
-					$end = $shift['end'];
-				} else {
-					$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
-				}
+				// 2.3.3.9: added check that shift day is set
+				if ( isset( $shift['day'] ) && ( '' != $shift['day'] ) ) {
 
-				// --- convert shift info ---
-				// 2.3.2: replace strtotime with to_time for timezones
-				// 2.3.2: fix to convert to 24 hour format first
-				// TODO: check/test possible undefined index for $shift['day'] ?
-				$start_time = radio_station_convert_shift_time( $start );
-				$end_time = radio_station_convert_shift_time( $end );
-				if ( isset( $shift['real_start'] ) ) {
-					$prevday = radio_station_get_previous_day( $shift['day'] );
-					$shift_start_time = radio_station_to_time( $weekdates[$prevday] . ' ' . $start_time );
-				} else {
-					$shift_start_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $start_time );
-				}
-				$shift_end_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $end_time );
-				// 2.3.3.9: fix to overnight check variables
-				// 2.3.3.9: added or equals to operator
-				if ( $shift_end_time <= $shift_start_time ) {
-					$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
-				}
-
-				// --- check currently playing show time ---
-				if ( $atts['for_time'] ) {
-					$now = $atts['for_time'];
-					$html['countdown'] .= '<input type="hidden" class="current-time-override" value="' . esc_attr( $atts['for_time'] ) . '">';
-				} else {
-					$now = radio_station_get_now();
-				}
-				// echo 'Shift Start: ' . $shift_start_time . '(' . radio_station_get_time( 'datetime', $shift_start_time ) . ')<br>';
-				// echo 'Shift End: ' . $shift_end_time . '(' . radio_station_get_time( 'datetime', $shift_end_time ) . ')<br>';
-
-				if ( ( ( $now > $shift_start_time ) || ( $now == $shift_start_time ) ) && ( $now < $shift_end_time ) ) {
-					
-					// print_r( $shift );
-					// echo "^^^ NOW PLAYING ^^^";
-					
-					// --- hidden input for playlist end time ---
-					$html['countdown'] .= '<input type="hidden" class="current-playlist-end" value="' . esc_attr( $shift_end_time ) . '">';
-
-					// --- for countdown timer display ---
-					if ( $atts['countdown'] ) {
-						$html['countdown'] .= '<div class="show-playlist-countdown rs-countdown"></div>';
+					// --- set shift start and end ---
+					if ( isset( $shift['real_start'] ) ) {
+						$start = $shift['real_start'];
+					} elseif ( isset( $shift['start'] ) ) {
+						$start = $shift['start'];
+					} else {
+						$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
+					}
+					if ( isset( $shift['real_end'] ) ) {
+						$end = $shift['real_end'];
+					} elseif ( isset( $shift['end'] ) ) {
+						$end = $shift['end'];
+					} else {
+						$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
 					}
 
-					// --- for dynamic reloading ---
-					if ( $atts['dynamic'] ) {
-						$dynamic = apply_filters( 'radio_station_countdown_dynamic', false, 'current-playlist', $atts, $shift_end_time );
-						if ( $dynamic ) {
-							$html['countdown'] .= $dynamic;
+					// --- convert shift info ---
+					// 2.3.2: replace strtotime with to_time for timezones
+					// 2.3.2: fix to convert to 24 hour format first
+					// TODO: check/test possible undefined index for $shift['day'] ?
+					$start_time = radio_station_convert_shift_time( $start );
+					$end_time = radio_station_convert_shift_time( $end );
+					if ( isset( $shift['real_start'] ) ) {
+						$prevday = radio_station_get_previous_day( $shift['day'] );
+						$shift_start_time = radio_station_to_time( $weekdates[$prevday] . ' ' . $start_time );
+					} else {
+						$shift_start_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $start_time );
+					}
+					$shift_end_time = radio_station_to_time( $weekdates[$shift['day']] . ' ' . $end_time );
+					// 2.3.3.9: fix to overnight check variables
+					// 2.3.3.9: added or equals to operator
+					if ( $shift_end_time <= $shift_start_time ) {
+						$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
+					}
+
+					// --- check currently playing show time ---
+					if ( $atts['for_time'] ) {
+						$now = $atts['for_time'];
+						$html['countdown'] .= '<input type="hidden" class="current-time-override" value="' . esc_attr( $atts['for_time'] ) . '">';
+					} else {
+						$now = radio_station_get_now();
+					}
+					// echo 'Shift Start: ' . $shift_start_time . '(' . radio_station_get_time( 'datetime', $shift_start_time ) . ')<br>';
+					// echo 'Shift End: ' . $shift_end_time . '(' . radio_station_get_time( 'datetime', $shift_end_time ) . ')<br>';
+
+					if ( ( ( $now > $shift_start_time ) || ( $now == $shift_start_time ) ) && ( $now < $shift_end_time ) ) {
+
+						// print_r( $shift );
+						// echo "^^^ NOW PLAYING ^^^";
+
+						// --- hidden input for playlist end time ---
+						$html['countdown'] .= '<input type="hidden" class="current-playlist-end" value="' . esc_attr( $shift_end_time ) . '">';
+
+						// --- for countdown timer display ---
+						if ( $atts['countdown'] ) {
+							$html['countdown'] .= '<div class="show-playlist-countdown rs-countdown"></div>';
+						}
+
+						// --- for dynamic reloading ---
+						if ( $atts['dynamic'] ) {
+							$dynamic = apply_filters( 'radio_station_countdown_dynamic', false, 'current-playlist', $atts, $shift_end_time );
+							if ( $dynamic ) {
+								$html['countdown'] .= $dynamic;
+							}
 						}
 					}
 				}
