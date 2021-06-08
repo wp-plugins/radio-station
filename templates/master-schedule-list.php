@@ -13,14 +13,14 @@ $today = radio_station_get_time( 'day', $now );
 // 2.3.3.9: added for non-now schedule displays
 if ( isset( $atts['start_date'] ) && $atts['start_date'] ) {
 	$start_date = $atts['start_date'];
-	$start_time = radio_station_to_time( $start_date . ' 00:00:00' );
 	// --- force display of date and month ---
 	$atts['display_date'] = ( !$atts['display_date'] ) ? '1' : $atts['display_date'];
 	$atts['display_month'] = ( !$atts['display_month'] ) ? 'short' : $atts['display_month'];
 } else {
-	$start_time = $now;
+	// 2.3.3.9: set start date to current date
+	$start_date = $date;	
 }
-$start_time = apply_filters( 'radio_station_schedule_start_time', $start_time, 'list' );
+$start_time = radio_station_to_time( $start_date . ' 00:00:00' );
 
 // --- set shift time formats ---
 // 2.3.2: set time formats early

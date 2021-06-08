@@ -889,7 +889,9 @@ function radio_station_show_shifts_metabox() {
 function radio_station_shifts_list_styles() {
 
 	// 2.3.3.9: change shift-table-buttons ID to shift-buttons class
-	$css = "#new-shifts .show-shift {border: 2px dashed green; background-color: #FFFFDD;}
+	// 2.3.3.9: added maximum width for shift lists
+	$css = "#shifts-list, #new-shifts {max-width: 900px;}
+	#new-shifts .show-shift {border: 2px dashed green; background-color: #FFFFDD;}
 	.show-shift {list-style: none; margin-bottom: 10px; border: 2px solid green; background-color: #EEFFEE;}
 	.show-shift select.changed, .show-shift input[checkbox].changed {background-color: #FFFFCC;}
 	.show-shift select option.original {font-weight: bold;}
@@ -1980,9 +1982,8 @@ function radio_station_show_save_data( $post_id ) {
 			echo "<script>parent.document.getElementById('shifts-saving-message').style.display = 'none';
 			parent.document.getElementById('shifts-error-message').style.display = '';
 			parent.document.getElementById('shifts-error-message').innerHTML = '" . esc_js( $error ) . "';
-			if (parent.document.getElementById('shift-save-form')) {
-				form = parent.document.getElementById('shift-save-form'); form.parentNode.removeChild(form);
-			}
+			form = parent.document.getElementById('shift-save-form');
+			if (form) {form.parentNode.removeChild(form);}
 			</script>";
 			exit;
 		}
@@ -2331,7 +2332,8 @@ function radio_station_show_save_data( $post_id ) {
 		parent.document.getElementById('shifts-saved-message').style.display = '';
 		if (typeof parent.jQuery == 'function') {parent.jQuery('#shifts-saved-message').fadeOut(3000);}
 		else {setTimeout(function() {parent.document.getElementById('shifts-saved-message').style.display = 'none';}, 3000);}
-		/* form = parent.document.getElementById('shift-save-form'); form.parentNode.removeChild(form); */
+		/* form = parent.document.getElementById('shift-save-form');
+		if (form) {form.parentNode.removeChild(form);} */
 		parent.document.getElementById('show_shifts_nonce').value = '" . esc_js( $show_shifts_nonce ) . "';
 		</script>";
 
@@ -2378,7 +2380,7 @@ function radio_station_show_save_data( $post_id ) {
 			shiftslist.style.display = '';" . PHP_EOL;
 
 			// --- reload the current schedule view ---
-			$js .= "parent.radio_load_schedule(false,false);" . PHP_EOL;
+			$js .= "parent.radio_load_schedule(false,false,true);" . PHP_EOL;
 
 			// 2.3.3.6: clear changes may not have been saved window reload message
 			$js .= "if (parent.window.onbeforeunloadset) {
@@ -3417,7 +3419,9 @@ function radio_station_schedule_override_metabox() {
 function radio_station_overrides_list_styles() {
 
 	// 2.3.3.9: change override-table-buttons to override-buttons
-	$css = "body.post-type-override #ui-datepicker-div {z-index: 1001 !important;}
+	// 2.3.3.9: added maximum width for override lists
+	$css = "#overrides-list, #new-overrides {max-width: 900px;}
+	body.post-type-override #ui-datepicker-div {z-index: 1001 !important;}
 	.override-list {list-style: none;}
 	.override-list .override-item {display: inline-block; margin-left: 20px;}
 	.override-list .override-item.first-item {margin-left: 10px;}
@@ -4064,7 +4068,8 @@ function radio_station_override_save_data( $post_id ) {
 			echo "<script>parent.document.getElementById('override-saving-message').style.display = 'none';
 			parent.document.getElementById('override-error-message').style.display = '';
 			parent.document.getElementById('override-error-message').innerHTML = '" . esc_js( $error ) . "';
-			form = parent.document.getElementById('override-save-form'); form.parentNode.removeChild(form);
+			form = parent.document.getElementById('override-save-form');
+			if (form) {form.parentNode.removeChild(form);}
 			</script>";
 
 			exit;
@@ -4406,7 +4411,8 @@ function radio_station_override_save_data( $post_id ) {
 		parent.document.getElementById('overrides-saved-message').style.display = '';
 		if (typeof parent.jQuery == 'function') {parent.jQuery('#overrides-saved-message').fadeOut(3000);}
 		else {setTimeout(function() {parent.document.getElementById('overrides-saved-message').style.display = 'none';}, 3000);}
-		form = parent.document.getElementById('override-save-form'); form.parentNode.removeChild(form);
+		form = parent.document.getElementById('override-save-form');
+		if (form) {form.parentNode.removeChild(form);}
 		parent.document.getElementById('show_override_nonce').value = '" . esc_js( $show_override_nonce ) . "';
 		</script>";
 
@@ -4427,13 +4433,13 @@ function radio_station_override_save_data( $post_id ) {
 			echo '</div>';
 
 			// --- refresh show shifts list ---
-			$js = "<script>overridelist = parent.document.getElementById('overrides-list');
+			$js = "if (!parent.document.getElementById('overrides-list')) {console.log('? OH YEAH ?');}
+			overridelist = parent.document.getElementById('overrides-list');
 			overridelist.innerHTML = document.getElementById('overrides-list').innerHTML;
 			overridelist.style.display = '';" . PHP_EOL;
 
 			// --- reload the current schedule view ---
-			$js .= "console.log('? OH YEAH ?');";
-			$js .= "parent.radio_load_schedule(false,false);" . PHP_EOL;
+			$js .= "parent.radio_load_schedule(false,false,true);" . PHP_EOL;
 
 			// $js .= "if (parent.window.onbeforeunloadset) {
 			//	parent.window.onbeforeunload = parent.storedonbeforeunload;
@@ -4448,7 +4454,7 @@ function radio_station_override_save_data( $post_id ) {
 
 			// --- re-initialize datepicker fields in parent window ---
 			$js .= "parent.jQuery('.override-date').each(function() {
-				jQuery(this).datepicker({dateFormat : 'yy-mm-dd'});
+				parent.jQuery(this).datepicker({dateFormat : 'yy-mm-dd'});
 			});" . PHP_EOL;
 		
 			// --- output the scripts ---
@@ -5453,7 +5459,8 @@ function radio_station_playlist_save_data( $post_id ) {
 			echo "<script>parent.document.getElementById('tracks-saving-message').style.display = 'none';
 			parent.document.getElementById('tracks-error-message').style.display = '';
 			parent.document.getElementById('tracks-error-message').innerHTML = '" . esc_js( $error ) . "';
-			form = parent.document.getElementById('track-save-form'); form.parentNode.removeChild(form);
+			form = parent.document.getElementById('track-save-form');
+			if (form) {form.parentNode.removeChild(form);}
 			</script>";
 
 			exit;
@@ -5543,7 +5550,8 @@ function radio_station_playlist_save_data( $post_id ) {
 			parent.document.getElementById('tracks-saved-message').style.display = '';
 			if (typeof parent.jQuery == 'function') {parent.jQuery('#tracks-saved-message').fadeOut(3000);}
 			else {setTimeout(function() {parent.document.getElementById('tracks-saved-message').style.display = 'none';}, 3000);}
-			form = parent.document.getElementById('track-save-form'); form.parentNode.removeChild(form);
+			form = parent.document.getElementById('track-save-form');
+			if (form) {form.parentNode.removeChild(form);}
 			parent.document.getElementById('playlist_tracks_nonce').value = '" . esc_js( $playlist_tracks_nonce ) . "';
 			</script>";
 
@@ -6454,7 +6462,7 @@ function radio_station_relogin_message() {
 		parent.document.getElementById('" . $type . "s-error-message').style.display = '';
 		parent.document.getElementById('" . $type . "s-error-message').innerHTML = '" . esc_js( $error ) . "';
 		form = parent.document.getElementById('" . $type . "-save-form');
-		form.parentNode.removeChild(form);" . PHP_EOL;
+		if (form) {form.parentNode.removeChild(form);}" . PHP_EOL;
 	}
 
 	// --- filter and output ---

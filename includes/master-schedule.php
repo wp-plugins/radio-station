@@ -252,6 +252,9 @@ function radio_station_master_schedule( $atts ) {
 		}
 	}
 	$output .= '<input type="hidden" id="schedule-active-date" value="' . esc_attr( $active_date ) . '">';
+	// 2.3.3.9: also added schedule start day input
+	$start_day = ( $atts['start_day'] ) ? $atts['start_day'] : '';
+	$output .= '<input type="hidden" id="schedule-start-day" value="' . esc_attr( $start_day ) . '">';
 
 	// --- enqueue schedule loader script ---
 	$js = radio_station_master_schedule_loader_js( $atts );
@@ -482,10 +485,11 @@ function radio_station_master_schedule_loader_js( $atts ) {
 	}
 
 	// --- schedule loader function ---
-	$js = "function radio_load_schedule(direction,view) {
+	$js = "function radio_load_schedule(direction,view,clear) {
 		if (document.getElementById('schedule-loader-frame')) {
 			view = radio_cookie.get('admin_schedule_view'); radio_load_view(view); return;
 		}
+		startday = document.getElementById('schedule-start-day').value;
 		startdate = document.getElementById('schedule-start-date').value;
 		activedate = document.getElementById('schedule-active-date').value;
 		if (!view) {
@@ -508,7 +512,9 @@ function radio_station_master_schedule_loader_js( $atts ) {
 		url = '" . $loader_url . "&view='+view;
 		timestamp = Math.floor((new Date()).getTime() / 1000);
 		url += '&timestamp='+timestamp+'&start_date='+newdate+'&active_date='+activedate;
-		if (radio.debug) {console.log('Reload View URL: '+url);}
+		if (startday != '') {url += '&start_day='+startday;}
+		if (clear) {url += '&clear=1';}
+		if (radio.debug) {url += '&rs-debug=1'; console.log('Reload View URL: '+url);}
 		if (document.getElementById('schedule-'+view+'-loader').src != url) {
 			document.getElementById('schedule-'+view+'-loader').src = url;
 		}
@@ -525,6 +531,11 @@ function radio_station_master_schedule_loader_js( $atts ) {
 add_action( 'wp_ajax_radio_station_schedule', 'radio_station_ajax_schedule_loader' );
 add_action( 'wp_ajax_nopriv_radio_station_schedule', 'radio_station_ajax_schedule_loader' );
 function radio_station_ajax_schedule_loader() {
+
+	// --- maybe clear cached data ---
+	if ( isset( $_REQUEST['clear'] ) && ( '1' == $_REQUEST['clear'] ) ) {
+		radio_station_clear_cached_data( false );
+	}
 
 	// --- sanitize shortcode attributes ---
 	$atts = radio_station_sanitize_shortcode_values( 'master-schedule' );
@@ -923,6 +934,7 @@ function radio_station_master_schedule_tabs_js() {
 	// 2.3.3.9: use setInterval instead of setTimeout for highlighting check
 	// 2.3.3.9: check for required elements before executing functions
 	// 2.3.3.9: fix to check before and after current time not show
+	// 2.3.3.9: adjust responsive tabs for possible loader control presence
 	$js .= "/* Initialize Tabs */
 	var radio_tabs_init = false;
 	jQuery(document).ready(function() {
@@ -1037,6 +1049,9 @@ function radio_station_master_schedule_tabs_js() {
 		jQuery('.master-schedule-tabs-day').removeClass('first-tab').removeClass('last-tab').hide();
 
 		totalwidth = 0; tabs = 0; firsttab = -1; lasttab = 7; endtabs = false;
+		if (jQuery('#master-schedule-tabs-loader-left').length) {totalwidth = totalwidth + jQuery('#master-schedule-tabs-loader-left').width();}
+		if (jQuery('#master-schedule-tabs-loader-right').length) {totalwidth = totalwidth + jQuery('#master-schedule-tabs-loader-right').width();}
+		
 		for (i = selected; i < 7; i++) {
 			if (!endtabs && (jQuery('.master-schedule-tabs-day.day-'+i).length)) {
 				if ((i > 0) && (i == selected)) {jQuery('.master-schedule-tabs-day.day-'+i).addClass('first-tab'); firsttab = i;}

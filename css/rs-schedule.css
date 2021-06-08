@@ -120,6 +120,15 @@
 	text-decoration: none;
 }
 
+.master-schedule-table-arrow-left, .master-schedule-table-arrow-right {
+	display: inline-block;
+	width: 50%;
+	line-height: 2em;
+	font-size: 1em;
+	vertical-align: top;
+	cursor: pointer;
+}
+
 #master-program-schedule th .shift-left-arrow {
 	float: left;
 	font-size: 2em;
@@ -323,6 +332,17 @@
 	font-weight: bold;
 	line-height: 0.5em;
 	padding: 5px;
+}
+
+.master-schedule-tabs-loader {
+	list-style: none;
+	display: inline-block;
+	margin: 0;
+	padding: 0 10px;
+	font-size: 1em;
+	line-height: 2em;
+	vertical-align: top;
+	cursor: pointer;
 }
 
 #master-schedule-tabs .master-schedule-tabs-day {

@@ -1290,18 +1290,32 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 	if ( !$time ) {
 		// 2.3.3: check data global first
 		if ( isset( $radio_station_data['current_schedule'] ) ) {
+			if ( RADIO_STATION_DEBUG ) {
+				echo "Using cached schedule pageload data for Now." . PHP_EOL;
+			}
 			return $radio_station_data['current_schedule'];
 		} else {
 			$show_shifts = get_transient( 'radio_station_current_schedule' );
+			if ( RADIO_STATION_DEBUG && $show_shifts ) {
+				echo "Using cached transient 'radio_station_current_schedule':" . PHP_EOL;
+				print_r( $show_shifts );
+			}
 		}
 	} else {
 		// --- get schedule for time ---
 		// 2.3.2: added transient for time schedule
 		// 2.3.3: check data global first
 		if ( isset( $radio_station_data['current_schedule_' . $time ] ) ) {
+			if ( RADIO_STATION_DEBUG ) {
+				echo "Using cached schedule pageload data for '" . $time . "'" . PHP_EOL;
+			}
 			return $radio_station_data['current_schedule_' . $time ];
 		} else {
 			$show_shifts = get_transient( 'radio_station_current_schedule_' . $time );
+			if ( RADIO_STATION_DEBUG && $show_shifts ) {
+				echo "Using cached transient 'radio_station_current_schedule_" . $time . "':" . PHP_EOL;
+				print_r( $show_shifts );
+			}
 		}
 	}
 
@@ -1807,22 +1821,6 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 
 		}
 
-		// --- debug point ---
-		if ( RADIO_STATION_DEBUG ) {
-			$debug = "Show Schedule: " . print_r( $show_shifts, true ) . PHP_EOL;
-			if ( isset( $current_show ) ) {
-				$debug .= "Current Show: " . print_r( $current_show, true ) . PHP_EOL;
-			}
-			if ( isset( $next_show ) ) {
-				$debug .= "Next Show: " . print_r( $next_show, true ) . PHP_EOL;
-			}
-
-			$next_shows = radio_station_get_next_shows( 5, $show_shifts );
-			$debug .= "Next 5 Shows: " . print_r( $next_shows, true ) . PHP_EOL;
-
-			radio_station_debug( $debug );
-		}
-
 		// --- cache current schedule data ---
 		// 2.3.2: set temporary transient if time is specified
 		// 2.3.3: also set global data for current schedule
@@ -1834,7 +1832,28 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 			set_transient( 'radio_station_current_schedule', $show_shifts, $expires );
 		} else {
 			$radio_station_data['current_schedule_' . $time] = $show_shifts;
+			delete_transient( 'radio_station_current_schedule_' . $time );
 			set_transient( 'radio_station_current_schedule_' . $time, $show_shifts, $expires );
+		}
+
+		// --- debug point ---
+		if ( RADIO_STATION_DEBUG ) {
+			$debug = '';
+			if ( $time ) {
+				$debug .= "Cached Schedule to radio_station_current_schedule_" . $time . PHP_EOL;
+			}
+			$debug .= "Show Schedule: " . print_r( $show_shifts, true ) . PHP_EOL;
+			if ( isset( $current_show ) ) {
+				$debug .= "Current Show: " . print_r( $current_show, true ) . PHP_EOL;
+			}
+			if ( isset( $next_show ) ) {
+				$debug .= "Next Show: " . print_r( $next_show, true ) . PHP_EOL;
+			}
+
+			$next_shows = radio_station_get_next_shows( 5, $show_shifts );
+			$debug .= "Next 5 Shows: " . print_r( $next_shows, true ) . PHP_EOL;
+
+			radio_station_debug( $debug );
 		}
 
 		// --- filter and return ---
@@ -4929,20 +4948,33 @@ function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
 // --------------------------
 // Delete Prefixed Transients
 // --------------------------
-// 2.3.4: added helper for clearing transient data
+// 2.3.3.4: added helper for clearing transient data
 function radio_station_delete_transients_with_prefix( $prefix ) {
 	global $wpdb;
 
-	$prefix = $wpdb->esc_like( '_transient_' . $prefix );
-	$sql = "SELECT `option_name` FROM $wpdb->options WHERE `option_name` LIKE '%s'";
-	$results = $wpdb->get_results( $wpdb->prepare( $sql, $prefix . '%' ), ARRAY_A );
+	// 2.3.3.9: fix to prefix by adding trailing underscore
+	$prefix = $wpdb->esc_like( '_transient_' . $prefix . '_' );
+	
+	// 2.3.3.9: fix to LIKE match and query prepare
+	$query = "SELECT `option_name` FROM " . $wpdb->prefix . "options WHERE `option_name` LIKE '%" . $prefix . "%'";
+	$results = $wpdb->get_results( $query, ARRAY_A );
+	if ( RADIO_STATION_DEBUG ) {
+		echo $query . PHP_EOL . '<br>';
+		print_r( $results );
+	}
 	if ( !$results || !is_array( $results ) || ( count( $results ) < 1 ) ) {
 		return;
 	}
 
 	foreach ( $results as $option ) {
-		$key = ltrim( $option['option_name'], '_transient_' );
+		// $key = ltrim( $option['option_name'], '_transient_' );
+		$key = substr( $option['option_name'], 11 );
+		if ( RADIO_STATION_DEBUG ) {
+			echo "Deleting transient and cache object for '" . $key . "'" . PHP_EOL;
+		}
 		delete_transient( $key );
+		// 2.3.3.9: also delete transient cache object by key
+		wp_cache_delete( $key, 'transient' );
 	}
 }
 

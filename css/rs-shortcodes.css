@@ -159,11 +159,6 @@
 	padding: 5px;
 }
 
-.show-pagination-button.arrow-button {
-	padding-top: 4px;
-	padding-bottom: 6px;
-}
-
 .show-pagination-button.active {
 	background-color: transparent;
 	font-weight: bold;

@@ -52,7 +52,13 @@
 	margin-bottom: 20px;
 }
 
-.show-label {
+#show-content .show-info .show-player-label,
+#show-content .show-info .show-hosts-label,
+#show-content .show-info .show-producers-label,
+#show-content .show-info .show-genres-label,
+#show-content .show-info .show-languages-label,
+#show-content .show-info .show-timezone-label,
+#show-content .show-info .show-latest-label {
 	font-weight: bold;
 }
 
@@ -110,13 +116,13 @@
 
 #show-content .show-icons {
 	vertical-align: top;
-	margin-top: 12px;
+	margin-top: 10px;
 }
 
 #show-content .show-icons .show-icon {
 	display: inline-block;
 	margin-right: 24px;
-	margin-bottom: 12px;
+	margin-bottom: 10px;
 }
 
 #show-content .show-icons .show-icon span, 
@@ -216,7 +222,7 @@
 /* --------- */
 #show-content .show-tabs .show-tab {
 	display: inline-block; 
-	min-width: 100px;
+	width: 100px;
 	line-height: 40px;
 	font-size: 18px;
 	color: #444444;

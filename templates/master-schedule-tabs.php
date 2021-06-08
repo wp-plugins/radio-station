@@ -14,13 +14,14 @@ $today =  radio_station_get_time( 'day', $now );
 // 2.3.3.9: added for non-now schedule displays
 if ( isset( $atts['start_date'] ) && $atts['start_date'] ) {
 	$start_date = $atts['start_date'];
-	$start_time = radio_station_to_time( $start_date . ' 00:00:00' );
 	// --- force display of date and month ---
 	$atts['display_date'] = ( !$atts['display_date'] ) ? '1' : $atts['display_date'];
 	$atts['display_month'] = ( !$atts['display_month'] ) ? 'short' : $atts['display_month'];
 } else {
-	$start_time = $now;
+	// 2.3.3.9: set start date to current date
+	$start_date = $date;	
 }
+$start_time = radio_station_to_time( $start_date . ' 00:00:00' );
 $start_time = apply_filters( 'radio_station_schedule_start_time', $start_time, 'tabs' );
 
 // --- set shift time formats ---
@@ -71,10 +72,20 @@ $arrows = apply_filters( 'radio_station_schedule_arrows', $arrows, 'tabs' );
 $infokeys = array( 'title', 'hosts', 'times', 'encore', 'file', 'genres', 'custom' );
 $infokeys = apply_filters( 'radio_station_schedule_tabs_info_order', $infokeys );
 
-// --- start tabbed schedule output ---
+// --- reset loop variables ---
 $tabs = $panels = '';
 $tcount = 0;
 $start_tab = false;
+
+// 2.3.3.9: added filter for week loader control
+$load_prev = apply_filters( 'radio_station_schedule_loader_control', '', 'tabs', 'left' );
+if ( '' != $load_prev ) {
+	$tabs .= '<li id="master-schedule-tabs-loader-left" class="master-schedule-tabs-loader">' . $newline;
+	$tabs .= $load_prev . $newline;
+	$tabs .= '</li>' . $newline;
+}
+
+// --- start tabbed schedule output ---
 // 2.3.0: loop weekdays instead of legacy master list
 foreach ( $weekdays as $i => $weekday ) {
 
@@ -631,6 +642,14 @@ foreach ( $weekdays as $i => $weekday ) {
 	}
 
 	$panels .= '</ul>' . $newline;
+}
+
+// 2.3.3.9: added filter for week loader control
+$load_next = apply_filters( 'radio_station_schedule_loader_control', '', 'tabs', 'right' );
+if ( '' != $load_next ) {
+	$tabs .= '<li id="master-schedule-tabs-loader-right" class="master-schedule-tabs-loader">' . $newline;
+	$tabs .= $load_next . $newline;
+	$tabs .= '</li>' . $newline;
 }
 
 // --- add day tabs to output ---
