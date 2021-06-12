@@ -1313,8 +1313,15 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 		} else {
 			$show_shifts = get_transient( 'radio_station_current_schedule_' . $time );
 			if ( RADIO_STATION_DEBUG && $show_shifts ) {
-				echo "Using cached transient 'radio_station_current_schedule_" . $time . "':" . PHP_EOL;
-				print_r( $show_shifts );
+				// 2.3.3.9: fix to clear transient object cache (OMFG.)
+				if ( isset( $_REQUEST['clear'] ) && ( '1' == $_REQUEST['clear'] ) ) {
+					echo "Clearing object cache for requested schedule time." . PHP_EOL;
+					wp_cache_delete( 'radio_station_current_schedule_' . $time, 'transients' );
+					$show_shifts = false;
+				} else {
+					echo "Using cached transient 'radio_station_current_schedule_" . $time . "':" . PHP_EOL;
+					print_r( $show_shifts );
+				}
 			}
 		}
 	}
@@ -2867,7 +2874,7 @@ function radio_station_check_shift( $show_id, $shift, $context = 'all' ) {
 		// --- check only against other show shifts ---
 		foreach ( $all_shifts as $day => $day_shifts ) {
 			foreach ( $day_shifts as $start => $day_shift ) {
-				// --- ...so remove any shifts for this show ---
+				// --- ...so remove (skip) any shifts for this show ---
 				if ( $day_shift['show'] != $show_id ) {
 					$check_shifts[$day][$start] = $day_shift;
 				}
@@ -3077,6 +3084,7 @@ function radio_station_check_new_shifts( $new_shifts ) {
 	// --- debug point ---
 	if ( RADIO_STATION_DEBUG ) {
 		$debug = "New Shifts: " . print_r( $new_shifts, true );
+		// print_r( $debug );
 		radio_station_debug( $debug );
 	}
 
@@ -3113,6 +3121,7 @@ function radio_station_check_new_shifts( $new_shifts ) {
 				$a_start = $shift_a['day'] . ' ' . $shift_a['start_hour'] . ':' . $shift_a['start_min'] . $shift_a['start_meridian'] . ' (' . $shift_a_start_time . ')';
 				$a_end = $shift_a['day'] . ' ' . $shift_a['end_hour'] . ':' . $shift_a['end_min'] . $shift_a['end_meridian'] . ' (' . $shift_a_end_time . ')';
 				$debug = "Shift A Start: " . $a_start . PHP_EOL . 'Shift A End: ' . $a_end . PHP_EOL;
+				// print_r( $debug );
 				radio_station_debug( $debug );
 			}
 
@@ -3193,6 +3202,7 @@ function radio_station_check_new_shifts( $new_shifts ) {
 	if ( RADIO_STATION_DEBUG ) {
 		$debug = "Checked New Shifts: " . print_r( $new_shifts, true ) . PHP_EOL;
 		radio_station_debug( $debug );
+		// print_r( $debug );
 	}
 
 	return $new_shifts;
@@ -4952,29 +4962,30 @@ function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
 function radio_station_delete_transients_with_prefix( $prefix ) {
 	global $wpdb;
 
-	// 2.3.3.9: fix to prefix by adding trailing underscore
+	// 2.3.3.9: add trailing underscore to prefix
 	$prefix = $wpdb->esc_like( '_transient_' . $prefix . '_' );
 	
-	// 2.3.3.9: fix to LIKE match and query prepare
+	// 2.3.3.9: fix to LIKE match 
 	$query = "SELECT `option_name` FROM " . $wpdb->prefix . "options WHERE `option_name` LIKE '%" . $prefix . "%'";
 	$results = $wpdb->get_results( $query, ARRAY_A );
 	if ( RADIO_STATION_DEBUG ) {
 		echo $query . PHP_EOL . '<br>';
-		print_r( $results );
+		echo 'Transients: ' . print_r( $results, true );
 	}
 	if ( !$results || !is_array( $results ) || ( count( $results ) < 1 ) ) {
 		return;
 	}
 
 	foreach ( $results as $option ) {
+		// 2.3.3.9: fix to replace malgunctioning ltrim 
 		// $key = ltrim( $option['option_name'], '_transient_' );
 		$key = substr( $option['option_name'], 11 );
-		if ( RADIO_STATION_DEBUG ) {
-			echo "Deleting transient and cache object for '" . $key . "'" . PHP_EOL;
-		}
 		delete_transient( $key );
 		// 2.3.3.9: also delete transient cache object by key
 		wp_cache_delete( $key, 'transient' );
+		if ( RADIO_STATION_DEBUG ) {
+			echo "Deleting transient and cache object for '" . $key . "'" . PHP_EOL;
+		}
 	}
 }
 

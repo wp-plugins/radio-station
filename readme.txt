@@ -204,13 +204,16 @@ We haven't built an interface between Google Calendar and Radio Station just yet
 * Improved: Allow for Multiple Override Times (with AJAX Saving)
 * Added: Link Override to Show Data with selectable Show Fields
 * Added: Language Archive Shortcode (similar to Genre Archive)
+* Added: Display Linked Override Date List on Show Pages
 * Fixed: Current Show highlighting timer interval cycling
 * Fixed: Before and After Show classes when no current Show
 * Fixed: Shows Data Endpoint 24 Hour Shift Format and Encore Switch
 * Fixed: Multiple host separator display in Current Show Widget
 * Fixed: Playlist Widget playlist ended label when no next playlist
 * Fixed: Conflicting duplicate filter name for Show Avatar
-* Fixed: time conversions where start/finish Show/Override is equal
+* Fixed: Time conversions where start/finish Show/Override is equal
+* Fixed: Show page subarchive lists pagination button arrow display
+* Fixed: Show Shifts with same start time overwriting bug
 
 = 2.3.3.8 =
 * Update: Plugin Panel (1.1.7) with Image and Color Picker fields

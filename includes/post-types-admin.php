@@ -890,7 +890,7 @@ function radio_station_shifts_list_styles() {
 
 	// 2.3.3.9: change shift-table-buttons ID to shift-buttons class
 	// 2.3.3.9: added maximum width for shift lists
-	$css = "#shifts-list, #new-shifts {max-width: 900px;}
+	$css = "#shifts-list, #new-shifts {max-width: 960px;}
 	#new-shifts .show-shift {border: 2px dashed green; background-color: #FFFFDD;}
 	.show-shift {list-style: none; margin-bottom: 10px; border: 2px solid green; background-color: #EEFFEE;}
 	.show-shift select.changed, .show-shift input[checkbox].changed {background-color: #FFFFCC;}
@@ -1347,9 +1347,10 @@ function radio_station_show_shifts_table( $post_id ) {
 	if ( isset( $shifts ) && is_array( $shifts ) && ( count( $shifts ) > 0 ) ) {
 
 		// 2.2.7: soft shifts by start day and time for ordered display
+		// 2.3.0: add shift index to prevent start time overwriting
+		// 2.3.3.9: fixed by moving extra shift index outside loop
+		$j = 1;
 		foreach ( $shifts as $unique_id => $shift ) {
-			// 2.3.0: add shift index to prevent start time overwriting
-			$j = 1;
 			$shift['unique_id'] = $unique_id;
 			$shift_start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
 			$shift_start = radio_station_convert_shift_time( $shift_start );
@@ -1385,11 +1386,16 @@ function radio_station_show_shifts_table( $post_id ) {
 		$show_shifts = array();
 		foreach ( $sorted_shifts as $shift_day => $day_shift ) {
 			ksort( $day_shift );
-			foreach ( $day_shift as $shift ) {
+			foreach ( $day_shift as $key => $shift ) {
 				$unique_id = $shift['unique_id'];
 				unset( $shift['unique_id'] );
 				$show_shifts[$unique_id] = $shift;
 			}
+		}
+
+		if ( RADIO_STATION_DEBUG ) {
+			echo 'Sorted Shifts: ' . print_r( $sorted_shifts, true ) . PHP_EOL;
+			echo 'Resorted Shifts: ' . print_r( $show_shifts, true ) . PHP_EOL;
 		}
 
 		// --- loop ordered show shifts ---
@@ -3420,7 +3426,7 @@ function radio_station_overrides_list_styles() {
 
 	// 2.3.3.9: change override-table-buttons to override-buttons
 	// 2.3.3.9: added maximum width for override lists
-	$css = "#overrides-list, #new-overrides {max-width: 900px;}
+	$css = "#overrides-list, #new-overrides {max-width: 960px;}
 	body.post-type-override #ui-datepicker-div {z-index: 1001 !important;}
 	.override-list {list-style: none;}
 	.override-list .override-item {display: inline-block; margin-left: 20px;}
