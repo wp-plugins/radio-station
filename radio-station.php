@@ -1446,7 +1446,24 @@ function radio_station_plugin_activation() {
 	// 2.3.3: added clear transients on (re)activation
 	// 2.3.3.9: just use clear cached data function
 	radio_station_clear_cached_data( false );
+	
+	// --- set welcome redirect transient ---
+	// TODO: check if handled by Freemius activation
+	// set_transient( 'radio_station_welcome', 1, 7 );
 }
+
+// ---------------------------
+// Activation Welcome Redirect
+// ---------------------------
+/* add_action( 'admin_init', 'radio_station_welcome_redirect' );
+function radio_station_welcome_redirect() {
+	if ( !get_transient( 'radio_station_welcome' ) || wp_doing_ajax() || is_network_admin() || !current_user_can( 'install_plugins' ) ) {
+		return;
+	}
+	delete_transient( 'radio_station_welcome' );
+	wp_safe_redirect( admin_url( 'admin.php?page=radio-station&welcome=1' ) );
+	exit;
+} */
 
 // -------------------
 // Flush Rewrite Rules
@@ -2674,24 +2691,27 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 		if ( RADIO_STATION_OVERRIDE_SLUG == $post->post_type ) {
 			// 2.3.3.6: get next/previous Show for override date/time
 			// 2.3.3.9: modified to handle multiple override times
+			// 2.3.3.9: added check that schedule key is set 
 			$scheds = get_post_meta( $post->ID, 'show_override_sched', true );
-			if ( array_key_exists( 'date', $scheds ) ) {
-				$sched = array( $scheds );
-			}
-			$now = time();
-			foreach ( $scheds as $sched ) {
-				$override_start = $sched['date'] . ' ' . $sched['start_hour'] . ':' . $sched['start_min'] . ' ' . $sched['start_meridian'];
-				$override_time = radio_station_get_time( ( $override_start + 1 ) );
-				if ( !isset( $time ) ) {
-					$time = $override_time;
-				} elseif ( ( $time < $now ) && ( $override_time > $now ) ) {
-					$time = $override_time;
+			if ( $scheds && is_array( $scheds ) ) {
+				if ( array_key_exists( 'date', $scheds ) ) {
+					$sched = array( $scheds );
 				}
-			}
-			if ( 'next' == $adjacent ) {
-				$show = radio_station_get_next_show( $time );
-			} elseif ( 'previous' == $adjacent ) {
-				$show = radio_station_get_previous_show( $time );
+				$now = time();
+				foreach ( $scheds as $sched ) {
+					$override_start = $sched['date'] . ' ' . $sched['start_hour'] . ':' . $sched['start_min'] . ' ' . $sched['start_meridian'];
+					$override_time = radio_station_get_time( ( $override_start + 1 ) );
+					if ( !isset( $time ) ) {
+						$time = $override_time;
+					} elseif ( ( $time < $now ) && ( $override_time > $now ) ) {
+						$time = $override_time;
+					}
+				}
+				if ( 'next' == $adjacent ) {
+					$show = radio_station_get_next_show( $time );
+				} elseif ( 'previous' == $adjacent ) {
+					$show = radio_station_get_previous_show( $time );
+				}
 			}
 		} else {
 			$shifts = get_post_meta( $post->ID, 'show_sched', true );

@@ -2459,6 +2459,10 @@ function radio_station_show_delete( $post_id, $post ) {
 			}
 		} elseif ( RADIO_STATION_OVERRIDE_SLUG == $post->post_type ) {
 			$shifts = get_post_meta( $post_id, 'show_override_sched', true );
+			// 2.3.3.9: maybe convert single shift to array
+			if ( $shifts && is_array( $shifts ) && array_key_exists( 'date', $shifts ) ) {
+				$shifts = array( $shifts );
+			}
 			if ( $shifts && is_array( $shifts ) && ( count( $shifts ) > 0 ) ) {
 				foreach ( $shifts as $shift ) {
 					if ( isset( $shift['id'] ) && ( 8 == strlen( $shift['id'] ) ) ) {
@@ -3457,7 +3461,8 @@ function radio_station_overrides_table( $post_id ) {
 
 	// --- get the saved meta as an array ---
 	$overrides = get_post_meta( $post_id, 'show_override_sched', true );
-	if ( array_key_exists( 'date', $overrides ) ) {
+	// 2.3.3.9: maybe convert single override to array
+	if ( $overrides && is_array( $overrides ) && array_key_exists( 'date', $overrides ) ) {
 		$overrides = array( $overrides );
 		update_post_meta( $post_id, 'show_override_sched', $overrides );
 	}
@@ -4208,8 +4213,7 @@ function radio_station_override_save_data( $post_id ) {
 		if ( is_array( $show_sched ) ) {
 
 			// 2.3.3.9: loop to save possible multiple override dates/times ---
-			print_r( $show_sched );
-			
+			// print_r( $show_sched );
 			foreach ( $show_sched as $sched ) {
 
 				// --- get/set current schedule for merging ---
@@ -4307,22 +4311,25 @@ function radio_station_override_save_data( $post_id ) {
 
 			// --- check if override schedule has changed ---
 			$sched_changed = true;
-			if ( array_key_exists( 'date', $current_scheds ) ) {
-				$current_scheds['id'] = radio_station_unique_shift_id();
-				$current_scheds = array( $current_scheds );
-			}
-			$prev_scheds = $current_scheds;
-			if ( count( $current_scheds ) == count( $new_scheds ) ) {
-				foreach ( $current_scheds as $i => $current_sched ) {
-					foreach ( $new_scheds as $j => $new_sched ) {
-						if ( $new_sched == $current_sched ) {
-							unset( $current_scheds[$i] );
+			// 2.3.3.9: added check that current schedule is set
+			if ( $current_scheds && is_array( $current_scheds ) ) {
+				if ( array_key_exists( 'date', $current_scheds ) ) {
+					$current_scheds['id'] = radio_station_unique_shift_id();
+					$current_scheds = array( $current_scheds );
+				}
+				$prev_scheds = $current_scheds;
+				if ( count( $current_scheds ) == count( $new_scheds ) ) {
+					foreach ( $current_scheds as $i => $current_sched ) {
+						foreach ( $new_scheds as $j => $new_sched ) {
+							if ( $new_sched == $current_sched ) {
+								unset( $current_scheds[$i] );
+							}
 						}
 					}
 				}
-			}
-			if ( 0 === count( $current_scheds ) ) {
-				$sched_changed = false;
+				if ( 0 === count( $current_scheds ) ) {
+					$sched_changed = false;
+				}
 			}
 			
 			// --- sort schedule overrides by date/time ---
@@ -4535,7 +4542,7 @@ function radio_station_override_column_data( $column, $post_id ) {
 
 	// 2.3.3.9: list override date and times in single column
 	$overrides = get_post_meta( $post_id, 'show_override_sched', true );
-	if ( array_key_exists( 'date', $overrides ) ) {
+	if ( $overrides && is_array( $overrides ) && array_key_exists( 'date', $overrides ) ) {
 		$overrides = array( $overrides );
 	}
 

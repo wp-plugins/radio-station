@@ -476,10 +476,11 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 			foreach( $archive_posts as $i => $archive_post ) {
 				// 2.3.3.9: set singular to false to allow for multiple override times
 				$override_times = get_post_meta( $archive_post->ID, 'show_override_sched', true );
-				if ( array_key_exists( 'date', $override_times ) ) {
+				// 2.3.3.9: convert possible single override to array
+				if ( $override_times && is_array( $override_times ) && array_key_exists( 'date', $override_times ) ) {
 					$override_times = array( $override_times );
 				}				
-				if ( $override_times || !is_array( $override_times ) || ( count( $override_times ) == 0 ) ) {
+				if ( !$override_times || !is_array( $override_times ) || ( count( $override_times ) == 0 ) ) {
 					unset( $archive_posts[$i] );
 				} else {
 					// 2.3.3.9: check if all override times are disabled
@@ -645,7 +646,8 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 
 				// 2.3.3.9: set third attribute to false to allow for multiple override times
 				$override_times = get_post_meta( $archive_post->ID, 'show_override_sched', true );
-				if ( array_key_exists( 'date', $override_times ) ) {
+				// 2.3.3.9: convert possible single value to array
+				if ( $override_times && is_array( $override_times ) && array_key_exists( 'date', $override_times ) ) {
 					$override_times = array( $override_times );
 				}
 
@@ -1810,12 +1812,14 @@ function radio_station_current_show_shortcode( $atts ) {
 	// 2.3.2: added for_time attribute
 	// 2.3.3.8: added show_encore attribute (default 1)
 	// 2.3.3.9: added avatar_size attribute (default thumbnail)
+	// 2.3.3.9: added show_title attribute (default 1)
 	$time_format = radio_station_get_setting( 'clock_time_format' );
 	$defaults = array(
 		// --- legacy options ---
 		'title'          => '',
 		'display_hosts'  => 0,
 		'show_avatar'    => 1,
+		'show_title'     => 1,
 		'show_link'      => 1,
 		'default_name'   => '',
 		'time'           => $time_format,
@@ -1965,7 +1969,8 @@ function radio_station_current_show_shortcode( $atts ) {
 
 		// --- shortcode only title ---
 		if ( !empty( $atts['title'] ) ) {
-			$output .= '<h3 class="current-show-title dj-on-air-title">';
+			// 2.3.3.9: fix class to not conflict with actual show title
+			$output .= '<h3 class="current-show-shortcode-title">';
 			$output .= esc_html( $atts['title'] );
 			$output .= '</h3>';
 		}
@@ -2138,17 +2143,20 @@ function radio_station_current_show_shortcode( $atts ) {
 		$html['clear'] = '<span class="radio-clear"></span>';
 
 		// --- set show title output ---
-		$title = '<div class="current-show-title on-air-dj-title">';
-		if ( $show_link ) {
-			$title .= '<a href="' . esc_url( $show_link ) . '">' . esc_html( $show['name'] ) . '</a>';
-		} else {
-			$title .= esc_html( $show['name'] );
-		}
-		$title .= '</div>';
-		// 2.3.3.8: added current show title filter
-		$title = apply_filters( 'radio_station_current_show_title_display', $title, $show_id, $atts );
-		if ( ( '' != $title ) && is_string( $title ) ) {
-			$html['title'] = $title;
+		// 2.3.3.9: adding show title attribute
+		if ( $atts['show_title'] ) {
+			$title = '<div class="current-show-title on-air-dj-title">';
+			if ( $show_link ) {
+				$title .= '<a href="' . esc_url( $show_link ) . '">' . esc_html( $show['name'] ) . '</a>';
+			} else {
+				$title .= esc_html( $show['name'] );
+			}
+			$title .= '</div>';
+			// 2.3.3.8: added current show title filter
+			$title = apply_filters( 'radio_station_current_show_title_display', $title, $show_id, $atts );
+			if ( ( '' != $title ) && is_string( $title ) ) {
+				$html['title'] = $title;
+			}
 		}
 
 		// --- show avatar ---
@@ -2509,11 +2517,13 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 	// 2.3.2: added AJAX load attribute
 	// 2.3.2: added for_time attribute
 	// 2.3.3.8: added show_encore attribute (default 1)
+	// 2.3.3.9: added show_title attribute (default 1)
 	$time_format = radio_station_get_setting( 'clock_time_format' );
 	$defaults = array(
 		// --- legacy options ---
 		'title'             => '',
 		'limit'             => 1,
+		'show_title'        => 1,
 		'show_avatar'       => 0,
 		'show_link'         => 0,
 		'time'              => $time_format,
@@ -2796,16 +2806,19 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 			$html['clear'] = '<span class="radio-clear"></span>';
 
 			// --- set show title ---
-			$title = '<div class="upcoming-show-title on-air-dj-title">';
-			if ( $show_link ) {
-				$title .= '<a href="' . esc_url( $show_link ) . '">' . esc_html( $show['name'] ) . '</a>';
-			} else {
-				$title .= esc_html( $show['name'] );
-			}
-			$title .= '</div>';
-			$title = apply_filters( 'radio_station_upcoming_show_title_display', $title, $show_id, $atts );
-			if ( ( '' != $title ) && is_string( $title ) ) {
-				$html['title'] = $title;
+			// 2.3.3.9: added attribute for show title display
+			if ( $atts['show_title'] ) {
+				$title = '<div class="upcoming-show-title on-air-dj-title">';
+				if ( $show_link ) {
+					$title .= '<a href="' . esc_url( $show_link ) . '">' . esc_html( $show['name'] ) . '</a>';
+				} else {
+					$title .= esc_html( $show['name'] );
+				}
+				$title .= '</div>';
+				$title = apply_filters( 'radio_station_upcoming_show_title_display', $title, $show_id, $atts );
+				if ( ( '' != $title ) && is_string( $title ) ) {
+					$html['title'] = $title;
+				}
 			}
 
 			// --- set show avatar ---

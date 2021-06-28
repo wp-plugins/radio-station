@@ -528,7 +528,8 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 	
 		// 2.3.3.9: get possible array of override shifts
 		$override_shifts = get_post_meta( $override['ID'], 'show_override_sched', true );
-		if ( array_key_exists( 'date', $override_shifts ) ) {
+		// 2.3.3.9: convert possible single override to array
+		if ( $override_shifts && is_array( $override_shifts ) && array_key_exists( 'date', $override_shifts ) ) {
 			$override_shifts = array( $override_shifts );
 			update_post_meta( $override['ID'], 'show_override_sched', $override_shifts );
 		}
