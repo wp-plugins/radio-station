@@ -82,6 +82,7 @@ function radio_clock_date_time(init) {
 	serverdatetime.setTime(userdatetime.getTime() + (serveroffset * 1000));
 
 	/* get timezone override */
+	override = false;
 	if (typeof radio_timezone_override == 'function') {
 		override = radio_timezone_override();
 		if (radio.debug) {console.log('User Timezone Selection Override: '+override);}

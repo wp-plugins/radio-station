@@ -4969,10 +4969,10 @@ function radio_station_delete_transients_with_prefix( $prefix ) {
 	// 2.3.3.9: fix to LIKE match 
 	$query = "SELECT `option_name` FROM " . $wpdb->prefix . "options WHERE `option_name` LIKE '%" . $prefix . "%'";
 	$results = $wpdb->get_results( $query, ARRAY_A );
-	if ( RADIO_STATION_DEBUG ) {
-		echo $query . PHP_EOL . '<br>';
-		echo 'Transients: ' . print_r( $results, true );
-	}
+	// if ( RADIO_STATION_DEBUG ) {
+	//	echo $query . PHP_EOL . '<br>';
+	//	echo 'Transients: ' . print_r( $results, true );
+	// }
 	if ( !$results || !is_array( $results ) || ( count( $results ) < 1 ) ) {
 		return;
 	}
@@ -4984,9 +4984,9 @@ function radio_station_delete_transients_with_prefix( $prefix ) {
 		delete_transient( $key );
 		// 2.3.3.9: also delete transient cache object by key
 		wp_cache_delete( $key, 'transient' );
-		if ( RADIO_STATION_DEBUG ) {
-			echo "Deleting transient and cache object for '" . $key . "'" . PHP_EOL;
-		}
+		// if ( RADIO_STATION_DEBUG ) {
+		// 	echo "Deleting transient and cache object for '" . $key . "'" . PHP_EOL;
+		// }
 	}
 }
 

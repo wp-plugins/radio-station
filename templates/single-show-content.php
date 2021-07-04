@@ -783,7 +783,7 @@ if ( $show_posts ) {
 	$posts_type = get_post_type_object( 'post' );
 	$posts_label = $posts_type->labels->name;
 	$sections['posts']['heading'] = '<a name="show-posts"></a>' . $newline;
-	$label = $label = $show_label . ' ' . $posts_label;
+	$label = $show_label . ' ' . $posts_label;
 	$label = apply_filters( 'radio_station_show_posts_label', $label, $post_id );
 	$sections['posts']['heading'] .= '<h3 id="show-section-posts">' . esc_html( $label ) . '</h3>' . $newline;
 	$anchor = apply_filters( 'radio_station_show_posts_anchor', $posts_label, $post_id );
@@ -809,7 +809,7 @@ if ( $show_playlists ) {
 	// 2.3.3.9: fix to filter name (replace dash with underscore)
 	$label = apply_filters( 'radio_station_show_playlists_label', $label, $post_id );
 	$sections['playlists']['heading'] .= '<h3 id="show-section-playlists">' . esc_html( $label ) . '</h3>' . $newline;
-	$anchor = apply_filters( 'radio_station_show_playlists_anchor', $playlists_label, $post_id );
+	$anchor = apply_filters( 'radio_station_show_playlists_anchor', $playlist_label, $post_id );
 	$sections['playlists']['anchor'] = $anchor;
 
 	$radio_station_data['show-playlists'] = $show_playlists;

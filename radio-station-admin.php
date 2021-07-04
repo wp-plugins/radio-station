@@ -27,7 +27,10 @@
 // === Admin Notices ===
 // - Plugin Settings Page Top
 // - Plugin Settings Page Bottom
-// - Directory Free Listing Offer Notice
+// - Directory Listing Offer Notice
+// - Launch Offer Notice
+// - Directory Listing Offer Content
+// - Launch Offer Content
 // - Dismiss Free Listing Offer
 // - Plugin Takeover Announcement Notice
 // - Plugin Takeover Announcement Content
@@ -793,11 +796,7 @@ function radio_station_update_notice() {
 	echo '</div>';
 
 	// --- notice dismissal iframe (once only) ---
-	global $radio_station_notice_iframe;
-	if ( !isset( $radio_station_notice_iframe ) ) {
-		echo '<iframe src="javascript:void(0);" name="radio-station-notice-iframe" style="display:none;"></iframe>';
-		$radio_station_notice_iframe = true;
-	}
+	radio_station_admin_notice_iframe();
 }
 
 // ---------------------
@@ -881,17 +880,14 @@ function radio_station_notice() {
 	$dismiss_url = add_query_arg( 'action', 'radio_station_notice_dismiss', admin_url( 'admin-ajax.php' ) );
 	$dismiss_url = add_query_arg( 'notice', $notice['id'], $dismiss_url );
 	echo '<div style="position:absolute; top:20px; right: 20px;">';
-	echo '<a href="' . esc_url( $dismiss_url ) . '" target="radio-station-notice-iframe" style="text-decoration:none;">';
+	echo '<a href="' . esc_url( $dismiss_url ) . '" target="radio-station-notice-iframe" id+style="text-decoration:none;">';
 	echo '<span class="dashicons dashicons-dismiss" title="' . esc_attr( __( 'Dismiss this Notice', 'radio-station' ) ) . '"></span></a>';
 	echo '</div>';
 	echo '</div>';
 
 	// --- notice dismissal iframe (once only) ---
-	global $radio_station_notice_iframe;
-	if ( !isset( $radio_station_notice_iframe ) ) {
-		echo '<iframe src="javascript:void(0);" name="radio-station-notice-iframe" style="display:none;"></iframe>';
-		$radio_station_notice_iframe = true;
-	}
+	radio_station_admin_notice_iframe();
+
 }
 
 // ------------------
@@ -983,20 +979,49 @@ function radio_station_notice_dismiss() {
 // === Admin Notices ===
 // ---------------------
 
+// --------------------------
+// Admin Notice Action Iframe
+// --------------------------
+// 2.3.3.9: separated out to individual function
+function radio_station_admin_notice_iframe() {
+	global $radio_station_notice_iframe;
+	if ( !isset( $radio_station_notice_iframe ) || !$radio_station_notice_iframe ) {
+		echo '<iframe src="javascript:void(0);" name="radio-station-notice-iframe" id="radio-station-notice-iframe" style="display:none;"></iframe>';
+		$radio_station_notice_iframe = true;
+	}
+}
+
 // ------------------------
 // Plugin Settings Page Top
 // ------------------------
 add_action( 'radio_station_admin_page_top', 'radio_station_settings_page_top' );
 function radio_station_settings_page_top() {
 
+	$now = time();
+
 	// --- free directory listing offer ---
 	// 2.3.1: added offer to top of admin settings
-	$now = time();
+	// 2.3.3.9: remove listing offer notice
+	/* 
 	$offer_end = strtotime( '2020-08-01 00:01' );
 	if ( $now < $offer_end ) {
 		if ( !get_option( 'radio_station_listing_offer_accepted' ) ) {
 			echo radio_station_listing_offer_content( false );
 		}
+	} */
+
+	// --- pro launch discount notice ---
+	// 2.3.3.9: add timed launch offer signup notice
+	$offer_start = strtotime( '2021-07-12 00:01' );
+	$offer_end = strtotime( '2021-07-25 23:59' );	
+	if ( ( $now > $offer_start ) && ( $now < $offer_end ) ) {
+		$user_ids = get_current_user_id();
+		$user_ids = get_option( 'radio_station_launch_offer_accepted' );
+		if ( !$user_ids || !is_array( $user_ids ) || !in_array( $user_id, $user_ids ) ) {
+			echo radio_station_launch_offer_content( false );
+		}
+	} elseif ( isset( $_GET['offertest'] ) && ( '1' == $_GET['offertest'] ) ) {
+		echo radio_station_launch_offer_content( false );
 	}
 
 	// --- plugin update notice ---	
@@ -1019,10 +1044,17 @@ function radio_station_settings_page_bottom() {
 // Directory Listing Offer Notice
 // ------------------------------
 // 2.3.1: added free directory listing offer notice
-add_action( 'admin_notices', 'radio_station_listing_offer_notice' );
+// 2.3.3.9: disable listing offer notice
+// add_action( 'admin_notices', 'radio_station_listing_offer_notice' );
 function radio_station_listing_offer_notice() {
 
-	// --- bug out if offer expired ---
+	// --- bug out on certain plugin pages ---
+	$pages = array( 'radio-station', 'radio-station-docs' );
+	if ( isset( $_REQUEST['page'] ) && in_array( $_REQUEST['page'], $pages ) ) {
+		return;
+	}
+
+	// --- check offer time window ---
 	$now = time();
 	$offer_end = strtotime( '2020-08-01 00:01' );
 	if ( $now > $offer_end ) {
@@ -1034,12 +1066,6 @@ function radio_station_listing_offer_notice() {
 		return;
 	}
 
-	// --- bug out on certain plugin pages ---
-	$pages = array( 'radio-station', 'radio-station-docs' );
-	if ( isset( $_REQUEST['page'] ) && in_array( $_REQUEST['page'], $pages ) ) {
-		return;
-	}
-
 	// --- display plugin announcement ---
 	echo '<div id="radio-station-listing-offer-notice" class="notice notice-success" style="position:relative;">';
 	// phpcs:ignore WordPress.Security.OutputNotEscaped
@@ -1047,11 +1073,49 @@ function radio_station_listing_offer_notice() {
 	echo '</div>';
 
 	// --- notice dismissal frame (once) ---
-	global $radio_station_notice_frame;
-	if ( !isset( $radio_station_notice_iframe ) ) {
-		echo '<iframe src="javascript:void(0);" name="radio-station-notice-iframe" style="display:none;"></iframe>';
-		$radio_station_notice_iframe = true;
+	radio_station_admin_notice_iframe();
+}
+
+// -------------------
+// Launch Offer Notice
+// -------------------
+add_action( 'admin_notices', 'radio_station_launch_offer_notice' );
+function radio_station_launch_offer_notice( $rspage = false ) {
+
+	// --- bug out on certain plugin pages ---
+	$pages = array( 'radio-station', 'radio-station-docs' );
+	if ( isset( $_REQUEST['page'] ) && in_array( $_REQUEST['page'], $pages ) ) {
+		return;
 	}
+
+	// --- bug out if not admin ---
+	if ( !current_user_can( 'manage_options' ) && !current_user_can( 'update_plugins' ) ) {
+		return;
+	}
+
+	// --- check offer time window ---
+	$now = time();
+	$offer_start = strtotime( '2021-07-12 00:01' );
+	$offer_end = strtotime( '2021-07-26 00:01' );
+	if ( ( $now < $offer_start ) && ( $now > $offer_end ) ) {
+		return;
+	}
+
+	// --- bug out if already dismissed (by user) ---
+	$user_id = get_current_user_id();
+	$user_ids = get_option( 'radio_station_launch_offer_dismissed' );
+	if ( $user_ids && is_array( $user_ids ) && in_array( $user_id, $user_ids ) ) {	
+		return;
+	}
+
+	// --- display plugin announcement ---
+	echo '<div id="radio-station-launch-offer-notice" class="notice notice-success" style="position:relative;">';
+	// phpcs:ignore WordPress.Security.OutputNotEscaped
+	echo radio_station_launch_offer_content();
+	echo '</div>';
+
+	// --- notice dismissal frame (once) ---
+	radio_station_admin_notice_iframe();
 }
 
 // -------------------------------
@@ -1084,7 +1148,6 @@ function radio_station_listing_offer_content( $dismissable = true ) {
 	$blurb .= '</p></li>';
 	
 	// --- accept / decline offer button links ---
-	// 2.3.3.9: added missing string text domains
 	$blurb .= '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">';
 	$blurb .= '<center>';
 	$onclick = '';
@@ -1130,24 +1193,144 @@ function radio_station_listing_offer_content( $dismissable = true ) {
 	return $blurb;
 }
 
+// --------------------
+// Launch Offer Content
+// --------------------
+// 2.3.3.9: added for Pro launch discount
+function radio_station_launch_offer_content( $dismissable = true ) {
+
+	$dismiss_url = admin_url( 'admin-ajax.php?action=radio_station_launch_offer_dismiss' );
+	$accept_dismiss_url = add_query_arg( 'accepted', '1', $dismiss_url );
+	$blurb = '<ul style="list-style:none;">';
+	
+	// --- directory logo image ---
+	$launch_image = plugins_url( 'images/netmix-logo.png', RADIO_STATION_FILE );
+	// TODO: pro-launch image
+	// $launch_image = plugins_url( 'images/pro-launch.gif', RADIO_STATION_FILE );
+	$blurb .= '<li style="display:inline-block; vertical-align:middle;">';
+	$blurb .= '<img src="' . esc_url( $launch_image ) . '">';
+	$blurb .= '</li>';
+
+	// --- free listing offer text ---
+	$blurb .= '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">';
+	$blurb .= '<center><b style="font-size:18px;">' . esc_html( __( 'Radio Station Pro Launch Discount!', 'radio-station' ) ) . '</b></center>';
+
+	$blurb .= '<p style="font-size: 16px; line-height: 24px; margin-top: 0;">';
+	$blurb .= esc_html( __( 'We are thrilled to announce the upcoming launch of Radio Station PRO', 'radio-station' ) ) . ' !!!<br>';
+	$blurb .= esc_html( __( 'Jam-packed with new features to "level up" your Station\'s online presence.', 'radio-station' ) ) . '<br>';
+	
+	$blurb .= esc_html( __( 'While launching,') ) . ' <b>' . esc_html( __( 'we are offering 30% discount to existing Radio Station users!', 'radio-station' ) ) . '</b><br>';
+	$blurb .= esc_html( __( 'Sign up to the exclusive launch list to receive your discount code when we go LIVE.', 'radio-station' ) );
+	$blurb .= '</p></li>';
+	
+	// --- accept / decline offer button links ---
+	$blurb .= '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">';
+	$blurb .= '<center>';
+	$onclick = '';
+	if ( $dismissable ) {
+		$onclick = ' onclick="radio_display_dismiss_link();"';
+	}
+	$blurb .= '<div id="launch-offer-accept-button" style="display:inline-block; margin-right:10px;">';
+	$blurb .= '<a href="https://radiostation.pro/plugin-launch-discount/" style="font-size: 16px;" target="_blank" class="button-primary"' . $onclick . '>' . esc_html( __( "Yes, I'm in!", 'radio-station' ) ) . '</a>';
+	$blurb .= '</div>';
+	// $blurb .= '<div id="launch-offer-blog-button" style="display:inline-block;">';
+	// $blurb .= '<a href="' . RADIO_STATION_NETMIX_DIR . 'announcing-new-netmix-directory/" style="font-size: 11px;" target="_blank" class="button-secondary">' . esc_html( __( 'More Details', 'radio-station' ) ) . '</a>';
+	$blurb .= '</div><br>';
+	
+	$blurb .= '<div id="launch-offer-dismiss-link" style="display:none;">';
+	$blurb .= '<a href="' . esc_url( $accept_dismiss_url ) . '" style="font-size: 12px;" target="radio-station-notice-iframe">' . esc_html( __( 'Thanks, already done.', 'radio-station' ) ) . '</a>';
+	$blurb .= '</div>';
+	$blurb .= '</center><br>';
+
+	// $blurb .= '<div style="font-size: 11px; line-height: 18px;">';
+	// $blurb .= esc_html( __( 'Offer valid until end of July 2020.', 'radio-station' ) ) . '<br>';
+	// $blurb .= esc_html( __( 'Activate your 30 days before it ends!', 'radio-station' ) );
+	// $blurb .= '</div>';
+
+	$blurb .= '</li>';
+
+	$blurb .= '</ul>';
+
+	// --- dismiss notice icon ---
+	if ( $dismissable ) {
+		$blurb .= '<div style="position:absolute; top:20px; right: 20px;">';
+		$blurb .= '<a href="' . esc_url( $dismiss_url ) . '" target="radio-station-notice-iframe" style="text-decoration:none;">';
+		$blurb .= '<span class="dashicons dashicons-dismiss" title="' . esc_html( __( 'Dismiss this Notice', 'radio-station' ) ) . '"></span>';
+		$blurb .= '</a>';
+		$blurb .= '</div>';
+	}
+
+	// --- display dismiss link script ---
+	$blurb .= "<script>function radio_display_dismiss_link() {
+		document.getElementById('launch-offer-accept-button').style.display = 'none';
+		document.getElementById('launch-offer-dismiss-link').style.display = '';
+		document.getElementById('radio-station-notice-iframe').src = '" . esc_url( $accept_dismiss_url ) . "';
+	}</script>";
+
+	return $blurb;
+}
+
 // --------------------------
 // Dismiss Free Listing Offer
 // --------------------------
 // 2.3.1: AJAX for free listing notice dismissal
 add_action( 'wp_ajax_radio_station_listing_offer_dismiss', 'radio_station_listing_offer_dismiss' );
 function radio_station_listing_offer_dismiss() {
-	if ( current_user_can( 'manage_options' ) || current_user_can( 'update_plugins' ) ) {
-	
-		// --- set option to dismissed ---
-		update_option( 'radio_station_listing_offer_dismissed', true );
-		if ( isset( $_REQUEST['accept'] ) && ( '1' == 'accepted' ) ) {
-			update_option( 'radio_station_listing_offer_accepted', true );
-		}
-		
-		// --- hide the announcement in parent frame ---
-		echo "<script>parent.document.getElementById('radio-station-listing-offer-notice').style.display = 'none';</script>";
+
+	// --- bug out if no permissions ---
+	if ( !current_user_can( 'manage_options' ) && !current_user_can( 'update_plugins' ) ) {
 		exit;
 	}
+	
+	// --- set option to dismissed ---
+	update_option( 'radio_station_listing_offer_dismissed', true );
+	if ( isset( $_REQUEST['accept'] ) && ( '1' == $_REQUEST['accept'] ) ) {
+		update_option( 'radio_station_listing_offer_accepted', true );
+	}
+
+	// --- hide the announcement in parent frame ---
+	echo "<script>parent.document.getElementById('radio-station-listing-offer-notice').style.display = 'none';</script>";
+	exit;
+}
+
+// --------------------
+// Dismiss Launch Offer
+// --------------------
+// 2.3.3.9: AJAX for free listing notice dismissal
+add_action( 'wp_ajax_radio_station_launch_offer_dismiss', 'radio_station_launch_offer_dismiss' );
+function radio_station_launch_offer_dismiss() {
+
+	// --- bug out if no permissions ---
+	if ( !current_user_can( 'manage_options' ) && !current_user_can( 'update_plugins' ) ) {
+		exit;
+	}
+
+	// --- get current user ID ---	
+	$user_id = get_current_user_id();
+
+	// --- set option to dismissed ---
+	$user_ids = get_option( 'radio_station_launch_offer_dismissed' );
+	if ( !$user_ids || !is_array( $user_ids ) ) {
+		$user_ids = array( $user_id );
+	} elseif ( !in_array( $user_id, $user_ids ) ) {
+		$user_ids[] = $user_id;
+	}
+	update_option( 'radio_station_launch_offer_dismissed', $user_ids );
+
+	// --- maybe set option for accepted ---
+	if ( isset( $_REQUEST['accept'] ) && ( '1' == $_REQUEST['accepted'] ) ) {
+		$user_ids = get_option( 'radio_station_launch_offer_accepted' );
+		if ( !$user_ids || !is_array( $user_ids ) ) {
+			$user_ids = array( $user_id );
+		} elseif ( !in_array( $user_id, $user_ids ) ) {
+			$user_ids[] = $user_id;
+		}
+		update_option( 'radio_station_launch_offer_accepted', $user_ids );
+	}
+
+	// --- hide the announcement in parent frame ---
+	echo "<script>parent.document.getElementById('radio-station-launch-offer-notice').style.display = 'none';</script>";
+	exit;
 }
 
 // -----------------------------------
@@ -1176,11 +1359,7 @@ function radio_station_announcement_notice() {
 	echo '</div>';
 
 	// --- notice dismissal frame (once) ---
-	global $radio_station_notice_frame;
-	if ( !isset( $radio_station_notice_iframe ) ) {
-		echo '<iframe src="javascript:void(0);" name="radio-station-notice-iframe" style="display:none;"></iframe>';
-		$radio_station_notice_iframe = true;
-	}
+	radio_station_admin_notice_iframe();
 
 }
 
