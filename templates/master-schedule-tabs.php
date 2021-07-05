@@ -19,7 +19,7 @@ if ( isset( $atts['start_date'] ) && $atts['start_date'] ) {
 	$atts['display_month'] = ( !$atts['display_month'] ) ? 'short' : $atts['display_month'];
 } else {
 	// 2.3.3.9: set start date to current date
-	$start_date = $date;	
+	$start_date = $date;
 }
 $start_time = radio_station_to_time( $start_date . ' 00:00:00' );
 $start_time = apply_filters( 'radio_station_schedule_start_time', $start_time, 'tabs' );
@@ -35,7 +35,7 @@ $start_data_format = apply_filters( 'radio_station_time_format_start', $start_da
 $end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_format, 'schedule-tabs', $atts );
 
 // --- get schedule days and dates ---
-// 2.3.2: allow for start day attibute
+// 2.3.2: allow for start day attribute
 // 2.3.3.5: use the start_day value for getting the current schedule
 if ( isset( $atts['start_day'] ) && $atts['start_day'] ) {
 	$start_day = $atts['start_day'];

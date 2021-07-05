@@ -206,6 +206,7 @@ We haven't built an interface between Google Calendar and Radio Station just yet
 * Added: Link Override to Show Data with selectable Show Fields
 * Added: Language Archive Shortcode (similar to Genre Archive)
 * Added: Display Linked Override Date List on Show Pages
+* Fixed: Show Schedule sometimes starting on previous week
 * Fixed: Current Show highlighting timer interval cycling
 * Fixed: Before and After Show classes when no current Show
 * Fixed: Shows Data Endpoint 24 Hour Shift Format and Encore Switch

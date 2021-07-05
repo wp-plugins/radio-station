@@ -4029,9 +4029,11 @@ function radio_station_get_schedule_weekdates( $weekdays, $time = false ) {
 	if ( defined( 'RADIO_STATION_USE_SERVER_TIMES' ) && RADIO_STATION_USE_SERVER_TIMES ) {
 		$today = date( 'l', $time );
 	} else {
-		$timezone = radio_station_get_timezone();
-		$datetime = radio_station_get_date_time( '@' . $time, $timezone );
-		$today = $datetime->format( 'l' );
+		// 2.3.3.9: fix to use radio_station_get_time 
+		// $timezone = radio_station_get_timezone();
+		// $datetime = radio_station_get_date_time( '@' . $time, $timezone );
+		// $today = $datetime->format( 'l' );
+		$today = radio_station_get_time( 'day', $time );
 	}
 
 	// --- get weekday index for today ---
@@ -4048,8 +4050,10 @@ function radio_station_get_schedule_weekdates( $weekdays, $time = false ) {
 		if ( defined( 'RADIO_STATION_USE_SERVER_TIMES' ) && RADIO_STATION_USE_SERVER_TIMES ) {
 			$weekdate = date( 'Y-m-d', $weekdate_time );
 		} else {
-			$weekdatetime = radio_station_get_date_time( '@' . $weekdate_time, $timezone );
-			$weekdate = $weekdatetime->format( 'Y-m-d' );
+			// 2.3.3.9: fix to use radio_station_get_time 
+			// $weekdatetime = radio_station_get_date_time( '@' . $weekdate_time, $timezone );
+			// $weekdate = $weekdatetime->format( 'Y-m-d' );
+			$weekdate = radio_station_get_time( 'Y-m-d', $weekdate_time );
 		}
 		$weekdates[$weekday] = $weekdate;
 	}
@@ -4058,7 +4062,9 @@ function radio_station_get_schedule_weekdates( $weekdays, $time = false ) {
 		echo '<span style="display:none;">';
 		echo 'Time: ' . $time . PHP_EOL;
 		echo 'Today: ' . $today . PHP_EOL;
-		echo 'Today Object: ' . print_r( $datetime, true );
+		if ( isset( $datetime ) ) {
+			echo 'Date Time Object: ' . print_r( $datetime, true );
+		}
 		echo 'Weekdays: ' . print_r( $weekdays, true );
 		echo 'Weekdates: ' . print_r( $weekdates, true );
 		echo '</span>';

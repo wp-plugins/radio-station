@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Improved: Markdown Extra Compatibility for PHP 7.4+
 * Added: Link Override to Show Data with selectable Show Fields
 * Added: Language Archive Shortcode (similar to Genre Archive)
+* Fixed: Show Schedule sometimes starting on previous week
 * Fixed: Current Show highlighting timer interval cycling
 * Fixed: Before and After Show classes when no current Show
 * Fixed: Shows Data Endpoint 24 Hour Shift Format and Encore Switch
