@@ -1012,16 +1012,20 @@ function radio_station_settings_page_top() {
 
 	// --- pro launch discount notice ---
 	// 2.3.3.9: add timed launch offer signup notice
-	$offer_start = strtotime( '2021-07-12 00:01' );
-	$offer_end = strtotime( '2021-07-25 23:59' );	
-	if ( ( $now > $offer_start ) && ( $now < $offer_end ) ) {
+	$offer_start = strtotime( '2021-07-20 00:01' );
+	$offer_end = strtotime( '2021-07-26 00:01' );
+	if ( $now < $offer_end ) {
 		$user_ids = get_current_user_id();
 		$user_ids = get_option( 'radio_station_launch_offer_accepted' );
 		if ( !$user_ids || !is_array( $user_ids ) || !in_array( $user_id, $user_ids ) ) {
-			echo radio_station_launch_offer_content( false );
+			$prelaunch = ( $now < $offer_start ) ? true : false;
+			if ( isset( $_GET['offertest'] ) && ( '1' == $_GET['offertest'] ) ) {
+				$prelaunch = false;
+			} elseif ( isset( $_GET['offertest'] ) && ( '2' == $_GET['offertest'] ) ) {
+				$prelaunch = true;
+			}
+			echo radio_station_launch_offer_content( false, $prelaunch );
 		}
-	} elseif ( isset( $_GET['offertest'] ) && ( '1' == $_GET['offertest'] ) ) {
-		echo radio_station_launch_offer_content( false );
 	}
 
 	// --- plugin update notice ---	
@@ -1095,9 +1099,9 @@ function radio_station_launch_offer_notice( $rspage = false ) {
 
 	// --- check offer time window ---
 	$now = time();
-	$offer_start = strtotime( '2021-07-12 00:01' );
+	$offer_start = strtotime( '2021-07-20 00:01' );
 	$offer_end = strtotime( '2021-07-26 00:01' );
-	if ( ( $now < $offer_start ) && ( $now > $offer_end ) ) {
+	if ( $now > $offer_end ) {
 		return;
 	}
 
@@ -1111,7 +1115,8 @@ function radio_station_launch_offer_notice( $rspage = false ) {
 	// --- display plugin announcement ---
 	echo '<div id="radio-station-launch-offer-notice" class="notice notice-success" style="position:relative;">';
 	// phpcs:ignore WordPress.Security.OutputNotEscaped
-	echo radio_station_launch_offer_content();
+		$prelaunch = ( $now < $offer_start ) ? true : false;
+	echo radio_station_launch_offer_content( true, $prelaunch );
 	echo '</div>';
 
 	// --- notice dismissal frame (once) ---
@@ -1197,31 +1202,42 @@ function radio_station_listing_offer_content( $dismissable = true ) {
 // Launch Offer Content
 // --------------------
 // 2.3.3.9: added for Pro launch discount
-function radio_station_launch_offer_content( $dismissable = true ) {
+function radio_station_launch_offer_content( $dismissable = true, $prelaunch ) {
 
 	$dismiss_url = admin_url( 'admin-ajax.php?action=radio_station_launch_offer_dismiss' );
 	$accept_dismiss_url = add_query_arg( 'accepted', '1', $dismiss_url );
 	$blurb = '<ul style="list-style:none;">';
 	
 	// --- directory logo image ---
-	$launch_image = plugins_url( 'images/netmix-logo.png', RADIO_STATION_FILE );
-	// TODO: pro-launch image
-	// $launch_image = plugins_url( 'images/pro-launch.gif', RADIO_STATION_FILE );
+	// $launch_image = plugins_url( 'images/netmix-logo.png', RADIO_STATION_FILE );
+	$launch_image = plugins_url( 'images/pro-launch.gif', RADIO_STATION_FILE );
 	$blurb .= '<li style="display:inline-block; vertical-align:middle;">';
-	$blurb .= '<img src="' . esc_url( $launch_image ) . '">';
+	$blurb .= '<img src="' . esc_url( $launch_image ) . '" style="width:128px; height:128px">';
 	$blurb .= '</li>';
 
 	// --- free listing offer text ---
 	$blurb .= '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">';
-	$blurb .= '<center><b style="font-size:18px;">' . esc_html( __( 'Radio Station Pro Launch Discount!', 'radio-station' ) ) . '</b></center>';
-
-	$blurb .= '<p style="font-size: 16px; line-height: 24px; margin-top: 0;">';
-	$blurb .= esc_html( __( 'We are thrilled to announce the upcoming launch of Radio Station PRO', 'radio-station' ) ) . ' !!!<br>';
-	$blurb .= esc_html( __( 'Jam-packed with new features to "level up" your Station\'s online presence.', 'radio-station' ) ) . '<br>';
 	
-	$blurb .= esc_html( __( 'While launching,') ) . ' <b>' . esc_html( __( 'we are offering 30% discount to existing Radio Station users!', 'radio-station' ) ) . '</b><br>';
-	$blurb .= esc_html( __( 'Sign up to the exclusive launch list to receive your discount code when we go LIVE.', 'radio-station' ) );
-	$blurb .= '</p></li>';
+	if ( $prelaunch ) {
+		$blurb .= '<center><b style="font-size:18px;">' . esc_html( __( 'Radio Station Pro Launch Discount!', 'radio-station' ) ) . '</b></center>';
+		$blurb .= '<p style="font-size: 16px; line-height: 24px; margin-top: 0;">';
+		$blurb .= esc_html( __( 'We are thrilled to announce the upcoming launch of Radio Station PRO', 'radio-station' ) ) . ' !!!<br>';
+		$blurb .= esc_html( __( 'Jam-packed with new features to "level up" your Station\'s online presence.', 'radio-station' ) ) . '<br>';
+		$blurb .= esc_html( __( 'During the launch,') ) . ' <b>' . esc_html( __( 'we are offering 30% discount to existing Radio Station users!', 'radio-station' ) ) . '</b><br>';
+		$blurb .= esc_html( __( 'Sign up to the exclusive launch list to receive your discount code when we go LIVE.', 'radio-station' ) );
+		$blurb .= '</p>';
+	} else {
+		$blurb .= '<center><b style="font-size:18px;">' . esc_html( __( 'Radio Station PRO Launch is LIVE!', 'radio-station' ) ) . '</b></center>';
+		$blurb .= '<p style="font-size: 16px; line-height: 24px; margin-top: 0;">';
+		$blurb .= esc_html( __( 'The long anticipated moment has arrived. The doors are open to get PRO', 'radio-station' ) ) . ' !!!<br>';
+		$blurb .= esc_html( __( 'Jam-packed with new features to "level up" your Station\'s online presence.', 'radio-station' ) ) . '<br>';
+		$blurb .= esc_html( __( 'Remember,') ) . ' <b>' . esc_html( __( 'we are offering 30% discount to existing Radio Station users!', 'radio-station' ) ) . '</b><br>';
+		$blurb .= '<a href="' . RADIO_STATION_PRO_URL . 'plugin-launch-discount/" target="_blank">';
+			$blurb .= esc_html( __( 'Sign up here to receive your exclusive launch discount code.', 'radio-station' ) );
+		$blurb .= '</a></p>';
+	}
+
+	$blurb .= '</li>';
 	
 	// --- accept / decline offer button links ---
 	$blurb .= '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">';
@@ -1231,21 +1247,17 @@ function radio_station_launch_offer_content( $dismissable = true ) {
 		$onclick = ' onclick="radio_display_dismiss_link();"';
 	}
 	$blurb .= '<div id="launch-offer-accept-button" style="display:inline-block; margin-right:10px;">';
-	$blurb .= '<a href="https://radiostation.pro/plugin-launch-discount/" style="font-size: 16px;" target="_blank" class="button-primary"' . $onclick . '>' . esc_html( __( "Yes, I'm in!", 'radio-station' ) ) . '</a>';
+	if ( $prelaunch ) {
+		$blurb .= '<a href="' . RADIO_STATION_PRO_URL . 'plugin-launch-discount/" style="font-size: 16px;" target="_blank" class="button-primary"' . $onclick . '>' . esc_html( __( "Yes, I'm in!", 'radio-station' ) ) . '</a>';
+	} else {
+		$blurb .= '<a href="' . RADIO_STATION_PRO_URL . 'pricing/" style="font-size: 16px;" target="_blank" class="button-primary"' . $onclick . '>' . esc_html( __( 'Go PRO', 'radio-station' ) ) . '</a>';
+	}
 	$blurb .= '</div>';
-	// $blurb .= '<div id="launch-offer-blog-button" style="display:inline-block;">';
-	// $blurb .= '<a href="' . RADIO_STATION_NETMIX_DIR . 'announcing-new-netmix-directory/" style="font-size: 11px;" target="_blank" class="button-secondary">' . esc_html( __( 'More Details', 'radio-station' ) ) . '</a>';
-	$blurb .= '</div><br>';
-	
+
 	$blurb .= '<div id="launch-offer-dismiss-link" style="display:none;">';
 	$blurb .= '<a href="' . esc_url( $accept_dismiss_url ) . '" style="font-size: 12px;" target="radio-station-notice-iframe">' . esc_html( __( 'Thanks, already done.', 'radio-station' ) ) . '</a>';
 	$blurb .= '</div>';
 	$blurb .= '</center><br>';
-
-	// $blurb .= '<div style="font-size: 11px; line-height: 18px;">';
-	// $blurb .= esc_html( __( 'Offer valid until end of July 2020.', 'radio-station' ) ) . '<br>';
-	// $blurb .= esc_html( __( 'Activate your 30 days before it ends!', 'radio-station' ) );
-	// $blurb .= '</div>';
 
 	$blurb .= '</li>';
 

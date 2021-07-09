@@ -206,6 +206,7 @@ We haven't built an interface between Google Calendar and Radio Station just yet
 * Added: Link Override to Show Data with selectable Show Fields
 * Added: Language Archive Shortcode (similar to Genre Archive)
 * Added: Display Linked Override Date List on Show Pages
+* Added: Automatic user showtime conversion and display
 * Fixed: Show Schedule sometimes starting on previous week
 * Fixed: Current Show highlighting timer interval cycling
 * Fixed: Before and After Show classes when no current Show
@@ -682,7 +683,9 @@ We haven't built an interface between Google Calendar and Radio Station just yet
 
 = 2.3.3.9 =
 * Multiple Dates and Times for Schedule Overrides!
+* https://netmix.com/radio-station-2-3-3-9-release-announcement/
 * Link Override to Show with Selective Fields
+* Automatic Visitor Showtime Conversion and Display
 * Language Archive Shortcode for Shows
 * Various Bugfixes and Improvements
 * Updated Freemius SDK and Plugin Loader

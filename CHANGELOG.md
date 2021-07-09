@@ -11,9 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Update: Plugin Panel (1.1.8) with Number Step Min/Max fix
 * Update: Freemius SDK (2.4.2)
 * Improved: Allow for Multiple Override Times (with AJAX Saving)
-* Improved: Markdown Extra Compatibility for PHP 7.4+
+* Improved: Markdown Extra Compatibility for PHP 7.4+ 
 * Added: Link Override to Show Data with selectable Show Fields
 * Added: Language Archive Shortcode (similar to Genre Archive)
+* Added: Display Linked Override Date List on Show Pages
+* Added: Automatic user showtime conversion and display
 * Fixed: Show Schedule sometimes starting on previous week
 * Fixed: Current Show highlighting timer interval cycling
 * Fixed: Before and After Show classes when no current Show
