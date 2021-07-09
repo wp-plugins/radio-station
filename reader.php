@@ -3583,13 +3583,13 @@ if (!class_exists('WordPress_Readme_Parser')) {
  * Add a few extras from GitHub's Markdown implementation. Must be used in a WordPress environment.
  */
 
-if (!class_exists('WPCom_GHF_Markdown_Parser')) {
- class WPCom_GHF_Markdown_Parser extends MarkdownExtra_Parser {
+if (!class_exists('GHF_Markdown_Parser')) {
+ class GHF_Markdown_Parser extends MarkdownExtra_Parser {
 
 	/**
 	 * Hooray somewhat arbitrary numbers that are fearful of 1.0.x.
 	 */
-	const WPCOM_GHF_MARDOWN_VERSION = '0.9.0';
+	const GHF_MARDOWN_VERSION = '0.9.0';
 
 	/**
 	 * Use a [code] shortcode when encountering a fenced code block
