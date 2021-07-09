@@ -55,9 +55,9 @@ class DJ_Upcoming_Widget extends WP_Widget {
 				</select>
 				' . esc_html( __( 'AJAX Load Widget?', 'radio-station' ) ) . '
 			</label>
-        </p>
+		</p>
 
-        <p>
+		<p>
 			<label for="' . esc_attr( $this->get_field_id( 'title' ) ) . '">
 				' . esc_html( __( 'Title', 'radio-station' ) ) . ':
 				<input class="widefat" id="' . esc_attr( $this->get_field_id( 'title' ) ) . '" name="' . esc_attr( $this->get_field_name( 'title' ) ) . '" type="text" value="' . esc_attr( $title ) . '" />
@@ -158,7 +158,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			<input id="' .esc_attr( $this->get_field_id( 'countdown' ) ) . '" name="' . esc_attr( $this->get_field_name( 'countdown' ) ) . '" type="checkbox" ' . checked( $countdown, true, false ) . '/>
 				' . esc_html( __( 'Display Countdown Timer', 'radio-station' ) ) . '
 			</label>
-        </p>';
+		</p>';
 
 		// --- filter and output ---
 		$fields = apply_filters( 'radio_station_upcoming_shows_widget_fields', $fields, $this, $instance );
@@ -226,7 +226,6 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		$link_djs = isset( $instance['link_djs'] ) ? $instance['link_djs'] : '';
 		$encore = isset( $instance['encore'] ) ? $instnace['encore'] : 0;
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : 0;
-		$dynamic = isset( $instance['dynamic'] ) ? $instance['dynamic'] : 0;
 		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : 0;
 
 		// --- set shortcode attributes ---
@@ -250,7 +249,6 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			'link_djs'       => $link_djs,
 			'show_encore'    => $encore,
 			'countdown'      => $countdown,
-			'dynamic'        => $dynamic,
 			'widget'         => 1,
 			'id'             => $id,
 		);
@@ -260,6 +258,9 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			$atts['ajax'] = $ajax;
 		}
 
+		// 2.3.3.9: add filter for default widget attributes
+		$atts = apply_filters( 'radio_station_upcoming_shows_widget_atts', $atts, $instance );
+
 		// --- before widget ---
 		// phpcs:ignore WordPress.Security.OutputNotEscaped
 		echo $args['before_widget'];
@@ -267,8 +268,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		// --- open widget container ---
 		// 2.3.0: add unique id to widget
 		// 2.3.2: add class to widget
-		$id = 'upcoming-shows-widget-' . $id;
-		echo '<div id="' . esc_attr( $id ) . '" class="upcoming-shows-wrap widget">';
+		echo '<div id="upcoming-shows-widget-' . esc_attr( $id ) . '" class="widget">';
 
 		// --- output widget title ---
 		// phpcs:ignore WordPress.Security.OutputNotEscaped
@@ -278,6 +278,9 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		}
 		// phpcs:ignore WordPress.Security.OutputNotEscaped
 		echo $args['after_title'];
+
+		// 2.3.3.9: add div wrapper for widget contents
+		echo '<div id="upcoming-shows-widget-contents-' . esc_attr( $id ) . '" class="upcoming-shows-wrap">';
 
 		// --- get default display output ---
 		// 2.3.0: use shortcode to generate default widget output
@@ -292,6 +295,9 @@ class DJ_Upcoming_Widget extends WP_Widget {
 			// phpcs:ignore WordPress.Security.OutputNotEscaped
 			echo $output;
 		}
+
+		// --- close widget contents wrapper ---
+		echo '</div>';
 
 		// --- close widget container ---
 		echo '</div>';

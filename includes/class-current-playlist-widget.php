@@ -51,7 +51,7 @@ class Playlist_Widget extends WP_Widget {
 				</select>
 				' . esc_html( __( 'AJAX Load Widget?', 'radio-station' ) ) . '
 			</label>
-        </p>
+		</p>
 
 		<p>
 			<label for="' . esc_attr( $this->get_field_id( 'title' ) ) . '">
@@ -114,7 +114,7 @@ class Playlist_Widget extends WP_Widget {
 			<input id="' .esc_attr( $this->get_field_id( 'countdown' ) ) . '" name="' . esc_attr( $this->get_field_name( 'countdown' ) ) . '" type="checkbox" ' . checked( $countdown, true, false ) . '>
 				' . esc_html( __( 'Display Countdown Timer', 'radio-station' ) ) . '
 			</label>
-        </p>';
+		</p>';
 
 		// --- filter and output ---
 		// 2.3.0: filter to allow for extra fields
@@ -175,7 +175,6 @@ class Playlist_Widget extends WP_Widget {
 		$comments = $instance['comments'];
 		$hide_empty = isset( $instance['hide_empty'] ) ? $instance['hide_empty'] : 1;
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : 0;
-		$dynamic = isset( $instance['dynamic'] ) ? $instance['dynamic'] : 1;
 		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : 0;
 
 		// --- set shortcode attributes for display ---
@@ -188,7 +187,6 @@ class Playlist_Widget extends WP_Widget {
 			'label'     => $label,
 			'comments'  => $comments,
 			'countdown' => $countdown,
-			'dynamic'   => $dynamic,
 			'widget'    => 1,
 			'id'        => $id,
 		);
@@ -197,6 +195,9 @@ class Playlist_Widget extends WP_Widget {
 		if ( in_array( $ajax, array( 'on', 'off' ) ) ) {
 			$atts['ajax'] = $ajax;
 		}
+
+		// 2.3.3.9: add filter for default widget attributes
+		$atts = apply_filters( 'radio_station_current_playlist_widget_atts', $atts, $instance );
 
 		// --- get default display output ---
 		// 2.3.0: use shortcode to generate default widget output
@@ -216,8 +217,7 @@ class Playlist_Widget extends WP_Widget {
 			// --- open widget container ---
 			// 2.3.0: add unique id to widget
 			// 2.3.2: add class to widget
-			$id = 'current-playlist-widget-' . $id;
-			echo '<div id="' . esc_attr( $id ) . '" class="current-playlist-wrap widget">';
+			echo '<div id="current-playlist-widget-' . esc_attr( $id ) . '" class="widget">';
 
 			// --- output widget title ---
 			// phpcs:ignore WordPress.Security.OutputNotEscaped
@@ -228,9 +228,21 @@ class Playlist_Widget extends WP_Widget {
 			// phpcs:ignore WordPress.Security.OutputNotEscaped
 			echo $args['after_title'];
 
+			// 2.3.3.9: add div wrapper for widget contents
+			echo '<div id="current-playlist-widget-contents-' . esc_attr( $id ) . '" class="current-playlist-wrap">';
+
+			// --- check for widget output override ---
+			// 2.3.3.9: added missing override filter
+			$output = apply_filters( 'radio_station_current_playlist_widget_override', $output, $args, $atts );
+
 			// --- output widget display ---
-			// phpcs:ignore WordPress.Security.OutputNotEscaped
-			echo $output;
+			if ( $output ) {
+				// phpcs:ignore WordPress.Security.OutputNotEscaped
+				echo $output;
+			}
+		
+			// --- close widget contents wrapper ---
+			echo '</div>';
 
 			// --- close widget container ---
 			echo '</div>';

@@ -14,7 +14,7 @@ Requires at least: 3.3.1
 
 Tested up to: 5.6.2
 
-Stable tag: 2.3.3.8
+Stable tag: 2.3.3.9
 
 License: GPLv2 or later
 
@@ -188,22 +188,21 @@ You may translate the plugin into another language. Please visit our [WordPress 
 
 ## Upgrade Notices
 
+#### 2.3.3.9
+* Multiple Dates and Times for Schedule Overrides!
+* https://netmix.com/radio-station-2-3-3-9-release-announcement/
+* Link Override to Show with Selective Fields
+* Automatic Visitor Showtime Conversion and Display
+* Language Archive Shortcode for Shows
+* Various Bugfixes and Improvements
+* Updated Freemius SDK and Plugin Loader
+
 #### 2.3.3.8
-* Update: Plugin Panel (1.1.7) with Image and Color Picker fields
-* Added: Stream Format and Fallback/Format selection setting
-* Added: Station Email Address setting with default display option
-* Added: Section order filtering for Master Schedule Views
-* Added: Section display filtering for Master Schedule Views
-* Added: Section display filtering for Widget sections
-* Added: Show image alignment attribute to Schedule Tabs View
-* Added: Show Description/Excerpt to Show Data Endpoint (via querystring)
-* Added: Reduced opacity for past Shows on Schedule Tab/Table Views
-* Added: Screen Reader text for Show icons on Show Page
-* Fixed: Display Widget Countdown when no Current Show/Playlist
-* Fixed: Check for explicit singular.php template usage setting
-* Fixed: Access to Shows Data via querystring of Show ID/name
-* Fixed: Shows Data for Genres/Languages querystring of ID/name
-* Fixed: Changed stable tag from trunk to version number to fix translations issue
+* Updated Plugin Panel Library
+* Added Stream Format selection setting
+* Added Station email address setting with default display option
+* Added Section order filtering for Master Schedules and Widgets
+* Added Show image alignment attribute to Schedule Tabs View
 
 #### 2.3.3.7
 * Updated Freemius SDK and Plugin Loader libraries

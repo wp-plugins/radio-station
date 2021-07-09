@@ -399,17 +399,21 @@ function radio_station_get_now_playing( $time = false ) {
 	if ( !$current_show ) {
 		return false;
 	}
+	$show_id = $current_show['show']['id'];
+
+	// TODO: improve handling of playlists for overrides
 	if ( isset( $current_show['override'] ) && $current_show['override'] ) {
 		$playlist = apply_filters( 'radio_station_override_now_playing', false, $current_show['override'] );
 		return $playlist;
 	}
-	$show_id = $current_show['show']['id'];
 	
+	// 2.3.3.9: fix to assign current show shifts to playlist data
 	// TODO: match current playlist to assigned show shift ?
-	if ( isset( $current_show['shifts'] ) ) {
-		$shifts = $current_show['shifts'];
-	}
 	$playlist = array();
+	$shifts = get_post_meta( $show_id, 'show_sched', true );
+	if ( $shifts ) {
+		$playlist['shifts'] = $shifts;
+	}
 
 	// --- grab the most recent playlist for the current show ---
 	$args = array(
@@ -431,7 +435,7 @@ function radio_station_get_now_playing( $time = false ) {
 	$playlist['query'] = $args;
 	$playlist['posts'] = $playlist_posts;
 
-	// TODO: check for playlist linked to this shift or date?
+	// TODO: check for playlist linked to this shift / date?
 
 	if ( $playlist_posts && is_array( $playlist_posts ) && ( count( $playlist_posts ) > 0 ) ) {
 

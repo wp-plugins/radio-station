@@ -2,6 +2,10 @@
 
 ***
 
+## Settings Filters
+
+To programmatically override any of the Plugin Settings available from the Settings Page, see [Options Documentation](./Options.md) 
+
 ## Data Filters
 
 There are filters throughout the plugin that allow you to override data values and plugin output. We employ the practice of adding as many of these as possible to allow users of the plugin to customize it's behaviour without needing to modify the plugin's code - as these kind of modifications are overwritten with plugin updates.
@@ -10,7 +14,7 @@ You can add your own custom filters via a Code Snippets plugin (which has the ad
 
 ## Finding Filters
 
-You can find these filters by searching any of PHP plugin files for `apply_filters( 'radio_`. 
+You can find these filters by searching any of the PHP plugin files for: `apply_filters( 'radio_`
 
 ## Filter Values and Arguments
 
@@ -441,3 +445,10 @@ Here is a full list of available filters within the plugin, grouped by file and 
 | |`radio_station_show_latest_posts_label` | ` $label` | `$post_id`|
 | |`radio_station_show_page_latest_shortcode` | ` $shortcode` | `$post_id`|
 | |`radio_station_show_page_section_order` | ` $section_order` | `$post_id`|
+
+
+## [Pro] Pro Filter List
+
+Below is a list of filters that are available within [Radio Station Pro](https://radiostation.pro).
+
+*TODO*

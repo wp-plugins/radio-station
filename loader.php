@@ -5,7 +5,7 @@
 // ===========================
 //
 // --------------
-// Version: 1.1.7
+// Version: 1.1.8
 // --------------
 // Note: Changelog and structure at end of file.
 //
@@ -1390,8 +1390,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						'support'    => $args['support'],
 						'account'    => $args['account'],
 					),
-				);
-
+				);		
+				
 				// --- maybe add plugin submenu to parent menu ---
 				if ( isset( $args['parentmenu'] ) ) {
 					$settings['menu']['parent'] = array( 'slug' => $args['parentmenu'] );
@@ -1414,6 +1414,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 				// --- add Freemius connect message filter ---
 				$this->freemius_connect();
+				
+				// --- fire Freemius loaded action ---
+				do_action( $args['namespace'] . '_loaded' );
 			}
 		}
 
@@ -2125,12 +2128,13 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 			// --- number input step script ---
 			// 1.0.9: added to script array
+			// 1.1.8: fix to check for no mix or max value
 			$script = "function settings_number_step(updown, id, min, max, step) {
 				if (updown == 'up') {multiplier = 1;} else if (updown == 'down') {multiplier = -1;}
 				current = parseInt(document.getElementById(id).value);
 				newvalue = current + (multiplier * parseInt(step));
-				if (newvalue < parseInt(min)) {newvalue = min;}
-				if (newvalue > parseInt(max)) {newvalue = max;}
+				if ((min !== false) && (newvalue < parseInt(min))) {newvalue = min;}
+				if ((max !== false) && (newvalue > parseInt(max))) {newvalue = max;}
 				document.getElementById(id).value = newvalue;
 			}";
 			$this->scripts[] = $script;
@@ -2576,12 +2580,12 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						if ( isset( $option['min'] ) ) {
 							$min = $option['min'];
 						} else {
-							$min = false;
+							$min = 'false';
 						}
 						if ( isset( $option['max'] ) ) {
 							$max = $option['max'];
 						} else {
-							$max = false;
+							$max = 'false';
 						}
 						if ( isset( $option['step'] ) ) {
 							$step = $option['step'];
@@ -3054,6 +3058,9 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // =========
 // CHANGELOG
 // =========
+
+// == 1.1.8 ==
+// - fix to number step if no min or max value
 
 // == 1.1.7 ==
 // - added media library upload image field type

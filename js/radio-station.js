@@ -15,14 +15,14 @@ function radio_scroll_to(id) {
 }
 
 /* Get Day of Week */
-function radio_get_weekday(dayweek) {
-	if (dayweek == '0') {day = 'sunday';}
-	if (dayweek == '1') {day = 'monday';}
-	if (dayweek == '2') {day = 'tuesday';}
-	if (dayweek == '3') {day = 'wednesday';}
-	if (dayweek == '4') {day = 'thursday';}
-	if (dayweek == '5') {day = 'friday';}
-	if (dayweek == '6') {day = 'saturday';}
+function radio_get_weekday(x) {
+	if (x == '0') {day = 'sunday';}
+	else if (x == '1') {day = 'monday';}
+	else if (x == '2') {day = 'tuesday';}
+	else if (x == '3') {day = 'wednesday';}
+	else if (x == '4') {day = 'thursday';}
+	else if (x == '5') {day = 'friday';}
+	else if (x == '6') {day = 'saturday';}
 	return day;
 }
 
@@ -47,11 +47,11 @@ radio_cookie = {
 					return JSON.parse(c.substring(nameeq.length, c.length));
 				}
 			}
-		}	
+		}
 		return null;
 	},
 	delete : function(name) {
-		setCookie('radio_' + name, "", -1);
+		document.cookie = 'radio_' + name +  '=; expires=-1; path=/';
 	}
 }
 
@@ -66,26 +66,121 @@ var radio_resize_debounce = (function () {
 })();
 
 /* User Timezone Display */
-if (typeof jQuery == 'function') {
-	jQuery(document).ready(function() {
-		if (jQuery('.radio-user-timezone').length) {
-			userdatetime = new Date();
-			useroffset  = -(userdatetime.getTimezoneOffset());
-			if ((useroffset * 60) == radio.timezone.offset) {return;}
-			if (typeof jstz == 'function') {tz = jstz.determine().name();}
-			else {tz = Intl.DateTimeFormat().resolvedOptions().timeZone;}
-			if (tz.indexOf('/') > -1) {
-				tz = tz.replace('/', ', '); tz = tz.replace('_',' ');
-				houroffset = parseInt(useroffset);
-				if (houroffset == 0) {userzone = ' [UTC]';}
-				else {
-					houroffset = houroffset / 60;
-					if (houroffset > 0) {tz += ' [UTC+'+houroffset+']';}
-					else {tz += ' [UTC'+houroffset+']';}
-				}
-				jQuery('.radio-user-timezone').html(tz);
-				jQuery('.radio-user-timezone-title').show();
+function radio_timezone_display() {
+	if (typeof radio_display_override == 'function') {
+		override = radio_display_override();
+		if (override) {return;}
+	}
+	if (jQuery('.radio-user-timezone').length) {
+		userdatetime = new Date();
+		useroffset = -(userdatetime.getTimezoneOffset());
+		if ((useroffset * 60) == radio.timezone.offset) {return;}
+		if (typeof jstz == 'function') {tz = jstz.determine().name();}
+		else {tz = Intl.DateTimeFormat().resolvedOptions().timeZone;}
+		if (tz.indexOf('/') > -1) {
+			tz = tz.replace('/', ', '); tz = tz.replace('_',' ');
+			houroffset = parseInt(useroffset);
+			if (houroffset == 0) {userzone = ' [UTC]';}
+			else {
+				houroffset = houroffset / 60;
+				if (houroffset > 0) {tz += ' [UTC+'+houroffset+']';}
+				else {tz += ' [UTC'+houroffset+']';}
+			}
+			jQuery('.radio-user-timezone').html(tz).css('display','inline-block');
+			jQuery('.radio-user-timezone-title').css('display','inline-block');
+		}
+	}
+}
+
+/* Retrigger Responsive Schedules */
+function radio_responsive_schedules() {
+	if (jQuery('#master-program-schedule').length) {radio_table_responsive(false);}
+	if (jQuery('#master-schedule-tabs').length) {radio_tabs_responsive(false);}
+	if (jQuery('#master-schedule-grid').length) {radio_grid_responsive(false);}
+	if (jQuery('#master-schedule-calendar').length) {radio_calendar_responsive(false);}
+}
+
+/* Update Time Displays */
+function radio_convert_times() {
+	if (!radio.convert_show_times) {return;}
+	/* schedule: .show-time; widgets: .current-shift, .upcoming-show-schedule; show page: .show-shift-time, .override-time */
+	jQuery('.show-time, .current-shift, .upcoming-show-shift, .override-time, .show-shift-time').each(function() {
+		start = jQuery(this).find('.rs-start-time');
+		end = jQuery(this).find('.rs-end-time');
+		starthtml = start.html(); starttime = start.attr('data'); startformat = start.attr('data-format');
+		endhtml = end.html(); endtime = end.attr('data'); endformat = end.attr('data-format');
+		startdisplay = radio_user_time(starttime, startformat);
+		enddisplay = radio_user_time(endtime, endformat);
+		if ((starthtml != startdisplay) || (endhtml != enddisplay)) {
+			if (radio.debug) {console.log('Start: '+starthtml+' => '+startdisplay+' - End: '+endhtml+' => '+enddisplay);}
+			showusertime = jQuery(this).parent().find('.show-user-time').show();
+			showusertime.find('.rs-start-time').html(startdisplay);
+			showusertime.find('.rs-end-time').html(enddisplay);
+		} else {jQuery(this).parent().find('.show-user-time').hide();}
+		if (jQuery(this).find('.rs-start-date').length) {
+			date = jQuery(this).find('.rs-start-date');
+			datehtml = date.html(); datetime = date.attr('data'); dateformat = date.attr('data-format');
+			datedisplay = radio_user_time(datetime, dateformat);
+			if (datehtml == datedisplay) {datedisplay = '';}
+			if (radio.debug) {console.log('Date: '+datehtml+' => '+datedisplay);}
+			showusertime = jQuery(this).parent().find('.show-user-time');
+			showusertime.find('.rs-start-date').html(datedisplay);
+		}
+	});
+	radio_responsive_schedules();
+}
+
+/* Convert To Time Display */
+function radio_user_time(time, format) {
+	if (typeof radio_user_override == 'function') {
+		override = radio_user_override(time, format);
+		if (override) {return override;}
+	}
+	datetime = new Date(time * 1000);
+	zonetime = moment(datetime.toISOString());
+	formatted = radio_convert_time(zonetime, format);
+	return formatted;
+}
+
+/* Convert Time to Formatted Time */
+function radio_convert_time(zonetime, format) {
+	formatted = '';
+	for (var i = 0; i < format.length; i++) {
+	    k = format.charAt(i);
+	    v = radio_format_key(zonetime, k);
+	    formatted += v;
+	}
+	return formatted;
+}
+
+/* Format Time Key */
+function radio_format_key(zonetime, key) {
+	v = key;
+	for (i in radio.moment_map) {
+		if (i == key) {
+			k = radio.moment_map[i];
+			v = zonetime.format(k);
+			if (((i == 'd') || (i == 'm') || (i == 'h') || (i == 'H') || (i == 'i') || (i == 's')) && (v < 10)) {v = '0'+v;}
+			else if (i == 'D') {v = radio.labels.sdays[v];}
+			else if (i == 'l') {v = radio.labels.days[v];}
+			else if (i == 'N') {v++;}
+			else if (i == 'S') {d = zonetime.format('D'); v.replace(d, '');}
+			else if (i == 'F') {v = radio.labels.months[v];}
+			else if (i == 'M') {v = radio.labels.smonths[v];}
+			else if ((i == 'a') || (i == 'A')) {
+				if (v.substr(0,1) == 'a') {v = radio.units.am;}
+				if (v.substr(0,1) == 'p') {v = radio.units.pm;}
+				if (i == 'A') {v = v.toUpperCase();}
 			}
 		}
+	}
+	return v;
+}
+
+/* Pageload Function */
+if (typeof jQuery == 'function') {
+	jQuery(document).ready(function() {
+		radio_timezone_display();
+		radio_convert_times();
 	});
 }

@@ -7,6 +7,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### 2.3.3.9
+* Update: Plugin Panel (1.1.8) with Number Step Min/Max fix
+* Update: Freemius SDK (2.4.2)
+* Improved: Allow for Multiple Override Times (with AJAX Saving)
+* Improved: Markdown Extra Compatibility for PHP 7.4+ 
+* Added: Link Override to Show Data with selectable Show Fields
+* Added: Language Archive Shortcode (similar to Genre Archive)
+* Added: Display Linked Override Date List on Show Pages
+* Added: Automatic user showtime conversion and display
+* Fixed: Show Schedule sometimes starting on previous week
+* Fixed: Current Show highlighting timer interval cycling
+* Fixed: Before and After Show classes when no current Show
+* Fixed: Shows Data Endpoint 24 Hour Shift Format and Encore Switch
+* Fixed: Multiple host separator display in Current Show Widget
+* Fixed: Playlist Widget playlist ended label when no next playlist
+* Fixed: Conflicting duplicate filter name for Show Avatar
+* Fixed: Time conversions where start/finish Show/Override is equal
+* Fixed: Show page subarchive lists pagination button arrow display
+* Fixed: Show Shifts with same start time overwriting bug
+
 ### 2.3.3.8
 * Update: Plugin Panel (1.1.7) with Image and Color Picker fields
 & Documentation: Full Plugin Filter List added to docs/Filters.md

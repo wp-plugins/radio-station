@@ -11,9 +11,15 @@
 	font-size: 0.8em;
 }
 
+.show-user-time {
+	display: none;
+	font-style: italic;
+}
+
+
 /* Timezone Shortcode */
 /* ------------------ */
-.radio-timezone-title, .radio-timezone, .radio-user-timezone-title, .radio-user-timezone {
+.radio-timezone-title, .radio-timezone {
 	display: inline-block;
 }
 
@@ -21,10 +27,14 @@
 	font-weight: bold;
 }
 
-.radio-user-timezone-title {
+.radio-user-timezone-title, .radio-user-timezone {
 	display: none;
-	margin-left: 30px;
 }
+
+.radio-user-timezone {
+	font-style: italic;
+}
+
 
 /* Clock Shortcode */
 /* --------------- */
@@ -37,12 +47,20 @@
 	min-width: 100px;
 }
 
+.radio-timezone-title, .radio-user-timezone-title {
+	min-width: 120px;
+}
+
 .radio-server-time, .radio-user-time, .radio-server-date, .radio-user-date {
 	margin-left: 10px;
 }
 
 .radio-server-zone, .radio-user-zone {
 	margin-left: 20px;
+}
+
+.radio-user-time, .radio-user-date, .radio-user-zone {
+    font-style: italic;
 }
 
 .radio-station-clock-widget .radio-station-server-clock, .radio-station-clock-widget .radio-station-user-clock {
@@ -63,7 +81,7 @@
 /* Archive Shortcodes */
 /* ------------------ */
 
-.genre-archive {
+.genre-archive, .language-archive {
 	clear: both;
 }
 
@@ -73,7 +91,7 @@
 }
 
 .show-archive-item, .playlist-archive-item, .override-archive-item {
-    list-style: none;
+	list-style: none;
 	clear: both;
 	padding-top: 10px;
 	padding-bottom: 10px;
@@ -84,9 +102,14 @@
 	padding-right: 20px;
 }
 
-.genre-archive .show-archive-item-title {
-    font-size: 1em;
-    margin-bottom: 5px;
+.genre-archive .show-archive-item-title, .language-archive .show-archive-item-title {
+	font-size: 1em;
+	margin-bottom: 5px;
+}
+
+.genre-archive .show-archive-item-thumbnail, .language-archive .show-archive-item-thumbnail {
+	width: 120px;
+	height: auto;
 }
 
 .show-archive-item-title, .playlist-archive-item-title, .override-archive-item-title {
@@ -104,8 +127,8 @@
 .show-post-thumbnail, .show-post-info,
 .show-playlist-thumbnail, .show-playlist-info,
 .show-episode-thumbnail, .show-episode-info {
-    display: table-cell;
-    vertical-align: top;
+	display: table-cell;
+	vertical-align: top;
 }
 
 .show-post-thumbnail, .show-playlist-thumbnail, .show-episode-thumbnail {
@@ -134,6 +157,11 @@
 	font-size: 1em;
 	color: #444444;
 	padding: 5px;
+}
+
+.show-pagination-button.arrow-button {
+	padding-top: 4px;
+	padding-bottom: 6px;
 }
 
 .show-pagination-button.active {
@@ -195,7 +223,7 @@ ul.current-show-list, ul.current-show-list li, ul.upcoming-shows-list, ul.upcomi
 }
 
 .current-show-countdown .rs-label, .upcoming-show-countdown .rs-label {
-    font-weight: bold;
+	font-weight: bold;
 }
 
 .current-show-countdown .rs-hours, .current-show-countdown .rs-minutes, .current-show-countdown .rs-seconds,
@@ -212,36 +240,40 @@ ul.current-show-list, ul.current-show-list li, ul.upcoming-shows-list, ul.upcomi
 
 .current-show-desc, .on-air-dj-desc,
 .current-show-playlist, .on-air-dj-playlist {
-    font-size: 0.8em;
-    margin-top: 5px;
-    margin-bottom: 5px;
+	font-size: 0.8em;
+	margin-top: 5px;
+	margin-bottom: 5px;
 }
 
 .current-show-schedule, .upcoming-show-schedule, .on-air-dj-schedule {
-    font-size: 0.85em;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    overflow: hidden;
+	font-size: 0.85em;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	overflow: hidden;
 }
 
 .current-show-shifts, .upcoming-show-shifts, .on-air-dj-sched {
+	font-size: 0.85em;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.current-show .show-user-time, .upcoming-show-schedule .show-user-time {
     font-size: 0.85em;
-    margin-top: 5px;
-    margin-bottom: 5px;
 }
 
 .current-shift-list, .current-shift-list-item {
-    margin: 0 !important;
-    padding: 0 !important;
+	margin: 0 !important;
+	padding: 0 !important;
 }
 
 .current-shift-list .current-shift-list-item {
-    list-style: disc;
-    text-indent: 20px;
+	list-style: disc;
+	text-indent: 20px;
 }
 
 .current-show-schedule .current-show-shifts.current-shift {
-    font-style: italic;
+	font-style: italic;
 }
 
 .upcoming-shows-list .upcoming-show-title, .on-air-upcoming-list .on-air-dj-title {

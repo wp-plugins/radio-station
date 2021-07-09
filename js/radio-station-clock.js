@@ -3,21 +3,28 @@
 /* ------------------ */
 
 /* Convert Date Time to Time String */
-function radio_time_string(datetime, format, seconds) {
+function radio_time_string(datetime, hours, seconds, override) {
 
-	h = datetime.getHours();
-	m = datetime.getMinutes();
-	if (m < 10) {m = '0'+m;}
+	if (override) {
+		isostring = datetime.toISOString();
+		h = parseInt(isostring.substr(11,2));
+		m = parseInt(isostring.substr(14,2));
+	} else {
+		h = datetime.getHours();
+		m = datetime.getMinutes();
+	}
 
 	if (seconds) {
-		s = datetime.getSeconds();
+		if (override) {s = parseInt(isostring.substr(17,2));}
+		else {s = datetime.getSeconds();}
 		if (s < 10) {s = '0'+s;}
 	}
 
-	if (format == 12) {
+	if (m < 10) {m = '0'+m;}
+	if (hours == 12) {
 		if ( h < 12 ) {mer = radio.units.am;}
-		if ( h == 0 ) {h = '12';}
 		if ( h > 11 ) {mer = radio.units.pm;}
+		if ( h == 0 ) {h = '12'; mer = radio.units.am;}
 		if ( h > 12 ) {h = h - 12;}
 	} else {
 		mer = '';
@@ -36,18 +43,24 @@ function radio_time_string(datetime, format, seconds) {
 }
 
 /* Convert Date Time to Date String */
-function radio_date_string(datetime, day, date, month) {
+function radio_date_string(datetime, day, date, month, override) {
+	if (override) {
+		isostring = datetime.toISOString();
+		m = parseInt(isostring.substr(5,2)) - 1;
+		dd = parseInt(isostring.substr(8,2));
+		d = datetime.getDay(); /* TODO */
+	} else {
+		d = datetime.getDay();
+		m = datetime.getMonth();
+		dd = datetime.getDate();
+	}
 	datestring = '';
 	if (day != '') {
-		d = datetime.getDay();
 		if (day == 'short') {datestring = radio.labels.sdays[d];}
 		else {datestring += radio.labels.days[d];}
 	}
-	if (date) {
-		datestring += ' '+datetime.getDate();
-	}
+	if (date) {datestring += ' '+dd;}
 	if (month != '') {
-		m = datetime.getMonth();
 		if (month == 'short') {datestring += ' '+radio.labels.smonths[m];}
 		else {datestring += ' '+radio.labels.months[m];}
 	}
@@ -59,35 +72,54 @@ function radio_clock_date_time(init) {
 
 	/* user datetime / timezone */
 	userdatetime = new Date();
+	useroffset  = -(userdatetime.getTimezoneOffset());
 	if (typeof jstz == 'function') {userzone = jstz.determine().name();}
 	else {userzone = Intl.DateTimeFormat().resolvedOptions().timeZone;}
-	userzone = userzone.replace('/',', ');
-	userzone = userzone.replace('_',' ');
+
+	/* server datetime / offset */
+	serverdatetime = new Date();
+	serveroffset = ( -(useroffset) * 60) + radio.timezone.offset;
+	serverdatetime.setTime(userdatetime.getTime() + (serveroffset * 1000));
+
+	/* get timezone override */
+	override = false;
+	if (typeof radio_timezone_override == 'function') {
+		override = radio_timezone_override();
+		if (radio.debug) {console.log('User Timezone Selection Override: '+override);}
+		if (override) {
+			userzone = override;
+			offset = radio_offset_override(false);
+			userdatetime.setTime(userdatetime.getTime() + (offset * 60 * 1000));
+			useroffset = offset;
+		}
+	}
 
 	/* user timezone offset */
-	useroffset  = -(userdatetime.getTimezoneOffset());
+	userzone = userzone.replace('/',', ');
+	userzone = userzone.replace('_',' ');
 	houroffset = parseInt(useroffset);
 	if (houroffset == 0) {userzone += ' [UTC]';}
 	else {
+		if ((typeof radio.timezone.zonename_override != 'undefined') && radio.timezone.zonename_override) {
+			userzone += ' ['+radio.timezone.zonename_override+']';
+		}
 		houroffset = houroffset / 60;
 		if (houroffset > 0) {userzone += ' [UTC+'+houroffset+']';}
 		else {userzone += ' [UTC'+houroffset+']';}
 	}
 
-	/* server datetime / offset */
-	serverdatetime = new Date();
-	serveroffset = ( -(useroffset) * 60) + radio.timezone.offset;
-	serverdatetime.setTime(userdatetime.getTime() + (serveroffset * 1000) );
-
 	/* server timezone */
 	serverzone = '';
-	if (typeof radio.timezone.location != 'undefined') {
+	if (radio.timezone.utczone) {
+		serverzone += ' [UTC'+radio.timezone.utc+']';
+	} else {
 		serverzone = radio.timezone.location;
 		serverzone = serverzone.replace('/',', ');
 		serverzone = serverzone.replace('_',' ');
-	}
-	if (typeof radio.timezone.code != 'undefined') {
-		serverzone += ' ['+radio.timezone.code+']';
+		if (typeof radio.timezone.code != 'undefined') {
+			serverzone += ' ['+radio.timezone.code+']';
+		}
+		serverzone += ' ['+radio.timezone.utc+']';
 	}
 
 	/* loop clock instances */
@@ -96,7 +128,7 @@ function radio_clock_date_time(init) {
 		if (clock[i]) {
 			classes = clock[i].className;
 			seconds = false; day = ''; date = false; month = ''; zone = false;
-			if (classes.indexOf('format-24') > -1) {format = 24;} else {format = 12;}
+			if (classes.indexOf('format-24') > -1) {hours = 24;} else {hours = 12;}
 			if (classes.indexOf('seconds') > -1) {seconds = true;}
 			if (classes.indexOf('day') > -1) {
 				if (classes.indexOf('day-short') > -1) {day = 'short';} else {day = 'full';}
@@ -106,10 +138,10 @@ function radio_clock_date_time(init) {
 				if (classes.indexOf('month-short') > -1) {month = 'short';} else {month = 'full';}
 			}
 			if (classes.indexOf('zone') > -1) {zone = true;}
-			servertime = radio_time_string(serverdatetime, format, seconds);
-			serverdate = radio_date_string(serverdatetime, day, date, month);
-			usertime = radio_time_string(userdatetime, format, seconds);
-			userdate = radio_date_string(userdatetime, day, date, month);
+			servertime = radio_time_string(serverdatetime, hours, seconds, false);
+			serverdate = radio_date_string(serverdatetime, day, date, month, false);
+			usertime = radio_time_string(userdatetime, hours, seconds, override);
+			userdate = radio_date_string(userdatetime, day, date, month, override);
 
 			/* loop server / user clocks */
 			clocks = clock[i].children;
@@ -142,7 +174,7 @@ function radio_clock_date_time(init) {
 	}
 
 	/* clock loop */
-	setTimeout('radio_clock_date_time();', 1000);
+	setTimeout(radio_clock_date_time, 1000);
 	return true;
 }
 

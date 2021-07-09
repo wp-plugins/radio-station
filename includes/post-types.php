@@ -10,8 +10,8 @@
 // -- Show
 // -- Playlist
 // -- Override
-// * DJ / Host
-// * Producer
+// -- DJ / Host
+// -- Producer
 // - Set CPTs to Classic Editor
 // - Add Theme Thumbnail Support
 // - Add Admin Bar Add New Links
@@ -20,6 +20,8 @@
 // - Register Show Taxonomies
 // -- Genre Taxonomy
 // -- Language Taxonomy
+// === Schedule Override Filters ===
+// - Add Override Template Filters
 
 
 // ------------------
@@ -64,7 +66,8 @@ function radio_station_create_post_types() {
 		'taxonomies'        => array( RADIO_STATION_GENRES_SLUG, RADIO_STATION_LANGUAGES_SLUG ),
 		'hierarchical'      => false,
 		// 2.3.0: added custom field and revision support
-		'supports'          => array( 'title', 'editor', 'thumbnail', 'comments', 'custom-fields', 'revisions' ),
+		// 2.3.3.9: added post excerpt support
+		'supports'          => array( 'title', 'editor', 'excerpt', 'thumbnail', 'comments', 'custom-fields', 'revisions' ),
 		'can_export'        => true,
 		// 2.3.0: added show archives support
 		'has_archive'       => 'shows',
@@ -158,7 +161,8 @@ function radio_station_create_post_types() {
 		'hierarchical'      => false,
 		// 2.3.0: added editor support for override description
 		// 2.3.0: added custom field and revision support
-		'supports'          => array( 'title', 'editor', 'thumbnail', 'custom-fields', 'revisions' ),
+		// 2.3.3.9: added post excerpt support
+		'supports'          => array( 'title', 'editor', 'excerpt', 'thumbnail', 'custom-fields', 'revisions' ),
 		'can_export'        => true,
 		'has_archive'       => false,
 		'rewrite'           => array(
@@ -180,20 +184,21 @@ function radio_station_create_post_types() {
 	// (so that rewrite rules and query vars are added for it)
 	$ui = apply_filters( 'radio_station_host_interface', false );
 	$post_type = array(
+		// 2.3.3.9: fix to labels for template output
 		'labels'              => array(
-			'name'               => __( 'Host Profiles', 'radio-station' ),
-			'singular_name'      => __( 'Host Profile', 'radio-station' ),
-			'add_new'            => __( 'New Host Profile', 'radio-station' ),
+			'name'               => __( 'Hosts', 'radio-station' ),
+			'singular_name'      => __( 'Host', 'radio-station' ),
+			'add_new'            => __( 'Add New Host Profile', 'radio-station' ),
 			'add_new_item'       => __( 'Add Host Profile', 'radio-station' ),
 			'edit_item'          => __( 'Edit Host Profile', 'radio-station' ),
 			'new_item'           => __( 'New Host Profile', 'radio-station' ),
 			'view_item'          => __( 'View Host Profile', 'radio-station' ),
 			'archive_title'      => __( 'Show Hosts', 'radio-station' ),
 			// 2.3.2: added missing post type labels
-			'search_items'       => __( 'Search Hosts', 'radio-station' ),
-			'not_found'          => __( 'No Hosts found', 'radio-station' ),
-			'not_found_in_trash' => __( 'No Hosts found in Trash', 'radio-station' ),
-			'all_items'          => __( 'All Hosts', 'radio-station' ),
+			'search_items'       => __( 'Search Host Profiles', 'radio-station' ),
+			'not_found'          => __( 'No Host Profiles found', 'radio-station' ),
+			'not_found_in_trash' => __( 'No Host Profiles found in Trash', 'radio-station' ),
+			'all_items'          => __( 'All Host Profiles', 'radio-station' ),
 		),
 		'show_ui'             => $ui,
 		'show_in_menu'        => false,
@@ -204,7 +209,10 @@ function radio_station_create_post_types() {
 		'exclude_from_search' => false,
 		'public'              => true,
 		'hierarchical'        => false,
-		'can_export'          => false,
+		// 2.3.3.9: set can_export true
+		'can_export'          => true,
+		// 2.3.3.9: added all post type supports
+		'supports'            => array( 'title', 'editor', 'excerpt', 'thumbnail', 'custom-fields', 'revisions' ),
 		'has_archive'         => 'hosts',
 		'rewrite'             => array(
 			'slug'       => 'host',
@@ -213,10 +221,10 @@ function radio_station_create_post_types() {
 		),
 		'query_var'           => true,
 		'capability_type'     => 'host',
-		'map_meta_cap'        => false,
+		// 2.3.3.9: set map_meta_cap true
+		'map_meta_cap'        => true,
 	);
 	$post_type = apply_filters( 'radio_station_post_type_host', $post_type );
-	// TODO: change Host post type slug to rs-host
 	register_post_type( RADIO_STATION_HOST_SLUG, $post_type );
 
 	// --------
@@ -226,20 +234,21 @@ function radio_station_create_post_types() {
 	// (so that rewrite rules and query vars are added for it)
 	$ui = apply_filters( 'radio_station_producer_interface', false );
 	$post_type = array(
+		// 2.3.3.9: fix to labels for template output
 		'labels'              => array(
-			'name'               => __( 'Producer Profiles', 'radio-station' ),
-			'singular_name'      => __( 'Producer Profile', 'radio-station' ),
-			'add_new'            => __( 'New Producer Profile', 'radio-station' ),
+			'name'               => __( 'Producers', 'radio-station' ),
+			'singular_name'      => __( 'Producer', 'radio-station' ),
+			'add_new'            => __( 'Add New Producer Profile', 'radio-station' ),
 			'add_new_item'       => __( 'Add Producer Profile', 'radio-station' ),
 			'edit_item'          => __( 'Edit Producer Profile', 'radio-station' ),
 			'new_item'           => __( 'New Producer Profile', 'radio-station' ),
 			'view_item'          => __( 'View Producer Profile', 'radio-station' ),
 			'archive_title'      => __( 'Show Producers Profile', 'Hosts' ),
 			// 2.3.2: added missing post type labels
-			'search_items'       => __( 'Search Producers', 'radio-station' ),
-			'not_found'          => __( 'No Producers found', 'radio-station' ),
-			'not_found_in_trash' => __( 'No Producers found in Trash', 'radio-station' ),
-			'all_items'          => __( 'All Producers', 'radio-station' ),
+			'search_items'       => __( 'Search Producer Profiles', 'radio-station' ),
+			'not_found'          => __( 'No Producer Profiles found', 'radio-station' ),
+			'not_found_in_trash' => __( 'No Producer Profiles found in Trash', 'radio-station' ),
+			'all_items'          => __( 'All Producer Profiles', 'radio-station' ),
 		),
 		'show_ui'             => $ui,
 		'show_in_menu'        => false,
@@ -250,7 +259,10 @@ function radio_station_create_post_types() {
 		'exclude_from_search' => false,
 		'public'              => true,
 		'hierarchical'        => false,
-		'can_export'          => false,
+		// 2.3.3.9: set can_export true 
+		'can_export'          => true,
+		// 2.3.3.9: added all post type supports
+		'supports'            => array( 'title', 'editor', 'excerpt', 'thumbnail', 'custom-fields', 'revisions' ),
 		'has_archive'         => 'producers',
 		'rewrite'             => array(
 			'slug'       => 'producer',
@@ -259,10 +271,10 @@ function radio_station_create_post_types() {
 		),
 		'query_var'           => true,
 		'capability_type'     => 'producer',
-		'map_meta_cap'        => false,
+		// 2.3.3.9: set map_meta_cap true
+		'map_meta_cap'        => true,
 	);
 	$post_type = apply_filters( 'radio_station_post_type_producer', $post_type );
-	// TODO: change Producer post type slug to rs-producer
 	register_post_type( RADIO_STATION_PRODUCER_SLUG, $post_type );
 
 	// --- maybe trigger flush of rewrite rules ---
@@ -332,10 +344,15 @@ function radio_station_add_featured_image_support() {
 add_action( 'admin_bar_menu', 'radio_station_modify_admin_bar_menu', 71 );
 function radio_station_modify_admin_bar_menu( $wp_admin_bar ) {
 
-	// 2.3.0: loop post types to add post type items
+	// 2.3.3.9: add filter for admin bar post types
 	$post_types = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_PLAYLIST_SLUG, RADIO_STATION_OVERRIDE_SLUG );
+	$post_types = apply_filters( 'radio_station_admin_bar_post_types', $post_types, 'new' );
+
+	// 2.3.0: loop post types to add post type items
 	foreach ( $post_types as $post_type ) {
-		if ( current_user_can( 'publish_' . $post_type . 's' ) ) {
+		// 2.3.3.9: strip post type prefix for permission check
+		$type = str_replace( 'rs-', '', $post_type );
+		if ( current_user_can( 'publish_' . $type . 's' ) ) {
 			$post_type_object = get_post_type_object( $post_type );
 			$args = array(
 				'id'     => 'new-' . $post_type,
@@ -357,14 +374,19 @@ function radio_station_modify_admin_bar_menu( $wp_admin_bar ) {
 add_action( 'admin_bar_menu', 'radio_station_admin_bar_view_edit_links', 81 );
 function radio_station_admin_bar_view_edit_links( $wp_admin_bar ) {
 
+	global $pagenow, $post;
 	$post_types = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_PLAYLIST_SLUG, RADIO_STATION_OVERRIDE_SLUG );
 
 	// --- loop to check for plugin post types ---
-	if ( ! is_admin() && is_singular() ) {
-		foreach ( $post_types as $post_type ) {
+	if ( !is_admin() && is_singular() ) {
+		// 2.3.3.9: added filter for admin bar post types
+		$edit_post_types = apply_filters( 'radio_station_admin_bar_post_types', $post_types, 'edit' );
+		foreach ( $edit_post_types as $post_type ) {
 			if ( is_singular( $post_type ) ) {
 				// --- add post type edit link ---
-				if ( current_user_can( 'edit_' . $post_type . 's' ) ) {
+				// 2.3.3.9: strip post type prefix for permission check
+				$type = str_replace( 'rs-', '', $post_type );
+				if ( current_user_can( 'edit_' . $type . 's' ) ) {
 					$post_type_object = get_post_type_object( $post_type );
 					$post_id = get_the_ID();
 					$args = array(
@@ -380,10 +402,9 @@ function radio_station_admin_bar_view_edit_links( $wp_admin_bar ) {
 
 	// --- check edit post match for view link ---
 	// 2.3.0: add view links for admin
-	global $pagenow;
 	if ( is_admin() && ( 'post.php' == $pagenow ) ) {
-		global $post;
-		foreach ( $post_types as $post_type ) {
+		$view_post_types = apply_filters( 'radio_station_admin_bar_post_types', $post_types, 'view' );
+		foreach ( $view_post_types as $post_type ) {
 			if ( $post->post_type == $post_type ) {
 				$post_type_object = get_post_type_object( $post_type );
 				if ( 'draft' == $post->post_status ) {
@@ -510,5 +531,183 @@ function radio_station_register_show_taxonomies() {
 	$args = apply_filters( 'radio_station_language_taxonomy_args', $args );
 	register_taxonomy( RADIO_STATION_LANGUAGES_SLUG, $post_types, $args );
 
+}
+
+
+// ---------------------------------
+// === Schedule Override Filters ===
+// ---------------------------------
+// (to apply linked show overrides in template single-show-content.php)
+// note: post object overrides (content, excerpt) are in radio_station_override_linked_show_data
+
+// --------------------------------------
+// Add Schedule Override Template Filters
+// --------------------------------------
+add_action( 'wp', 'radio_station_override_filters' );
+function radio_station_override_filters() {
+	if ( is_admin() || !is_singular() ) {
+		return;
+	}
+	global $post;
+	if ( is_object( $post ) && ( RADIO_STATION_OVERRIDE_SLUG == $post->post_type ) ) {
+		add_filter( 'the_title', 'radio_station_override_show_title', 10, 2 );
+		add_filter( 'radio_station_show_title', 'radio_station_override_show_title', 10, 2 );
+		add_filter( 'radio_station_show_avatar', 'radio_station_override_show_avatar', 10, 2 );
+		add_filter( 'radio_station_show_avatar_id', 'radio_station_override_show_avatar_id', 10, 2 );
+		add_filter( 'radio_station_show_thumbnail', 'radio_station_override_show_thumbnail', 10, 2 );
+		add_filter( 'get_post_metadata', 'radio_station_override_thumbnail_id', 11, 4 );
+		// add_filter( 'radio_station_show_header', $header_id, $post_id );
+		add_filter( 'radio_station_show_hosts', 'radio_station_override_show_hosts', 10, 2 );
+		add_filter( 'radio_station_show_producers', 'radio_station_override_show_producers', 10, 2 );
+		add_filter( 'radio_station_show_link', 'radio_station_override_show_link', 10, 2 );
+		add_filter( 'radio_station_show_email', 'radio_station_override_show_email', 10, 2 );
+		add_filter( 'radio_station_show_phone', 'radio_station_override_show_phone', 10, 2 );
+		add_filter( 'radio_station_show_download', 'radio_station_override_show_download', 10, 2 );
+		add_filter( 'radio_station_show_file', 'radio_station_override_show_file', 10, 2 );
+		add_filter( 'radio_station_show_patreon', 'radio_station_override_show_patreon', 10, 2 );
+		add_filter( 'radio_station_show_shifts', 'radio_station_override_show_shifts', 10, 2 );
+		// add_filter( 'radio_station_show_rss', 'radio_station_override_show_rss', 10, 2 );
+		// add_filter( 'radio_station_show_social_icons', 'radio_station_override_show_social_icons', 10, 2 );
+	}
+}
+
+// --- Show Title ---
+function radio_station_override_show_title( $show_title, $post_id ) {
+	global $post;
+	if ( !is_object( $post ) || ( $post->ID != $post_id ) ) {
+		return $show_title;
+	}
+	$override = radio_station_get_show_override( $post_id, 'show_title' );
+	if ( false !== $override ) {
+		return $override;
+	}
+	return $show_title;
+}
+
+// --- Show Avatar ---
+function radio_station_override_show_avatar( $show_avatar, $post_id ) {
+	if ( radio_station_doing_template() ) {
+		$override = radio_station_get_show_override( $post_id, 'show_avatar' );
+		if ( false !== $override ) {
+			return $override;
+		}
+	}
+	return $show_avatar;
+}
+
+// --- Show Avatar ID ---
+function radio_station_override_show_avatar_id( $avatar_id, $post_id ) {
+	if ( radio_station_doing_template() ) {
+		$override = radio_station_get_show_override( $post_id, 'show_avatar' );
+		if ( false !== $override ) {
+			return $override;
+		}
+	}	
+	return $avatar_id;
+}
+
+// --- Show Thumbnail (Featured Image) ---
+function radio_station_override_show_thumbnail( $show_thumbnail, $post_id ) {
+	$override = radio_station_get_show_override( $post_id, 'show_image' );
+	if ( false !== $override ) {
+		return $override;
+	}
+	return $show_thumbnail;
+}
+
+// --- Show Thumbnail ID ---
+function radio_station_override_thumbnail_id( $id, $object_id, $meta_key, $single ) {
+	global $post;
+	if ( ( '_thumbnail_id' != $meta_key ) || !is_object( $post ) || ( $post->ID != $object_id ) ) {
+		return $id;
+	}
+	if ( RADIO_STATION_OVERRIDE_SLUG == $post->post_type ) {
+		$override = radio_station_get_show_override( $object_id, 'show_image' );
+		if ( false !== $override ) {
+			return $override;
+		}		
+	}
+	return $id;
+}
+
+// --- Show Hosts ---
+function radio_station_override_show_hosts( $hosts, $post_id ) {
+	$override = radio_station_get_show_override( $post_id, 'show_user_list' );
+	if ( false !== $override ) {
+		return $override;
+	}
+	return $hosts;
+}
+ 
+// --- Show Producers ---
+function radio_station_override_show_producers( $producers, $post_id ) {
+	$override = radio_station_get_show_override( $post_id, 'show_producer_list' );
+	if ( false !== $override ) {
+		return $override;
+	}
+	return $producers;
+}
+ 
+// --- Show Website Link ---
+function radio_station_override_show_link( $show_link, $post_id ) {
+	$override = radio_station_get_show_override( $post_id, 'show_link' );
+	if ( false !== $override ) {
+		return $override;
+	}
+	return $show_link;
+}
+ 
+// --- Show Email ---
+function radio_station_override_show_email( $show_email, $post_id ) {
+	$override = radio_station_get_show_override( $post_id, 'show_email' );
+	if ( false !== $override ) {
+		return $override;
+	}
+	return $show_email;
+}
+ 
+// --- Show Phone ---
+function radio_station_override_show_phone( $show_phone, $post_id ) {
+	$override = radio_station_get_show_override( $post_id, 'show_phone' );
+	if ( false !== $override ) {
+		return $override;
+	}
+	return $show_phone;
+}
+ 
+// --- Show File ---
+function radio_station_override_show_file( $show_file, $post_id ) {
+	$override = radio_station_get_show_override( $post_id, 'show_file' );
+	if ( false !== $override ) {
+		return $override;
+	}
+	return $show_file;
+}
+ 
+// --- Disable Download ---
+function radio_station_override_show_download( $show_download, $post_id ) {
+	$override = radio_station_get_show_override( $post_id, 'show_download' );
+	if ( false !== $override ) {
+		return $override;
+	}
+	return $show_download;
+}
+ 
+// --- Show Patreon ---
+function radio_station_override_show_patreon( $show_patreon, $post_id ) {
+	$override = radio_station_get_show_override( $post_id, 'show_patreon' );
+	if ( false !== $override ) {
+		return $override;
+	}
+	return $show_patreon;
+}
+
+// --- Show Shifts ---
+function radio_station_override_show_shifts( $show_shifts, $post_id ) {
+	$linked_id = get_post_meta( $post_id, 'linked_show_id', true );
+	if ( $linked_id ) {
+		$show_shifts = radio_station_get_show_schedule( $linked_id );
+	}
+	return $show_shifts;
 }
 

@@ -54,7 +54,7 @@ function radio_countdown() {
     jQuery('.current-playlist-end').each(function() {
         diff = parseInt(jQuery(this).val()) - radio.time.current;
         if (radio.debug) {console.log('Current Playlist Ends in: '+diff);}
-        if (diff < 1) {countdown = playlistended; jQuery(this).removeClass('current-playlist-end');}
+        if (diff < 1) {countdown = radio.labels.playlistended; jQuery(this).removeClass('current-playlist-end');}
         else {countdown = radio_countdown_display(diff, radio.labels.timeremaining);}
         jQuery(this).parent().find('.rs-countdown').html(countdown);
     });

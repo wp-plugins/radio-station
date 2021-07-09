@@ -7,6 +7,39 @@
 	clear: both;
 }
 
+.show-user-time {
+	display: none;
+	font-style: italic;
+}
+
+/* Edit / Add Links */
+/* ---------------- */
+.show-title, .show-edit-link {
+	display: inline-block;
+}
+
+.show-edit-link, .show-add-link, .shift-edit-link {
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.show-edit-link span, .show-add-link span {
+	color: #777777;
+	opacity: 0.9;
+}
+
+.show-edit-link span {
+	font-size: 18px;
+}
+
+.show-add-link span {
+	font-size: 16px;
+}
+
+.show-edit-link:hover span, .show-add-link:hover span {
+	opacity: 1;
+}
+
 /* Schedule Controls */
 /* ----------------- */
 #master-schedule-controls-wrapper {
@@ -87,12 +120,27 @@
 	text-decoration: none;
 }
 
+.master-schedule-table-arrow-left, .master-schedule-table-arrow-right {
+	display: inline-block;
+	width: 50%;
+	line-height: 2em;
+	font-size: 1em;
+	vertical-align: top;
+	cursor: pointer;
+}
+
 #master-program-schedule th .shift-left-arrow {
 	float: left;
+	font-size: 2em;
+	font-weight: bold;
+	line-height: 0.5em;
 }
 
 #master-program-schedule th .shift-right-arrow {
 	float: right;
+	font-size: 2em;
+	font-weight: bold;
+	line-height: 0.5em;
 }
 
 #master-program-schedule th .shift-left-arrow, #master-program-schedule th .shift-right-arrow {
@@ -146,7 +194,7 @@
 
 #master-program-schedule .show-title, #master-program-schedule .show-image, #master-program-schedule .show-desc {
     max-width: 120px;
-    margin: 0 auto;
+    text-align: center;
 }
 
 #master-program-schedule .show-info.overflow {
@@ -280,7 +328,21 @@
 
 #master-schedule-tabs .first-tab .shift-left-arrow, #master-schedule-tabs .last-tab .shift-right-arrow {
 	display: inline-block;
+	font-size: 2em;
+	font-weight: bold;
+	line-height: 0.5em;
 	padding: 5px;
+}
+
+.master-schedule-tabs-loader {
+	list-style: none;
+	display: inline-block;
+	margin: 0;
+	padding: 0 10px;
+	font-size: 1em;
+	line-height: 2em;
+	vertical-align: top;
+	cursor: pointer;
 }
 
 #master-schedule-tabs .master-schedule-tabs-day {
@@ -291,14 +353,14 @@
 	cursor: pointer; 
 	text-align: center; 
 	background-color: #eeeeee; 
-    color: #444444;
+	color: #444444;
 	font-size: 1em;
 	font-weight: bold;
-    border-radius: 7px 7px 0 0;
-    border: 1px solid #000000;
-    list-style: none;
-    margin-left: 20px;
-    border-bottom: 0;
+	border-radius: 7px 7px 0 0;
+	border: 1px solid #000000;
+	list-style: none;
+	margin-left: 20px;
+	border-bottom: 0;
 }
 
 #master-schedule-tabs .master-schedule-tabs-day.start-tab,
@@ -516,6 +578,7 @@
 	font-size: 0.6em;
 	line-height: 1em;
 }
+
 
 #master-schedule-divs .show-image img {
 	width: 100%;

@@ -15,6 +15,17 @@ You can find the base styles in the `/css` directory of the plugin, prefixed wit
 You may wish to add your own styles to suit your site's look and feel. One easy way to do this is to add your own `rs-custom.css` to your Child Theme's directory, and add more specific style rules that modify or override the existing styles. Radio Station will automatically detect the presence of this file and enqueue it. This is preferable to modifying the base style files, as your changes will be overwritten in a plugin update.
 
 
+## Timezone Conversions
+
+#### Automatic Display
+
+Radio Station will now display a shift time converted to the users timezone under every shift time displayed. This conversion is based on the selected Timezone in your plugin settings and the default timezone detected in the users browser. This feature is on by default but can be disabled in the Plugin Settings.
+
+#### [Pro] User Timezone Switching
+
+In [Radio Station Pro](https://radiostation.pro), there is an additional interface displayed in the Clock/Timezone shortcode (automatically displayed above schedules and also in the Radio Clock widget.) This allows your visitors/listeners to select a specific timezone other than what is in their browser. This can be useful for travellers especially, for keeping up with their home Shows, or tuning into a new local station without needing to update their computer clock.
+
+
 ## Automatic Pages
 
 ### Master Schedule Page
@@ -95,6 +106,36 @@ If your chosen Show template (eg. `page.php`) does not display the Featured Imag
 
 Since 2.3.0, image support has been added to Schedule Overrides so that they behave just like Shows in this respect. So the above sections on Show Images also now apply to Schedule Overrides.
 
-### [Pro] Genre Images
+### [Pro] Profile Images
 
-In Radio Station Pro, images can also be assigned to Genre taxonomy terms via the WordPress Admin Taxonomy Editing interface. These may then optionally be displayed in the [Genre Archive Shortcode](./Shortcodes.md#genre-archives-shortcode) to provide another visual level to that Show list display. 
+In [Radio Station Pro](https://radiostation.pro), Host and Producer Profiles also support having images added, which then display on thee public profile pages for the host or producer.
+
+### [Pro] Genre Images and Colors
+
+In [Radio Station Pro](https://radiostation.pro), images and colors can also be assigned to Genre taxonomy terms via the WordPress Admin Taxonomy Editing interface. Images may then optionally be displayed in the [Genre Archive Shortcode](./Shortcodes.md#genre-archives-shortcode) to provide another visual level to that Show list display. Genre colors are used in the Master Schedule display when the user highlights particular Genres.
+
+
+## Translations
+
+#### Using WordPress Translations
+
+Please note that the "Main Broadcast Language" Setting on the plugin page does NOT translate any strings, it is for assigning the default Language for Shows, which is displayed to visitors on the Show page etc. See the [Language Taxonomy](./Data.md) for more details.
+
+Radio Station is fully translation ready. This means all the text strings within the plugin are wrapped in translation functions so that WordPress can handle the automatic translation of these strings. If your site language is set through WordPress Admin -> Settings page (under Site Language) then you will see the translated string output changed in your selected language - but only for any strings where a translation exists.
+
+This is because some strings have never been translated into certain languages, but also because some have been translated in the past and some added to newer versions have not been translated yet. You can add to the existing translations in any Language via the [Radio Station Translation Project on WordPress.Org](https://translate.wordpress.org/projects/wp-plugins/radio-station/) By logging in to WordPress.org you can now add these string translations directly, and they will be used by the WordPress to translate the plugin.
+
+#### Time Related Translations
+
+Unlike other word strings, those involving dates and times are automatically translated by the plugin into your WordPress language using the `WP_Locale` class.
+
+This means you do not have to retranslate common strings for days of the week, month names, or am/pm meridian strings.
+
+#### Using a Translation Plugin
+
+If you wish to use a translation plugin instead, you can find the relevant language filed in the /languages/ directory of the plugin. Follow the translation plugin documentation on how to use these files. We welcome submissions of updated language files. Please contact us via email or submit a pull request via the [Github repository](https://github.com/netmix/radio-station/).
+
+
+
+
+

@@ -10,6 +10,7 @@
 # Copyright (c) 2004-2006 John Gruber
 # <http://daringfireball.net/projects/markdown/>
 #
+# Tweaked to remove WordPress interface
 
 if (!defined('MARKDOWN_VERSION')) {
 	define( 'MARKDOWN_VERSION',  "1.0.2" ); # 29 Nov 2013
@@ -96,6 +97,21 @@ if (!function_exists('Markdown')) {
  }
 }
 
+/**
+ * Returns the length of $text loosely counting the number of UTF-8 characters with regular expression.
+ * Used by the Markdown_Parser class when mb_strlen is not available.
+ *
+ * @since 5.9
+ *
+ * @return string Length of the multibyte string
+ *
+ */
+if (!function_exists('markdown_extra_utf8_strlen')) {
+ function markdown_extra_utf8_strlen( $text ) {
+	return preg_match_all( "/[\\x00-\\xBF]|[\\xC0-\\xFF][\\x80-\\xBF]*/", $text, $m );
+ }
+}
+
 #
 # Markdown Parser Class
 #
@@ -106,31 +122,31 @@ if (!class_exists('Markdown_Parser')) {
 	### Configuration Variables ###
 
 	# Change to ">" for HTML output.
-	var $empty_element_suffix = MARKDOWN_EMPTY_ELEMENT_SUFFIX;
-	var $tab_width = MARKDOWN_TAB_WIDTH;
+	public $empty_element_suffix = MARKDOWN_EMPTY_ELEMENT_SUFFIX;
+	public $tab_width = MARKDOWN_TAB_WIDTH;
 
 	# Change to `true` to disallow markup or entities.
-	var $no_markup = false;
-	var $no_entities = false;
+	public $no_markup = false;
+	public $no_entities = false;
 
 	# Predefined urls and titles for reference links and images.
-	var $predef_urls = array();
-	var $predef_titles = array();
+	public $predef_urls = array();
+	public $predef_titles = array();
 
 
 	### Parser Implementation ###
 
 	# Regex to match balanced [brackets].
 	# Needed to insert a maximum bracked depth while converting to PHP.
-	var $nested_brackets_depth = 6;
-	var $nested_brackets_re;
+	public $nested_brackets_depth = 6;
+	public $nested_brackets_re;
 
-	var $nested_url_parenthesis_depth = 4;
-	var $nested_url_parenthesis_re;
+	public $nested_url_parenthesis_depth = 4;
+	public $nested_url_parenthesis_re;
 
 	# Table of hash values for escaped characters:
-	var $escape_chars = '\`*_{}[]()>#+-.!';
-	var $escape_chars_re;
+	public $escape_chars = '\`*_{}[]()>#+-.!';
+	public $escape_chars_re;
 
 
 	function __construct() {
@@ -158,12 +174,12 @@ if (!class_exists('Markdown_Parser')) {
 
 
 	# Internal hashes used during transformation.
-	var $urls = array();
-	var $titles = array();
-	var $html_hashes = array();
+	public $urls = array();
+	public $titles = array();
+	public $html_hashes = array();
 
 	# Status flag to avoid invalid nesting.
-	var $in_anchor = false;
+	public $in_anchor = false;
 
 
 	function setup() {
@@ -229,7 +245,7 @@ if (!class_exists('Markdown_Parser')) {
 		return $text . "\n";
 	}
 
-	var $document_gamut = array(
+	public $document_gamut = array(
 		# Strip link definitions, store in hashes.
 		"stripLinkDefinitions" => 20,
 
@@ -457,7 +473,7 @@ if (!class_exists('Markdown_Parser')) {
 	}
 
 
-	var $block_gamut = array(
+	public $block_gamut = array(
 	#
 	# These are all the transformations that form block-level
 	# tags like paragraphs, headers, and list items.
@@ -476,7 +492,7 @@ if (!class_exists('Markdown_Parser')) {
 	#
 		# We need to escape raw HTML in Markdown source before doing anything
 		# else. This need to be done for each block, and not only at the
-		# begining in the Markdown function since hashed blocks can be part of
+		# beginning in the Markdown function since hashed blocks can be part of
 		# list items and could have been indented. Indented blocks would have
 		# been seen as a code block in a previous pass of hashHTMLBlocks.
 		$text = $this->hashHTMLBlocks($text);
@@ -519,7 +535,7 @@ if (!class_exists('Markdown_Parser')) {
 	}
 
 
-	var $span_gamut = array(
+	public $span_gamut = array(
 	#
 	# These are all the transformations that occur *within* block-level
 	# tags like paragraphs, headers, and list items.
@@ -827,7 +843,7 @@ if (!class_exists('Markdown_Parser')) {
 		if ($matches[2] == '-' && preg_match('{^-(?: |$)}', $matches[1]))
 			return $matches[0];
 
-		$level = $matches[2]{0} == '=' ? 1 : 2;
+		$level = $matches[2][0] == '=' ? 1 : 2;
 		$block = "<h$level>".$this->runSpanGamut($matches[1])."</h$level>";
 		return "\n" . $this->hashBlock($block) . "\n\n";
 	}
@@ -922,7 +938,7 @@ if (!class_exists('Markdown_Parser')) {
 		return "\n". $result ."\n\n";
 	}
 
-	var $list_level = 0;
+	public $list_level = 0;
 
 	function processListItems($list_str, $marker_any_re) {
 	#
@@ -1036,22 +1052,22 @@ if (!class_exists('Markdown_Parser')) {
 	}
 
 
-	var $em_relist = array(
+	public $em_relist = array(
 		''  => '(?:(?<!\*)\*(?!\*)|(?<!_)_(?!_))(?=\S|$)(?![\.,:;]\s)',
 		'*' => '(?<=\S|^)(?<!\*)\*(?!\*)',
 		'_' => '(?<=\S|^)(?<!_)_(?!_)',
 		);
-	var $strong_relist = array(
+	public $strong_relist = array(
 		''   => '(?:(?<!\*)\*\*(?!\*)|(?<!_)__(?!_))(?=\S|$)(?![\.,:;]\s)',
 		'**' => '(?<=\S|^)(?<!\*)\*\*(?!\*)',
 		'__' => '(?<=\S|^)(?<!_)__(?!_)',
 		);
-	var $em_strong_relist = array(
+	public $em_strong_relist = array(
 		''    => '(?:(?<!\*)\*\*\*(?!\*)|(?<!_)___(?!_))(?=\S|$)(?![\.,:;]\s)',
 		'***' => '(?<=\S|^)(?<!\*)\*\*\*(?!\*)',
 		'___' => '(?<=\S|^)(?<!_)___(?!_)',
 		);
-	var $em_strong_prepared_relist;
+	public $em_strong_prepared_relist;
 
 	function prepareItalicsAndBold() {
 	#
@@ -1425,7 +1441,7 @@ if (!class_exists('Markdown_Parser')) {
 
 	function parseSpan($str) {
 	#
-	# Take the string $str and parse it into tokens, hashing embeded HTML,
+	# Take the string $str and parse it into tokens, hashing embedded HTML,
 	# escaped characters and handling code spans.
 	#
 		$output = '';
@@ -1458,7 +1474,7 @@ if (!class_exists('Markdown_Parser')) {
 
 		while (1) {
 			#
-			# Each loop iteration seach for either the next tag, the next
+			# Each loop iteration search for either the next tag, the next
 			# openning code span marker, or the next escaped character.
 			# Each token is then passed to handleSpanToken.
 			#
@@ -1517,7 +1533,7 @@ if (!class_exists('Markdown_Parser')) {
 
 	# String length function for detab. `_initDetab` will create a function to
 	# hanlde UTF-8 if the default function does not exist.
-	var $utf8_strlen = 'mb_strlen';
+	public $utf8_strlen = 'mb_strlen';
 
 	function detab($text) {
 	#
@@ -1552,14 +1568,14 @@ if (!class_exists('Markdown_Parser')) {
 	function _initDetab() {
 	#
 	# Check for the availability of the function in the `utf8_strlen` property
-	# (initially `mb_strlen`). If the function is not available, create a
-	# function that will loosely count the number of UTF-8 characters with a
+	# (initially `mb_strlen`). If the function is not available, use markdown_extra_utf8_strlen 
+	# that will loosely count the number of UTF-8 characters with a
 	# regular expression.
 	#
-		if (function_exists($this->utf8_strlen)) return;
-		$this->utf8_strlen = create_function('$text', 'return preg_match_all(
-			"/[\\\\x00-\\\\xBF]|[\\\\xC0-\\\\xFF][\\\\x80-\\\\xBF]*/",
-			$text, $m);');
+		if ( function_exists( $this->utf8_strlen ) )  {
+			return;
+		}
+		$this->utf8_strlen = 'markdown_extra_utf8_strlen';
 	}
 
 
@@ -1574,36 +1590,37 @@ if (!class_exists('Markdown_Parser')) {
 		return $this->html_hashes[$matches[0]];
 	}
 
+ }
 }
 
 
 #
 # Markdown Extra Parser Class
 #
-
-class MarkdownExtra_Parser extends Markdown_Parser {
+if (!class_exists('MarkdownExtra_Parser')) {
+ class MarkdownExtra_Parser extends Markdown_Parser {
 
 	### Configuration Variables ###
 
 	# Prefix for footnote ids.
-	var $fn_id_prefix = "";
+	public $fn_id_prefix = "";
 
 	# Optional title attribute for footnote links and backlinks.
-	var $fn_link_title = MARKDOWN_FN_LINK_TITLE;
-	var $fn_backlink_title = MARKDOWN_FN_BACKLINK_TITLE;
+	public $fn_link_title = MARKDOWN_FN_LINK_TITLE;
+	public $fn_backlink_title = MARKDOWN_FN_BACKLINK_TITLE;
 
 	# Optional class attribute for footnote links and backlinks.
-	var $fn_link_class = MARKDOWN_FN_LINK_CLASS;
-	var $fn_backlink_class = MARKDOWN_FN_BACKLINK_CLASS;
+	public $fn_link_class = MARKDOWN_FN_LINK_CLASS;
+	public $fn_backlink_class = MARKDOWN_FN_BACKLINK_CLASS;
 
 	# Optional class prefix for fenced code block.
-	var $code_class_prefix = MARKDOWN_CODE_CLASS_PREFIX;
+	public $code_class_prefix = MARKDOWN_CODE_CLASS_PREFIX;
 	# Class attribute for code blocks goes on the `code` tag;
 	# setting this to true will put attributes on the `pre` tag instead.
-	var $code_attr_on_pre = MARKDOWN_CODE_ATTR_ON_PRE;
+	public $code_attr_on_pre = MARKDOWN_CODE_ATTR_ON_PRE;
 
 	# Predefined abbreviations.
-	var $predef_abbr = array();
+	public $predef_abbr = array();
 
 
 	### Parser Implementation ###
@@ -1639,15 +1656,15 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 
 
 	# Extra variables used during extra transformations.
-	var $footnotes = array();
-	var $footnotes_ordered = array();
-	var $footnotes_ref_count = array();
-	var $footnotes_numbers = array();
-	var $abbr_desciptions = array();
-	var $abbr_word_re = '';
+	public $footnotes = array();
+	public $footnotes_ordered = array();
+	public $footnotes_ref_count = array();
+	public $footnotes_numbers = array();
+	public $abbr_desciptions = array();
+	public $abbr_word_re = '';
 
 	# Give the current footnote number.
-	var $footnote_counter = 1;
+	public $footnote_counter = 1;
 
 
 	function setup() {
@@ -1690,9 +1707,9 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 	### Extra Attribute Parser ###
 
 	# Expression to use to catch attributes (includes the braces)
-	var $id_class_attr_catch_re = '\{((?:[ ]*[#.][-_:a-zA-Z0-9]+){1,})[ ]*\}';
+	public $id_class_attr_catch_re = '\{((?:[ ]*[#.][-_:a-zA-Z0-9]+){1,})[ ]*\}';
 	# Expression to use when parsing in a context when no capture is desired
-	var $id_class_attr_nocatch_re = '\{(?:[ ]*[#.][-_:a-zA-Z0-9]+){1,}[ ]*\}';
+	public $id_class_attr_nocatch_re = '\{(?:[ ]*[#.][-_:a-zA-Z0-9]+){1,}[ ]*\}';
 
 	function doExtraAttributes($tag_name, $attr) {
 	#
@@ -1778,20 +1795,20 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 	### HTML Block Parser ###
 
 	# Tags that are always treated as block tags:
-	var $block_tags_re = 'p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|address|form|fieldset|iframe|hr|legend|article|section|nav|aside|hgroup|header|footer|figcaption';
+	public $block_tags_re = 'p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|address|form|fieldset|iframe|hr|legend|article|section|nav|aside|hgroup|header|footer|figcaption';
 
 	# Tags treated as block tags only if the opening tag is alone on its line:
-	var $context_block_tags_re = 'script|noscript|ins|del|iframe|object|source|track|param|math|svg|canvas|audio|video';
+	public $context_block_tags_re = 'script|noscript|ins|del|iframe|object|source|track|param|math|svg|canvas|audio|video';
 
 	# Tags where markdown="1" default to span mode:
-	var $contain_span_tags_re = 'p|h[1-6]|li|dd|dt|td|th|legend|address';
+	public $contain_span_tags_re = 'p|h[1-6]|li|dd|dt|td|th|legend|address';
 
 	# Tags which must not have their contents modified, no matter where
 	# they appear:
-	var $clean_tags_re = 'script|math|svg';
+	public $clean_tags_re = 'script|math|svg';
 
 	# Tags that do not need to be closed.
-	var $auto_close_tags_re = 'hr|img|param|source|track';
+	public $auto_close_tags_re = 'hr|img|param|source|track';
 
 
 	function hashHTMLBlocks($text) {
@@ -1849,7 +1866,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 	#
 		if ($text === '') return array('', '');
 
-		# Regex to check for the presense of newlines around a block tag.
+		# Regex to check for the presence of newlines around a block tag.
 		$newline_before_re = '/(?:^\n?|\n\n)*$/';
 		$newline_after_re =
 			'{
@@ -2869,17 +2886,17 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 	# Redefining emphasis markers so that emphasis by underscore does not
 	# work in the middle of a word.
 	#
-	var $em_relist = array(
+	public $em_relist = array(
 		''  => '(?:(?<!\*)\*(?!\*)|(?<![a-zA-Z0-9_])_(?!_))(?=\S|$)(?![\.,:;]\s)',
 		'*' => '(?<=\S|^)(?<!\*)\*(?!\*)',
 		'_' => '(?<=\S|^)(?<!_)_(?![a-zA-Z0-9_])',
 		);
-	var $strong_relist = array(
+	public $strong_relist = array(
 		''   => '(?:(?<!\*)\*\*(?!\*)|(?<![a-zA-Z0-9_])__(?!_))(?=\S|$)(?![\.,:;]\s)',
 		'**' => '(?<=\S|^)(?<!\*)\*\*(?!\*)',
 		'__' => '(?<=\S|^)(?<!_)__(?![a-zA-Z0-9_])',
 		);
-	var $em_strong_relist = array(
+	public $em_strong_relist = array(
 		''    => '(?:(?<!\*)\*\*\*(?!\*)|(?<![a-zA-Z0-9_])___(?!_))(?=\S|$)(?![\.,:;]\s)',
 		'***' => '(?<=\S|^)(?<!\*)\*\*\*(?!\*)',
 		'___' => '(?<=\S|^)(?<!_)___(?![a-zA-Z0-9_])',
@@ -2983,7 +3000,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 			$text .= "<hr". $this->empty_element_suffix ."\n";
 			$text .= "<ol>\n\n";
 
-			$attr = " rev=\"footnote\"";
+			$attr = "";
 			if ($this->fn_backlink_class != "") {
 				$class = $this->fn_backlink_class;
 				$class = $this->encodeAttribute($class);
@@ -3052,7 +3069,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 				$ref_count_mark = $this->footnotes_ref_count[$node_id] += 1;
 			}
 
-			$attr = " rel=\"footnote\"";
+			$attr = "";
 			if ($this->fn_link_class != "") {
 				$class = $this->fn_link_class;
 				$class = $this->encodeAttribute($class);
@@ -3554,4 +3571,425 @@ if (!class_exists('WordPress_Readme_Parser')) {
 	}
 
  } // end class
+}
+
+/**
+ * GitHub-Flavoured Markdown. Inspired by Evan's plugin, but modified.
+ *
+ * @author Evan Solomon
+ * @author Matt Wiebe <wiebe@automattic.com>
+ * @link https://github.com/evansolomon/wp-github-flavored-markdown-comments
+ *
+ * Add a few extras from GitHub's Markdown implementation. Must be used in a WordPress environment.
+ */
+
+if (!class_exists('GHF_Markdown_Parser')) {
+ class GHF_Markdown_Parser extends MarkdownExtra_Parser {
+
+	/**
+	 * Hooray somewhat arbitrary numbers that are fearful of 1.0.x.
+	 */
+	const GHF_MARDOWN_VERSION = '0.9.0';
+
+	/**
+	 * Use a [code] shortcode when encountering a fenced code block
+	 * @var boolean
+	 */
+	public $use_code_shortcode = true;
+
+	/**
+	 * Preserve shortcodes, untouched by Markdown.
+	 * This requires use within a WordPress installation.
+	 * @var boolean
+	 */
+	public $preserve_shortcodes = true;
+
+	/**
+	 * Preserve the legacy $latex your-latex-code-here$ style
+	 * LaTeX markup
+	 */
+	public $preserve_latex = true;
+
+	/**
+	 * Preserve single-line <code> blocks.
+	 * @var boolean
+	 */
+	public $preserve_inline_code_blocks = true;
+
+	/**
+	 * Strip paragraphs from the output. This is the right default for WordPress,
+	 * which generally wants to create its own paragraphs with `wpautop`
+	 * @var boolean
+	 */
+	public $strip_paras = true;
+
+	// Will run through sprintf - you can supply your own syntax if you want
+	public $shortcode_start = '[code lang=%s]';
+	public $shortcode_end   = '[/code]';
+
+	// Stores shortcodes we remove and then replace
+	protected $preserve_text_hash = array();
+
+	/**
+	 * Set environment defaults based on presence of key functions/classes.
+	 */
+	public function __construct() {
+		$this->use_code_shortcode  = class_exists( 'SyntaxHighlighter' );
+		/**
+		 * Allow processing shortcode contents.
+		 *
+		 * @module markdown
+		 *
+		 * @since 4.4.0
+		 *
+		 * @param boolean $preserve_shortcodes Defaults to $this->preserve_shortcodes.
+		 */
+		$this->preserve_shortcodes = apply_filters( 'jetpack_markdown_preserve_shortcodes', $this->preserve_shortcodes ) && function_exists( 'get_shortcode_regex' );
+		$this->preserve_latex      = function_exists( 'latex_markup' );
+		$this->strip_paras         = function_exists( 'wpautop' );
+
+		parent::__construct();
+	}
+
+	/**
+	 * Overload to specify heading styles only if the hash has space(s) after it. This is actually in keeping with
+	 * the documentation and eases the semantic overload of the hash character.
+	 * #Will Not Produce a Heading 1
+	 * # This Will Produce a Heading 1
+	 *
+	 * @param  string $text Markdown text
+	 * @return string       HTML-transformed text
+	 */
+	public function transform( $text ) {
+		// Preserve anything inside a single-line <code> element
+		if ( $this->preserve_inline_code_blocks ) {
+			$text = $this->single_line_code_preserve( $text );
+		}
+		// Remove all shortcodes so their interiors are left intact
+		if ( $this->preserve_shortcodes ) {
+			$text = $this->shortcode_preserve( $text );
+		}
+		// Remove legacy LaTeX so it's left intact
+		if ( $this->preserve_latex ) {
+			$text = $this->latex_preserve( $text );
+		}
+
+		// Do not process characters inside URLs.
+		$text = $this->urls_preserve( $text );
+
+		// escape line-beginning # chars that do not have a space after them.
+		$text = preg_replace_callback( '|^#{1,6}( )?|um', array( $this, '_doEscapeForHashWithoutSpacing' ), $text );
+
+		/**
+		 * Allow third-party plugins to define custom patterns that won't be processed by Markdown.
+		 *
+		 * @module markdown
+		 *
+		 * @since 3.9.2
+		 *
+		 * @param array $custom_patterns Array of custom patterns to be ignored by Markdown.
+		 */
+		$custom_patterns = apply_filters( 'jetpack_markdown_preserve_pattern', array() );
+		if ( is_array( $custom_patterns ) && ! empty( $custom_patterns ) ) {
+			foreach ( $custom_patterns as $pattern ) {
+				$text = preg_replace_callback( $pattern, array( $this, '_doRemoveText'), $text );
+			}
+		}
+
+		// run through core Markdown
+		$text = parent::transform( $text );
+
+		// Occasionally Markdown Extra chokes on a para structure, producing odd paragraphs.
+		$text = str_replace( "<p>&lt;</p>\n\n<p>p>", '<p>', $text );
+
+		// put start-of-line # chars back in place
+		$text = $this->restore_leading_hash( $text );
+
+		// Strip paras if set
+		if ( $this->strip_paras ) {
+			$text = $this->unp( $text );
+		}
+
+		// Restore preserved things like shortcodes/LaTeX
+		$text = $this->do_restore( $text );
+
+		return $text;
+	}
+
+	/**
+	 * Prevents blocks like <code>__this__</code> from turning into <code><strong>this</strong></code>
+	 * @param  string $text Text that may need preserving
+	 * @return string       Text that was preserved if needed
+	 */
+	public function single_line_code_preserve( $text ) {
+		return preg_replace_callback( '|<code\b[^>]*>(.*?)</code>|', array( $this, 'do_single_line_code_preserve' ), $text );
+	}
+
+	/**
+	 * Regex callback for inline code presevation
+	 * @param  array $matches Regex matches
+	 * @return string         Hashed content for later restoration
+	 */
+	public function do_single_line_code_preserve( $matches ) {
+		return '<code>' . $this->hash_block( $matches[1] ) . '</code>';
+	}
+
+	/**
+	 * Preserve code block contents by HTML encoding them. Useful before getting to KSES stripping.
+	 * @param  string $text Markdown/HTML content
+	 * @return string       Markdown/HTML content with escaped code blocks
+	 */
+	public function codeblock_preserve( $text ) {
+		return preg_replace_callback( "/^([`~]{3})([^`\n]+)?\n([^`~]+)(\\1)/m", array( $this, 'do_codeblock_preserve' ), $text );
+	}
+
+	/**
+	 * Regex callback for code block preservation.
+	 * @param  array $matches Regex matches
+	 * @return string         Codeblock with escaped interior
+	 */
+	public function do_codeblock_preserve( $matches ) {
+		$block = stripslashes( $matches[3] );
+		$block = esc_html( $block );
+		$block = str_replace( '\\', '\\\\', $block );
+		$open = $matches[1] . $matches[2] . "\n";
+		return $open . $block . $matches[4];
+	}
+
+	/**
+	 * Restore previously preserved (i.e. escaped) code block contents.
+	 * @param  string $text Markdown/HTML content with escaped code blocks
+	 * @return string       Markdown/HTML content
+	 */
+	public function codeblock_restore( $text ) {
+		return preg_replace_callback( "/^([`~]{3})([^`\n]+)?\n([^`~]+)(\\1)/m", array( $this, 'do_codeblock_restore' ), $text );
+	}
+
+	/**
+	 * Regex callback for code block restoration (unescaping).
+	 * @param  array $matches Regex matches
+	 * @return string         Codeblock with unescaped interior
+	 */
+	public function do_codeblock_restore( $matches ) {
+		$block = html_entity_decode( $matches[3], ENT_QUOTES );
+		$open = $matches[1] . $matches[2] . "\n";
+		return $open . $block . $matches[4];
+	}
+
+	/**
+	 * Called to preserve legacy LaTeX like $latex some-latex-text $
+	 * @param  string $text Text in which to preserve LaTeX
+	 * @return string       Text with LaTeX replaced by a hash that will be restored later
+	 */
+	protected function latex_preserve( $text ) {
+		// regex from latex_remove()
+		$regex = '%
+			\$latex(?:=\s*|\s+)
+			((?:
+				[^$]+ # Not a dollar
+			|
+				(?<=(?<!\\\\)\\\\)\$ # Dollar preceded by exactly one slash
+			)+)
+			(?<!\\\\)\$ # Dollar preceded by zero slashes
+		%ix';
+		$text = preg_replace_callback( $regex, array( $this, '_doRemoveText'), $text );
+		return $text;
+	}
+
+	/**
+	 * Called to preserve WP shortcodes from being formatted by Markdown in any way.
+	 * @param  string $text Text in which to preserve shortcodes
+	 * @return string       Text with shortcodes replaced by a hash that will be restored later
+	 */
+	protected function shortcode_preserve( $text ) {
+		$text = preg_replace_callback( $this->get_shortcode_regex(), array( $this, '_doRemoveText' ), $text );
+		return $text;
+	}
+
+	/**
+	 * Avoid characters inside URLs from being formatted by Markdown in any way.
+	 *
+	 * @param  string $text Text in which to preserve URLs.
+	 *
+	 * @return string Text with URLs replaced by a hash that will be restored later.
+	 */
+	protected function urls_preserve( $text ) {
+		$text = preg_replace_callback(
+			'#(?<!<)(?:https?|ftp)://([^\s<>"\'\[\]()]+|\[(?1)*+\]|\((?1)*+\))+(?<![_*.?])#i',
+			array( $this, '_doRemoveText' ),
+			$text
+		);
+		return $text;
+	}
+
+	/**
+	 * Restores any text preserved by $this->hash_block()
+	 * @param  string $text Text that may have hashed preservation placeholders
+	 * @return string       Text with hashed preseravtion placeholders replaced by original text
+	 */
+	protected function do_restore( $text ) {
+		// Reverse hashes to ensure nested blocks are restored.
+		$hashes = array_reverse( $this->preserve_text_hash, true );
+		foreach( $hashes as $hash => $value ) {
+			$placeholder = $this->hash_maker( $hash );
+			$text = str_replace( $placeholder, $value, $text );
+		}
+		// reset the hash
+		$this->preserve_text_hash = array();
+		return $text;
+	}
+
+	/**
+	 * Regex callback for text preservation
+	 * @param  array $m  Regex $matches array
+	 * @return string    A placeholder that will later be replaced by the original text
+	 */
+	protected function _doRemoveText( $m ) {
+		return $this->hash_block( $m[0] );
+	}
+
+	/**
+	 * Call this to store a text block for later restoration.
+	 * @param  string $text Text to preserve for later
+	 * @return string       Placeholder that will be swapped out later for the original text
+	 */
+	protected function hash_block( $text ) {
+		$hash = md5( $text );
+		$this->preserve_text_hash[ $hash ] = $text;
+		$placeholder = $this->hash_maker( $hash );
+		return $placeholder;
+	}
+
+	/**
+	 * Less glamorous than the Keymaker
+	 * @param  string $hash An md5 hash
+	 * @return string       A placeholder hash
+	 */
+	protected function hash_maker( $hash ) {
+		return 'MARKDOWN_HASH' . $hash . 'MARKDOWN_HASH';
+	}
+
+	/**
+	 * Remove bare <p> elements. <p>s with attributes will be preserved.
+	 * @param  string $text HTML content
+	 * @return string       <p>-less content
+	 */
+	public function unp( $text ) {
+		return preg_replace( "#<p>(.*?)</p>(\n|$)#ums", '$1$2', $text );
+	}
+
+	/**
+	 * A regex of all shortcodes currently registered by the current
+	 * WordPress installation
+	 * @uses   get_shortcode_regex()
+	 * @return string A regex for grabbing shortcodes.
+	 */
+	protected function get_shortcode_regex() {
+		$pattern = get_shortcode_regex();
+
+		// don't match markdown link anchors that could be mistaken for shortcodes.
+		$pattern .= '(?!\()';
+
+		return "/$pattern/s";
+	}
+
+	/**
+	 * Since we escape unspaced #Headings, put things back later.
+	 * @param  string $text text with a leading escaped hash
+	 * @return string       text with leading hashes unescaped
+	 */
+	protected function restore_leading_hash( $text ) {
+		return preg_replace( "/^(<p>)?(&#35;|\\\\#)/um", "$1#", $text );
+	}
+
+	/**
+	 * Overload to support ```-fenced code blocks for pre-Markdown Extra 1.2.8
+	 * https://help.github.com/articles/github-flavored-markdown#fenced-code-blocks
+	 */
+	public function doFencedCodeBlocks( $text ) {
+		// If we're at least at 1.2.8, native fenced code blocks are in.
+		// Below is just copied from it in case we somehow got loaded on
+		// top of someone else's Markdown Extra
+		if ( version_compare( MARKDOWNEXTRA_VERSION, '1.2.8', '>=' ) )
+			return parent::doFencedCodeBlocks( $text );
+
+		#
+		# Adding the fenced code block syntax to regular Markdown:
+		#
+		# ~~~
+		# Code block
+		# ~~~
+		#
+		$less_than_tab = $this->tab_width;
+
+		$text = preg_replace_callback('{
+				(?:\n|\A)
+				# 1: Opening marker
+				(
+					(?:~{3,}|`{3,}) # 3 or more tildes/backticks.
+				)
+				[ ]*
+				(?:
+					\.?([-_:a-zA-Z0-9]+) # 2: standalone class name
+				|
+					'.$this->id_class_attr_catch_re.' # 3: Extra attributes
+				)?
+				[ ]* \n # Whitespace and newline following marker.
+
+				# 4: Content
+				(
+					(?>
+						(?!\1 [ ]* \n)	# Not a closing marker.
+						.*\n+
+					)+
+				)
+
+				# Closing marker.
+				\1 [ ]* (?= \n )
+			}xm',
+			array($this, '_doFencedCodeBlocks_callback'), $text);
+
+		return $text;
+	}
+
+	/**
+	 * Callback for pre-processing start of line hashes to slyly escape headings that don't
+	 * have a leading space
+	 * @param  array $m  preg_match matches
+	 * @return string    possibly escaped start of line hash
+	 */
+	public function _doEscapeForHashWithoutSpacing( $m ) {
+		if ( ! isset( $m[1] ) )
+			$m[0] = '\\' . $m[0];
+		return $m[0];
+	}
+
+	/**
+	 * Overload to support Viper's [code] shortcode. Because awesome.
+	 */
+	public function _doFencedCodeBlocks_callback( $matches ) {
+		// in case we have some escaped leading hashes right at the start of the block
+		$matches[4] = $this->restore_leading_hash( $matches[4] );
+		// just MarkdownExtra_Parser if we're not going ultra-deluxe
+		if ( ! $this->use_code_shortcode ) {
+			return parent::_doFencedCodeBlocks_callback( $matches );
+		}
+
+		// default to a "text" class if one wasn't passed. Helps with encoding issues later.
+		if ( empty( $matches[2] ) ) {
+			$matches[2] = 'text';
+		}
+
+		$classname =& $matches[2];
+		$codeblock = preg_replace_callback('/^\n+/', array( $this, '_doFencedCodeBlocks_newlines' ), $matches[4] );
+
+		if ( $classname[0] == '.' )
+			$classname = substr( $classname, 1 );
+
+		$codeblock = esc_html( $codeblock );
+		$codeblock = sprintf( $this->shortcode_start, $classname ) . "\n{$codeblock}" . $this->shortcode_end;
+		return "\n\n" . $this->hashBlock( $codeblock ). "\n\n";
+	}
+
+ }
 }

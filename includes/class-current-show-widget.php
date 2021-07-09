@@ -260,7 +260,6 @@ class DJ_Widget extends WP_Widget {
 		$width = empty( $instance['avatar_width'] ) ? '' : $instance['avatar_width'];
 		$link_djs = isset( $instance['link_djs'] ) ? $instance['link_djs'] : '';
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : 0;
-		$dynamic = isset( $instance['dynamic'] ) ? $instance['dynamic'] : 0;
 		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : 0;
 
 		// --- set shortcode attributes ---
@@ -284,7 +283,6 @@ class DJ_Widget extends WP_Widget {
 			'link_djs'       => $link_djs,
 			'show_encore'    => $encore,
 			'countdown'      => $countdown,
-			'dynamic'        => $dynamic,
 			'widget'         => 1,
 			'id'             => $id,
 		);
@@ -294,6 +292,9 @@ class DJ_Widget extends WP_Widget {
 			$atts['ajax'] = $ajax;
 		}
 
+		// 2.3.3.9: add filter for default widget attributes
+		$atts = apply_filters( 'radio_station_current_show_widget_atts', $atts, $instance );
+
 		// --- before widget ---
 		// phpcs:ignore WordPress.Security.OutputNotEscaped
 		echo $args['before_widget'];
@@ -301,8 +302,7 @@ class DJ_Widget extends WP_Widget {
 		// --- open widget container ---
 		// 2.3.0: add unique id to widget
 		// 2.3.2: add class to widget
-		$id = 'current-show-widget-' . $id;
-		echo '<div id="' . esc_attr( $id ) . '" class="current-show-wrap widget">';
+		echo '<div id="current-show-widget-' . esc_attr( $id ) . '" class="widget">';
 
 		// --- widget title ---
 		// phpcs:ignore WordPress.Security.OutputNotEscaped
@@ -312,6 +312,9 @@ class DJ_Widget extends WP_Widget {
 		}
 		// phpcs:ignore WordPress.Security.OutputNotEscaped
 		echo $args['after_title'];
+
+		// 2.3.3.9: add div wrapper for widget contents
+		echo '<div id="current-show-widget-contents-' . esc_attr( $id ) . '" class="current-show-wrap">';
 
 		// --- get default display output ---
 		// 2.3.0: use shortcode to generate default widget output
@@ -327,6 +330,10 @@ class DJ_Widget extends WP_Widget {
 			echo $output;
 		}
 
+		// --- close widget contents wrapper ---
+		echo '</div>';
+
+		// --- close widget container ---
 		echo '</div>';
 
 		// --- after widget ---
