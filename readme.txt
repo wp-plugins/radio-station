@@ -3,8 +3,8 @@ Contributors: tonyzeoli, majick
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
-Tested up to: 5.6.2
-Stable tag: 2.3.3.9
+Tested up to: 5.7.2
+Stable tag: 2.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -197,6 +197,10 @@ We haven't built an interface between Google Calendar and Radio Station just yet
 8. Show Conflict Display
 
 == Changelog ==
+
+= 2.4.0 =
+* Added: Radio Stream Player!
+* Fixed: Shows archive shortcode with no Shows selected
 
 = 2.3.3.9 =
 * Update: Plugin Panel (1.1.8) with Number Step Min/Max fix

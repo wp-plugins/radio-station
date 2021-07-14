@@ -7,6 +7,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### 2.4.0
+* Added: Radio Stream Player!
+* Fixed: Shows archive shortcode with no Shows selected
+
 ### 2.3.3.9
 * Update: Plugin Panel (1.1.8) with Number Step Min/Max fix
 * Update: Freemius SDK (2.4.2)
