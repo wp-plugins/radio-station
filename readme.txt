@@ -3,8 +3,8 @@ Contributors: tonyzeoli, majick
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
-Tested up to: 5.6.2
-Stable tag: 2.3.3.9
+Tested up to: 5.7.2
+Stable tag: 2.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -96,15 +96,15 @@ Simply create a new show via Add Show in the Radio Station plugin menu in the Ad
 
 = How do I display a full schedule of my Station's shows? =
 
-In the Plugin Settings, you can select a Page on which to automatically display the schedule as well as which View to display (a Table grid by default.) Alternatively, you can use the shortcode `[master-schedule]` on any page (or post.) This option allows you to use further shortcode attributes to control the what is displayed in the Schedule (see [Master Schedule Shortcode Docs](./Shortcodes.md#master-schedule-shortcode) )
+In the Plugin Settings, you can select a Page on which to automatically display the schedule as well as which View to display (a Table grid by default.) Alternatively, you can use the shortcode `[master-schedule]` on any page (or post.) This option allows you to use further shortcode attributes to control the what is displayed in the Schedule (see [Master Schedule Shortcode Docs](https://netmix.com/radio-station/docs/shortcodes/#master-schedule-shortcode) )
 
 = I've scheduled all my Shows, but some are not showing up on the program schedule? =
 
-Did you remember to check the "Active" checkbox for each Show? If a Show is not marked active, the plugin assumes that it's not currently in production and it is not shown on the Schedule. A Show will also not be shown if it has no active Shifts assigned to it.
+Did you remember to check the "Active" checkbox for each Show? If a Show is not marked active, the plugin assumes that it's not currently in production and it is not shown on the Schedule. A Show will also not be shown if it has a Draft status or has no active Shifts assigned to it.
 
-= What if I want to schedule a special event? =
+= What if I want to schedule a special event or one-off schedule change? =
 
-If you have a one-off event that you need to show up in the Schedule and Widgets, you can create a Schedule Override by clicking the Schedule Override tab in the Admin menu. This will allow you to set aside a block of time on a specific date, and when the Schedule or Widget is displaying that date, the override will be used instead of the normally scheduled Show. (Note that Schedule Overrides will not display in the old Legacy Table or List Views of the Master Schedule.)
+If you have a one-off event that you need to show up in the Schedule and Widgets, you can create a Schedule Override by clicking Schedule Override in the Radio Station admin menu. This will allow you to set aside a block of time on a specific date, and when the Schedule or Widget is displaying that date, the override will be used instead of the normally scheduled Show. (Note that Schedule Overrides will not display in the old Legacy Table/Div Views of the Master Schedule.)
 
 = I'm seeing a 404 Not Found error when I click on the link for a Show! =
 
@@ -117,11 +117,15 @@ The default styles for Radio Station have intionally kept fairly minimal so as t
 = What Widgets are available with this plugin? =
 
 The following Widgets are available to add via the WordPress Appearance -> Widgets page:
-Current Show, Upcoming Shows, Current Playlist. Radio Clock and Streaming Player Widgets will also be available in future versions. See the [Widget Documentation](./Widgets.md) for more details on these Widgets.
+Current Show, Upcoming Shows, Current Playlist, Radio Clock and Streaming Player Widgets. See the [Widget Documentation](https://netmix.com/radio-station/docs/widgets/) for more details on these Widgets.
+
+= Do the Widgets reload automatically? =
+
+Current Show, Upcoming Shows and Current Playlist widgets do not refresh automatically in this free version. This capability has been added as a new feature to the [Pro version](https://radiostation.pro) however - so that the widgets refresh exactly at Show changeover times.
 
 = What Shortcodes are available with this plugin? =
 
-See the [Shortcode Documentation](./Shortcodes.md) for more details and a full list of possible Attributes for these Shortcodes:
+See the [Shortcode Documentation](https://netmix.com/radio-station/docs/shortcodes/) for more details and a full list of possible Attributes for these Shortcodes:
 
 * `[master-schedule]` - Master Program Schedule Display
 * `[current-show]` - Current Show Widget
@@ -129,6 +133,7 @@ See the [Shortcode Documentation](./Shortcodes.md) for more details and a full l
 * `[current-playlist]` - Current Playlist Widget
 * `[shows-archive]` - Archive List of Shows
 * `[genres-archive]` - Archive List of Shows sorted by Genre
+* `[languages-archive]` - Archive List of Shows sorted by Language
 * `[overrides-archive]` - Archive List of Schedule overrides
 * `[playlists-archive]` - Archive List of Show Playlists
 
@@ -136,7 +141,7 @@ Note old shortcode aliases will still work in current and future versions to pre
 
 = I need users other than just the Administrator and DJ roles to have access to the Shows and Playlists post types. How do I do that? =
 
-There are a number of different options depending on what you are wanting to to do. You can find more information on these in the [Roles Documentation](./Roles.md)
+There are a number of different options depending on what you are wanting to to do. To address this situation, we have added a Show Editor role that can edit Shows without being an Administrator. You can find more information on roles in the [Roles Documentation](https://netmix.com/radio-station/docs/roles/)
 
 = How do I change the Show Avatar displayed in the sidebar widget? =
 
@@ -144,15 +149,15 @@ The avatar is whatever image is assigned as the Show's Avatar.  All you have to 
 
 = Why don't any users show up in the Hosts or Producers list on the Show edit page? =
 
-You did remember to assign the Host or Producer role to the users you want, right?
+You need to assign the Host or Producer role to the users you want, so that you can select these users on the Show edit page. You can assign roles by editing the User via the WordPress admin. The [Pro version](https://radiostation.pro) has an additional Role Editor interface where you can assign the plugin roles to any number of users at once.
 
-= My Show Hosts and Producers can't edit a Show page.  What do I do? =
+= My Show Hosts and Producers can't edit a Show page. What do I do? =
 
 The only Hosts and Producers that can edit a show are the ones listed as being Hosts or Producers for that Show in the respective user selection menus. This is to prevent Hosts/Producers from editing other Host/Producer's Shows without permission.
 
 = I don't want to use Gravatar for my Host/Producer's image on their profile page. =
 
-Then you'll need to install a plugin that lets you add a different image to your Host/Producer's user account and edit your author.php theme file accordingly.  That's a little out of the scope of this plugin. I recommend [Cimy User Extra Fields](http://wordpress.org/extend/plugins/cimy-user-extra-fields/)
+Then you'll need to install a plugin that lets you add a different image to your Host/Producer's user account. As there are a number of plugins that do just this, it's a little out of the scope of this plugin. However, in the [Pro version](https://radiostation.pro) you can create separate profile pages to showcase each of your Hosts and Producers, and assign profile images to these profile pages.
 
 = What languages other than English is the plugin available in? =
 
@@ -170,13 +175,13 @@ Right now:
 
 = Can the plugin be translated into my language? =
 
-You may translate the plugin into another language. Please visit our [WordPress Translate project page](https://translate.wordpress.org/locale/en-gb/default/wp-plugins/radio-station/) for this plugin for further instruction. The `radio-station.pot` file is located in the `/languages` directory of the plugin. Please send the finished translation to `info@netmix.com`. We'd love to include it.
+You may translate the plugin into another language. Please visit our [WordPress Translate project page](https://translate.wordpress.org/projects/wp-plugins/radio-station/) for this plugin for further instruction. The `radio-station.pot` file is located in the `/languages` directory of the plugin. Please send the finished translation to `info@netmix.com`. We'd love to include it.
 
 = Can I use this plugin for Podcasts? =
 
 While the plugin is not specifically geared toward Podcasting, which is not live programming, some podcaster's have used Radio Station to let their subscribers know when they publish new shows.
 
-= Can I use this plugin for TWitchTV, Facebook Live, or Clubhouse shows? =
+= Can I use this plugin for TwitchTV, Facebook Live, or Clubhouse shows? =
 
 Sure, there's no reason why you couldn't use the plugin to display a show schedule on a WordPress site for those services. Unfortunately, we are not currently syncing events from these platforms, but may do so in the future. While there may be APIs available from the larger services, Clubhouse does not yet have a public API, so scheduled rooms can't be automated to the Radio Station show scheduling system.
 
@@ -184,6 +189,17 @@ Sure, there's no reason why you couldn't use the plugin to display a show schedu
 
 We haven't built an interface between Google Calendar and Radio Station just yet, but it's on our radar to do so in the foreseeable future.
 
+= How do I install the latest Development version for testing? =
+
+If you are having issues with the plugin, we may recommend you install the development version for further bugix testing, as it may contain fixes that are not yet released into the next stable WordPress version. It is recommended you do this on a staging site. Instructions:
+
+1. Download the `develop` branch zip from the Github repository at: 
+`https://github.com/netmix/radio-station/tree/develop/`
+2. Unzip the downloaded file on your computer and upload it via FTP to the subdirectory of your WordPress install on your web server: `/wp-content/plugins/radio-station-dev/`
+3. Rename the subdirectory `/wp-content/plugins/radio-station/` to `/wp-content/plugins/radio-station-old`
+4. Rename the subdirectory `/wp-content/plugins/radio-station-dev/` to `/wp-content/plugins/radio-station/`
+
+You can now visit your site to make sure nothing is broken. If you experience issues you can reverse the folder renaming process to activate the old copy of the plugin. If the new development version works fine, at your convenience you can delete the `/wp-content/plugins/radio-station-old/` directory.
 
 
 == Screenshots ==
@@ -197,6 +213,10 @@ We haven't built an interface between Google Calendar and Radio Station just yet
 8. Show Conflict Display
 
 == Changelog ==
+
+= 2.4.0 =
+* Added: Radio Stream Player!
+* Fixed: Shows archive shortcode with no Shows selected
 
 = 2.3.3.9 =
 * Update: Plugin Panel (1.1.8) with Number Step Min/Max fix
@@ -680,6 +700,10 @@ We haven't built an interface between Google Calendar and Radio Station just yet
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.4.0 =
+* Radio Station Stream Player Widget!
+* https://netmix.com/radio-station-2-4-0-release-with-stream-player/
 
 = 2.3.3.9 =
 * Multiple Dates and Times for Schedule Overrides!

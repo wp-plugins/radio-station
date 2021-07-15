@@ -305,6 +305,9 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 		}
 	}
 	$atts = shortcode_atts( $defaults, $atts, $type . '-archive' );
+	if ( RADIO_STATION_DEBUG ) {
+		echo '<span style="display:none;">Shortcode Atts: ' . print_r( $atts, true ) . '</span>';
+	}
 
 	// --- get published shows ---
 	// 2.3.3.9: ignore offset and limit and reapply later
@@ -397,11 +400,12 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 	}
 
 	// 2.3.3.9: allow for selective post specifications
-	if ( ( RADIO_STATION_SHOW_SLUG == $type ) && isset( $atts['show'] ) ) {
+	// 2.4.0: fix selective posts for default (false)
+	if ( ( RADIO_STATION_SHOW_SLUG == $type ) && isset( $atts['show'] ) && $atts['show'] ) {
 		$args['include'] = explode( ',', $atts['show'] );		
-	} elseif ( ( RADIO_STATION_OVERRIDE_SLUG == $type ) && isset( $atts['override'] ) ) {
+	} elseif ( ( RADIO_STATION_OVERRIDE_SLUG == $type ) && isset( $atts['override'] ) && $atts['override'] ) {
 		$args['include'] = explode( ',', $atts['override'] );
-	} elseif ( ( RADIO_STATION_PLAYLIST_SLUG == $type ) && isset( $atts['playlist'] ) ) {
+	} elseif ( ( RADIO_STATION_PLAYLIST_SLUG == $type ) && isset( $atts['playlist'] ) && $atts['playlist'] ) {
 		$args['include'] = explode( ',', $atts['playlist'] );
 	}
 

@@ -9,6 +9,16 @@ Note Widgets are displayed via their corresponding Shortcodes to prevent code du
 [Radio Station Demo Site](http://radiostationdemo.com)
 
 
+## Radio Player Widget
+Since 2.4.0, Radio Station includes a Streaming Player Widget! (see [Radio Player Widget](./Player.md#radio-player-widget))
+
+### Radio Player Shortcode
+`[radio-player]` (see [Radio Player Shortcode](./Player.md#radio-player-shortcode))
+
+#### [Pro] Sitewide Bar Player
+[Radio Station Pro](https://radiostation.pro) includes a Sitewide Bar Streaming Player. It isn't added via the Widgets Page, but is instead configured via the Plugin Settings Page under the Player tab. (see [Sitewide Bar Player](./Player.md#pro-sitewide-bar-player) )
+
+
 ## Current Show Widget
 Displays the currently playing Show - if there is one scheduled to play right now.
 
@@ -92,22 +102,6 @@ Example: `[current-playlist title="Current Song" artist="1" song="1" album="1" l
 
 As of 2.3.2, Radio Station now includes a Radio Clock Widget which will display the current Radio Station time in your selected Radio Station Timezone (via the Plugin Settings page) alongside the site visitor's current time (via browser detection.)
 
-### [Pro] Timezone Switcher
-[Radio Station Pro](https://radiostation.pro) will include a user Timezone Switcher in the which will allow your listener's to select a timezone and display adjusted Schedule and Show times.
-
-
-## Radio Player Widget
-A future version of Radio Station will include a Streaming Player Widget.
-
-### Radio Player Shortcode
-`[radio-player]` (see [Radio Player Shortcode](./Shortcodes.md#radio-player-shortcode))
-
-The following attributes are available for this shortcode:
-
-
-
-
-
-### [Pro] Sitewide Bar Player
-Radio Station Pro includes a Sitewide Bar Streaming Player. It isn't added via the Widgets Page, but uses the Radio Player Shortcode with Settings from the Plugin Settings Page.
+#### [Pro] Timezone Switcher
+[Radio Station Pro](https://radiostation.pro) includes a user Timezone Switcher in the which will allow your listener's to select a timezone and display adjusted Schedule and Show times.
 

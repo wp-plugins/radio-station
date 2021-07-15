@@ -3347,6 +3347,9 @@ function radio_station_get_show_avatar( $show_id, $size = 'thumbnail', $attr = a
 function radio_station_get_stream_url() {
 	$streaming_url = '';
 	$stream = radio_station_get_setting( 'streaming_url' );
+	if ( RADIO_STATION_DEBUG ) {
+		echo '<span style="display:none;">Stream URL Setting: '; var_dump( $stream ); echo '</span>';
+	}
 	if ( $stream && ( '' != $stream ) ) {
 		$streaming_url = $stream;
 	}
@@ -3364,6 +3367,9 @@ function radio_station_get_fallback_url() {
 	$fallback = radio_station_get_setting( 'fallback_url' );
 	if ( $fallback && ( '' != $fallback ) ) {
 		$fallback_url = $fallback;
+	}
+	if ( RADIO_STATION_DEBUG ) {
+		echo '<span style="display:none;">Fallback URL Setting: '; var_dump( $stream ); echo '</span>';
 	}
 	$fallback_url = apply_filters( 'radio_station_fallback_url', $fallback_url );
 
