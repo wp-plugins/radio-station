@@ -2,8 +2,7 @@
 
 ***
 
-Note if you want to display a Shortcode within a custom Template, you can use `do_shortcode`.
-eg. `do_shortcode('[master-schedule]');`
+Note if you want to display a Shortcode within a custom Template, you can use the WordPress `do_shortcode` function. eg. `do_shortcode('[master-schedule]');`
 
 Shortcode Output Examples can be seen on the [Radio Station Demo Site](http://radiostationdemo.com)
 

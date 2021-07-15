@@ -29,7 +29,7 @@ Note that additional Pro Documentation will be added as new Features are release
 [Visual Shift Editor)(./Manage.md#pro-visual-shift-editor)
 
 #### Options
-[Pro Options](./Options.md) (throughout list)
+[Pro Options](./Options.md) (throughout options list)
 
 #### Roles
 [Role Editor Interface](./Roles.md#pro-role-editor-interface)
@@ -41,6 +41,7 @@ Note that additional Pro Documentation will be added as new Features are release
 [Show Episodes Archive Shortcode](./Shortcodes.md#pro-show-episodes-archive-shortcode
 
 #### Widgets
+[Sitewide Bar Player(./Player.md#pro-sitewide-bar-player)
 [Timezone Switcher](./Widgets.md#pro-timezone-switcher)
 
 

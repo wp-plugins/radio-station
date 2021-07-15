@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.3.4.0
+Version: 2.4.0
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -430,7 +430,7 @@ $options = array(
 			'howler'    => __( 'Howler', 'radio-station' ),
 			'jplayer'   => __( 'jPlayer', 'radio-station' ),
 		),
-		'helper'  => __( 'Default Script to use for Radio Streaming Player.', 'radio-station' ),
+		'helper'  => __( 'Default audio script to use for Radio Streaming Player.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'basic',
 		'pro'     => false,
@@ -473,7 +473,7 @@ $options = array(
 		'label'   => __( 'Player Debug Mode', 'radio-station' ),
 		'default' => '',
 		'value'   => 'yes',
-		'helper'  => __( 'Output player debug information in browser console.', 'radio-station' ),
+		'helper'  => __( 'Output player debug information in browser javascript console.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'basic',
 		'pro'     => false,
@@ -497,7 +497,7 @@ $options = array(
 		'type'    => 'color',
 		'label'   => __( 'Control Icons Highlight Color', 'radio-station' ),
 		'default' => '#00A0E0',
-		'helper'  => __( 'Default highlight color to use for Control buttons when active.', 'radio-station' ),
+		'helper'  => __( 'Default highlight color to use for Control button icons when active.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'colors',
 		'pro'     => true,
@@ -634,7 +634,7 @@ $options = array(
 	// --- [Pro] Player Page Fade ---
 	'player_bar_pagefade' => array(
 		'type'    => 'number',
-		'label'   => __( 'Fade In Player Bar', 'radio-station' ),
+		'label'   => __( 'Page Fade Time', 'radio-station' ),
 		'default' => 2000,
 		'min'     => 0,
 		'step'    => 100,
@@ -667,7 +667,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// TODO: additional CSS input field ?
+	// TODO: additional CSS input textarea field ?
 
 	// === Master Schedule Page ===
 
@@ -1780,6 +1780,10 @@ function radio_station_streaming_data( $data, $station = false ) {
 		'fallback'	=> radio_station_get_fallback_url(),
 		'fformat'	=> radio_station_get_setting( 'fallback_format' ),
 	);
+	if ( RADIO_STATION_DEBUG ) {
+		echo '<span style="display:none;">Player Stream Data: ' . print_r( $data, true ) . '</span>';
+	}
+	$data = apply_filters( 'radio_station_streaming_data', $data, $station );
 	return $data;
 }
 

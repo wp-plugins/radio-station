@@ -101,13 +101,84 @@ Default: Off. Key: clear_transients
 Default: On. transient_caching
 Use Transient Caching to improve Schedule calculation performance.
 
-#### [Pro] Show Shift Feeds
-Default: On. Key: show_shift_feeds
-Convert RSS Feeds for a single Show to a Show shift feed, allowing a visitor to subscribe to a Show feed to be notified of Show shifts.
-
 
 ## Player
 
+#### Player Title
+Default: on. Key: player_title
+Display your Radio Station Title in Player by default.
+
+#### Player Image
+Default: on. Key: player_image
+Display your Radio Station Image in Player by default.
+
+#### Player Script
+Default: amplitude. Key: player_script
+Default audio script to use for Radio Streaming Player. Ampliture, Howler and Jplayer.
+
+#### Player Theme
+Default: light. Key: player_theme
+Default Player Controls theme style. Light or dark to match your theme.
+
+#### Player Buttons
+Default: rounded. Key: player_buttons
+Default Player Buttons shape style. Circular, rounded or square.
+
+#### Player Debug Mode
+Default: off. Key: player_debug
+Output player debug information in browser javascript console.
+
+#### [Pro] Playing Highlight Color
+Default: #70E070. Key: player_playing_color
+Default highlight color to use for Play button icon when playing.
+
+#### [Pro] Controls Highlight Color
+Default: #00A0E0. Key: player_buttons_color
+Default highlight color to use for player Control button icons when active.
+
+#### [Pro] Volume Knob Color
+Default: #80C080. Key: player_thumb_color
+Default Knob Color for Player Volume Slider.
+
+#### [Pro] Volume Track Color
+Default: #80C080. Key: player_range_color
+Default Track Color for Player Volume Slider.
+
+#### Player Start Volume
+Default: 77. Key: player_volume
+Initial volume for when the Player starts playback. 0-100
+
+#### Single Player
+Default: on. Key: player_single
+Stop any existing Players on the page or in other windows or tabs when a Player is started.
+
+#### [Pro] Player Autoresume
+Default: on. Key: player_autoresume
+Attempt to resume playback if visitor was playing. Only triggered when the user first interacts with the page.
+
+#### [Pro] Sitewide Player Bar
+Default: off. Key: player_bar
+Add a fixed position Player Bar which displays Sitewide. Fixed top or bottom position.
+
+#### [Pro] Fade In Player Bar
+Default: 2500. Key: player_bar_fadein
+Number of milliseconds after Page load over which to fade in Player Bar. Use 0 for instant display
+
+#### [Pro] Continuous Playback
+Default: on. Key: player_bar_continuous
+Uninterrupted Sitewide Bar playback while user is navigating between pages! Pages are loaded in background and faded in while Player Bar persists.
+
+#### [Pro] Player Page Fade
+Default: 2000. Key: player_bar_pagefade
+Number of milliseconds over which to fade in new Pages when continuous playback is enabled. Use 0 for instant display.
+
+#### [Pro] Bar Player Text Color
+Default: #FFFFFF. Key: player_bar_text
+Text color for the fixed position Sitewide Bar Player.
+
+#### [Pro] Bar Player Background Color
+Default: black. Key: player_bar_background
+Background color for the fixed position Sitewide Bar Player.
 
 
 ## Pages
