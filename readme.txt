@@ -12,7 +12,7 @@ Radio Station let's you build and manage a Show Schedule for a radio station or 
 
 == Description ==
 
-Radio Station by NetMix is a plugin to build and manage a Show Schedule for a radio station or internet broadcaster's WordPress website. If you're a podcaster with scheduled releases or a Clubhouse app moderator who schedule rooms, you could use this plugin to announce your schedule on your website. It's functionality was originally based on Drupal 6's Station plugin, reworked for use in Wordpress and then extended.
+Radio Station by Netmix is a plugin to build and manage a Show Schedule for a radio station or internet broadcaster's WordPress website. If you're a podcaster with scheduled releases or a Clubhouse app moderator who schedule rooms, you could use this plugin to announce your schedule on your website. It's functionality was originally based on Drupal 6's Station plugin, reworked for use in Wordpress and then extended.
 
 The plugin adds a new "Show" post type, schedulable blocks of time that contain a Show description, a Show shifts repeater field, assignable images and other meta information. You can also create Playlists associated with those shows, or assign standard blog posts to relate to a Show. It also supports adding Schedule Overrides for specific dates and times, and adds the ability to associate users (given a role of "Host" or "Producer") to Shows, so they can be displayed for that Show and to give them edit access.
 
@@ -213,6 +213,11 @@ You can now visit your site to make sure nothing is broken. If you experience is
 8. Show Conflict Display
 
 == Changelog ==
+
+= 2.4.0.1 =
+* Fixed: Rounded player play button background corner style
+* Fixed: Tabbed schedule active day tab on pageload
+* Improved: Radio Clock Widget layout
 
 = 2.4.0 =
 * Added: Radio Stream Player!

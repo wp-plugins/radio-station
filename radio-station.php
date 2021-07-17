@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.4.0
+Version: 2.4.0.1
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -603,6 +603,20 @@ $options = array(
 		'tab'     => 'player',
 		'section' => 'bar',
 		'helper'  => __( 'Add a fixed position Player Bar which displays Sitewide.', 'radio-station' ),
+		'pro'     => true,
+	),
+
+	// --- [Pro] Player Bar Height ---
+	'player_bar_height'        => array(
+		'type'    => 'number',
+		'min'     => 40,
+		'max'     => 400,
+		'step'    => 1,
+		'label'   => __( 'Player Bar Height', 'radio-station' ),
+		'default' => 80,
+		'tab'     => 'player',
+		'section' => 'bar',
+		'helper'  => __( 'Set the height of the Sitewide Player Bar in pixels.', 'radio-station' ),
 		'pro'     => true,
 	),
 
@@ -1349,7 +1363,7 @@ $settings = array(
 	'freemius_id'  => '4526',
 	'freemius_key' => 'pk_aaf375c4fb42e0b5b3831e0b8476b',
 	'hasplans'     => false,
-	'hasaddons'    => false,
+	'hasaddons'    => true, // false, // true
 	'plan'         => 'free',
 );
 
