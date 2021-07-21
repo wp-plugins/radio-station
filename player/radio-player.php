@@ -206,15 +206,25 @@ function radio_station_player_output( $args = array() ) {
 	}
 
 	// --- maybe set player instance ---
-	if ( isset( $args['id'] ) ) {
-		$instance = $args['id'];
-	} else {
-		$instance = 0;
-		if ( isset( $radio_player['instance'] ) ) {
-			$instance = $radio_player['instance'];
+	// 2.4.0.1: fix for storing multiple instance IDs
+	if ( !isset( $radio_player['instances'] ) ) {
+		$radio_player['instances'] = array();
+	}
+	$instance = 0;
+	if ( isset( $args['id'] ) && ( '' != $args['id'] ) ) {
+		$id = abs( intval( $args['id'] ) ) ;
+		if ( $instance > 0 ) {
+			$instance = $id; 
 		}
-		$instance++;
-		$radio_player['instance'] = $instance;
+	}		
+	if ( in_array( $instance, $radio_player['instances'] ) ) {
+		while ( in_array( $instance, $radio_player['instances'] ) ) {
+			$instance++;
+		}
+	}
+	$radio_player['instances'][] = $instance;
+	if ( isset( $_REQUEST['player-debug'] ) && ( '1' == $_REQUEST['player-debug'] ) ) {
+		echo '<span style="display:none;">Player Instance: ' . $instance . ' - Instances: ' . print_r( $radio_player['instances'], true ) . '</span>';
 	}
 
 	// --- filter player output args ---
@@ -278,16 +288,18 @@ function radio_station_player_output( $args = array() ) {
 		$html['station'] .= '	<div class="rp-station-text">';
 
 			// --- station title ---
-			$html['station'] .= '		<div class="rp-station-title" aria-label="' . esc_attr( __( 'Station Name' ) ) . '">';
+			$station_text_html = '		<div class="rp-station-title" aria-label="' . esc_attr( __( 'Station Name' ) ) . '">';
 			if ( ( '0' != (string)$args['title'] ) && ( 0 !== $args['title'] ) && ( '' != $args['title'] ) ) {
-				$html['station'] .= esc_html( $args['title'] );
+				$station_text_html .= esc_html( $args['title'] );
 			}
-			$html['station'] .= '		</div>' . PHP_EOL;
+			$station_text_html .= '		</div>' . PHP_EOL;
 
-			// --- station timezone / location / frequency ? ---
-			// TODO: add timezone and/or frequency display
-			$html['station'] .= '		<div class="rp-station-timezone"></div>' . PHP_EOL;
-			$html['station'] .= '		<div class="rp-station-frequency"></div>' . PHP_EOL;
+			// --- station timezone / location / frequency ---
+			// TODO: add timezone and/or frequency display ?
+			$station_text_html .= '		<div class="rp-station-timezone"></div>' . PHP_EOL;
+			$station_text_html .= '		<div class="rp-station-frequency"></div>' . PHP_EOL;
+			
+			$html['station'] .= $station_text_html;
 
 		$html['station'] .= '	</div>' . PHP_EOL;
 
@@ -351,17 +363,19 @@ function radio_station_player_output( $args = array() ) {
 		$html['switcher'] .= '</div>' . PHP_EOL;
 	}
 
-	// --- Current Show ---
+	// --- Current Show Texts ---
 	// TODO: add other show info divs ( with expander ) ?
+	$show_text_html = '<div class="rp-show-text">' . PHP_EOL;
+	$show_text_html .= '	<div class="rp-show-title" aria-label="' . esc_attr( __( 'Show Title', 'radio-player' ) ) . '"></div>' . PHP_EOL;
+	$show_text_html .= '	<div class="rp-show-hosts"></div>' . PHP_EOL;
+	$show_text_html .= '	<div class="rp-show-producers"></div>' . PHP_EOL;
+	$show_text_html .= '	<div class="rp-show-shift"></div>' . PHP_EOL;
+	$show_text_html .= '	<div class="rp-show-remaining"></div>' . PHP_EOL;
+	$show_text_html .= '</div>' . PHP_EOL;
+	$show_text_html .= '<div id="rp-show-image-' . esc_attr( $instance ) . '" class="rp-show-image no-image" aria-label="' . esc_attr( __( 'Show Logo Image', 'radio-player' ) ) . '"></div>' . PHP_EOL;
+
 	$html['show'] = '<div class="rp-show-info">' . PHP_EOL;
-	$html['show'] .= '	<div class="rp-show-text">' . PHP_EOL;
-	$html['show'] .= '		<div class="rp-show-title" aria-label="' . esc_attr( __( 'Show Title', 'radio-player' ) ) . '"></div>' . PHP_EOL;
-	$html['show'] .= '		<div class="rp-show-hosts"></div>' . PHP_EOL;
-	$html['show'] .= '		<div class="rp-show-producers"></div>' . PHP_EOL;
-	$html['show'] .= '		<div class="rp-show-shift"></div>' . PHP_EOL;
-	$html['show'] .= '		<div class="rp-show-remaining"></div>' . PHP_EOL;
-	$html['show'] .= '	</div>' . PHP_EOL;
-	$html['show'] .= '	<div id="rp-show-image-' . esc_attr( $instance ) . '" class="rp-show-image no-image" aria-label="' . esc_attr( __( 'Show Logo Image', 'radio-player' ) ) . '"></div>' . PHP_EOL;
+	$html['show'] .= $show_text_html;
 	$html['show'] .= '	</div>' . PHP_EOL;
 
 	// --- Progress Bar ---
@@ -420,7 +434,7 @@ function radio_station_player_output( $args = array() ) {
 		}
 	// }
 	if ( function_exists( 'apply_filters' ) ) {
-		$control_order = apply_filters( 'radio_station_player_control_order', $control_order, $args );
+		$control_order = apply_filters( 'radio_station_player_control_order', $control_order, $args, $instance );
 	}
 
 	if ( isset( $_REQUEST['player-debug'] ) && ( '1' == $_REQUEST['player-debug'] ) ) {
@@ -428,18 +442,28 @@ function radio_station_player_output( $args = array() ) {
 		echo '<!-- Control Order: ' . print_r( $control_order, true ) . ' -->';
 	}
 
+	// --- set alternative text sections ---
+	// 2.4.0.2: added for alternative display methods
+	$station_text_alt = '<div class="rp-station-text-alt">' . $station_text_html . '</div>' . PHP_EOL;
+	$station_text_alt = apply_filters( 'radio_station_player_station_text_alt', $station_text_alt, $args, $instance );
+	$show_text_alt = '<div class="rp-station-text-alt">' . $show_text_html . '</div>' . PHP_EOL;
+	$show_text_alt = apply_filters( 'radio_station_player_show_text_alt', $show_text_alt, $args, $instance );
+
 	// --- create player from sections ---
 	$player = $html['player_open'];
 	foreach ( $section_order as $section ) {
 		if ( 'interface' == $section ) {
 
 			// --- create control interface ---
+			// 2.4.0.1: added alternative text sections
 			$player .= $html['interface_open'];
+			$player .= $html['station-text-alt'];
 			foreach ( $control_order as $control ) {
 				if ( isset( $html[$control] ) ) {
 					$player .= $html[$control];
 				}
 			}
+			$player .= $html['show-text-alt'];
 			$player .= $html['interface_close'];
 
 		} elseif ( isset( $html[$section] ) ) {
@@ -451,6 +475,8 @@ function radio_station_player_output( $args = array() ) {
 	// }
 	$player .= $html['player_close'];
 
+	// --- filter and return ---
+	$player = apply_filters( 'radio_station_player_html', $player, $args, $instance );
 	return $player;
 }
 
@@ -542,6 +568,7 @@ function radio_station_player_shortcode( $atts ) {
 	}
 
 	// --- set default atts ---
+	// 2.4.0.1: add player ID attribute
 	$defaults = array(
 		'url'       => '',
 		'format'    => '',
@@ -557,6 +584,7 @@ function radio_station_player_shortcode( $atts ) {
 		'volume'    => $volume,
 		'default'   => false,
 		'widget'    => 0,
+		'id'        => '',
 	);
 
 	// --- unset attribites set to default ---
@@ -564,6 +592,12 @@ function radio_station_player_shortcode( $atts ) {
 		if ( 'default' == $value ) {
 			unset( $atts[$key] );
 		}
+	}
+
+	// --- filter attributes ---
+	// 2.4.0.1: move fitler to before merging
+	if ( function_exists( 'apply_filters' ) ) {
+		$atts = apply_filters( 'radio_station_player_shortcode_attributes', $atts );
 	}
 
 	// --- merge attribute values ---
@@ -574,11 +608,6 @@ function radio_station_player_shortcode( $atts ) {
 		if ( !isset( $atts[$key] ) ) {
 			$atts[$key] = $value;
 		}
-	}
-
-	// --- filter attributes ---
-	if ( function_exists( 'apply_filters' ) ) {
-		$atts = apply_filters( 'radio_station_player_shortcode_attributes', $atts );
 	}
 
 	// --- maybe get station title ---
@@ -1476,9 +1505,10 @@ function radio_station_player_get_settings() {
 	$js .= "radio_player.stream_data = radio_data.state.data;" . PHP_EOL;
 
 	// --- attempt to set player state from cookies ---
-	$js .= "var radio_player_state_loader = setInterval(function() {
-		if (typeof radio_player_load_state != 'undefined') {
-			radio_player_load_state();
+	$js .= "var radio_player_state_loaded = false;
+	var radio_player_state_loader = setInterval(function() {
+		if (!radio_player_state_loaded && (typeof radio_player_load_state != 'undefined')) {
+			radio_player_load_state(); radio_player_state_loaded = true;
 			radio_player_custom_event('rp-state-loaded', false);			
 			clearInterval(radio_player_state_loader);
 		}
@@ -1616,7 +1646,7 @@ function radio_station_player_script_amplitude() {
 					station = jQuery('#radio_player_'+instance).attr('station-id');
 					if (station) {radio_player_set_state('station', station);}
 				}, */
-				/* bug: play callback is not being triggered 
+				/* bug: play callback event is not being triggered 
 				'play': function(e) {
 					radio_player.loading = false;
 					instance = radio_player_event_instance(e, 'Playing', 'amplitude');
@@ -2343,17 +2373,17 @@ function radio_station_player_control_styles( $instance ) {
 		$colors['thumb'] = radio_station_get_setting( 'player_thumb_color' );
 		$colors['track'] = radio_station_get_setting( 'player_range_color' );
 	} elseif ( function_exists( 'apply_filters' ) ) {
-		$colors['playing'] = apply_filters( 'radio_station_player_playing_color', $colors['playing'] );
-		$colors['buttons'] = apply_filters( 'radio_station_player_buttons_color', $colors['buttons'] );
-		$colors['thumb'] = apply_filters( 'radio_station_player_thumb_color', $colors['thumb'] );
-		$colors['track'] = apply_filters( 'radio_station_player_range_color', $colors['track'] );
+		$colors['playing'] = apply_filters( 'radio_station_player_playing_color', $colors['playing'], $instance );
+		$colors['buttons'] = apply_filters( 'radio_station_player_buttons_color', $colors['buttons'], $instance );
+		$colors['thumb'] = apply_filters( 'radio_station_player_thumb_color', $colors['thumb'], $instance );
+		$colors['track'] = apply_filters( 'radio_station_player_range_color', $colors['track'], $instance );
 	}
 
 	// --- maybe set player container selector ---
 	$container = '.radio-container';
 	if ( $instance ) {
 		$container = '#radio_container_' . $instance;
-		// TODO: get colors for container instance (eg. widget)
+		// --- get colors for container instance ---
 		if ( isset( $radio_player['instance-colors'][$instance] ) ) {
 			$instance_colors = $radio_player['instance-colors'];
 			foreach ( $instance_colors as $key => $instance_color ) {

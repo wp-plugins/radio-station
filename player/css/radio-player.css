@@ -51,6 +51,10 @@
 	margin-top: 7px;
 }
 
+.rp-station-text-alt, .rp-show-text-alt {
+	display: none;
+}
+
 .radio-container.vertical .rp-station-info,
 .radio-container.vertical .rp-interface,
 .radio-container.vertical .rp-show-info {
@@ -112,12 +116,13 @@
 	border-radius: 20px;
 }
 
-.radio-container.rounded .rp-play-pause-button {
+.radio-container.rounded .rp-play-pause-button-bg {
 	border-radius: 10px;
 }
 
 .rp-play-pause-button {
 	opacity: 0.9;
+	cursor: pointer;
 }
 
 .rp-play-pause-button:hover, .rp-play-pause-button:focus {
@@ -287,11 +292,11 @@
 	padding: 0;
 	background-size: 100% 100%;
 }
-.rp-station-info .rp-station-image {margin-right: 20px;}
+.rp-station-info .rp-station-image {margin-right: 16px;}
 .rp-station-info .rp-station-image.no-image {width: 0; height: 0; margin-right: 0;}
 .rp-station-info .rp-station-image.no-image.new-image {width: 64px; height: 64px; margin-right: 20px;}
 .rp-station-info .rp-station-image.new-image img {display: none;}
-.rp-show-info .rp-show-image {margin-left: 20px;}
+.rp-show-info .rp-show-image {margin-left: 16px;}
 .rp-show-info .rp-show-image.no-image {width: 0; height: 0; margin-left: 0;}
 /* @end */
 
@@ -316,10 +321,3 @@
 	font-weight: bold;
 }
 /* @end */
-
-
-
-
-
-
-

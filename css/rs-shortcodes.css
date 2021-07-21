@@ -38,13 +38,19 @@
 
 /* Clock Shortcode */
 /* --------------- */
-.radio-clock-title, .radio-server-time, .radio-server-date, .radio-server-zone,
+.radio-server-time, .radio-server-date, .radio-server-zone,
 .radio-user-time, .radio-user-date, .radio-user-zone {
 	display: inline-block;
 }
 
+.widget .radio-clock-title {
+	float: left;
+}
+
 .radio-clock-title {
 	min-width: 100px;
+	min-height: 40px;	
+	display: inline-block;
 }
 
 .radio-timezone-title, .radio-user-timezone-title {

@@ -621,10 +621,12 @@ $options = array(
 	),
 
 	// --- [Pro] Continuous Playback ---
+	// 2.4.0.1: fix for missing value field
 	'player_bar_continuous' => array(
 		'type'    => 'checkbox',
 		'label'   => __( 'Continuous Playback', 'radio-station' ),
 		'default' => 'yes',
+		'value'   => 'yes',
 		'helper'  => __( 'Uninterrupted Sitewide Bar playback while user is navigating between pages! Pages are loaded in background and faded in while Player Bar persists.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'bar',
@@ -889,9 +891,9 @@ $options = array(
 	),
 
 	// === Episode Pages ===
-	// 2.3.3.9: added proflie page settings
+	// 2.3.3.9: added episode page settings
 
-	// --- [Pro] Profile Blocks Position ---
+	// --- [Pro] Episode Blocks Position ---
 	'episode_block_position' => array(
 		'type'    => 'select',
 		'label'   => __( 'Info Blocks Position', 'radio-station' ),
@@ -907,7 +909,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// ---- [Pro] Profile Section Layout ---
+	// ---- [Pro] Episode Section Layout ---
 	'episode_section_layout' => array(
 		'type'    => 'select',
 		'label'   => __( 'Episode Content Layout', 'radio-station' ),
@@ -1346,10 +1348,11 @@ $settings = array(
 	'textdomain'   => 'radio-station',
 
 	// --- Freemius ---
+	// 2.4.0.1: turn on addons switch for Pro
 	'freemius_id'  => '4526',
 	'freemius_key' => 'pk_aaf375c4fb42e0b5b3831e0b8476b',
 	'hasplans'     => false,
-	'hasaddons'    => false,
+	'hasaddons'    => true,
 	'plan'         => 'free',
 );
 

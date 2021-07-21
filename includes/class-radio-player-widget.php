@@ -223,7 +223,7 @@ class Radio_Player_Widget extends WP_Widget {
 
 		// --- set widget id ---
 		if ( !isset( $radio_station_data['widgets']['player'] ) ) {
-			$id = $radio_station_data['widgets']['player'] = 0;
+			$id = $radio_station_data['widgets']['player'] = 1;
 		} else {
 			$id = $radio_station_data['widgets']['player']++;
 		}
@@ -272,6 +272,7 @@ class Radio_Player_Widget extends WP_Widget {
 			// 'hosts'          => $hosts,
 			// 'producers'      => $producers,
 			// --- widget data ---
+			// 2.4.0.1: prefix widget player ID
 			'widget'         => 1,
 			'id'             => $id,
 		);
