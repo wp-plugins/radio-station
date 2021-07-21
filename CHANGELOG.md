@@ -7,11 +7,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### 2.4.0.1
-* Fixed: Rounded player play button background corner style
-* Fixed: Tabbed schedule active day tab on pageload
-* Improved: Radio Clock Widget layout
-
 ### 2.4.0
 * Added: Radio Stream Player!
 * Fixed: Shows archive shortcode with no Shows selected

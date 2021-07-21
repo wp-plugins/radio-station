@@ -935,7 +935,6 @@ function radio_station_master_schedule_tabs_js() {
 	// 2.3.3.9: check for required elements before executing functions
 	// 2.3.3.9: fix to check before and after current time not show
 	// 2.3.3.9: adjust responsive tabs for possible loader control presence
-	// 2.4.0.1: fix to active day on load by moving init set within tabs function
 	$js .= "/* Initialize Tabs */
 	var radio_tabs_init = false;
 	jQuery(document).ready(function() {
@@ -950,6 +949,7 @@ function radio_station_master_schedule_tabs_js() {
 		radio_tabs_clicks();
 		radio_tabs_responsive(false);
 		radio_tabs_show_highlight();
+		radio_tabs_init = true;	
 	}
 
 	/* Set Day Tab on Load */
@@ -965,7 +965,6 @@ function radio_station_master_schedule_tabs_js() {
 			jQuery('#master-schedule-tabs-header-'+day).addClass('active-day-tab');
 			jQuery('#master-schedule-tabs-day-'+day).addClass('active-day-panel');
 		}
-		radio_tabs_init = true;
 	}
 
 	/* Current Show Highlighting */

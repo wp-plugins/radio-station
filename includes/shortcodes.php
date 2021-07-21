@@ -24,8 +24,11 @@
 // - Show Lists Pagination Javascript
 // === Widget Shortcodes ===
 // - Current Show Shortcode
+// - AJAX Current Show Loader
 // - Upcoming Shows Shortcode
-// - Now Playing Shortcode
+// - AJAX Upcoming Shows Shortcode
+// - Current Playlist Shortcode
+// =-AJAX Current Playlist Loader
 // - Countdown Script
 // === Legacy Shortcodes ===
 // - Show List Shortcode
@@ -3063,9 +3066,9 @@ function radio_station_upcoming_shows() {
 	exit;
 }
 
-// ---------------------
-// Now Playing Shortcode
-// ---------------------
+// --------------------------
+// Current Playlist Shortcode
+// --------------------------
 // [current-playlist] / [now-playing]
 // 2.3.0: added missing output sanitization
 add_shortcode( 'current-playlist', 'radio_station_current_playlist_shortcode' );

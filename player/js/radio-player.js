@@ -499,13 +499,17 @@ function radio_player_default_instance() {
 
 /* --- pause all other instances */
 function radio_player_pause_others(instance) {
-	if (radio_player.debug) {console.log(radio_data.players);}
-	if (radio_data.players.length) {
+	if (radio_player.settings.singular && radio_data.players.length) {
+		if (radio_player.debug) {console.log(radio_data.players);}
 		for (i in radio_data.players) {
 			if (i != instance) {
 				/* TODO: if the stream is the same, maybe swap-fade players ? */
 				if (radio_player.debug) {console.log('Pausing Player Instance '+i);}
-				radio_player_pause_instance(instance);
+				/* temporarily disabled as conflicting with multiple instances usage */
+				/* radio_player_pause_instance(instance); */				
+				/* player = radio_data.players[instance]; script = radio_data.scripts[instance];
+				if ((script == 'amplitude') || (script == 'howler')) {player.pause();}
+				else if (script == 'jplayer') {player.jPlayer('pause');} */
 			}
 		}
 	}
@@ -706,6 +710,7 @@ function radio_player_broadcast_playing(instance) {
 		if (!instance) {instance = 0;}
 		message = windowid+':'+instance+':'+type+':'+channel;
 		console.log('Broadcast Message: '+message);
+		if (typeof channel == 'object') {console.log(channel);}
 		sysend.broadcast('radio-play', {message: message});
 	}
 }
@@ -790,15 +795,17 @@ jQuery(document).ready(function() {
 		container = jQuery(this).parents('.radio-container');
 		instance = container.attr('id').replace('radio_container_','');
 		if (radio_player_is_playing(instance)) {
-			console.log('Trigger Pause of Player Instance '+instance);
+			if (radio_player.debug) {console.log('Trigger Pause of Player Instance '+instance);}
 			radio_player_pause_instance(instance);
 		} else {
 			/* maybe toggle currently playing radio */
+			inst = instance;
 			if (typeof radio_player_toggle_current == 'function') {
+				if (radio_player.debug) {console.log('Trigger Toggle of Player. New Instance '+instance);}
 				done = radio_player_toggle_current(instance);
 				if (done) {return;}
 			}
-
+			instance = inst; /* <- this is a fix */
 			if (radio_player.debug) {console.log('Trigger Play of Player Instance '+instance);}
 			if (instance in radio_data.players) {
 				radio_player_play_instance(instance);
