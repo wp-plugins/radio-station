@@ -4,7 +4,7 @@ Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
 Tested up to: 5.7.2
-Stable tag: 2.4.0
+Stable tag: 2.4.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -213,6 +213,14 @@ You can now visit your site to make sure nothing is broken. If you experience is
 8. Show Conflict Display
 
 == Changelog ==
+
+= 2.4.0.2 =
+* Fixed: Multiple Player instance IDs
+* Fixed: Player loading button glow animation
+* Added: Enabled Pro Pricing plans page
+* Added: Widget type specific classes
+* Added: Alternative text positions in Player
+* Added: Pause button graphics to Player
 
 = 2.4.0 =
 * Added: Radio Stream Player!

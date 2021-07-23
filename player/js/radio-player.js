@@ -271,8 +271,7 @@ function radio_player_player_fallback(instance, script) {
 	else {radio_data.failed[instance] = new Array(); j = 0;}
 	if (!(script in radio_data.failed[instance])) {radio_data.failed[instance][j] = script;}
 	jQuery('#radio_container_'+instance).removeClass('playing').removeClass('loaded');
-
-	/* TODO: retry with fallback stream data first ? */
+	radio_player_event_handler('failed', radio_data.data[instance]);
 
 	/* retry different script with stored player instance data */
 	newscript = false;
@@ -288,6 +287,7 @@ function radio_player_player_fallback(instance, script) {
 	if (!newscript) {
 		console.log('Exhausted All Player Script Type Attempts');
 		radio_data.failed = new Array(); /* reset */
+		/* TODO: swap to fallback stream data and retry ? */
 	} else {
 		radio_data.data[instance].script = newscript; data = radio_data.data[instance];
 		if (radio_player.debug) {console.log('Trying New Player Script: '+newscript); console.log(data);}
@@ -506,7 +506,7 @@ function radio_player_pause_others(instance) {
 				/* TODO: if the stream is the same, maybe swap-fade players ? */
 				if (radio_player.debug) {console.log('Pausing Player Instance '+i);}
 				/* temporarily disabled as conflicting with multiple instances usage */
-				/* radio_player_pause_instance(instance); */				
+				/* radio_player_pause_instance(instance); */
 				/* player = radio_data.players[instance]; script = radio_data.scripts[instance];
 				if ((script == 'amplitude') || (script == 'howler')) {player.pause();}
 				else if (script == 'jplayer') {player.jPlayer('pause');} */

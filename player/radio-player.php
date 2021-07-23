@@ -455,7 +455,7 @@ function radio_station_player_output( $args = array() ) {
 		if ( 'interface' == $section ) {
 
 			// --- create control interface ---
-			// 2.4.0.1: added alternative text sections
+			// 2.4.0.2: added alternative text sections
 			$player .= $html['interface_open'];
 			$player .= $html['station-text-alt'];
 			foreach ( $control_order as $control ) {
@@ -2396,11 +2396,12 @@ function radio_station_player_control_styles( $instance ) {
 	$colors = apply_filters( 'radio_station_player_control_colors', $colors, $instance );
 
 	// --- Play Button ---
+	// 2.4.0.2: fix to glowingloading animation reference
 	$css = "/* Playing Button */
 " . $container . ".loaded .rp-play-pause-button-bg {background-color: " . $colors['buttons'] . ";}
 " . $container . ".playing .rp-play-pause-button-bg {background-color: " . $colors['playing'] . ";}
 " . $container . ".error .rp-play-pause-button-bg {background-color: #CC0000;}
-" . $container . ".loading .rp-play-pause-button-bg {animation: glowingloaded 1s infinite alternate;}
+" . $container . ".loading .rp-play-pause-button-bg {animation: glowingloading 1s infinite alternate;}
 " . $container . ".playing .rp-play-pause-button-bg, 
 " . $container . ".playing.loaded .rp-play-pause-button-bg {animation: glowingplaying 1s infinite alternate;}
 @keyframes glowingloading {
