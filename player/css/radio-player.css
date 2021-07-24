@@ -153,6 +153,30 @@
 	background:url("../images/play-dark-square.png");
 }
 
+.radio-container.paused.light.circular .rp-play-pause-button {
+	background:url("../images/pause-light-circular.png");
+}
+
+.radio-container.paused.light.rounded .rp-play-pause-button {
+	background:url("../images/pause-light-rounded.png");
+}
+
+.radio-container.paused.light.square .rp-play-pause-button {
+	background:url("../images/pause-light-square.png");
+}
+
+.radio-container.paused.dark.circular .rp-play-pause-button {
+	background:url("../images/pause-dark-circular.png");
+}
+
+.radio-container.paused.dark.rounded .rp-play-pause-button {
+	background:url("../images/pause-dark-rounded.png");
+}
+
+.radio-container.paused.dark.square .rp-play-pause-button {
+	background:url("../images/pause-dark-square.png");
+}
+
 /* .rp-stop, .rp-previous, .rp-next {
 	width: 28px;
 	height: 28px;
