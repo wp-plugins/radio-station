@@ -149,6 +149,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			unset( $args['options'] );
 
 			// --- set plugin args and namespace ---
+			// 1.1.9: filter all arguments 
+			$args = apply_filters( $args['namespace'] . '_args', $args );
 			$this->args = $args;
 			$this->namespace = $args['namespace'];
 
@@ -731,9 +733,12 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						if ( is_array( $newsettings ) ) {
 
 							// --- validate array of settings ---
+							// 1.1.9: fix to allow saving of zero value
 							foreach ( $newsettings as $newkey => $newvalue ) {
 								$newsetting = $this->validate_setting( $newvalue, $valid, $validate_args );
 								if ( $newsetting && ( '' != $newsetting ) ) {
+									$newsettings[$newkey] = $newsetting;
+								} elseif ( ( 0 === $newsetting ) || ( '0' == $newsetting ) ) {
 									$newsettings[$newkey] = $newsetting;
 								} else {
 									unset( $newsettings[$newkey] );
@@ -1667,8 +1672,10 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			echo "<table><tr>";
 
 			// --- plugin icon ---
+			// 1.1.9: add filter for plugin icon url
+			$icon_url = apply_filters( $args['namespace'] . '_settings_page_icon_url' );
 			echo "<td>";
-			if ( $icon_url ) {
+			if ( $icon_url ) {				
 				echo "<img src='" . esc_url( $icon_url ) . "' width='128' height='128'>";
 			}
 			echo "</td>";
@@ -1678,8 +1685,10 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			echo "<table><tr>";
 
 			// --- plugin title ---
+			// 1.1.9: add filter for plugin pagetitle
+			$title = apply_filters( $args['namespace'] '_setting_page_title', $args['title'] );
 			echo "<td><h3 style='font-size:20px;'>";
-			echo "<a href='" . esc_url( $args['home'] ) . "' target='_blank' style='text-decoration:none;'>" . esc_html( $args['title'] ) . "</a>";
+			echo "<a href='" . esc_url( $args['home'] ) . "' target='_blank' style='text-decoration:none;'>" . esc_html( $title ) . "</a>";
 			echo "</h3></td>";
 
 			echo "<td width='20'></td>";
@@ -3058,6 +3067,9 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // =========
 // CHANGELOG
 // =========
+
+// == 1.1.9 ==
+// - fix to allow saving of zero value
 
 // == 1.1.8 ==
 // - fix to number step if no min or max value

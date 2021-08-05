@@ -214,6 +214,10 @@ You can now visit your site to make sure nothing is broken. If you experience is
 
 == Changelog ==
 
+= 2.4.0.3 =
+* Update: Plugin Panel (1.1.9) with zero value save fix
+* Refix: missing fix to active day tab on pageload
+
 = 2.4.0.2 =
 * Fixed: Multiple Player instance IDs
 * Fixed: Player loading button glow animation
@@ -221,6 +225,11 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Added: Widget type specific classes
 * Added: Alternative text positions in Player
 * Added: Pause button graphics to Player
+
+= 2.4.0.1 =
+* Fixed: Rounded player play button background corner style
+* Fixed: Tabbed schedule active day tab on pageload
+* Improved: Radio Clock Widget layout
 
 = 2.4.0 =
 * Added: Radio Stream Player!

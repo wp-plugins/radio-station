@@ -949,7 +949,6 @@ function radio_station_master_schedule_tabs_js() {
 		radio_tabs_clicks();
 		radio_tabs_responsive(false);
 		radio_tabs_show_highlight();
-		radio_tabs_init = true;	
 	}
 
 	/* Set Day Tab on Load */
@@ -965,6 +964,7 @@ function radio_station_master_schedule_tabs_js() {
 			jQuery('#master-schedule-tabs-header-'+day).addClass('active-day-tab');
 			jQuery('#master-schedule-tabs-day-'+day).addClass('active-day-panel');
 		}
+		radio_tabs_init = true;
 	}
 
 	/* Current Show Highlighting */
