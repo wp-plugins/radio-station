@@ -5,7 +5,7 @@
 // ===========================
 //
 // --------------
-// Version: 1.1.8
+// Version: 1.1.9
 // --------------
 // Note: Changelog and structure at end of file.
 //
@@ -716,7 +716,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 					if ( $this->debug ) {
 						echo 'New Settings for Key ' . $key . ': ';
-						if ( $newsettings ) {
+						if ( $newsetting || ( 0 === $newsetting ) || ( '0' === $newsetting ) ) {
 							echo '(to-validate) ' . print_r( $newsettings, true ) . '<br>';
 						} else {
 							// 1.1.7 handle if (new) key not set yet
@@ -729,16 +729,20 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					}
 
 					// --- maybe validate new settings ---
-					if ( $newsettings ) {
+					// 1.1.9: fix to allow saving of zero value
+					if ( $newsettings || ( 0 === $newsettings ) || ( '0' === $newsettings ) ) {
 						if ( is_array( $newsettings ) ) {
 
 							// --- validate array of settings ---
 							// 1.1.9: fix to allow saving of zero value
 							foreach ( $newsettings as $newkey => $newvalue ) {
 								$newsetting = $this->validate_setting( $newvalue, $valid, $validate_args );
+								if ( $this->debug ) {
+									echo 'Validated Setting array value ' . $newvalue . ' to ' . $newsetting;
+								}
 								if ( $newsetting && ( '' != $newsetting ) ) {
 									$newsettings[$newkey] = $newsetting;
-								} elseif ( ( 0 === $newsetting ) || ( '0' == $newsetting ) ) {
+								} elseif ( ( 0 == $newsetting ) || ( '0' == $newsetting ) ) {
 									$newsettings[$newkey] = $newsetting;
 								} else {
 									unset( $newsettings[$newkey] );
@@ -758,13 +762,21 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 								$values = explode( ',', $newsettings );
 								$newvalues = array();
 								foreach ( $values as $value ) {
-									$newvalues[] = $this->validate_setting( $value, $valid, $validate_args );
+									$newvalue = $this->validate_setting( $value, $valid, $validate_args );
+									$newvalues[] = $newvalue;
+									if ( $this->debug ) {
+										echo 'Validated Setting value ' . $value . ' to ' . $newvalue;
+									}
 								}
 								$newsettings = implode( ',', $newvalues );
 								$settings[$key] = $newsettings;
 							} else {
 								$newsetting = $this->validate_setting( $newsettings, $valid, $validate_args );
-								if ( $newsetting ) {
+								// 1.1.9: fix to allow saving of zero value
+								if ( $this->debug ) {
+									echo 'Validated Setting single value ' . $newsettings . ' to ' . $newsetting;
+								}
+								if ( $newsetting || ( 0 == $newsetting ) || ( '0' == $newsetting ) ) {
 									$settings[$key] = $newsetting;
 								}
 							}
@@ -1686,7 +1698,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 			// --- plugin title ---
 			// 1.1.9: add filter for plugin pagetitle
-			$title = apply_filters( $args['namespace'] '_setting_page_title', $args['title'] );
+			$title = apply_filters( $args['namespace'] . '_settings_page_title', $args['title'] );
 			echo "<td><h3 style='font-size:20px;'>";
 			echo "<a href='" . esc_url( $args['home'] ) . "' target='_blank' style='text-decoration:none;'>" . esc_html( $title ) . "</a>";
 			echo "</h3></td>";
