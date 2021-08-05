@@ -1686,7 +1686,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 			// --- plugin title ---
 			// 1.1.9: add filter for plugin pagetitle
-			$title = apply_filters( $args['namespace'] '_setting_page_title', $args['title'] );
+			$title = apply_filters( $args['namespace'] . '_settings_page_title', $args['title'] );
 			echo "<td><h3 style='font-size:20px;'>";
 			echo "<a href='" . esc_url( $args['home'] ) . "' target='_blank' style='text-decoration:none;'>" . esc_html( $title ) . "</a>";
 			echo "</h3></td>";
