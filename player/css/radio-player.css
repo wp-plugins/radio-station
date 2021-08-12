@@ -304,6 +304,14 @@
 }
 /* @end */
 
+/* @roup Now Playing Info */
+.rp-now-playing {
+    font-size: 14px;
+}
+.rp-now-playing-title, .rp-now-playing-artist, .rp-now-playing-album {
+	display: inline-block;
+}
+
 /* @group Station and Show Info */
 .rp-station-image, .rp-station-text, .rp-show-text, .rp-show-image {
 	display: inline-block;

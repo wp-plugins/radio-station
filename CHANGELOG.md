@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2.4.0.3
 * Update: Plugin Panel (1.1.9) with zero value save fix
+* Improved: lazy load all fallback player scripts on pageload
 * Refix: missing fix to active day tab on pageload
 
 ### 2.4.0.2

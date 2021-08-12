@@ -2279,11 +2279,21 @@ function radio_station_get_current_playlist() {
 			$track[$key] = $value;
 			$entries[$i] = $track;
 		}
-		if ( 'queued' == $entry['status'] ) {
-			$queued[] = $entry;
-		} elseif ( 'played' == $entry['status'] ) {
-			$played[] = $entry;
+		// 2.4.0.3: fix for queued and played arrays
+		foreach ( $track as $key => $value ) {
+			if ( 'status' == $key ) {
+				if ( 'queued' == $value ) {
+					$queued[] = $track;
+				} elseif ( 'played' == $value ) {
+					$played[] = $track;
+				}
+			}
 		}
+	}
+	
+	$latest = array();
+	if ( isset( $queued[0] ) ) {
+		$latest = $queued[0];
 	}
 
 	// --- get the track list for display  ---
@@ -2291,7 +2301,7 @@ function radio_station_get_current_playlist() {
 		'tracks'   => $entries,
 		'queued'   => $queued,
 		'played'   => $played,
-		'latest'   => array_pop( $entries ),
+		'latest'   => $latest,
 		'id'       => $playlist_id,
 		'url'      => get_permalink( $playlist_id ),
 		'show'     => $show_id,

@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.4.0.2
+Version: 2.4.0.3
 Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
@@ -90,7 +90,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 define( 'RADIO_STATION_FILE', __FILE__ );
 define( 'RADIO_STATION_DIR', dirname( __FILE__ ) );
 define( 'RADIO_STATION_BASENAME', plugin_basename( __FILE__ ) );
-define( 'RADIO_STATION_HOME_URL', 'https://netmix.com/radio-station/' );
+define( 'RADIO_STATION_HOME_URL', 'https://radiostation.pro/' );
 define( 'RADIO_STATION_DOCS_URL', 'https://radiostation.pro/docs/' );
 define( 'RADIO_STATION_API_DOCS_URL', 'https://radiostation.pro/docs/api/' );
 define( 'RADIO_STATION_PRO_URL', 'https://radiostation.pro/' );
@@ -684,6 +684,44 @@ $options = array(
 		'pro'     => true,
 	),
 
+	// --- [Pro] Display Current Show ---
+	// 2.4.0.3: added for current show display
+	'player_bar_currentshow'     => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Display Current Show', 'radio-station' ),
+		'value'   => 'yes',
+		'default' => 'yes',
+		'tab'     => 'player',
+		'section' => 'bar',
+		'helper'  => __( 'Display the Current Show in the Player Bar.', 'radio-station' ),
+		'pro'     => true,
+	),
+
+	// --- [Pro] Display Metadata ---
+	// 2.4.0.3: added for now playing metadata display
+	'player_bar_nowplaying'     => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Display Now Playing', 'radio-station' ),
+		'value'   => 'yes',
+		'default' => 'yes',
+		'tab'     => 'player',
+		'section' => 'bar',
+		'helper'  => __( 'Display the currently playing song in the Player Bar, if a supported metadata format is available. (Icy Meta, Icecast, Shoutcast 1/2, Current Playlist)', 'radio-station' ),
+		'pro'     => true,
+	),
+
+	// --- Metadata URL ---
+	// 2.4.0.3: added for alternative stream metadata URL
+	'player_bar_metadata'     => array(
+		'type'    => 'url',
+		'label'   => __( 'Metadata URL', 'radio-station' ),
+		'default' => '',
+		'tab'     => 'player',
+		'section' => 'bar',
+		'helper'  => __( 'Now playing metadata is normally retrieved via the Stream URL. Use this setting if you need to provide an alternative metadata location.', 'radio-station' ),
+		'pro'     => true,
+	),
+
 	// TODO: additional CSS input textarea field ?
 
 	// === Master Schedule Page ===
@@ -1230,12 +1268,34 @@ $options = array(
 	// === Roles / Capabilities / Permissions  ===
 	// 2.3.0: added new capability and role options
 
+	// --- Show Editing Permission Note ---
+	// 2.4.0.3: added role to show assignment note
+	'permissions_show_role_note'      => array(
+		'type'    => 'note',
+		'label'   => __( 'Show Editing Permissions', 'radio-station' ),
+		'helper'  => __( 'By default, only Hosts and Producers that are assigned to a Show can edit that Show.', 'radio-station' )
+		             . ' ' . __( 'This means an Administrator or Show Editor must assign these users to the Show first.', 'radio-station' ),
+		'tab'     => 'roles',
+		'section' => 'permissions',
+	),
+
+	// --- Playlist Editing Role Note ---
+	// 2.4.0.3: added role to playlist assignment note
+	'permissions_playlistow_role_note'      => array(
+		'type'    => 'note',
+		'label'   => __( 'Playlist Permissions', 'radio-station' ),
+		'helper'  => __( 'Any user with a Host or Producer role can create Playlists.', 'radio-station' ),
+		'tab'     => 'roles',
+		'section' => 'permissions',
+	),
+
 	// --- Show Editor Role Note ---
 	'show_editor_role_note'      => array(
 		'type'    => 'note',
 		'label'   => __( 'Show Editor Role', 'radio-station' ),
 		'helper'  => __( 'Since 2.3.0, a new Show Editor role has been added with Publish and Edit capabilities for all Radio Station Post Types.', 'radio-station' )
-		             . ' ' . __( 'You can assign this Role to any user to give them full Station Schedule updating permissions.', 'radio-station' ),
+		             . ' ' . __( 'You can assign this Role to any user to give them full Station Schedule updating permissions.', 'radio-station' )
+		             . ' ' . __( 'This is so a manager can edit the schedule without requiring full site administration role.', 'radio-station' ),
 		'tab'     => 'roles',
 		'section' => 'permissions',
 	),

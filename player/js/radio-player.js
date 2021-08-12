@@ -121,7 +121,7 @@ function radio_player_load_stream(script, instance, data, start) {
 	/* set channel ID for instance */
 	if (!instance) {instance = radio_player_default_instance();}
 	radio_data.types[instance] = 'stream'; radio_data.channels[instance] = data;
-	if (radio_player.debug) {console.log('Set Stream Data '+channel+' on Instance '+instance);}
+	if (radio_player.debug) {console.log('Set Stream Data '+data+' on Instance '+instance);}
 
 	/* load the audio stream */
 	data = radio_player_check_format(data); script = data.script;
@@ -135,7 +135,7 @@ function radio_player_load_file(script, instance, data, start) {
 	/* set channel ID for instance */
 	if (!instance) {instance = radio_player_default_instance();}
 	radio_data.types[instance] = 'file'; radio_data.channels[instance] = data;
-	if (radio_player.debug) {console.log('Set File Data '+channel+' on Instance '+instance);}
+	if (radio_player.debug) {console.log('Set File Data '+data+' on Instance '+instance);}
 
 	/* load the audio stream */
 	data = radio_player_check_format(data); script = data.script;
@@ -229,31 +229,31 @@ function radio_player_play_on_load(player, script, instance) {
 // --- check/load a player script ---
 function radio_player_check_script(script) {
 	loading = false; head = document.getElementsByTagName('head')[0];
-	funcs = radio_player.settings.ajaxurl+'?action=radio_station_player_script&script='+script;
+	/* funcs = radio_player.settings.ajaxurl+'?action=radio_station_player_script&script='+script; */
 	if (script == 'amplitude') {
 		if (typeof window.Amplitude == 'undefined') {
 			if (radio_player.debug) {console.log('Dynamically Loading Amplitude Player Script...');}
 			el = document.createElement('script'); el.src = radio_player.scripts.amplitude; head.appendChild(el); loading = true;
 		}
-		if (typeof radio_player_amplitude == 'undefined') {
+		/* if (typeof radio_player_amplitude == 'undefined') {
 			el = document.createElement('script'); el.src = funcs; head.appendChild(el); loading = true;
-		}
+		} */
 	} else if (script == 'jplayer') {
 		if (typeof jQuery.jPlayer == 'undefined') {
 			if (radio_player.debug) {console.log('Dynamically Loading jPlayer Script...');}
 			el = document.createElement('script'); el.src = radio_player.scripts.jplayer; head.appendChild(el); loading = true;
 		}
-		if (typeof radio_player_jplayer == 'undefined') {
+		/* if (typeof radio_player_jplayer == 'undefined') {
 			el = document.createElement('script'); el.src = funcs; head.appendChild(el); loading = true;
-		}
+		} */
 	} else if (script == 'howler') {
 		if (typeof window.Howl == 'undefined') {
 			if (radio_player.debug) {console.log('Dynamically Loading Howler Player Script...');}
 			el = document.createElement('script'); el.src = radio_player.scripts.howler; head.appendChild(el); loading = true;
 		}
-		if (typeof radio_player_howler == 'undefined') {
+		/* if (typeof radio_player_howler == 'undefined') {
 			el = document.createElement('script'); el.src = funcs; head.appendChild(el); loading = true;
-		}
+		} */
 	} /* else if ( ( script == 'mediaelement') && (typeof mejs == 'undefined' ) ) {
 		el = document.createElement('script'); el.src = radio_player.scripts.media; head.appendChild(el);
 		el = document.createElement('script'); el.src = radio_player.scripts.elements; head.appendChild(el);

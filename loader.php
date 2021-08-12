@@ -1499,6 +1499,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			if ( !isset( $args['menutitle'] ) ) {
 				$args['menutitle'] = $args['title'];
 			}
+			// 1.1.9: added filters for page and menu titles
+			$pagetitle = apply_filters( $namespace . '_settings_page_title', $args['pagetitle'] );
+			$menutitle = apply_filters( $namespace . '_settings_menu_title', $args['menutitle'] );
 
 			// --- trigger filter plugin menu action ---
 			// (can hook into this to add an admin menu manually using the provided loader args)
@@ -1639,16 +1642,16 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 			// --- output debug values ---
 			if ( $this->debug ) {
-				echo "<br><b>Current Settings:</b><br>";
+				echo '<br><b>Current Settings:</b><br>';
 				print_r( $settings );
-				echo "<br><br>";
+				echo '<br><br>';
 
-				echo "<br><b>Plugin Options:</b><br>";
+				echo '<br><b>Plugin Options:</b><br>';
 				print_r( $this->options );
-				echo "<br><br>";
+				echo '<br><br>';
 
 				if ( isset( $_POST ) ) {
-					echo "<br><b>Posted Values:</b><br>";
+					echo '<br><b>Posted Values:</b><br>';
 					foreach ( $_POST as $key => $value ) {
 						echo esc_attr( $key ) . ': ' . print_r( $value, true ) . '<br>';
 					}
@@ -1681,42 +1684,53 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			.readme:hover {text-decoration:underline;}</style>";
 
 			// --- open header table ---
-			echo "<table><tr>";
+			echo '<table class="plugin-settings-page-header"><tr>';
 
 			// --- plugin icon ---
 			// 1.1.9: add filter for plugin icon url
-			$icon_url = apply_filters( $args['namespace'] . '_settings_page_icon_url' );
-			echo "<td>";
+			$icon_url = apply_filters( $namespace . '_settings_page_icon_url', $icon_url );
+			echo '<td>';
 			if ( $icon_url ) {				
-				echo "<img src='" . esc_url( $icon_url ) . "' width='128' height='128'>";
+				echo '<img class="plugin-settings-page-icon" src="' . esc_url( $icon_url ) . '" width="128" height="128">';
 			}
-			echo "</td>";
+			echo '</td>';
 
-			echo "<td width='20'></td><td>";
+			echo '<td width="20"></td><td>';
 
-			echo "<table><tr>";
+			echo '<table><tr>';
 
 			// --- plugin title ---
 			// 1.1.9: add filter for plugin pagetitle
-			$title = apply_filters( $args['namespace'] . '_settings_page_title', $args['title'] );
-			echo "<td><h3 style='font-size:20px;'>";
-			echo "<a href='" . esc_url( $args['home'] ) . "' target='_blank' style='text-decoration:none;'>" . esc_html( $title ) . "</a>";
-			echo "</h3></td>";
+			$title = apply_filters( $namespace . '_settings_page_title', $args['title'] );
+			echo '<td><h3 style="font-size:20px;">';
+			echo '<a href="' . esc_url( $args['home'] ) . '" target="_blank" style="text-decoration:none;">' . esc_html( $title ) . '</a>';
+			echo '</h3></td>';
 
-			echo "<td width='20'></td>";
+			echo '<td width="20"></td>';
 
 			// --- plugin version ---
-			echo "<td><h3>v" . esc_html( $args['version'] ) . "</h3></td></tr>";
+			// 1.1.9: add filter for plugin version
+			$version = apply_filters( $namespace . '_settings_page_version', 'v' . $args['version'] );
+			echo '<td><h3 class="plugin-setttings-page-version">' . esc_html( $version ) . '</h3></td></tr>';
 
-			echo "<tr><td colspan='3' align='center'>";
+			// --- subtitle ---
+			// 1.1.9: added optional subtitle filter display
+			$subtitle = apply_filters( $namespace . '_settings_page_subtitle', '' );
+			if ( '' != $subtitle ) { 
+				echo '<tr><td colspan="3" align="center">';
+				echo '<h4 class="plugins-settings-page-subtitle" style="font-size:14px; margin-top:0;">' . esc_html( $subtitle ) . '</h4>';
+				echo '</td></tr>';
+			}
 
-			echo "<table><tr><td align='center'>";
+			echo '<tr><td colspan="3" align="center">';
+
+			echo '<table><tr><td align="center">';
 
 			// ---- plugin author ---
 			// 1.0.8: check if author URL is set
 			if ( isset( $args['author_url'] ) ) {
-				echo "<font style='font-size:16px;'>" . esc_html( __( 'by' ) ) . "</font> ";
-				echo "<a href='" . esc_url( $args['author_url'] ) . "' target='_blank' style='text-decoration:none;font-size:16px;' target=_blank><b>" . esc_html( $args['author'] ) . "</b></a><br><br>";
+				echo '<font style="font-size:16px;">' . esc_html( __( 'by' ) ) . '</font> ';
+				echo '<a href="' . esc_url( $args['author_url'] ) . '" target="_blank" style="text-decoration:none;font-size:16px;" target="_blank"><b>' . esc_html( $args['author'] ) . '</b></a><br><br>';
 			}
 
 			// --- readme / docs / support links ---
@@ -1725,20 +1739,20 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// 1.1.0: added title attributes to links
 			$links = array();
 			if ( isset( $args['home'] ) ) {
-				$links[] = "<a href='" . esc_url( $args['home'] ) . "' class='pluginlink smalllink' title='" . esc_attr( __( 'Plugin Homepage' ) ) . "' target='_blank'><b>" . esc_html( __( 'Home' ) ) . "</b></a>";
+				$links[] = '<a href="' . esc_url( $args['home'] ) . '" class="pluginlink smalllink" title="' . esc_attr( __( 'Plugin Homepage' ) ) . '" target="_blank"><b>' . esc_html( __( 'Home' ) ) . '</b></a>';
 			}
 			if ( !isset( $args['readme'] ) || ( false !== $args['readme'] ) ) {
 				$readme_url = add_query_arg( 'action', $namespace . '_readme_viewer', admin_url( 'admin-ajax.php' ) );
-				$links[] = "<a href='" . esc_url( $readme_url ) . "' class='pluginlink smalllink thickbox' title='" . esc_attr( __( 'View Plugin' ) ) . " readme.txt'><b>" . esc_html( __( 'Readme' ) ) . "</b></a>";
+				$links[] = '<a href="' . esc_url( $readme_url ) . '" class="pluginlink smalllink thickbox" title="' . esc_attr( __( 'View Plugin' ) ) . ' readme.txt"><b>' . esc_html( __( 'Readme' ) ) . '</b></a>';
 			}
 			if ( isset( $args['docs'] ) ) {
-				$links[] = "<a href='" . esc_url( $args['docs'] ) . "' class='pluginlink smalllink' title='" . esc_attr( __( 'Plugin Documentation' ) ) . "' target='_blank'><b>" . esc_html( __( 'Docs' ) ) . "</b></a>";
+				$links[] = '<a href="' . esc_url( $args['docs'] ) . '" class="pluginlink smalllink" title="' . esc_attr( __( 'Plugin Documentation' ) ) . '" target="_blank"><b>' . esc_html( __( 'Docs' ) ) . '</b></a>';
 			}
 			if ( isset( $args['support'] ) ) {
-				$links[] = "<a href='" . esc_url( $args['support'] ) . "' class='pluginlink smalllink' title='" . esc_attr( __( 'Plugin Support' ) ) . "' target='_blank'><b>" . esc_html( __( 'Support' ) ) . "</b></a>";
+				$links[] = '<a href="' . esc_url( $args['support'] ) . '" class="pluginlink smalllink" title="' . esc_attr( __( 'Plugin Support' ) ) . '" target="_blank"><b>' . esc_html( __( 'Support' ) ) . '</b></a>';
 			}
 			if ( isset( $args['development'] ) ) {
-				$links[] = "<a href='" . esc_url( $args['development'] ) . "' class='pluginlink smalllink' title='" . esc_attr( __( 'Plugin Development' ) ) . "' target='_blank'><b>" . esc_html( __( 'Dev' ) ) . "</b></a>";
+				$links[] = '<a href="' . esc_url( $args['development'] ) . '" class="pluginlink smalllink" title="' . esc_attr( __( 'Plugin Development' ) ) . '" target="_blank"><b>' . esc_html( __( 'Dev' ) ) . '</b></a>';
 			}
 
 			// 1.0.9: change filter from _plugin_links to disambiguate
@@ -1750,28 +1764,28 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 			// --- author icon ---
 			if ( $author_icon_url ) {
-				echo "</td><td>";
+				echo '</td><td>';
 
 				// 1.0.8: check if author URL is set for link
 				if ( isset( $args['author_url'] ) ) {
-					echo "<a href='" . esc_url( $args['author_url'] ) . "' target=_blank>";
+					echo '<a href="' . esc_url( $args['author_url'] ) . '" target="_blank">';
 				}
-				echo "<img src='" . esc_url( $author_icon_url ) . "' width='64' height='64' border='0'>";
+				echo '<img src="' . esc_url( $author_icon_url ) . '" width="64" height="64" border="0">';
 				if ( isset( $args['author_url'] ) ) {
-					echo "</a>";
+					echo '</a>';
 				}
 			}
 
-			echo "</td></tr></table>";
+			echo '</td></tr></table>';
 
-			echo "</td></tr></table>";
+			echo '</td></tr></table>';
 
-			echo "</td><td width='50'></td><td style='vertical-align:top;'>";
+			echo '</td><td width="50"></td><td style="vertical-align:top;">';
 
 			// --- plugin supporter links ---
 			// 1.0.1: set rate/share/donate links and texts
 			// 1.0.8: added filters for rate/share/donate links
-			echo "<br>";
+			echo '<br><div class="plugin-settings-page-links">';
 
 			// --- Rate link ---
 			if ( isset( $args['wporgslug'] ) ) {
@@ -1787,9 +1801,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				} else {
 					$rate_text = __( 'Rate on WordPress.Org' );
 				}
-				$rate_link = "<a href='" . esc_url( $rate_url ) . "' class='pluginlink' target='_blank'>";
-				$rate_link .= "<span style='font-size:24px; color:#FC5; margin-right:10px;' class='dashicons dashicons-star-filled'></span> ";
-				$rate_link .= esc_html( $rate_text ) . "</a><br><br>";
+				$rate_link = '<a href="' . esc_url( $rate_url ) . '" class="pluginlink" target="_blank">';
+				$rate_link .= '<span style="font-size:24px; color:#FC5; margin-right:10px;" class="dashicons dashicons-star-filled"></span> ';
+				$rate_link .= esc_html( $rate_text ) . '</a><br><br>';
 				$rate_link = apply_filters( $args['namespace'] . '_rate_link', $rate_link, $args );
 				if ( $rate_link ) {
 					// phpcs:ignore WordPress.Security.OutputNotEscaped
@@ -1804,9 +1818,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				} else {
 					$share_text = __( 'Share the Plugin Love' );
 				}
-				$share_link = "<a href='" . esc_url( $args['share'] ) . "' class='pluginlink' target='_blank'>";
-				$share_link .= "<span style='font-size:24px; color:#E0E; margin-right:10px;' class='dashicons dashicons-share'></span> ";
-				$share_link .= esc_html( $share_text ) . "</a><br><br>";
+				$share_link = '<a href="' . esc_url( $args['share'] ) . '" class="pluginlink" target="_blank">';
+				$share_link .= '<span style="font-size:24px; color:#E0E; margin-right:10px;" class="dashicons dashicons-share"></span> ';
+				$share_link .= esc_html( $share_text ) . '</a><br><br>';
 				$share_link = apply_filters( $args['namespace'] . '_share_link', $share_link, $args );
 				if ( $share_link ) {
 					// phpcs:ignore WordPress.Security.OutputNotEscaped
@@ -1821,9 +1835,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				} else {
 					$donate_text = __( 'Support this Plugin' );
 				}
-				$donate_link = "<a href='" . esc_url( $args['donate'] ) . "' class='pluginlink' target='_blank'>";
-				$donate_link .= "<span style='font-size:24px; color:#E00; margin-right:10px;' class='dashicons dashicons-heart'></span> ";
-				$donate_link .= "<b>" . esc_html( $donate_text ) . "</b></a><br><br>";
+				$donate_link = '<a href="' . esc_url( $args['donate'] ) . '" class="pluginlink" target="_blank">';
+				$donate_link .= '<span style="font-size:24px; color:#E00; margin-right:10px;" class="dashicons dashicons-heart"></span> ';
+				$donate_link .= '<b>' . esc_html( $donate_text ) . '</b></a><br><br>';
 				$donate_link = apply_filters( $args['namespace'] . '_donate_link', $donate_link, $args );
 				if ( $donate_link ) {
 					// phpcs:ignore WordPress.Security.OutputNotEscaped
@@ -1831,7 +1845,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				}
 			}
 
-			echo "</td></tr>";
+			echo '</div></td></tr>';
 
 			// --- output updated and reset messages ---
 			if ( isset( $_GET['updated'] ) ) {
@@ -1843,23 +1857,23 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					$message = $settings['title'] . ' ' . __( 'Settings Reset!' );
 				}
 				if ( isset( $message ) ) {
-					echo "<tr><td></td><td></td><td align='center'>";
+					echo '<tr><td></td><td></td><td align="center">';
 					// phpcs:ignore WordPress.Security.OutputNotEscaped
 					echo $this->message_box( $message, false );
-					echo "</td></tr>";
+					echo '</td></tr>';
 				}
 			} else {
 				// --- maybe output welcome message ---
 				if ( isset( $_REQUEST['welcome'] ) && ( 'true' == $_REQUEST['welcome'] ) ) {
 					if ( isset( $args['welcome'] ) ) {
-						echo "<tr><td colspan='3' align='center'>";
+						echo '<tr><td colspan="3" align="center">';
 						echo $this->message_box( $args['welcome'], false );
-						echo "</td></tr>";
+						echo '</td></tr>';
 					}
 				}
 			}
 
-			echo "</table><br>";
+			echo '</table><br>';
 		}
 
 		// -------------
@@ -1870,7 +1884,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			$namespace = $this->namespace;
 
 			// --- open page wrapper ---
-			echo "<div id='pagewrap' class='wrap' style='width:100%;margin-right:0px !important;'>";
+			echo '<div id="pagewrap" class="wrap" style="width:100%;margin-right:0px !important;">';
 
 			do_action( $namespace . '_admin_page_top' );
 
@@ -1885,7 +1899,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			do_action( $namespace . '_admin_page_bottom' );
 
 			// --- close page wrapper ---
-			echo "</div>";
+			echo '</div>';
 		}
 
 		// --------------
@@ -3082,6 +3096,7 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 
 // == 1.1.9 ==
 // - fix to allow saving of zero value
+// - added filters for plugin page settings header sections
 
 // == 1.1.8 ==
 // - fix to number step if no min or max value
