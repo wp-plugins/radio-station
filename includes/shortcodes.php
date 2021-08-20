@@ -1458,6 +1458,10 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 		unset( $radio_station_data['show-' . $type . 's'] );
 		$show_id = $radio_station_data['show-id'];
 
+		if ( RADIO_STATION_DEBUG ) {
+			echo '<span style="display:none;">Stored Show Posts (' . $type . '):' . print_r( $posts, true ) . '</span>';
+		}
+
 	} else {
 		// --- check for show ID (required at minimum) ---
 		if ( !$atts['show'] ) {

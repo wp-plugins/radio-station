@@ -215,9 +215,12 @@ You can now visit your site to make sure nothing is broken. If you experience is
 == Changelog ==
 
 = 2.4.0.3 =
-* Update: Plugin Panel (1.1.9) with zero value save fix
-* Improved: lazy load all fallback player scripts on pageload
+* Update: Plugin Panel (1.2.0) with zero value save and tab fix
+* Added: option to disable player audio fallback scripts
+* Added: option to hide various volume controls
+* Improved: lazy load player audio fallback scripts
 * Refix: missing fix to active day tab on pageload
+* Fixed: player volume slider background position (cross-browser)
 
 = 2.4.0.2 =
 * Fixed: Multiple Player instance IDs

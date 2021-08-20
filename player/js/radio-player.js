@@ -275,19 +275,27 @@ function radio_player_player_fallback(instance, script) {
 
 	/* retry different script with stored player instance data */
 	newscript = false;
-	for (k in radio_player.scripts) {
-		if (!newscript) {
-			found = false;
-			for (j = 0; j < radio_data.failed[instance].length; j++) {
-				if (radio_data.failed[instance][j] == k) {found = true;}
+	if (radio_player.scripts.length) {
+		for (k in radio_player.scripts) {
+			if (!newscript) {
+				found = false;
+				for (j = 0; j < radio_data.failed[instance].length; j++) {
+					if (radio_data.failed[instance][j] == k) {found = true;}
+				}
+				if (!found) {newscript = k;}
 			}
-			if (!found) {newscript = k;}
 		}
 	}
 	if (!newscript) {
-		console.log('Exhausted All Player Script Type Attempts');
+		if (radio_player.debug) {console.log('Exhausted All Player Script Type Attempts');}
 		radio_data.failed = new Array(); /* reset */
-		/* TODO: swap to fallback stream data and retry ? */
+		/* maybe swap to fallback stream data to retry */
+		if (data.fallback != '') {
+			if (radio_player.debug) {console.log('Switching to Fallback Stream');}
+			tmpa = data.url; data.url = data.fallback; data.fallback = tmpa;
+			tmpb = data.format; data.fformat = data.format; data.fformat = tmpb;
+			radio_player_load_audio(script, instance, data, data.start);
+		}
 	} else {
 		radio_data.data[instance].script = newscript; data = radio_data.data[instance];
 		if (radio_player.debug) {console.log('Trying New Player Script: '+newscript); console.log(data);}
@@ -429,11 +437,12 @@ function radio_player_change_volume(instance, volume) {
 }
 
 /* --- get player volume --- */
-function radio_player_get_volume(instance, volume) {
+function radio_player_get_volume(instance) {
 	player = radio_data.players[instance]; script = radio_data.scripts[instance];
-	if (script == 'amplitude') {return player.getVolume();}
-	else if (script == 'howler') {return (player.volume() * 100);}
-	else if (script == 'jplayer') {return (player.jPlayer('volume') * 100);}
+	if (script == 'amplitude') {volume = player.getVolume();}
+	else if (script == 'howler') {volume = (player.volume() * 100);}
+	else if (script == 'jplayer') {volume = (player.jPlayer('volume') * 100);}
+	return volume;
 }
 
 /* --- set slider volume with background div width fix --- */

@@ -3,6 +3,8 @@
 // ====================
 // === RADIO PLAYER ===
 // ====================
+// === by Tony Hayes ==
+// ====================
 
 // === Radio Player ===
 // - Player Output
@@ -14,7 +16,7 @@
 // === Player Scripts ===
 // - Enqueue Player Javasscripts
 // - Enqueue Player Script
-// - Lazy Load Script Fallbacks
+// - Lazy Load Audio Script Fallbacks
 // - Enqueue Amplitude Javascript
 // - Enqueue JPlayer Javascript
 // - Enqueue Howler Javascript
@@ -85,7 +87,7 @@
 // (then include /mu-plugins/player/radio-player.php from a file in /mu-plugins/)
 
 // --- player script and skin ---
-// RADIO_PLAYER_SCRIPT - default player script (amplitude, jplayer, howler, mediaelements)
+// RADIO_PLAYER_SCRIPT - default player script (amplitude, jplayer, howler)
 // RADIO_PLAYER_FORCE_SCRIPT - force override any use of other player script
 // RADIO_PLAYER_SKIN - default player skin (must match script used)
 // RADIO_PLAYER_FORCE_SKIN - force override any use of other player skin
@@ -1162,25 +1164,40 @@ function radio_station_player_enqueue_script( $script ) {
 	$radio_player['enqeued_' . $script] = true;
 }
 
-// --------------------------
-// Lazy Load Script Fallbacks
-// --------------------------
+// --------------------------------
+// Lazy Load Audio Script Fallbacks
+// --------------------------------
 // 2.4.0.3: lazy load fallback scripts on pageload to cache them
 add_filter( 'radio_station_player_pageload_script', 'radio_station_player_load_script_fallbacks' );
 function radio_station_player_load_script_fallbacks( $js ) {
 
 	global $radio_player;
-	$js .= "head = document.getElementsByTagName('head')[0]; ";
-	if ( !isset( $radio_player['enqueued_howler'] ) ) {
-		$js .= "el = document.createElement('script'); el.src = radio_player.scripts.howler; head.appendChild(el);";
+
+	// 2.4.0.3: check for fallback selection (default all)
+	$fallbacks = array( 'jplayer', 'howler', 'amplitude' );
+	if ( function_exists( 'radio_station_get_setting' ) ) {
+		$fallbacks = radio_station_get_setting( 'player_fallbacks' );
+	} elseif ( function_exists( 'apply_filters' ) ) {
+		$fallbacks = apply_filters( 'radio_station_player_fallbacks', $fallbacks );
 	}
-	if ( !isset( $radio_player['enqueued_jplayer'] ) ) {
-		$js .= "el = document.createElement('script'); el.src = radio_player.scripts.jplayer; head.appendChild(el);";
+	if ( defined( 'RADIO_PLAYER_FALLBACKS' ) ) {
+		$fallbacks = explode( ',', RADIO_PLAYER_FALLBACKS );
 	}
-	if ( !isset( $radio_player['enqueued_amplitude'] ) ) {
-		$js .= "el = document.createElement('script'); el.src = radio_player.scripts.amplitude; head.appendChild(el);";
+
+	// --- load fallback audio scripts ---
+	if ( count( $fallbacks ) > 0 ) {
+		$js .= "head = document.getElementsByTagName('head')[0]; ";
+		if ( !isset( $radio_player['enqueued_howler'] ) && in_array( 'howler', $fallbacks ) ) {
+			$js .= "el = document.createElement('script'); el.src = radio_player.scripts.howler; head.appendChild(el);";
+		}
+		if ( !isset( $radio_player['enqueued_jplayer'] )  && in_array( 'jplayer', $fallbacks ) ) {
+			$js .= "el = document.createElement('script'); el.src = radio_player.scripts.jplayer; head.appendChild(el);";
+		}
+		if ( !isset( $radio_player['enqueued_amplitude'] )  && in_array( 'amplitude', $fallbacks ) ) {
+			$js .= "el = document.createElement('script'); el.src = radio_player.scripts.amplitude; head.appendChild(el);";
+		}
+		$js .= PHP_EOL;
 	}
-	$js .= PHP_EOL;
 	
 	return $js;
 }
@@ -1364,18 +1381,6 @@ function radio_station_player_get_settings() {
 	$player_script = radio_station_player_get_default_script();
 	if ( function_exists( 'radio_station_get_setting' ) ) {
 
-		// --- get stream settings ---
-		// $streaming_url = radio_station_get_setting( 'streaming_url' );
-		// $fallback_url = radio_station_get_setting( 'fallback_url' );
-		// $streaming_format = radio_station_get_setting( 'streaming_format' );
-		// $fallback_format = radio_station_get_setting( 'fallback_format' );
-
-		// --- set player settings ---
-		// $js .= "radio_player.settings.url = '" . esc_url( $streaming_url ) . "'; " . PHP_EOL;
-		// $js .= "radio_player.settings.fallback = '" . esc_url( $fallback_url ) . "'; " . PHP_EOL;
-		// $js .= "radio_player.settings.format = '" . esc_js( $streaming_format ) . "'; " . PHP_EOL;
-		// $js .= "radio_player.settings.fformat = '" . esc_js( $fallback_format ) . "'; " . PHP_EOL;
-
 		// --- get player settings ---
 		$player_script = radio_station_get_setting( 'player_script' );
 		$player_title = radio_station_get_setting( 'player_title' );
@@ -1451,6 +1456,16 @@ function radio_station_player_get_settings() {
 	}
 
 	// --- set script URL ouput ---
+	// 2.4.0.3: check for fallback script settings
+	$fallbacks = array( 'jplayer', 'howler', 'amplitude' );
+	if ( function_exists( 'radio_station_get_setting' ) ) {
+		$fallbacks = radio_station_get_setting( 'player_fallbacks' );
+	} elseif ( function_exists( 'apply_filters' ) ) {
+		$fallbacks = apply_filters( 'radio_station_player_fallbacks', $fallbacks );
+	}
+	if ( defined( 'RADIO_PLAYER_FALLBACKS' ) ) {
+		$fallbacks = explode( ',', RADIO_PLAYER_FALLBACKS );
+	}
 	$js .= "scripts = {";
 		if ( in_array( 'amplitude', $scripts ) ) {
 			$js .= "'amplitude': '" . $radio_player['amplitude_script']['url'] . '?version=' . $radio_player['amplitude_script']['version'] . "', ";
@@ -1467,17 +1482,17 @@ function radio_station_player_get_settings() {
 
 	// --- set player script supported formats ---
 	// TODO: recheck supported amplitude formats ?
-	// [Amplitude] HTML5 Support - mp3, aac ...?
-	// ref: https://en.wikipedia.org/wiki/HTML5_audio#Supporting_browsers
 	// [JPlayer] Audio: mp3, m4a - Video: m4v
 	// +Audio: webma, oga, wav, fla, rtmpa +Video: webmv, ogv, flv, rtmpv
 	// [Howler] mp3, opus, ogg, wav, aac, m4a, mp4, webm
 	// +mpeg, oga, caf, weba, webm, dolby, flac
+	// [Amplitude] HTML5 Support - mp3, aac ...?
+	// ref: https://en.wikipedia.org/wiki/HTML5_audio#Supporting_browsers
 	// [Media Elements] Audio: mp3, wma, wav +Video: mp4, ogg, webm, wmv
 	$js .= "formats = {";
 		$js .= "'howler': ['mp3','opus','ogg','oga','wav','aac','m4a','mp4','webm','weba','flac'], ";
-		$js .= "'amplitude': ['mp3','aac'], ";
 		$js .= "'jplayer': ['mp3','m4a','webm','oga','rtmpa','wav','flac'], ";
+		$js .= "'amplitude': ['mp3','aac'], ";
 		// $js .= "'mediaelements': ['mp3','wma','wav'], ";
 	$js .= "}" . PHP_EOL;
 
@@ -2493,9 +2508,10 @@ function radio_station_player_control_styles( $instance ) {
 " . $container . " .rp-volume-controls input[type=range]::-moz-focus-outer {outline: none; box-shadow: none;}" . PHP_EOL;
 
 	// --- Range Track (synced Background Div) ---
+	// 2.4.0.3: add position absolute/top on slider background (cross-browser display fix)
 	$css .= "/* Range Track */
 " . $container . " .rp-volume-controls .rp-volume-slider-bg {
-	overflow: hidden; height: 9px; margin-left: 9px; z-index: -1;
+	position: absolute; top: 9px; overflow: hidden; height: 9px; margin-left: 9px; z-index: -1;
 	border: 1px solid rgba(128, 128, 128, 0.5); border-radius: 3px; background: rgba(128, 128, 128, 0.5);
 }
 " . $container . ".playing .rp-volume-controls .rp-volume-slider-bg {background: " . $colors['track'] . ";}
@@ -2503,10 +2519,11 @@ function radio_station_player_control_styles( $instance ) {
 
 	// --- Slider Range Track (Clickable Transparent) ---
 	$css .= "/* Range Track */
-" . $container . " .rp-volume-controls input[type=range] {float: left; margin-top: -9px;}
 " . $container . " .rp-volume-controls input[type=range]::-webkit-slider-runnable-track {height: 9px; background: transparent; -webkit-appearance: none;}
 " . $container . " .rp-volume-controls input[type=range]::-moz-range-track {height: 9px; background: transparent;}
 " . $container . " .rp-volume-controls input[type=range]::-ms-track {height: 9px; color: transparent; background: transparent; border-color: transparent;}" . PHP_EOL;
+// 2.4.0.3: remove float on range input (cross-browser display fix)
+// " . $container . " .rp-volume-controls input[type=range] {float: left; margin-top: -9px;}
 
 	// --- Slider Range Thumb ---
 	$css .= "/* Range Thumb */
@@ -2534,6 +2551,30 @@ function radio_station_player_control_styles( $instance ) {
 	// note: since *actual* range input thumb width is hard/impossible to get with jQuery,
 	// if changing the thumb width style, override this style also for volume background to match!
 	$css .= PHP_EOL . $container . " .rp-volume-thumb {display: none; width: 18px;}" . PHP_EOL;
+
+	// --- get volume control display settings ---
+	// 2.4.1.4: added volume control visibility options
+	if ( function_exists( 'radio_station_get_setting' ) ) {
+		$volumes = radio_station_get_setting( 'player_volumes' );
+		if ( !is_array( $volumes ) ) {
+			$volumes = array( 'slider', 'updown', 'mute', 'max' );
+		}
+	} elseif ( function_exists( 'apply_filters' ) ) {
+		$volumes = array( 'slider', 'updown', 'mute', 'max' );
+		$volumes = apply_filters( 'radio_station_player_volumes_display', $volumes );
+	}
+	if ( !in_array( 'slider', $volumes ) ) {
+		$css .= PHP_EOL . $container . " .rp-volume-slider-container {display: none;}" . PHP_EOL;
+	}
+	if ( !in_array( 'updown', $volumes ) ) {
+		$css .= PHP_EOL . $container . " .rp-volume-up, " . $container . " .rp-volume-down {display: none;}" . PHP_EOL;
+	}
+	if ( !in_array( 'mute', $volumes ) ) {
+		$css .= PHP_EOL . $container . " .rp-mute {display: none;}" . PHP_EOL;
+	}
+	if ( !in_array( 'max', $volumes ) ) {
+		$css .= PHP_EOL . $container . " .rp-volume-max {display: none;}" . PHP_EOL;
+	}
 
 	// --- filter and return ---
 	// 2.4.0.3: added missing function_exists wrapper

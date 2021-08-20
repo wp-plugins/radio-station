@@ -422,16 +422,34 @@ $options = array(
 	),
 
 	// --- Player Script ---
+	// 2.4.0.3: change script default to jplayer
 	'player_script'       => array(
 		'type'    => 'select',
 		'label'   => __( 'Player Script', 'radio-station' ),
-		'default' => 'amplitude',
+		'default' => 'jplayer',
 		'options' => array(
-			'amplitude' => __( 'Amplitude', 'radio-station' ),
-			'howler'    => __( 'Howler', 'radio-station' ),
 			'jplayer'   => __( 'jPlayer', 'radio-station' ),
+			'howler'    => __( 'Howler', 'radio-station' ),
+			'amplitude' => __( 'Amplitude', 'radio-station' ),
 		),
-		'helper'  => __( 'Default audio script to use for Radio Streaming Player.', 'radio-station' ),
+		'helper'  => __( 'Default audio script to use for playback in the Player.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'basic',
+		'pro'     => false,
+	),
+
+	// --- Fallback Scripts ---
+	// 2.4.0.3: added fallback enable/disable switching
+	'player_fallbacks'       => array(
+		'type'    => 'multicheck',
+		'label'   => __( 'Player Script', 'radio-station' ),
+		'default' => array( 'amplitude', 'howler', 'jplayer' ),
+		'options' => array(
+			'jplayer'   => __( 'jPlayer', 'radio-station' ),
+			'howler'    => __( 'Howler', 'radio-station' ),
+			'amplitude' => __( 'Amplitude', 'radio-station' ),
+		),
+		'helper'  => __( 'Fallback scripts to enable for when the default Player script fails.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'basic',
 		'pro'     => false,
@@ -466,6 +484,23 @@ $options = array(
 		'tab'     => 'player',
 		'section' => 'basic',
 		'pro'     => false,
+	),
+
+	// --- Volume Controls  ---
+	// 2.4.0.3: added enable/disable volume controls option
+	'player_volumes'       => array(
+		'type'    => 'multicheck',
+		'label'   => __( 'Volume Controls', 'radio-station' ),
+		'default' => array( 'slider', 'updown', 'mute', 'max' ),
+		'options' => array(
+			'slider'   => __( 'Volume Slider', 'radio-station' ),
+			'updown'   => __( 'Volume Plus / Minus', 'radio-station' ),
+			'mute'     => __( 'Mute Volume Toggle', 'radio-station' ),
+			'max'      => __( 'Maximize Volume', 'radio-station' ),
+		),
+		'helper'  => __( 'Which volume controls to display in the Player by default.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'basic',
 	),
 
 	// --- Player Debug Mode ---
@@ -656,7 +691,22 @@ $options = array(
 		'min'     => 0,
 		'step'    => 100,
 		'max'     => 10000,
-		'helper'  => __( 'Number of milliseconds over which to fade in new Pages when continuous playback is enabled. Use 0 for instant display.', 'radio-station' ),
+		'helper'  => __( 'Number of milliseconds over which to fade in new Pages (when continuous playback is enabled.) Use 0 for instant display.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'bar',
+		'pro'     => true,
+	),
+
+	// --- [Pro] Page Load Timeout ---
+	// 2.4.0.3: add page load timeout option
+	'player_bar_timeout' => array(
+		'type'    => 'number',
+		'label'   => __( 'Page Load Timeout', 'teleporter' ),
+		'default' => 7000,
+		'min'     => 0,
+		'step'    => 500,
+		'max'     => 20000,
+		'helper'  => __( 'Number of milliseconds to wait for new Page to load before fading in anyway (when continuous playback is enabled.)', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'bar',
 		'pro'     => true,
@@ -1424,10 +1474,16 @@ $settings = array(
 
 	// --- Freemius ---
 	// 2.4.0.1: turn on addons switch for Pro
+	// 2.4.0.3: turn on plans switch for Pro also
+	// 2.4.0.3: set Pro details and Upgrade links
 	'freemius_id'  => '4526',
 	'freemius_key' => 'pk_aaf375c4fb42e0b5b3831e0b8476b',
-	'hasplans'     => false,
-	'hasaddons'    => true,
+	'hasplans'     => true,
+	'upgrade_link' => RADIO_STATION_PRO_URL . 'pricing/',
+	// 'upgrade_link' => add_query_arg( 'page', $args['slug'] . '-addons', admin_url( 'admin.php' ) ),
+	// 'pro_link'     => RADIO_STATION_PRO_URL . 'pricing/',
+	// 'hasaddons'    => true,
+	// 'addons_link'  => add_query_arg( 'page', $args['slug'] . '-addons', admin_url( 'admin.php' ) ),
 	'plan'         => 'free',
 );
 

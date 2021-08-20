@@ -2310,7 +2310,8 @@ function radio_station_show_save_data( $post_id ) {
 				wp_set_post_terms( $override_id, $language_term_ids, RADIO_STATION_LANGUAGES_SLUG );
 			}
 			if ( ( 'yes' == $sync_genres ) || ( 'yes' == $sync_languages ) ) {
-				radio_station_clear_cached_data( $override_id );
+				// 2.4.0.3: added second argument to cache clear
+				radio_station_clear_cached_data( $override_id, RADIO_STATION_OVERRIDE_SLUG );
 			}
 		}
 	}
@@ -2320,7 +2321,8 @@ function radio_station_show_save_data( $post_id ) {
 	// 2.3.3: remove current show transient
 	// 2.3.3.9: just call clear cached data function
 	if ( $show_meta_changed || $show_shifts_changed ) {
-		radio_station_clear_cached_data( $post_id );
+		// 2.4.0.3: added second argument to cache clear
+		radio_station_clear_cached_data( $post_id, RADIO_STATION_SHOW_SLUG );
 	}
 
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
@@ -2434,13 +2436,15 @@ function radio_station_show_delete( $post_id, $post ) {
 	if ( !property_exists( $post, 'post_type' ) ) {
 		$post = get_post( $post_id );
 	}
-	$post_types = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG );
+	// 2.4.0.3: also trigger clear data for playlists
+	$post_types = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG, RADIO_STATION_PLAYLIST_SLUG );
 	if ( !in_array( $post->post_type, $post_types ) ) {
 		return;
 	}
 
 	// --- clear all cached schedule data ---
-	radio_station_clear_cached_data( $post_id );
+	// 2.4.0.3: added second argument to cache clear
+	radio_station_clear_cached_data( $post_id, $post->post_type );
 	
 	// --- clear from unique shift IDs list ---
 	// 2.3.3.9: added to keep unique ID list from bloating over time
@@ -4405,7 +4409,8 @@ function radio_station_override_save_data( $post_id ) {
 	// --- clear cached schedule if changed ---
 	// 2.3.3.9: clear cache on data/schedule change
 	if ( $meta_changed || $sched_changed ) {
-		radio_station_clear_cached_data( $post_id );
+		// 2.4.0.3: added second argument to cache clear
+		radio_station_clear_cached_data( $post_id, RADIO_STATION_OVERRIDE_SLUG );
 	}
 
 	// --- update overrides table when AJAX saving ---
@@ -5547,7 +5552,7 @@ function radio_station_playlist_save_data( $post_id ) {
 			// 2.3.4: add previous show transient
 			// 2.3.3.9: just call new clear cache function
 			if ( $show_changed ) {				
-				radio_station_clear_cached_data( $show );
+				radio_station_clear_cached_data( $show, RADIO_STATION_PLAYLIST_SLUG );
 			}
 		}
 	}
@@ -5885,7 +5890,7 @@ function radio_station_post_save_data( $post_id ) {
 		// 2.3.4: add previous show transient
 		// 2.3.3.9: just call clear cache data function
 		if ( $changed ) {
-			radio_station_clear_cached_data( $post_id );
+			radio_station_clear_cached_data( $post_id, 'post' );
 		}
 	}
 

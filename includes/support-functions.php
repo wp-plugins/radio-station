@@ -762,6 +762,9 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array() ) {
 		$default_data = apply_filters( 'radio_station_cached_data', false, $datatype, $show_id );
 		if ( $default_data ) {
 			return $default_data;
+			if ( RADIO_STATION_DEBUG ) {
+				echo '<span style="display:none;">Using Cacehed Data:' . print_r( $default_data, true ) . '</span>';
+			}
 		}
 	}
 
@@ -5016,7 +5019,8 @@ function radio_station_delete_transients_with_prefix( $prefix ) {
 // Clear Cached Data
 // -----------------
 // 2.3.3.9: made into separate function
-function radio_station_clear_cached_data( $post_id = false ) {
+// 2.4.0.3: added second argument for post type
+function radio_station_clear_cached_data( $post_id = false, $post_type = false ) {
 
 	// --- clear main schedule transients ---
 	// 2.3.3: remove current show transient
@@ -5033,8 +5037,8 @@ function radio_station_clear_cached_data( $post_id = false ) {
 
 	// --- maybe clear show meta data ---
 	if ( $post_id ) {
-		do_action( 'radio_station_clear_data', 'show', $post_id );
-		do_action( 'radio_station_clear_data', 'show_meta', $post_id );
+		do_action( 'radio_station_clear_data', $post_type, $post_id );
+		do_action( 'radio_station_clear_data', $post_type . '_meta', $post_id );
 	}
 
 	// --- maybe send directory ping ---
