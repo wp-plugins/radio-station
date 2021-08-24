@@ -60,7 +60,7 @@ function radio_station_api_link_header() {
 		return;
 	}
 	$api_url = radio_station_get_api_url();
-	$header = 'Link: <' . esc_url_raw( $api_url ) . '>; rel="' . RADIO_STATION_API_DOCS_URL . '"';
+	$header = 'Link: <' . esc_url_raw( $api_url ) . '>; rel="' . RADIO_STATION_DOCS_URL . 'api/"';
 	$header = apply_filters( 'radio_station_api_discovery_header', $header );
 	if ( $header ) {
 		header( $header, false );
@@ -73,7 +73,7 @@ function radio_station_api_link_header() {
 add_action( 'wp_head', 'radio_station_api_discovery_link' );
 function radio_station_api_discovery_link() {
 	$api_url = radio_station_get_api_url();
-	$link = "<link rel='" . RADIO_STATION_API_DOCS_URL . "' href='" . esc_url( $api_url ) . "' />";
+	$link = "<link rel='" . RADIO_STATION_DOCS_URL . "api/' href='" . esc_url( $api_url ) . "' />";
 	$link = apply_filters( 'radio_station_api_discovery_link', $link );
 	if ( $link ) {
 		// phpcs:ignore WordPress.Security.OutputNotEscaped

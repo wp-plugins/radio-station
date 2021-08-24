@@ -58,6 +58,11 @@ function radio_station_enqueue_admin_scripts() {
 	$deps = array( 'jquery' );
 	wp_enqueue_script( 'radio-station-admin', $script['url'], $deps, $version, true );
 
+	if ( RADIO_STATION_DEBUG ) {
+		$js = "radio_admin.debug = true;";
+		wp_add_inline_script( 'radio-station-admin', $js );
+	}
+
 	// --- enqueue admin styles ---
 	radio_station_enqueue_style( 'admin' );
 
@@ -276,18 +281,17 @@ function radio_station_role_editor() {
 	}
 
 	// --- role assignment message ---
-	echo "<h3>" . esc_html( __( 'Role Assignments', 'radio-station' ) ) . "</h3>";
-	echo esc_html( __( 'You can assign a Radio Station role to users through the WordPress User editor.', 'radio-station' ) );
+	echo '<h3>' . esc_html( __( 'Role Assignments', 'radio-station' ) ) . '</h3>';
+	echo esc_html( __( 'You can assign a Radio Station role to users through the WordPress User editor.', 'radio-station' ) ) . '<br>';
 
 	// --- info regarding Pro role assignment interface ---
-	// TODO: change this text when Pro version becomes available
-	echo '<br>' . esc_html( __( 'Radio Station Pro will include a Role Assignment Interface so you can easily assign Radio Station roles to any user.', 'radio-station' ) ) . '<br>';
+	// 2.4.0.3: change text to reflect inclusion in Pro
+	echo esc_html( __( 'Radio Station Pro includes a Role Assignment Interface so you can easily assign Radio Station roles to any user.', 'radio-station' ) ) . '<br>';
 	
-	// --- find out about Pro link ---
-	// [Pro Blurb]
-	// TODO: add go Por link when Pro available
+	// --- Pro upgrade link ---
+	// TODO: maybe add picture of role editing interface ?
 	$upgrade_url = radio_station_get_upgrade_url();
-	echo '<br><a href="' . esc_url( $upgrade_url ) . '" target="_blank">';
+	echo '<a href="' . esc_url( $upgrade_url ) . '" target="_blank">';
 		// echo esc_html( __( 'Upgrade to Radio Station Pro', 'radio-station' ) );
 	 	echo esc_html( __( 'Find out more about Radio Station Pro', 'radio-station' ) );
 	echo ' &rarr;</a>.';

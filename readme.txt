@@ -4,7 +4,7 @@ Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
 Tested up to: 5.8
-Stable tag: 2.4.0.2
+Stable tag: 2.4.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -84,11 +84,11 @@ Love Radio Station and ready for more? As the free version develops, we have als
 
 = How do I get started with Radio Station? =
 
-Read the [Quickstart Guide](https://netmix.com/radio-station/docs/#quickstart-guide) for an introduction to the plugin, what features are available and how to set them up.
+Read the [Quickstart Guide](https://radiostation.pro/docs/#quickstart-guide) for an introduction to the plugin, what features are available and how to set them up.
 
 = Where can I find the full plugin documentation? =
 
-The latest documentation can be found online at [NetMix.com](https://netmix.com/radio-station/docs/). Documentation is also included with for the currently installed version via the Radio Station Help menu. You can find the Markdown-formatted files in the `/docs` folder of the [GitHub Repository](https://github.com/netmix/radio-station/docs/) and in the `/docs` folder of the plugin directory. 
+The latest documentation can be found online at [NetMix.com](https://radiostation.pro/docs/). Documentation is also included with for the currently installed version via the Radio Station Help menu. You can find the Markdown-formatted files in the `/docs` folder of the [GitHub Repository](https://github.com/netmix/radio-station/docs/) and in the `/docs` folder of the plugin directory. 
 
 = How do I schedule a Show? =
 
@@ -96,7 +96,7 @@ Simply create a new show via Add Show in the Radio Station plugin menu in the Ad
 
 = How do I display a full schedule of my Station's shows? =
 
-In the Plugin Settings, you can select a Page on which to automatically display the schedule as well as which View to display (a Table grid by default.) Alternatively, you can use the shortcode `[master-schedule]` on any page (or post.) This option allows you to use further shortcode attributes to control the what is displayed in the Schedule (see [Master Schedule Shortcode Docs](https://netmix.com/radio-station/docs/shortcodes/#master-schedule-shortcode) )
+In the Plugin Settings, you can select a Page on which to automatically display the schedule as well as which View to display (a Table grid by default.) Alternatively, you can use the shortcode `[master-schedule]` on any page (or post.) This option allows you to use further shortcode attributes to control the what is displayed in the Schedule (see [Master Schedule Shortcode Docs](https://radiostation.pro/docs/shortcodes/#master-schedule-shortcode) )
 
 = I've scheduled all my Shows, but some are not showing up on the program schedule? =
 
@@ -117,7 +117,7 @@ The default styles for Radio Station have intionally kept fairly minimal so as t
 = What Widgets are available with this plugin? =
 
 The following Widgets are available to add via the WordPress Appearance -> Widgets page:
-Current Show, Upcoming Shows, Current Playlist, Radio Clock and Streaming Player Widgets. See the [Widget Documentation](https://netmix.com/radio-station/docs/widgets/) for more details on these Widgets.
+Current Show, Upcoming Shows, Current Playlist, Radio Clock and Streaming Player Widgets. See the [Widget Documentation](https://radiostation.pro/docs/widgets/) for more details on these Widgets.
 
 = Do the Widgets reload automatically? =
 
@@ -125,7 +125,7 @@ Current Show, Upcoming Shows and Current Playlist widgets do not refresh automat
 
 = What Shortcodes are available with this plugin? =
 
-See the [Shortcode Documentation](https://netmix.com/radio-station/docs/shortcodes/) for more details and a full list of possible Attributes for these Shortcodes:
+See the [Shortcode Documentation](https://radiostation.pro/docs/shortcodes/) for more details and a full list of possible Attributes for these Shortcodes:
 
 * `[master-schedule]` - Master Program Schedule Display
 * `[current-show]` - Current Show Widget
@@ -141,7 +141,7 @@ Note old shortcode aliases will still work in current and future versions to pre
 
 = I need users other than just the Administrator and DJ roles to have access to the Shows and Playlists post types. How do I do that? =
 
-There are a number of different options depending on what you are wanting to to do. To address this situation, we have added a Show Editor role that can edit Shows without being an Administrator. You can find more information on roles in the [Roles Documentation](https://netmix.com/radio-station/docs/roles/)
+There are a number of different options depending on what you are wanting to to do. To address this situation, we have added a Show Editor role that can edit Shows without being an Administrator. You can find more information on roles in the [Roles Documentation](https://radiostation.pro/docs/roles/)
 
 = How do I change the Show Avatar displayed in the sidebar widget? =
 
@@ -214,6 +214,16 @@ You can now visit your site to make sure nothing is broken. If you experience is
 
 == Changelog ==
 
+= 2.4.0.3 =
+* Update: Plugin Panel (1.2.1) with zero value save and tab fixes
+* Added: option to disable player audio fallback scripts
+* Added: option to hide various volume controls
+* Improved: lazy load player audio fallback scripts
+* Improved: added author support to post types for quick edit
+* Refix: missing fix to active day tab on pageload
+* Fixed: player volume slider background position (cross-browser)
+* Fixed: missing title value for adjacent post links
+
 = 2.4.0.2 =
 * Fixed: Multiple Player instance IDs
 * Fixed: Player loading button glow animation
@@ -221,6 +231,11 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Added: Widget type specific classes
 * Added: Alternative text positions in Player
 * Added: Pause button graphics to Player
+
+= 2.4.0.1 =
+* Fixed: Rounded player play button background corner style
+* Fixed: Tabbed schedule active day tab on pageload
+* Improved: Radio Clock Widget layout
 
 = 2.4.0 =
 * Added: Radio Stream Player!

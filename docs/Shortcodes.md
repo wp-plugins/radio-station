@@ -28,7 +28,6 @@ Note that Divs and Legacy Views are considered deprecated as they do not honour 
 The following attributes are available for the shortcode:
 
 * *view* : Which View to use for display output. 'table', 'tabs', 'list', 'divs', 'legacy', 'grid', 'calendar'. Default 'table'.
-* *selector* : Whether to display the Genre highlight selector above the Schedule. 0 or 1. Default 1.
 * *time* : Display time format you with to use. 12 and 24. Default is the Plugin Setting.
 * *clock* : Display Radio Clock above schedule. 0 or 1. Default is the Plugin Setting.
 * *show_link* : Display the title of the show as a link to its profile page. 0 or 1.  Default 1.

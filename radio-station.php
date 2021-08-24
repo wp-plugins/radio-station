@@ -10,7 +10,8 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.4.0.2
+Version: 2.4.0.3
+Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
 Author URI: https://netmix.com/radio-station
@@ -37,6 +38,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // - Define Plugin Data Slugs
 // - Include Plugin Files
 // - Plugin Options and Defaults
+// - Pro Version Install Check
 // - Plugin Loader Settings
 // - Start Plugin Loader Instance
 // - Include Plugin Admin Files
@@ -86,12 +88,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // Define Plugin Constants
 // -----------------------
 // 2.3.1: added constant for Netmix Directory
+// 2.4.0.3: remove separate constant for API docs link
+// 2.4.0.3: update home URLs to radiostation.pro
 define( 'RADIO_STATION_FILE', __FILE__ );
 define( 'RADIO_STATION_DIR', dirname( __FILE__ ) );
 define( 'RADIO_STATION_BASENAME', plugin_basename( __FILE__ ) );
-define( 'RADIO_STATION_HOME_URL', 'https://netmix.com/radio-station/' );
+define( 'RADIO_STATION_HOME_URL', 'https://radiostation.pro/' );
 define( 'RADIO_STATION_DOCS_URL', 'https://radiostation.pro/docs/' );
-define( 'RADIO_STATION_API_DOCS_URL', 'https://radiostation.pro/docs/api/' );
+// define( 'RADIO_STATION_API_DOCS_URL', 'https://radiostation.pro/docs/api/' );
 define( 'RADIO_STATION_PRO_URL', 'https://radiostation.pro/' );
 define( 'RADIO_STATION_NETMIX_DIR', 'https://netmix.com/' );
 
@@ -421,16 +425,34 @@ $options = array(
 	),
 
 	// --- Player Script ---
+	// 2.4.0.3: change script default to jplayer
 	'player_script'       => array(
 		'type'    => 'select',
 		'label'   => __( 'Player Script', 'radio-station' ),
-		'default' => 'amplitude',
+		'default' => 'jplayer',
 		'options' => array(
-			'amplitude' => __( 'Amplitude', 'radio-station' ),
-			'howler'    => __( 'Howler', 'radio-station' ),
 			'jplayer'   => __( 'jPlayer', 'radio-station' ),
+			'howler'    => __( 'Howler', 'radio-station' ),
+			'amplitude' => __( 'Amplitude', 'radio-station' ),
 		),
-		'helper'  => __( 'Default audio script to use for Radio Streaming Player.', 'radio-station' ),
+		'helper'  => __( 'Default audio script to use for playback in the Player.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'basic',
+		'pro'     => false,
+	),
+
+	// --- Fallback Scripts ---
+	// 2.4.0.3: added fallback enable/disable switching
+	'player_fallbacks'       => array(
+		'type'    => 'multicheck',
+		'label'   => __( 'Player Script', 'radio-station' ),
+		'default' => array( 'amplitude', 'howler', 'jplayer' ),
+		'options' => array(
+			'jplayer'   => __( 'jPlayer', 'radio-station' ),
+			'howler'    => __( 'Howler', 'radio-station' ),
+			'amplitude' => __( 'Amplitude', 'radio-station' ),
+		),
+		'helper'  => __( 'Fallback scripts to enable for when the default Player script fails.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'basic',
 		'pro'     => false,
@@ -465,6 +487,23 @@ $options = array(
 		'tab'     => 'player',
 		'section' => 'basic',
 		'pro'     => false,
+	),
+
+	// --- Volume Controls  ---
+	// 2.4.0.3: added enable/disable volume controls option
+	'player_volumes'       => array(
+		'type'    => 'multicheck',
+		'label'   => __( 'Volume Controls', 'radio-station' ),
+		'default' => array( 'slider', 'updown', 'mute', 'max' ),
+		'options' => array(
+			'slider'   => __( 'Volume Slider', 'radio-station' ),
+			'updown'   => __( 'Volume Plus / Minus', 'radio-station' ),
+			'mute'     => __( 'Mute Volume Toggle', 'radio-station' ),
+			'max'      => __( 'Maximize Volume', 'radio-station' ),
+		),
+		'helper'  => __( 'Which volume controls to display in the Player by default.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'basic',
 	),
 
 	// --- Player Debug Mode ---
@@ -606,6 +645,20 @@ $options = array(
 		'pro'     => true,
 	),
 
+	// --- [Pro] Player Bar Height ---
+	'player_bar_height'        => array(
+		'type'    => 'number',
+		'min'     => 40,
+		'max'     => 400,
+		'step'    => 1,
+		'label'   => __( 'Player Bar Height', 'radio-station' ),
+		'default' => 80,
+		'tab'     => 'player',
+		'section' => 'bar',
+		'helper'  => __( 'Set the height of the Sitewide Player Bar in pixels.', 'radio-station' ),
+		'pro'     => true,
+	),
+
 	// --- [Pro] Fade In Player Bar ---
 	'player_bar_fadein'        => array(
 		'type'    => 'number',
@@ -641,7 +694,22 @@ $options = array(
 		'min'     => 0,
 		'step'    => 100,
 		'max'     => 10000,
-		'helper'  => __( 'Number of milliseconds over which to fade in new Pages when continuous playback is enabled. Use 0 for instant display.', 'radio-station' ),
+		'helper'  => __( 'Number of milliseconds over which to fade in new Pages (when continuous playback is enabled.) Use 0 for instant display.', 'radio-station' ),
+		'tab'     => 'player',
+		'section' => 'bar',
+		'pro'     => true,
+	),
+
+	// --- [Pro] Page Load Timeout ---
+	// 2.4.0.3: add page load timeout option
+	'player_bar_timeout' => array(
+		'type'    => 'number',
+		'label'   => __( 'Page Load Timeout', 'teleporter' ),
+		'default' => 7000,
+		'min'     => 0,
+		'step'    => 500,
+		'max'     => 20000,
+		'helper'  => __( 'Number of milliseconds to wait for new Page to load before fading in anyway (when continuous playback is enabled.)', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'bar',
 		'pro'     => true,
@@ -666,6 +734,44 @@ $options = array(
 		'helper'  => __( 'Background color for the fixed position Sitewide Bar Player.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'bar',
+		'pro'     => true,
+	),
+
+	// --- [Pro] Display Current Show ---
+	// 2.4.0.3: added for current show display
+	'player_bar_currentshow'     => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Display Current Show', 'radio-station' ),
+		'value'   => 'yes',
+		'default' => 'yes',
+		'tab'     => 'player',
+		'section' => 'bar',
+		'helper'  => __( 'Display the Current Show in the Player Bar.', 'radio-station' ),
+		'pro'     => true,
+	),
+
+	// --- [Pro] Display Metadata ---
+	// 2.4.0.3: added for now playing metadata display
+	'player_bar_nowplaying'     => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Display Now Playing', 'radio-station' ),
+		'value'   => 'yes',
+		'default' => 'yes',
+		'tab'     => 'player',
+		'section' => 'bar',
+		'helper'  => __( 'Display the currently playing song in the Player Bar, if a supported metadata format is available. (Icy Meta, Icecast, Shoutcast 1/2, Current Playlist)', 'radio-station' ),
+		'pro'     => true,
+	),
+
+	// --- Metadata URL ---
+	// 2.4.0.3: added for alternative stream metadata URL
+	'player_bar_metadata'     => array(
+		'type'    => 'url',
+		'label'   => __( 'Metadata URL', 'radio-station' ),
+		'default' => '',
+		'tab'     => 'player',
+		'section' => 'bar',
+		'helper'  => __( 'Now playing metadata is normally retrieved via the Stream URL. Use this setting if you need to provide an alternative metadata location.', 'radio-station' ),
 		'pro'     => true,
 	),
 
@@ -1215,12 +1321,34 @@ $options = array(
 	// === Roles / Capabilities / Permissions  ===
 	// 2.3.0: added new capability and role options
 
+	// --- Show Editing Permission Note ---
+	// 2.4.0.3: added role to show assignment note
+	'permissions_show_role_note'      => array(
+		'type'    => 'note',
+		'label'   => __( 'Show Editing Permissions', 'radio-station' ),
+		'helper'  => __( 'By default, only Hosts and Producers that are assigned to a Show can edit that Show.', 'radio-station' )
+		             . ' ' . __( 'This means an Administrator or Show Editor must assign these users to the Show first.', 'radio-station' ),
+		'tab'     => 'roles',
+		'section' => 'permissions',
+	),
+
+	// --- Playlist Editing Role Note ---
+	// 2.4.0.3: added role to playlist assignment note
+	'permissions_playlistow_role_note'      => array(
+		'type'    => 'note',
+		'label'   => __( 'Playlist Permissions', 'radio-station' ),
+		'helper'  => __( 'Any user with a Host or Producer role can create Playlists.', 'radio-station' ),
+		'tab'     => 'roles',
+		'section' => 'permissions',
+	),
+
 	// --- Show Editor Role Note ---
 	'show_editor_role_note'      => array(
 		'type'    => 'note',
 		'label'   => __( 'Show Editor Role', 'radio-station' ),
 		'helper'  => __( 'Since 2.3.0, a new Show Editor role has been added with Publish and Edit capabilities for all Radio Station Post Types.', 'radio-station' )
-		             . ' ' . __( 'You can assign this Role to any user to give them full Station Schedule updating permissions.', 'radio-station' ),
+		             . ' ' . __( 'You can assign this Role to any user to give them full Station Schedule updating permissions.', 'radio-station' )
+		             . ' ' . __( 'This is so a manager can edit the schedule without requiring full site administration role.', 'radio-station' ),
 		'tab'     => 'roles',
 		'section' => 'permissions',
 	),
@@ -1302,11 +1430,34 @@ $options = array(
 	),
 );
 
-// 2.3.3.8: [temp] remove player options if player not present
-if ( !file_exists( $player_file ) ) {
-	foreach ( $options as $key => $option ) {
-		if ( 'player_' == substr( $key, 0, 7 ) ) {
-			unset( $options[$key] );
+// -------------------------
+// Pro Version Install Check
+// -------------------------
+// 2.4.0.3: added check active/installed Pro version 
+$plan = 'free';
+if ( defined( 'RADIO_STATION_PRO_FILE' ) ) {
+	// --- check for activated pro plugin ---
+	$plan = 'premium';
+} else {
+	// --- check for deactivated pro plugin ---
+	$plugins = wp_cache_get( 'plugins', 'plugins' );
+	if ( !$plugins ) {
+		if ( function_exists( 'get_plugins' ) ) {
+			$plugins = get_plugins();
+		} else {
+			$plugin_path = ABSPATH . 'wp-admin/includes/plugin.php';
+			if ( file_exists( $plugin_path ) ) {
+				include $plugin_path;
+				$plugins = get_plugins();
+			}
+		}
+	}
+	if ( $plugins && is_array( $plugins ) && ( count( $plugins ) > 0 ) ) {
+		foreach ( $plugins as $slug => $plugin ) {
+			if ( strstr( $slug, 'radio-station-pro.php' ) ) {
+				$plan = 'premium';
+				break;
+			}
 		}
 	}
 }
@@ -1316,6 +1467,8 @@ if ( !file_exists( $player_file ) ) {
 // ----------------------
 // 2.3.0: added plugin loader settings
 $slug = 'radio-station';
+
+// --- settings array ---
 $settings = array(
 	// --- Plugin Info ---
 	'slug'         => $slug,
@@ -1329,7 +1482,7 @@ $settings = array(
 	'docs'         => RADIO_STATION_DOCS_URL,
 	'support'      => 'https://github.com/netmix/radio-station/issues/',
 	'ratetext'     => __( 'Rate on WordPress.org', 'radio-station' ),
-	'share'        => RADIO_STATION_HOME_URL . '?share',
+	'share'        => RADIO_STATION_HOME_URL . '#share',
 	'sharetext'    => __( 'Share the Plugin Love', 'radio-station' ),
 	'donate'       => 'https://patreon.com/radiostation',
 	'donatetext'   => __( 'Support this Plugin', 'radio-station' ),
@@ -1349,11 +1502,17 @@ $settings = array(
 
 	// --- Freemius ---
 	// 2.4.0.1: turn on addons switch for Pro
+	// 2.4.0.3: turn on plans switch for Pro also
+	// 2.4.0.3: set Pro details and Upgrade links
 	'freemius_id'  => '4526',
 	'freemius_key' => 'pk_aaf375c4fb42e0b5b3831e0b8476b',
-	'hasplans'     => false,
-	'hasaddons'    => true,
-	'plan'         => 'free',
+	'hasplans'     => true,
+	'upgrade_link' => RADIO_STATION_PRO_URL . 'pricing/',
+	// 'upgrade_link' => add_query_arg( 'page', $args['slug'] . '-addons', admin_url( 'admin.php' ) ),
+	// 'pro_link'     => RADIO_STATION_PRO_URL . 'pricing/',
+	// 'hasaddons'    => true,
+	// 'addons_link'  => add_query_arg( 'page', $args['slug'] . '-addons', admin_url( 'admin.php' ) ),
+	'plan'         => $plan,
 );
 
 // -------------------------
@@ -2810,6 +2969,15 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 				$rel = 'prev';
 			}
 			$adjacent_post = get_post( $show['id'] );
+
+			// --- adjacent post title ---
+			// 2.4.0.3: added fix for missing post title
+			$post_title = $adjacent_post->post_title;
+			if ( empty( $adjacent_post->post_title ) ) {
+				$post_title = $title;
+			}
+			$post_title = apply_filters( 'the_title', $post_title, $adjacent_post->ID );
+
 			$date = mysql2date( get_option( 'date_format' ), $adjacent_post->post_date );
 			$string = '<a href="' . esc_url( get_permalink( $adjacent_post ) ) . '" rel="' . esc_attr( $rel ) . '" title="' . $title . '">';
 			$inlink = str_replace( '%title', $post_title, $link );
@@ -2935,7 +3103,7 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 		}
 		$adjacent_post = $show_posts[0];
 		if ( RADIO_STATION_DEBUG ) {
-			echo '<span style="display:none;">Realted Adjacent Post: ' . print_r( $adjacent_post, true ) . '</span>';
+			echo '<span style="display:none;">Related Adjacent Post: ' . print_r( $adjacent_post, true ) . '</span>';
 		}
 
 		// --- adjacent post title ---
@@ -3066,7 +3234,13 @@ function radio_station_set_roles() {
 	if ( !is_array( $role_caps ) ) {
 		$role_caps = array();
 	}
-	$host_caps = array( 'edit_hosts', 'edit_published_hosts', 'delete_hosts', 'read_hosts', 'publish_hosts' );
+	$host_caps = array(
+		'edit_hosts',
+		'edit_published_hosts',
+		'delete_hosts',
+		'read_hosts',
+		'publish_hosts'
+	);
 	foreach ( $host_caps as $cap ) {
 		if ( !array_key_exists( $cap, $role_caps ) || !$role_caps[$cap] ) {
 			$wp_roles->add_cap( 'dj', $cap, true );

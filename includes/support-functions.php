@@ -762,6 +762,9 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array() ) {
 		$default_data = apply_filters( 'radio_station_cached_data', false, $datatype, $show_id );
 		if ( $default_data ) {
 			return $default_data;
+			if ( RADIO_STATION_DEBUG ) {
+				echo '<span style="display:none;">Using Cacehed Data:' . print_r( $default_data, true ) . '</span>';
+			}
 		}
 	}
 
@@ -2279,11 +2282,21 @@ function radio_station_get_current_playlist() {
 			$track[$key] = $value;
 			$entries[$i] = $track;
 		}
-		if ( 'queued' == $entry['status'] ) {
-			$queued[] = $entry;
-		} elseif ( 'played' == $entry['status'] ) {
-			$played[] = $entry;
+		// 2.4.0.3: fix for queued and played arrays
+		foreach ( $track as $key => $value ) {
+			if ( 'status' == $key ) {
+				if ( 'queued' == $value ) {
+					$queued[] = $track;
+				} elseif ( 'played' == $value ) {
+					$played[] = $track;
+				}
+			}
 		}
+	}
+	
+	$latest = array();
+	if ( isset( $queued[0] ) ) {
+		$latest = $queued[0];
 	}
 
 	// --- get the track list for display  ---
@@ -2291,7 +2304,7 @@ function radio_station_get_current_playlist() {
 		'tracks'   => $entries,
 		'queued'   => $queued,
 		'played'   => $played,
-		'latest'   => array_pop( $entries ),
+		'latest'   => $latest,
 		'id'       => $playlist_id,
 		'url'      => get_permalink( $playlist_id ),
 		'show'     => $show_id,
@@ -3369,7 +3382,7 @@ function radio_station_get_fallback_url() {
 		$fallback_url = $fallback;
 	}
 	if ( RADIO_STATION_DEBUG ) {
-		echo '<span style="display:none;">Fallback URL Setting: '; var_dump( $stream ); echo '</span>';
+		echo '<span style="display:none;">Fallback URL Setting: '; var_dump( $fallback_url ); echo '</span>';
 	}
 	$fallback_url = apply_filters( 'radio_station_fallback_url', $fallback_url );
 
@@ -3567,7 +3580,7 @@ function radio_station_get_upgrade_url() {
 	// ...maybe it is -addons instead of -pricing ???
 	// $upgrade_url = add_query_arg( 'page', 'radio-station-pricing', admin_url( 'admin.php' ) );
 
-	$upgrade_url = RADIO_STATION_PRO_URL;
+	$upgrade_url = RADIO_STATION_PRO_URL . 'pricing/';
 
 	return $upgrade_url;
 }
@@ -4663,6 +4676,11 @@ function radio_station_sanitize_input( $prefix, $key ) {
 	$postkey = $prefix . '_' . $key;
 	$types = radio_station_get_meta_input_types();
 
+	// 2.4.0.3: bug out if post key not set
+	if ( !isset( $_POST[$postkey] ) ) {
+		return '';
+	}
+
 	if ( in_array( $key, $types['file'] ) ) {
 		$value = wp_strip_all_tags( trim( $_POST[$postkey] ) );
 	} elseif ( in_array( $key, $types['email'] ) ) {
@@ -5006,7 +5024,8 @@ function radio_station_delete_transients_with_prefix( $prefix ) {
 // Clear Cached Data
 // -----------------
 // 2.3.3.9: made into separate function
-function radio_station_clear_cached_data( $post_id = false ) {
+// 2.4.0.3: added second argument for post type
+function radio_station_clear_cached_data( $post_id = false, $post_type = false ) {
 
 	// --- clear main schedule transients ---
 	// 2.3.3: remove current show transient
@@ -5023,8 +5042,8 @@ function radio_station_clear_cached_data( $post_id = false ) {
 
 	// --- maybe clear show meta data ---
 	if ( $post_id ) {
-		do_action( 'radio_station_clear_data', 'show', $post_id );
-		do_action( 'radio_station_clear_data', 'show_meta', $post_id );
+		do_action( 'radio_station_clear_data', $post_type, $post_id );
+		do_action( 'radio_station_clear_data', $post_type . '_meta', $post_id );
 	}
 
 	// --- maybe send directory ping ---

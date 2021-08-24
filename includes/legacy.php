@@ -461,7 +461,12 @@ function radio_station_get_now_playing( $time = false ) {
 			$playlist['tracks'] = $tracks;
 			$playlist['queued'] = $queued;
 			$playlist['played'] = $played;
-			$playlist['latest'] = array_pop( $tracks );
+			// 2.4.0.3: set latest track from queued
+			if ( count( $queued ) > 0 ) {
+				$playlist['latest'] = $queued[0];
+			} else {
+				$playlist['latest'] = array();
+			}
 
 			// --- add show and playlist data ---
 			// 2.3.0: add IDs and URLs instead of just playlist URL

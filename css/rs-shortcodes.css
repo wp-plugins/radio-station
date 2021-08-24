@@ -125,7 +125,7 @@
 
 /* Show Subarchive Shortcodes */
 /* -------------------------- */
-.show-post {
+.show-post, .show-playlist, .show-host, .show-producer, .show-episode {
 	padding-top: 5px;
 	padding-bottom: 5px;
 }
