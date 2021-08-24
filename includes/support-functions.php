@@ -3382,7 +3382,7 @@ function radio_station_get_fallback_url() {
 		$fallback_url = $fallback;
 	}
 	if ( RADIO_STATION_DEBUG ) {
-		echo '<span style="display:none;">Fallback URL Setting: '; var_dump( $stream ); echo '</span>';
+		echo '<span style="display:none;">Fallback URL Setting: '; var_dump( $fallback_url ); echo '</span>';
 	}
 	$fallback_url = apply_filters( 'radio_station_fallback_url', $fallback_url );
 
@@ -3580,7 +3580,7 @@ function radio_station_get_upgrade_url() {
 	// ...maybe it is -addons instead of -pricing ???
 	// $upgrade_url = add_query_arg( 'page', 'radio-station-pricing', admin_url( 'admin.php' ) );
 
-	$upgrade_url = RADIO_STATION_PRO_URL;
+	$upgrade_url = RADIO_STATION_PRO_URL . 'pricing/';
 
 	return $upgrade_url;
 }
@@ -4675,6 +4675,11 @@ function radio_station_sanitize_input( $prefix, $key ) {
 
 	$postkey = $prefix . '_' . $key;
 	$types = radio_station_get_meta_input_types();
+
+	// 2.4.0.3: bug out if post key not set
+	if ( !isset( $_POST[$postkey] ) ) {
+		return '';
+	}
 
 	if ( in_array( $key, $types['file'] ) ) {
 		$value = wp_strip_all_tags( trim( $_POST[$postkey] ) );

@@ -310,6 +310,7 @@
 }
 .rp-now-playing-title, .rp-now-playing-artist, .rp-now-playing-album {
 	display: inline-block;
+	padding: 0 10px;
 }
 
 /* @group Station and Show Info */

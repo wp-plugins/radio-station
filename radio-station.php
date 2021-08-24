@@ -38,6 +38,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // - Define Plugin Data Slugs
 // - Include Plugin Files
 // - Plugin Options and Defaults
+// - Pro Version Install Check
 // - Plugin Loader Settings
 // - Start Plugin Loader Instance
 // - Include Plugin Admin Files
@@ -87,12 +88,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // Define Plugin Constants
 // -----------------------
 // 2.3.1: added constant for Netmix Directory
+// 2.4.0.3: remove separate constant for API docs link
+// 2.4.0.3: update home URLs to radiostation.pro
 define( 'RADIO_STATION_FILE', __FILE__ );
 define( 'RADIO_STATION_DIR', dirname( __FILE__ ) );
 define( 'RADIO_STATION_BASENAME', plugin_basename( __FILE__ ) );
 define( 'RADIO_STATION_HOME_URL', 'https://radiostation.pro/' );
 define( 'RADIO_STATION_DOCS_URL', 'https://radiostation.pro/docs/' );
-define( 'RADIO_STATION_API_DOCS_URL', 'https://radiostation.pro/docs/api/' );
+// define( 'RADIO_STATION_API_DOCS_URL', 'https://radiostation.pro/docs/api/' );
 define( 'RADIO_STATION_PRO_URL', 'https://radiostation.pro/' );
 define( 'RADIO_STATION_NETMIX_DIR', 'https://netmix.com/' );
 
@@ -1427,20 +1430,45 @@ $options = array(
 	),
 );
 
-// 2.3.3.8: [temp] remove player options if player not present
-// if ( !file_exists( $player_file ) ) {
-//	foreach ( $options as $key => $option ) {
-//		if ( 'player_' == substr( $key, 0, 7 ) ) {
-//			unset( $options[$key] );
-//		}
-//	}
-// }
+// -------------------------
+// Pro Version Install Check
+// -------------------------
+// 2.4.0.3: added check active/installed Pro version 
+$plan = 'free';
+if ( defined( 'RADIO_STATION_PRO_FILE' ) ) {
+	// --- check for activated pro plugin ---
+	$plan = 'premium';
+} else {
+	// --- check for deactivated pro plugin ---
+	$plugins = wp_cache_get( 'plugins', 'plugins' );
+	if ( !$plugins ) {
+		if ( function_exists( 'get_plugins' ) ) {
+			$plugins = get_plugins();
+		} else {
+			$plugin_path = ABSPATH . 'wp-admin/includes/plugin.php';
+			if ( file_exists( $plugin_path ) ) {
+				include $plugin_path;
+				$plugins = get_plugins();
+			}
+		}
+	}
+	if ( $plugins && is_array( $plugins ) && ( count( $plugins ) > 0 ) ) {
+		foreach ( $plugins as $slug => $plugin ) {
+			if ( strstr( $slug, 'radio-station-pro.php' ) ) {
+				$plan = 'premium';
+				break;
+			}
+		}
+	}
+}
 
 // ----------------------
 // Plugin Loader Settings
 // ----------------------
 // 2.3.0: added plugin loader settings
 $slug = 'radio-station';
+
+// --- settings array ---
 $settings = array(
 	// --- Plugin Info ---
 	'slug'         => $slug,
@@ -1454,7 +1482,7 @@ $settings = array(
 	'docs'         => RADIO_STATION_DOCS_URL,
 	'support'      => 'https://github.com/netmix/radio-station/issues/',
 	'ratetext'     => __( 'Rate on WordPress.org', 'radio-station' ),
-	'share'        => RADIO_STATION_HOME_URL . '?share',
+	'share'        => RADIO_STATION_HOME_URL . '#share',
 	'sharetext'    => __( 'Share the Plugin Love', 'radio-station' ),
 	'donate'       => 'https://patreon.com/radiostation',
 	'donatetext'   => __( 'Support this Plugin', 'radio-station' ),
@@ -1484,7 +1512,7 @@ $settings = array(
 	// 'pro_link'     => RADIO_STATION_PRO_URL . 'pricing/',
 	// 'hasaddons'    => true,
 	// 'addons_link'  => add_query_arg( 'page', $args['slug'] . '-addons', admin_url( 'admin.php' ) ),
-	'plan'         => 'free',
+	'plan'         => $plan,
 );
 
 // -------------------------
@@ -2941,6 +2969,15 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 				$rel = 'prev';
 			}
 			$adjacent_post = get_post( $show['id'] );
+
+			// --- adjacent post title ---
+			// 2.4.0.3: added fix for missing post title
+			$post_title = $adjacent_post->post_title;
+			if ( empty( $adjacent_post->post_title ) ) {
+				$post_title = $title;
+			}
+			$post_title = apply_filters( 'the_title', $post_title, $adjacent_post->ID );
+
 			$date = mysql2date( get_option( 'date_format' ), $adjacent_post->post_date );
 			$string = '<a href="' . esc_url( get_permalink( $adjacent_post ) ) . '" rel="' . esc_attr( $rel ) . '" title="' . $title . '">';
 			$inlink = str_replace( '%title', $post_title, $link );
@@ -3066,7 +3103,7 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 		}
 		$adjacent_post = $show_posts[0];
 		if ( RADIO_STATION_DEBUG ) {
-			echo '<span style="display:none;">Realted Adjacent Post: ' . print_r( $adjacent_post, true ) . '</span>';
+			echo '<span style="display:none;">Related Adjacent Post: ' . print_r( $adjacent_post, true ) . '</span>';
 		}
 
 		// --- adjacent post title ---
@@ -3197,7 +3234,13 @@ function radio_station_set_roles() {
 	if ( !is_array( $role_caps ) ) {
 		$role_caps = array();
 	}
-	$host_caps = array( 'edit_hosts', 'edit_published_hosts', 'delete_hosts', 'read_hosts', 'publish_hosts' );
+	$host_caps = array(
+		'edit_hosts',
+		'edit_published_hosts',
+		'delete_hosts',
+		'read_hosts',
+		'publish_hosts'
+	);
 	foreach ( $host_caps as $cap ) {
 		if ( !array_key_exists( $cap, $role_caps ) || !$role_caps[$cap] ) {
 			$wp_roles->add_cap( 'dj', $cap, true );

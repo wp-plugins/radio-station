@@ -2388,7 +2388,10 @@ function radio_station_show_save_data( $post_id ) {
 			shiftslist.style.display = '';" . PHP_EOL;
 
 			// --- reload the current schedule view ---
-			$js .= "parent.radio_load_schedule(false,false,true);" . PHP_EOL;
+			// 2.4.0.3: added missing check for window parent function
+			$js .= "if (window.parent && (typeof parent.radio_load_schedule == 'function')) {
+				parent.radio_load_schedule(false,false,true);
+			}" . PHP_EOL;
 
 			// 2.3.3.6: clear changes may not have been saved window reload message
 			$js .= "if (parent.window.onbeforeunloadset) {
@@ -4457,7 +4460,10 @@ function radio_station_override_save_data( $post_id ) {
 			overridelist.style.display = '';" . PHP_EOL;
 
 			// --- reload the current schedule view ---
-			$js .= "parent.radio_load_schedule(false,false,true);" . PHP_EOL;
+			// 2.4.0.3: added missing check for window parent function
+			$js .= "if (window.parent && (typeof parent.radio_load_schedule == 'function')) {
+				parent.radio_load_schedule(false,false,true);
+			}" . PHP_EOL;
 
 			// $js .= "if (parent.window.onbeforeunloadset) {
 			//	parent.window.onbeforeunload = parent.storedonbeforeunload;

@@ -4,6 +4,8 @@
 /* note: admin scripts are currently enqueued using wp_add_inline_script */
 /* this file is necessary to ensure they are printed in the right place */
 
+var radio_admin; radio_admin = {debug:false};
+
 /* Cookie Value Function */
 /* since @2.3.2 */
 radio_cookie = {

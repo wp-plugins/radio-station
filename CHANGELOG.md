@@ -8,12 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### 2.4.0.3
-* Update: Plugin Panel (1.2.0) with zero value save and tab fix
+* Update: Plugin Panel (1.2.1) with zero value save and tab fixes
 * Added: option to disable player audio fallback scripts
 * Added: option to hide various volume controls
 * Improved: lazy load player audio fallback scripts
+* Improved: added author support to post types for quick edit
 * Refix: missing fix to active day tab on pageload
 * Fixed: player volume slider background position (cross-browser)
+* Fixed: missing title value for adjacent post links
 
 ### 2.4.0.2
 * Fixed: Multiple Player instance IDs

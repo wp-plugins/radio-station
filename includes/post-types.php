@@ -67,7 +67,8 @@ function radio_station_create_post_types() {
 		'hierarchical'      => false,
 		// 2.3.0: added custom field and revision support
 		// 2.3.3.9: added post excerpt support
-		'supports'          => array( 'title', 'editor', 'excerpt', 'thumbnail', 'comments', 'custom-fields', 'revisions' ),
+		// 2.4.1.4: added author support for quick edit
+		'supports'          => array( 'title', 'editor', 'excerpt', 'thumbnail', 'comments', 'custom-fields', 'revisions', 'author' ),
 		'can_export'        => true,
 		// 2.3.0: added show archives support
 		'has_archive'       => 'shows',
@@ -113,7 +114,8 @@ function radio_station_create_post_types() {
 		'public'            => true,
 		'hierarchical'      => false,
 		// 2.3.0: added thumbnail, custom field and revision support
-		'supports'          => array( 'title', 'editor', 'thumbnail', 'comments', 'custom-fields', 'revisions' ),
+		// 2.4.1.4: added author support for quick edit
+		'supports'          => array( 'title', 'editor', 'thumbnail', 'comments', 'custom-fields', 'revisions', 'author' ),
 		'can_export'        => true,
 		// 2.3.0: changed from playlists-archive
 		'has_archive'       => 'playlists',
@@ -162,7 +164,8 @@ function radio_station_create_post_types() {
 		// 2.3.0: added editor support for override description
 		// 2.3.0: added custom field and revision support
 		// 2.3.3.9: added post excerpt support
-		'supports'          => array( 'title', 'editor', 'excerpt', 'thumbnail', 'custom-fields', 'revisions' ),
+		// 2.4.1.4: added author support for quick edit
+		'supports'          => array( 'title', 'editor', 'excerpt', 'thumbnail', 'custom-fields', 'revisions', 'author' ),
 		'can_export'        => true,
 		'has_archive'       => false,
 		'rewrite'           => array(
@@ -212,7 +215,8 @@ function radio_station_create_post_types() {
 		// 2.3.3.9: set can_export true
 		'can_export'          => true,
 		// 2.3.3.9: added all post type supports
-		'supports'            => array( 'title', 'editor', 'excerpt', 'thumbnail', 'custom-fields', 'revisions' ),
+		// 2.4.1.4: added author support for quick edit
+		'supports'            => array( 'title', 'editor', 'excerpt', 'thumbnail', 'custom-fields', 'revisions', 'author' ),
 		'has_archive'         => 'hosts',
 		'rewrite'             => array(
 			'slug'       => 'host',
@@ -262,7 +266,8 @@ function radio_station_create_post_types() {
 		// 2.3.3.9: set can_export true 
 		'can_export'          => true,
 		// 2.3.3.9: added all post type supports
-		'supports'            => array( 'title', 'editor', 'excerpt', 'thumbnail', 'custom-fields', 'revisions' ),
+		// 2.4.1.4: added author support for quick edit
+		'supports'            => array( 'title', 'editor', 'excerpt', 'thumbnail', 'custom-fields', 'revisions', 'author' ),
 		'has_archive'         => 'producers',
 		'rewrite'             => array(
 			'slug'       => 'producer',

@@ -224,7 +224,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					$profiles = explode( ',', $proslug );
 					$proslug = trim( $profiles[0] );
 				}
-				$args['proslug'] = substr( $proslug, 0, - 4 );    // strips .php extension
+				$args['proslug'] = substr( $proslug, 0, - 4 ); // strips .php extension
 				$args['profiles'] = $profiles;
 			}
 
@@ -1170,10 +1170,10 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			}
 
 			// --- Pro Functions ---
-			$plan = 'free';
 			// 1.0.2: added prototype auto-loading of Pro file(s)
+			// 1.2.1: fix overriding of plan arg to free
 			// (to work with @fs_premium_only file list)
-			if ( count( $args['profiles'] ) > 0 ) {
+			if ( isset( $args['profiles'] ) && count( $args['profiles'] ) > 0 ) {
 				$included = get_included_files();
 				foreach ( $args['profiles'] as $profile ) {
 					// --- chech for php extension ---
@@ -1189,8 +1189,11 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					}
 				}
 			}
-			$args['plan'] = $plan;
-			$this->args = $args;
+			// 1.2.0: only change plan setting if premium files found
+			if ( isset( $plan ) ) {
+				$args['plan'] = $plan;
+				$this->args = $args;
+			}
 
 			// --- Plugin Update Checker ---
 			// note: lack of updatechecker.php file indicates WordPress.Org SVN repo version
@@ -1564,24 +1567,27 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				// --- maybe add Pro upgrade link ---
 				if ( isset( $args['hasplans'] ) && $args['hasplans'] ) {
 				
-					// -- internal upgrade link ---
-					// TODO: check if premium is already installed
-					if ( isset( $args['upgrade_link'] ) ) {
-						$upgrade_url = $args['upgrade_link'];
-						$upgrade_target = '';
-					} else {
-						$upgrade_url = add_query_arg( 'page', $args['slug'] . '-pricing', admin_url( 'admin.php' ) );
-						$upgrade_target = !strstr( $upgrade_url, '/wp-admin/' ) ? ' target="_blank"' : '';
-					}
-					$upgrade_link = "<b><a href='" . esc_url( $upgrade_url ) . "'" . $upgrade_target . ">" . esc_html( __('Upgrade' ) ) . "</a></b>";
-					array_unshift( $links, $upgrade_link );
-					
-					// --- external pro link ---
-					// 1.2.0: added pro link 
-					if ( isset( $args['pro_link'] ) ) {
-						$pro_target = !strstr( $args['pro_link'], '/wp-admin/' ) ? ' target="_blank"' : '';
-						$pro_link = "<b><a href='" . esc_url( $args['pro_link'] ) . "'" . $pro_target . ">" . esc_html( __('Pro Details' ) ) . "</a></b>";
-						array_unshift( $links, $pro_link );
+					// 1.2.1: add check if premium is already installed
+					if ( !isset( $args['plan'] ) || ( 'premium' != $args['plan'] ) ) {
+
+						// -- internal upgrade link ---
+						if ( isset( $args['upgrade_link'] ) ) {
+							$upgrade_url = $args['upgrade_link'];
+							$upgrade_target = '';
+						} else {
+							$upgrade_url = add_query_arg( 'page', $args['slug'] . '-pricing', admin_url( 'admin.php' ) );
+							$upgrade_target = !strstr( $upgrade_url, '/wp-admin/' ) ? ' target="_blank"' : '';
+						}
+						$upgrade_link = "<b><a href='" . esc_url( $upgrade_url ) . "'" . $upgrade_target . ">" . esc_html( __('Upgrade' ) ) . "</a></b>";
+						array_unshift( $links, $upgrade_link );
+
+						// --- external pro link ---
+						// 1.2.0: added separate pro details link 
+						if ( isset( $args['pro_link'] ) ) {
+							$pro_target = !strstr( $args['pro_link'], '/wp-admin/' ) ? ' target="_blank"' : '';
+							$pro_link = "<b><a href='" . esc_url( $args['pro_link'] ) . "'" . $pro_target . ">" . esc_html( __('Pro Details' ) ) . "</a></b>";
+							array_unshift( $links, $pro_link );
+						}
 					}
 				}
 
@@ -2370,10 +2376,12 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					  || ( isset( $args['hasaddons'] ) && $args['hasaddons'] ) ) {
 						$upgrade_link = add_query_arg( 'page', $args['slug'] . '-pricing', admin_url( 'admin.php' ) );
 						$upgrade_target = '';
-					} elseif ( isset( $args['upgrade_link'] ) ) {
-						$upgrade_link = $args['upgrade_link'];
-						$upgrade_target = !strstr( $pro_link, '/wp-admin/' ) ? ' target="_blank"' : '';
 					}
+					if ( isset( $args['upgrade_link'] ) ) {
+						$upgrade_link = $args['upgrade_link'];
+						$upgrade_target = !strstr( $upgrade_link, '/wp-admin/' ) ? ' target="_blank"' : '';
+					}
+					// 1.2.1: fix to check pro_link not upgrade_link
 					if ( isset( $args['pro_link'] ) ) {
 						$pro_link = $args['pro_link'];
 						$pro_target = !strstr( $pro_link, '/wp-admin/' ) ? ' target="_blank"' : '';
@@ -3154,6 +3162,10 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // =========
 // CHANGELOG
 // =========
+
+// == 1.2.1 ==
+// - fix overriding of plan arg to free
+// - add check if premium already installed
 
 // == 1.2.0 ==
 // - fix missing CSV field type row output condition
