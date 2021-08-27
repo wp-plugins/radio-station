@@ -7,6 +7,7 @@
 // === Admin Setup ===
 // - Enqueue Admin Scripts
 // - Admin Style Fixes
+// - Filter License Activation Link
 // === Admin Menu ===
 // - Setting Page Capability Check
 // - Add Admin Menu and Submenu Items
@@ -90,6 +91,33 @@ function radio_station_admin_styles() {
 
 	echo '</style>';
 
+}
+
+// ------------------------------
+// Filter License Activation Link
+// ------------------------------
+// 2.4.0.3: filter license activation link for free version on plugin page
+// note: this is because Pro is a separate plugin not a replacement one
+add_filter( 'plugin_action_links_' . RADIO_STATION_BASENAME, 'radio_station_license_activation_link', 20, 2 );
+// add_filter( 'network_admin_plugin_action_links_' . RADIO_STATION_BASENAME, , 'radio_station_license_activation_link', 20, 2 );
+function radio_station_license_activation_link( $links, $file ) {
+	foreach ( $links as $key => $link ) {
+		// if ( RADIO_STATION_DEBUG ) {
+		// 	echo '<span style="display:none;">Plugin Link ' . $key . ': ' . $link . '</span>' . PHP_EOL;
+		// }
+		// --- remove activate premium license link from free version ---
+		if ( strstr( $key, 'activate-license' ) ) {
+			unset( $links[$key] );
+		}
+		// --- remove upgrade link if Pro is already installed ---
+		if ( defined( 'RADIO_STATION_PRO_FILE' ) && strstr( $key, 'upgrade' ) ) {
+			unset( $links[$key] );
+		}
+	}
+	// if ( RADIO_STATION_DEBUG ) {
+	//	echo '<span style="display:none;">Plugin Links: ' . print_r( $links, true ) . '</span>' . PHP_EOL;
+	// }
+	return $links;
 }
 
 
