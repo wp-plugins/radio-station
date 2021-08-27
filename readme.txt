@@ -220,9 +220,11 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Added: option to hide various volume controls
 * Improved: lazy load player audio fallback scripts
 * Improved: added author support to post types for quick edit
+* Improved: Playlist content template and action hooks
 * Refix: missing fix to active day tab on pageload
 * Fixed: player volume slider background position (cross-browser)
 * Fixed: missing title value for adjacent post links
+* Fixed: Fallback scripts and fallback stream URLs
 
 = 2.4.0.2 =
 * Fixed: Multiple Player instance IDs

@@ -5,7 +5,7 @@
 // ===========================
 //
 // --------------
-// Version: 1.2.0
+// Version: 1.2.1
 // --------------
 // Note: Changelog and structure at end of file.
 //
@@ -332,7 +332,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			}
 
 			// 1.0.9: trigger add settings action
-			do_action( $args['nsmespace'] . '_add_settings', $args );
+			// 1.2.1: fix to namespace typo (nsmespace)
+			do_action( $args['namespace'] . '_add_settings', $args );
 		}
 
 		// -----------------------
@@ -521,7 +522,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					if ( isset( $_POST[$postkey] ) ) {
 						$posted = $_POST[$postkey];
 					}
-					$newsettings = false;
+					$newsettings = null;
 
 					// --- maybe validate special options ---
 					// 1.0.9: check for special options to prepare
@@ -713,7 +714,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					if ( $this->debug ) {
 						echo 'New Settings for Key ' . $key . ': ';
 						// 1.2.0: added isset check for newsetting
-						if ( isset( $newsetting ) && ( $newsetting || ( 0 === $newsetting ) || ( '0' === $newsetting ) ) ) {
+						if ( !is_null( $newsettings ) ) {
 							echo '(to-validate) ' . print_r( $newsettings, true ) . '<br>';
 						} else {
 							// 1.1.7 handle if (new) key not set yet
@@ -727,17 +728,19 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 					// --- maybe validate new settings ---
 					// 1.1.9: fix to allow saving of zero value
-					if ( $newsettings || ( 0 === $newsettings ) || ( '0' === $newsettings ) ) {
+					// 1.2.1: fix to allow saving of empty value
+					if ( !is_null( $newsettings ) ) {
 						if ( is_array( $newsettings ) ) {
 
 							// --- validate array of settings ---
 							// 1.1.9: fix to allow saving of zero value
+							// 1.2.1: fix to allow saving of empty value
 							foreach ( $newsettings as $newkey => $newvalue ) {
 								$newsetting = $this->validate_setting( $newvalue, $valid, $validate_args );
 								if ( $this->debug ) {
 									echo 'Validated Setting array value ' . $newvalue . ' to ' . $newsetting;
 								}
-								if ( $newsetting && ( '' != $newsetting ) ) {
+								if ( $newsetting || ( '' == $newsetting ) ) {
 									$newsettings[$newkey] = $newsetting;
 								} elseif ( ( 0 == $newsetting ) || ( '0' == $newsetting ) ) {
 									$newsettings[$newkey] = $newsetting;
@@ -751,7 +754,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 								$settings[$key] = $newsettings;
 							}
 
-						} else {
+						} elseif ( $newsettings || ( '' == $newsettings ) || ( 0 === $newsettings ) || ( '0' === $newsettings ) ) {
 
 							// --- validate single setting ---
 							if ( 'csv' == $type ) {
@@ -770,10 +773,11 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 							} else {
 								$newsetting = $this->validate_setting( $newsettings, $valid, $validate_args );
 								// 1.1.9: fix to allow saving of zero value
+								// 1.2.1: fix to allow saving of empty value
 								if ( $this->debug ) {
-									echo 'Validated Setting single value ' . $newsettings . ' to ' . $newsetting;
+									echo 'Validated Setting single value ' . $newsettings . ' to ' . $newsetting . '<br>';
 								}
-								if ( $newsetting || ( 0 == $newsetting ) || ( '0' == $newsetting ) ) {
+								if ( $newsetting || ( '' == $newsetting ) || ( 0 == $newsetting ) || ( '0' == $newsetting ) ) {
 									$settings[$key] = $newsetting;
 								}
 							}
@@ -957,8 +961,11 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				// 1.0.6: fix to posted variable type (vposted)
 				// 1.0.9: remove check for http prefix to allow other protocols
 				// 1.1.7: use FILTER_SANITIZE_URL not FILTER_SANITIZE_STRING
+				// 1.2.1: allow for clearing URL by saving empty value
 				$posted = trim( $posted );
-				$posted = filter_var( $posted, FILTER_SANITIZE_URL );
+				if ( '' != $posted ) {
+					$posted = filter_var( $posted, FILTER_SANITIZE_URL );
+				}
 
 				// 1.1.7: remove FILTER_VALIDATE_URL check - not working!?
 				if ( $this->debug ) {
@@ -1152,6 +1159,12 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 			// --- AJAX readme viewer ---
 			add_action( 'wp_ajax_' . $namespace . '_readme_viewer', array( $this, 'readme_viewer' ) );
+			
+			// --- load Freemius (requires PHP 5.4+) ---
+			// 1.2.1: move Freemius loading to plugins_loaded hook
+			if ( version_compare( PHP_VERSION, '5.4.0' ) >= 0 ) {
+				add_action( 'plugins_loaded', array( $this, 'load_freemius' ) );
+			}
 		}
 
 		// ---------------------
@@ -1213,10 +1226,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// 1.0.9: added action for extra loader helpers (eg. WordQuest)
 			do_action( $args['namespace'] . '_loader_helpers', $args );
 
-			// --- Freemius (requires PHP 5.4+) ---
-			if ( version_compare( PHP_VERSION, '5.4.0' ) >= 0 ) {
-				$this->load_freemius();
-			}
+			// --- load Freemius (requires PHP 5.4+) ---
+			// 1.2.1: moved to plugins_loaded action hook
 
 		}
 
@@ -1334,6 +1345,11 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 		// ====================
 		public function load_freemius() {
 
+			// 1.2.1: no need to laod if not in admin area
+			if ( !is_admin() ) {
+				return;
+			}
+
 			$args = $this->args;
 			$namespace = $this->namespace;
 
@@ -1348,6 +1364,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			$premium = false;
 			if ( isset( $args['plan'] ) && ( 'premium' == $args['plan'] ) ) {
 				$premium = true;
+			} else {
+				// 1.2.1: added filter for premium init
+				$premium = apply_filters( 'freemius_init_premium_' . $args['namespace'], $premium );
 			}
 
 			// --- maybe redirect link to plugin support forum ---
@@ -1360,9 +1379,10 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					// changes the support forum slug for premium based on the pro plugin file slug
 					// 1.0.7: fix support URL undefined variable warning
 					$support_url = $args['support'];
-					if ( $premium ) {
-						$support_url = str_replace( $args['slug'], $args['proslug'], $support_url );
-					}
+					// 1.2.1: removed in favour of filtering via Pro
+					// if ( $premium && isset( $args['proslug'] ) ) {
+					// 	$support_url = str_replace( $args['slug'], $args['proslug'], $support_url );
+					// }
 					$support_url = apply_filters( 'freemius_plugin_support_url_redirect', $support_url, $args['slug'] );
 					wp_redirect( $support_url );
 					exit;
@@ -1385,15 +1405,17 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				if ( !isset( $args['type'] ) ) {
 					$args['type'] = 'plugin';
 				}
-				if ( !isset( $args['hasaddons'] ) ) {
-					$args['hasaddons'] = false;
+				if ( !isset( $args['wporg'] ) ) {
+					$args['wporg'] = false;
 				}
 				if ( !isset( $args['hasplans'] ) ) {
 					$args['hasplans'] = false;
 				}
-				if ( !isset( $args['wporg'] ) ) {
-					$args['wporg'] = false;
+				if ( !isset( $args['hasaddons'] ) ) {
+					$args['hasaddons'] = false;
 				}
+				// 1.2.1: add filter for addons init
+				$args['hasaddons'] = apply_filters( 'freemius_init_addons_' . $args['namespace'], $args['hasaddons'] );
 
 				// --- set defaults for options submenu key values ---
 				// 1.0.2: fix to isset check keys
@@ -3164,8 +3186,10 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // =========
 
 // == 1.2.1 ==
+// - added filters for premium and addons init
 // - fix overriding of plan arg to free
 // - add check if premium already installed
+// - fix namespace typo in add settings action
 
 // == 1.2.0 ==
 // - fix missing CSV field type row output condition

@@ -1397,23 +1397,29 @@ function radio_station_player_get_settings() {
 		$player_single = true;
 
 		if ( function_exists( 'apply_filters' ) ) {
+			$player_script = apply_fitlers( 'radio_station_player_script', $player_script );
 			$player_title = apply_filters( 'radio_station_player_title', $player_title );
 			$player_image = apply_filters( 'radio_station_player_image', $player_image );
 			$player_volume = abs( intval( apply_filters( 'radio_station_player_volume', $player_volume ) ) );
 			$player_single = apply_filters( 'radio_station_player_single', $player_single );
 		}
-		if ( defined( 'RADIO_PLAYER_TITLE' ) ) {
-			$player_title = RADIO_PLAYER_TITLE;
-		}
-		if ( defined( 'RADIO_PLAYER_IMAGE' ) ) {
-			$player_image = RADIO_PLAYER_IMAGE;
-		}
-		if ( defined( 'RADIO_PLAYER_VOLUME' ) ) {
-			$player_volume = abs( intval( RADIO_PLAYER_VOLUME ) );
-		}
-		if ( defined( 'RADIO_PLAYER_SINGLE' ) ) {
-			$player_single = RADIO_PLAYER_SINGLE;
-		}
+	}
+	
+	// 2.4.0.3: move constant checks out
+	if ( defined( 'RADIO_PLAYER_SCRIPT' ) ) {
+		$player_script = RADIO_PLAYER_SCRIPT;
+	}
+	if ( defined( 'RADIO_PLAYER_TITLE' ) ) {
+		$player_title = RADIO_PLAYER_TITLE;
+	}
+	if ( defined( 'RADIO_PLAYER_IMAGE' ) ) {
+		$player_image = RADIO_PLAYER_IMAGE;
+	}
+	if ( defined( 'RADIO_PLAYER_VOLUME' ) ) {
+		$player_volume = abs( intval( RADIO_PLAYER_VOLUME ) );
+	}
+	if ( defined( 'RADIO_PLAYER_SINGLE' ) ) {
+		$player_single = RADIO_PLAYER_SINGLE;
 	}
 
 	// --- set script suffix ---
@@ -1437,23 +1443,16 @@ function radio_station_player_get_settings() {
 		// $js .= "'suffix': '" . esc_js( $suffix ) . "', ";
 	$js .= "}" . PHP_EOL;
 
-	// --- set player script URLs ---
-	$scripts = array( 'amplitude', 'howler', 'jplayer' );
-
 	// --- maybe limit available scripts for testing purposes ---
-	if ( isset( $_REQUEST['scripts'] ) ) {
-		$limit_scripts = explode( ',', $_REQUEST['scripts'] );
-		if ( is_array( $limit_scripts ) && ( count( $limit_scripts ) > 0 ) ) {
-			foreach ( $limit_scripts as $i => $limit_script ) {
-				if ( !in_array( $limit_script, $scripts ) ) {
-					unset( $limit_scripts[$i] );
-				}
-			}
-		}
-		if ( is_array( $limit_scripts ) && ( count( $limit_scripts ) > 0 ) ) {
-			$scripts = $limit_scripts;
+	$valid_scripts = array( 'amplitude', 'howler', 'jplayer' );
+	// 2.4.0.3: set single script override only
+	if ( isset( $_REQUEST['player-script'] ) && in_array( $_REQUST['player-script'], $valid_scripts ) ) {
+		// 2.4.0.3: only allow admin to override script for testing purposes
+		if ( function_exists( 'current_user_can' ) && current_user_can( 'manage_options' ) ) {
+			$player_script = $_REQUEST['player-script'];
 		}
 	}
+	$scripts = array( $player_script );
 
 	// --- set script URL ouput ---
 	// 2.4.0.3: check for fallback script settings
@@ -1465,6 +1464,27 @@ function radio_station_player_get_settings() {
 	}
 	if ( defined( 'RADIO_PLAYER_FALLBACKS' ) ) {
 		$fallbacks = explode( ',', RADIO_PLAYER_FALLBACKS );
+	}
+	// 2.4.0.3: allow for admin-only fallback script override
+	if ( isset( $_REQUEST['fallback-scripts'] ) ) {
+		if ( function_exists( 'current_user_can' ) && current_user_can( 'manage_options' ) ) {
+			$fallback_scripts = explode( ',', $_REQUEST['fallback-scripts'] );
+			if ( count( $fallback_scripts ) > 0 ) {
+				foreach ( $fallback_scripts as $i => $fallback_script ) {
+					if ( !in_array( $fallback_script, $valid_scripts ) ) {
+						unset( $fallback_scripts[$i] );
+					}
+				}
+			}
+			if ( count( $fallback_scripts ) > 0 ) {
+				$fallbacks = $fallback_scripts;
+			}
+		}
+	}
+	
+	// 2.4.0.3: merge fallbacks with current script
+	if ( is_array( $fallbacks ) && ( count( $fallbacks ) > 0 ) ) {
+		$scripts = array_merge( $scripts, $fallbacks );
 	}
 	$js .= "scripts = {";
 		if ( in_array( 'amplitude', $scripts ) ) {
@@ -1685,7 +1705,7 @@ function radio_station_player_script_amplitude() {
 		/* set song streams */
 		songs = new Array();
 		songs[0] = {'name': '',	'artist': '', 'album': '', 'url': url, 'cover_art_url': '',	'live': true};
-		if ('' != fallback) {songs[1] = {'name': '', 'artist': '', 'album': '', 'url': fallback, 'cover_art_url': '', 'live': true};}
+		/* if ('' != fallback) {songs[1] = {'name': '', 'artist': '', 'album': '', 'url': fallback, 'cover_art_url': '', 'live': true};} */
 
 		/* set volume */
 		if (jQuery('#'+container_id+' .rp-volume-slider').hasClass('changed')) {
@@ -1851,8 +1871,8 @@ function radio_station_player_script_howler() {
 
 		/* set sources */
 		sources = new Array(); formats = new Array();
-		sources[0] = url; if (fallback != '') {sources[1] = fallback;}
-		formats[0] = format; if ((fallback != '') && (fformat != '')) {formats[1] = fformat;}
+		sources[0] = url; /* if (fallback != '') {sources[1] = fallback;} */
+		formats[0] = format; /* if ((fallback != '') && (fformat != '')) {formats[1] = fformat;} */
 
 		/* set volume */
 		if (jQuery('#'+container_id+' .rp-volume-slider').hasClass('changed')) {
@@ -1978,7 +1998,7 @@ function radio_station_player_script_jplayer() {
 		if (radio_player.debug) {console.log('jPlayer init Volume: '+volume);}
 
 		media = {}; /* media.title = ''; */ media[format] = url; supplied = format;
-		if (fallback && fformat) {media[fformat] = fallback; supplied += ', '+fformat;}
+		/* if (fallback && fformat) {media[fformat] = fallback; supplied += ', '+fformat;} */
 		radio_player.jplayer_media = media;
 		console.log(radio_player.jplayer_media);
 		radio_player.jplayer_ready = false;

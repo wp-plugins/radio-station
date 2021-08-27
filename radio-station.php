@@ -44,7 +44,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // - Include Plugin Admin Files
 // - Load Plugin Text Domain
 // - Check Plugin Version
-// - Flush Rewrite Rules
+// - Flush Rewrite Rules on Deactivation
 // - Enqueue Plugin Script
 // - Enqueue Plugin Stylesheet
 // - Enqueue Datepicker
@@ -443,16 +443,17 @@ $options = array(
 
 	// --- Fallback Scripts ---
 	// 2.4.0.3: added fallback enable/disable switching
+	// 2.4.0.3: fixed option label from Player Script
 	'player_fallbacks'       => array(
 		'type'    => 'multicheck',
-		'label'   => __( 'Player Script', 'radio-station' ),
+		'label'   => __( 'Fallback Scripts', 'radio-station' ),
 		'default' => array( 'amplitude', 'howler', 'jplayer' ),
 		'options' => array(
 			'jplayer'   => __( 'jPlayer', 'radio-station' ),
 			'howler'    => __( 'Howler', 'radio-station' ),
 			'amplitude' => __( 'Amplitude', 'radio-station' ),
 		),
-		'helper'  => __( 'Fallback scripts to enable for when the default Player script fails.', 'radio-station' ),
+		'helper'  => __( 'Enabled fallback audio scripts to try when the default Player script fails.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'basic',
 		'pro'     => false,
@@ -1435,29 +1436,25 @@ $options = array(
 // -------------------------
 // 2.4.0.3: added check active/installed Pro version 
 $plan = 'free';
-if ( defined( 'RADIO_STATION_PRO_FILE' ) ) {
-	// --- check for activated pro plugin ---
-	$plan = 'premium';
-} else {
-	// --- check for deactivated pro plugin ---
-	$plugins = wp_cache_get( 'plugins', 'plugins' );
-	if ( !$plugins ) {
-		if ( function_exists( 'get_plugins' ) ) {
+
+// --- check for deactivated pro plugin ---
+$plugins = wp_cache_get( 'plugins', 'plugins' );
+if ( !$plugins ) {
+	if ( function_exists( 'get_plugins' ) ) {
+		$plugins = get_plugins();
+	} else {
+		$plugin_path = ABSPATH . 'wp-admin/includes/plugin.php';
+		if ( file_exists( $plugin_path ) ) {
+			include $plugin_path;
 			$plugins = get_plugins();
-		} else {
-			$plugin_path = ABSPATH . 'wp-admin/includes/plugin.php';
-			if ( file_exists( $plugin_path ) ) {
-				include $plugin_path;
-				$plugins = get_plugins();
-			}
 		}
 	}
-	if ( $plugins && is_array( $plugins ) && ( count( $plugins ) > 0 ) ) {
-		foreach ( $plugins as $slug => $plugin ) {
-			if ( strstr( $slug, 'radio-station-pro.php' ) ) {
-				$plan = 'premium';
-				break;
-			}
+}
+if ( $plugins && is_array( $plugins ) && ( count( $plugins ) > 0 ) ) {
+	foreach ( $plugins as $slug => $plugin ) {
+		if ( strstr( $slug, 'radio-station-pro.php' ) ) {
+			$plan = 'premium';
+			break;
 		}
 	}
 }
@@ -1507,11 +1504,11 @@ $settings = array(
 	'freemius_id'  => '4526',
 	'freemius_key' => 'pk_aaf375c4fb42e0b5b3831e0b8476b',
 	'hasplans'     => true,
-	'upgrade_link' => RADIO_STATION_PRO_URL . 'pricing/',
-	// 'upgrade_link' => add_query_arg( 'page', $args['slug'] . '-addons', admin_url( 'admin.php' ) ),
-	// 'pro_link'     => RADIO_STATION_PRO_URL . 'pricing/',
-	// 'hasaddons'    => true,
-	// 'addons_link'  => add_query_arg( 'page', $args['slug'] . '-addons', admin_url( 'admin.php' ) ),
+	// 'upgrade_link' => RADIO_STATION_PRO_URL . 'pricing/',
+	'upgrade_link' => add_query_arg( 'page', $slug . '-addons', admin_url( 'admin.php' ) ),
+	'pro_link'     => RADIO_STATION_PRO_URL . 'pricing/',
+	'hasaddons'    => false,
+	'addons_link'  => add_query_arg( 'page', $slug . '-addons', admin_url( 'admin.php' ) ),
 	'plan'         => $plan,
 );
 
@@ -1627,9 +1624,9 @@ function radio_station_welcome_redirect() {
 	exit;
 } */
 
-// -------------------
-// Flush Rewrite Rules
-// -------------------
+// -----------------------------------
+// Flush Rewrite Rules on Deactivation
+// -----------------------------------
 register_deactivation_hook( RADIO_STATION_FILE, 'flush_rewrite_rules' );
 
 // ----------------------
