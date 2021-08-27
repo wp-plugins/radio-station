@@ -48,7 +48,7 @@ If you are a WordPress developer wanting to contribute to Radio Station, please 
 
 = Quickstart Guide =
 
-Once you have installed and activated the Radio Station Plugin on your WordPress site, your WordPress Admin area will now have a new menu item titled Radio Station with submenu page items. If you are trying to do something specific, you can check out the [FAQ](https://netmix.com/radio-station/docs/FAQ.md) for Frequently Asked Questions as you may find the answer there.
+Once you have installed and activated the Radio Station Plugin on your WordPress site, your WordPress Admin area will now have a new menu item titled Radio Station with submenu page items. If you are trying to do something specific, you can check out the [FAQ](https://netmix.com/radio-station/docs/FAQ.md) for Frequently Asked Questions as you may find the answer there. Or, view the combined {FREE and PRO demo site](https://demo.radiostation.pro).
 
 Firstly, you can visit the Plugin Settings screen to adjust the default [Options](https://netmix.com/radio-station/docs/Options.md) to your liking. Here you can set your Radio Timezone and Streaming URL (if you have one) along with other global plugin settings. Also from this Settings page you may want to assign [Pages](https://netmix.com/radio-station/docs/Display.md#automatic-pages) and Views for your Program Schedule display and other optional Post Type Archive displays.
 
@@ -88,7 +88,11 @@ Read the [Quickstart Guide](https://radiostation.pro/docs/#quickstart-guide) for
 
 = Where can I find the full plugin documentation? =
 
-The latest documentation can be found online at [NetMix.com](https://radiostation.pro/docs/). Documentation is also included with for the currently installed version via the Radio Station Help menu. You can find the Markdown-formatted files in the `/docs` folder of the [GitHub Repository](https://github.com/netmix/radio-station/docs/) and in the `/docs` folder of the plugin directory. 
+The latest documentation can be found online at [NetMix.com](https://radiostation.pro/docs/). Documentation is also included with for the currently installed version via the Radio Station Help menu. You can find the Markdown-formatted files in the `/docs` folder of the [GitHub Repository](https://github.com/netmix/radio-station/docs/) and in the `/docs` folder of the plugin directory.
+
+= Is there a demo site I can view to see how Radio Statin works? =
+
+Yes, visite [demo.radiostation.pro](https://demo.radiostation.pro/) to view the FREE and PRO features of Radio Station. You will not be able to test the Visual Schedule Editor in PRO as it's only available for logged in users.
 
 = How do I schedule a Show? =
 
