@@ -451,15 +451,13 @@ function radio_player_volume_slider(instance, volume) {
 	slider = jQuery('#radio_container_'+instance+' .rp-volume-slider');
 	sliderbg = jQuery('#radio_container_'+instance+' .rp-volume-slider-bg');
 	thumb = jQuery('#radio_container_'+instance+' .rp-volume-thumb');
-	console.log(thumb);
 	if (slider.length) {
-		sliderbg.hide().css('border','inherit');
+		sliderbg.hide(); /* .css('border','inherit'); */
 		slider.val(volume); swidth = slider.width();
 		thumb.show(); twidth = thumb.width(); thumb.hide();
-		bgwidth = (swidth - twidth) * (volume / 100);
-		sliderbg.attr('style', 'width: '+bgwidth+'px !important; border:inherit;').show();
-		newwidth = parseInt(sliderbg.css('width'));
-		if (radio_player.debug) {console.log('Volume Slider: '+swidth+' : '+twidth+' : '+bgwidth+' : '+newwidth);}
+		bgwidth = (swidth - (twidth / 2)) * (volume / 100);
+		sliderbg.attr('style', 'width: '+bgwidth+'px !important;').show(); /*  border:inherit; */
+		if (radio_player.debug) {newwidth = parseInt(sliderbg.css('width')); console.log('Volume Slider: '+swidth+' : '+twidth+' : '+bgwidth+' : '+newwidth);}
 		if (volume == 100) {container.addClass('maxed');} else {container.removeClass('maxed');}
 	}
 }

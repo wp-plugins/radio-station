@@ -170,8 +170,7 @@ foreach ( $master_list as $hour => $days ) {
 					*/
 
 					// 2.3.0: filter show time by show and context
-					// 2.4.0.4: added missing filter arguments for Pro
-					$show_time = apply_filters( 'radio_station_schedule_show_time', $show_time, $show['id'], 'div', false, false );
+					$show_time = apply_filters( 'radio_station_schedule_show_time', $show_time, $show['id'], 'div' );
 					$output .= $show_time;
 					$output .= '</span>';
 				}
