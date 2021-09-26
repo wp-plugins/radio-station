@@ -220,6 +220,8 @@ You can now visit your site to make sure nothing is broken. If you experience is
 
 = 2.4.0.4 =
 * Fixed: Fallback scripts and fallback stream URLs
+* Fixed: Radio Clock responsive width display
+* Fixed: Collapse descriptions for non-show pages
 
 = 2.4.0.3 =
 * Update: Plugin Panel (1.2.1) with zero value save and tab fixes

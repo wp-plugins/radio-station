@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.4.0.3.1
+Version: 2.4.0.3.3
 Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
@@ -767,7 +767,8 @@ $options = array(
 	// --- Metadata URL ---
 	// 2.4.0.3: added for alternative stream metadata URL
 	'player_bar_metadata'     => array(
-		'type'    => 'url',
+		'type'    => 'text',
+		'options' => 'URL',
 		'label'   => __( 'Metadata URL', 'radio-station' ),
 		'default' => '',
 		'tab'     => 'player',
@@ -846,7 +847,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro] Available Views ===
+	// --- [Pro] Available Views ---
 	// 2.3.2: added additional views option
 	'schedule_views'      => array(
 		'type'    => 'multicheck',
@@ -862,6 +863,19 @@ $options = array(
 			'calendar' => __( 'Calendar View', 'radio-station' ),
 		),
 		'helper'  => __( 'Switcher Views available on automatic Master Schedule page.', 'radio-station' ),
+		'tab'     => 'pages',
+		'section' => 'schedule',
+		'pro'     => true,
+	),
+
+	// --- [Pro] Time Spaced Grid View ---
+	// 2.4.0.3: added grid view time spacing option
+	'schedule_timegrid'      => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Time Spaced Grid', 'radio-station' ),
+		'default' => '',
+		'value'	  => 'yes',
+		'helper'  => __( 'Enable Grid View option for equalized time spacing and background imsges.', 'radio-station' ),
 		'tab'     => 'pages',
 		'section' => 'schedule',
 		'pro'     => true,

@@ -459,7 +459,7 @@ function radio_station_show_info_metabox() {
 				echo '<div class="input-field">' . PHP_EOL;
 				echo '<input type="checkbox" name="show_active" ' . checked( $active, 'on', false ) . '>' . PHP_EOL;
 				echo '</div><div class="input-helper">' . PHP_EOL;
-				echo '<i>' . esc_html( __( 'Check this box if show is currently active (Show will not appear on programming schedule if unchecked.)', 'radio-station' ) ) . '</i>' . PHP_EOL;
+				echo '<i>' . esc_html( __( 'Check this box if show is currently active (Show will not appear on schedule if unchecked.)', 'radio-station' ) ) . '</i>' . PHP_EOL;
 				echo '</div>' . PHP_EOL;
 			echo '</li>' . PHP_EOL;
 

@@ -595,15 +595,18 @@
 
 /* Media Queries */
 @media screen and (max-width: 782px) {
- #master-schedule-tab-panels .master-schedule-tabs-show .show-image {width: 120px;}
+	#master-schedule-tab-panels .master-schedule-tabs-show .show-image {width: 120px;}
 }
 
 @media screen and (max-width: 599px) {
- #master-program-schedule .show-image,
- #master-schedule-tab-panels .master-schedule-tabs-show .show-image {width: 90px;}
- #master-program-schedule #master-program-hour-heading, #master-program-schedule .master-program-hour-row {width: 75px;}
+	#master-program-schedule .show-image,
+	#master-schedule-tab-panels .master-schedule-tabs-show .show-image {width: 90px;}
+	#master-program-schedule #master-program-hour-heading, #master-program-schedule .master-program-hour-row {width: 75px;}
+	#master-schedule-controls-wrapper .radio-station-server-clock,
+	#master-schedule-controls-wrapper .radio-station-user-clock {margin-bottom: 10px;}
+	#master-schedule-controls-wrapper .radio-clock-title {display: block; min-height: auto; margin-bottom: 5px;}
 }
 
 @media screen and (max-width: 299px) {
- #master-program-schedule #master-program-hour-heading, #master-program-schedule .master-program-hour-row {width: 50px;}
+	#master-program-schedule #master-program-hour-heading, #master-program-schedule .master-program-hour-row {width: 50px;}
 }

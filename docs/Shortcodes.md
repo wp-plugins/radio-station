@@ -48,6 +48,7 @@ The following attributes are available for the shortcode:
 * *hide_past_shows* : Hide shows that are finished in the Schedule for Tabs view. 0 or 1. Default 0.
 * *divheight* : Set the height, in pixels, of the individual divs. For legacy 'divs' view only. Default 45.
 * *gridheight* : Set the width, in pixels, of the grid columns. For Pro 'grid' view only. Default 150.
+* 'time_spaced* : Enabled time spacing with background images. For Pro 'grid' view only. 0 or 1. Default 0.
 * *weeks* : Number of weeks to display in calendar. For Pro 'calendar' view only. Default 4.
 * *previous_weeks* : Number of past weeks to display in calendar. For Pro 'calendar' view only. Default 1.
 

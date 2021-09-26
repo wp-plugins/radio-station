@@ -109,14 +109,14 @@ function radio_station_timezone_shortcode( $atts = array() ) {
 	// --- radio timezone ---
 	$output .= '<div class="radio-timezone-title">';
 	$output .= esc_html( __( 'Radio Timezone', 'radio-station' ) );
-	$output .= ':</div>';
+	$output .= ':</div> ';
 	$output .= '<div class="radio-timezone">' . esc_html( $timezone_display ) . '</div><br>';
 
 	// --- user timezone ---
 	// 2.3.3.9: change span elements to divs
 	$output .= '<div class="radio-user-timezone-title">';
 	$output .= esc_html( __( 'Your Timezone', 'radio-station' ) );
-	$output .= ':</div>';
+	$output .= ':</div> ';
 	$output .= '<div class="radio-user-timezone"></div>';
 
 	// 2.3.2 allow for timezone selector test
