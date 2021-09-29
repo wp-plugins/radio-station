@@ -2847,12 +2847,27 @@ function radio_station_override_show_metabox() {
 				if ( $linked_id == $show_id ) {
 					echo ' selected="selected"';
 				}
-				echo '>' . esc_html( $post_id ) . ': ' . esc_html( $title );
+				echo '>' . esc_html( $show_id ) . ': ';
+				if ( 'on' != $active ) {
+					echo '[Inactive] ';
+				}
+				echo esc_html( $title );
 				if ( 'draft' == $status ) {
 					echo ' (Draft)';
+				} elseif ( 'pending' == $status ) {
+					echo ' (Pending)';
+				} elseif ( 'future' == $status ) {
+					echo ' (Future)';
 				}
-				if ( 'on' != $active ) {
-					echo ' (Inactive)';
+				$hosts = get_post_meta( $show_id, 'show_user_list', true );
+				if ( $hosts && is_array( $hosts ) && ( count( $hosts ) > 0 ) ) {
+					echo ' : ';
+					$hostnames = array();
+					foreach ( $hosts as $host ) {
+						$user = get_user_by( 'ID', $host );
+						$hostnames[] = $user->display_name;
+					}
+					echo implode( ', ', $hostnames );
 				}
 				echo '</option>' . PHP_EOL;
 			}
