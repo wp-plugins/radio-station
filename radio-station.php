@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://netmix.com/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.4.0.3.3
+Version: 2.4.0.3.4
 Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
@@ -520,7 +520,7 @@ $options = array(
 	),
 
 	// === Player Colours ===
-	
+
 	// --- [Pro] Playing Highlight Color ---
 	'player_playing_color'        => array(
 		'type'    => 'color',
@@ -869,7 +869,7 @@ $options = array(
 	),
 
 	// --- [Pro] Time Spaced Grid View ---
-	// 2.4.0.3: added grid view time spacing option
+	// 2.4.0.4: added grid view time spacing option
 	'schedule_timegrid'      => array(
 		'type'    => 'checkbox',
 		'label'   => __( 'Time Spaced Grid', 'radio-station' ),
@@ -1320,7 +1320,7 @@ $options = array(
 		'section' => 'loading',
 		'pro'     => true,
 	),
-	
+
 	// --- [Pro] Timezone Switching ---
 	'timezone_switching' => array(
 		'type'    => 'checkbox',
@@ -1349,7 +1349,7 @@ $options = array(
 
 	// --- Playlist Editing Role Note ---
 	// 2.4.0.3: added role to playlist assignment note
-	'permissions_playlistow_role_note'      => array(
+	'permissions_playlist_role_note'      => array(
 		'type'    => 'note',
 		'label'   => __( 'Playlist Permissions', 'radio-station' ),
 		'helper'  => __( 'Any user with a Host or Producer role can create Playlists.', 'radio-station' ),
@@ -1448,7 +1448,7 @@ $options = array(
 // -------------------------
 // Pro Version Install Check
 // -------------------------
-// 2.4.0.3: added check active/installed Pro version 
+// 2.4.0.3: added check active/installed Pro version
 $plan = 'free';
 
 // --- check for deactivated pro plugin ---
@@ -1619,7 +1619,7 @@ function radio_station_plugin_activation() {
 	// 2.3.3: added clear transients on (re)activation
 	// 2.3.3.9: just use clear cached data function
 	radio_station_clear_cached_data( false );
-	
+
 	// --- set welcome redirect transient ---
 	// TODO: check if handled by Freemius activation
 	// set_transient( 'radio_station_welcome', 1, 7 );
@@ -2276,7 +2276,7 @@ function radio_station_automatic_pages_content_set( $content ) {
 			}
 		}
 	}
-	
+
 	// --- languages archive page ---
 	// 2.3.3.9: added automatic display of language archive page
 	$language_archive_page = radio_station_get_setting( '' );
@@ -2435,7 +2435,7 @@ function radio_station_override_linked_show_data( $post, $post_type ) {
 					}
 				}
 			}
-		}	
+		}
 	}
 	return $post;
 }
@@ -2493,7 +2493,7 @@ function radio_station_override_content( $content ) {
 	$override = radio_station_get_show_override( $post->ID, 'show_content' );
 	if ( false !== $override ) {
 		$override = radio_station_override_linked_show_data( $post, RADIO_STATION_OVERRIDE_SLUG );
-		$content = $override->post_content;			
+		$content = $override->post_content;
 	}
 	add_filter( 'the_content', 'radio_station_override_content', 0 );
 	return $content;
@@ -2868,7 +2868,7 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 		if ( RADIO_STATION_OVERRIDE_SLUG == $post->post_type ) {
 			// 2.3.3.6: get next/previous Show for override date/time
 			// 2.3.3.9: modified to handle multiple override times
-			// 2.3.3.9: added check that schedule key is set 
+			// 2.3.3.9: added check that schedule key is set
 			$scheds = get_post_meta( $post->ID, 'show_override_sched', true );
 			if ( $scheds && is_array( $scheds ) ) {
 				if ( array_key_exists( 'date', $scheds ) ) {
@@ -3482,13 +3482,10 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args, $user ) {
 
 	global $post, $wp_roles;
 
-	// --- get the current user ---
-	// 2.3.3.6: get user object from fourth argument instead
-	// $user = wp_get_current_user();
-
 	// --- check if super admin ---
+	// 2.3.3.6: get user object from fourth argument instead
 	// ? fix to not revoke edit caps from super admin ?
-	// (not implemented, as causing a connection reset error)
+	// (not implemented, as causing a connection reset error!)
 	// if ( function_exists( 'is_super_admin' ) && is_super_admin() ) {
 	//	return $allcaps;
 	// }
@@ -3499,11 +3496,16 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args, $user ) {
 		echo '<span style="display:none;">Cap Args: ' . print_r( $args, true ) . '</span>';
 	}
 
-	// --- check for editor
+	// --- check for editor role ---
 	// 2.3.3.6: check editor roles first separately
-	$editor_roles = array( 'administrator', 'editor', 'show-editor' );
+	// 2.4.0.4: only add WordPress editor role if on in settings
+	$editor_roles = array( 'administrator', 'show-editor' );
+	$editor_role_caps = radio_station_get_setting( 'add_editor_capabilities' );
+	if ( 'yes' == $editor_role_caps ) {
+		$editor_roles[] = 'editor';
+	}
 	foreach ( $editor_roles as $role ) {
-		if ( in_array( $role, $user->roles ) ) {
+	 	if ( in_array( $role, $user->roles ) ) {
 			return $allcaps;
 		}
 	}
@@ -3535,7 +3537,9 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args, $user ) {
 	// 2.3.3.6: preserve if user has edit_others_shows capability
 	foreach ( $edit_others_shows_roles as $role ) {
 		if ( in_array( $role, $user->roles ) ) {
-			return $allcaps;
+			// 2.4.0.4: do not automatically assume capability match
+			// return $allcaps;
+			$found = true;
 		}
 	}
 
@@ -3553,7 +3557,7 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args, $user ) {
 
 		// --- limit this to published shows ---
 		// 2.3.0: added object and property_exists check to be safe
-		if ( is_object( $post ) && property_exists( $post, 'post_type' ) && isset( $post->post_type ) ) {
+		if ( isset( $post ) && is_object( $post ) && property_exists( $post, 'post_type' ) && isset( $post->post_type ) ) {
 
 			// 2.3.0: removed is_admin check (so works with frontend edit show link)
 			// 2.3.0: moved check if show is published inside
@@ -3577,11 +3581,24 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args, $user ) {
 
 					// --- remove the edit_shows capability ---
 					$allcaps['edit_shows'] = false;
+					$allcaps['edit_others_shows'] = false;
+					if ( RADIO_STATION_DEBUG ) {
+						echo "Removed Edit Show Caps (" . $post->ID . ")";
+					}
 
 					// 2.3.0: move check if show is published inside
 					if ( 'publish' == $post->post_status ) {
 						$allcaps['edit_published_shows'] = false;
 					}
+				} else {
+					// 2.4.0.4: add edit others shows capability
+					// (fix for when not original show author)
+					$allcaps['edit_shows'] = true;
+					$allcaps['edit_others_shows'] = true;
+					if ( RADIO_STATION_DEBUG ) {
+						echo "Added Edit Show Caps (" . $post->ID . ")";
+					}
+
 				}
 			}
 		}

@@ -219,6 +219,8 @@ You can now visit your site to make sure nothing is broken. If you experience is
 == Changelog ==
 
 = 2.4.0.4 =
+* Fixed: DJ / Host can edit own/others Show permissions
+* Fixed: Override link to show dropdown query
 * Fixed: Fallback scripts and fallback stream URLs
 * Fixed: Radio Clock responsive width display
 * Fixed: Collapse descriptions for non-show pages
