@@ -4093,23 +4093,6 @@ function radio_station_get_schedule_weekdates( $weekdays, $time = false ) {
 		$weekdates[$weekday] = $weekdate;
 	}
 
-	// 2.4.0.4: check/fix for duplicate date crackliness (daylight saving?)
-	foreach ( $weekdates as $day => $date ) {
-		if ( isset( $prevdate ) && ( $prevdate == $date ) ) {
-			$weekdates[$day] = radio_station_get_next_date( $date );
-			$found = false;
-			foreach ( $weekdates as $k => $v ) {
-				if ( $found ) {
-					$weekdates[$k] = radio_station_next_date[$v];
-				}
-				if ( $k == $day ) {
-					$found = true;
-				}
-			}
-		}
-		$prevdate = $date;
-	}
-
 	if ( RADIO_STATION_DEBUG ) {
 		echo '<span style="display:none;">';
 		echo 'Time: ' . $time . PHP_EOL;
