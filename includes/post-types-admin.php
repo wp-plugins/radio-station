@@ -642,9 +642,12 @@ function radio_station_show_hosts_metabox() {
 	$hosts = get_users( $args );
 
 	// --- get the Hosts currently assigned to the show ---
+	// 2.4.0.4: convert possible (old) non-array value
 	$current = get_post_meta( $post->ID, 'show_user_list', true );
 	if ( !$current ) {
 		$current = array();
+	} elseif ( !is_array( $current ) ) {
+		$current = array( $current );
 	}
 
 	// --- move any selected Hosts to the top of the list ---
@@ -721,8 +724,11 @@ function radio_station_show_producers_metabox() {
 
 	// --- get Producers currently assigned to the show ---
 	$current = get_post_meta( $post->ID, 'show_producer_list', true );
+	// 2.4.0.4: convert possible (old) non-array values
 	if ( !$current ) {
 		$current = array();
+	} elseif ( !is_array( $current ) ) {
+		$current = array( $current );
 	}
 
 	// --- move any selected DJs to the top of the list ---
@@ -2701,10 +2707,16 @@ function radio_station_show_column_data( $column, $post_id ) {
 	} elseif ( 'hosts' == $column ) {
 
 		$hosts = get_post_meta( $post_id, 'show_user_list', true );
-		if ( $hosts && ( count( $hosts ) > 0 ) ) {
-			foreach ( $hosts as $host ) {
-				$user_info = get_userdata( $host );
-				echo esc_html( $user_info->display_name ) . '<br>';
+		if ( $hosts ) {
+			// 2.4.0.4: convert possible (old) non-array value
+			if ( !is_array( $hosts ) ) {
+				$hosts = array( $hosts );
+			}
+			if ( is_array( $hosts ) && ( count( $hosts ) > 0 ) ) {
+				foreach ( $hosts as $host ) {
+					$user_info = get_userdata( $host );
+					echo esc_html( $user_info->display_name ) . '<br>';
+				}
 			}
 		}
 
@@ -2712,10 +2724,16 @@ function radio_station_show_column_data( $column, $post_id ) {
 
 		// 2.3.0: added column for Producers
 		$producers = get_post_meta( $post_id, 'show_producer_list', true );
-		if ( $producers && ( count( $producers ) > 0 ) ) {
-			foreach ( $producers as $producer ) {
-				$user_info = get_userdata( $producer );
-				echo esc_html( $user_info->display_name ) . '<br>';
+		if ( $producers ) {
+			// 2.4.0.4: convert possible (old) non-array value
+			if ( !is_array( $producers ) ) {
+				$producers = array( $producers );
+			} 
+			if ( is_array( $producers ) && ( count( $producers ) > 0 ) ) {
+				foreach ( $producers as $producer ) {
+					$user_info = get_userdata( $producer );
+					echo esc_html( $user_info->display_name ) . '<br>';
+				}
 			}
 		}
 
@@ -5576,7 +5594,8 @@ function radio_station_playlist_save_data( $post_id ) {
 			// 2.3.4: add previous show transient
 			// 2.3.3.9: just call new clear cache function
 			if ( $show_changed ) {
-				radio_station_clear_cached_data( $show, RADIO_STATION_PLAYLIST_SLUG );
+				// 2.4.0.4: fix to mismatching post type argument
+				radio_station_clear_cached_data( $show, RADIO_STATION_SHOW_SLUG );
 			}
 		}
 	}

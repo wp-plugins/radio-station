@@ -260,18 +260,23 @@ function radio_station_clock_shortcode( $atts = array() ) {
 // Archive List Shortcode Abstract
 // -------------------------------
 // (handles Shows, Overrides, Playlists etc.)
-function radio_station_archive_list_shortcode( $type, $atts ) {
+function radio_station_archive_list_shortcode( $post_type, $atts ) {
+
+	// --- set type from post type ---
+	$type = str_replace( 'rs-', '', $post_type );
 
 	// --- get clock time format ---
 	$time_format = radio_station_get_setting( 'clock_time_format' );
 
 	// --- merge defaults with passed attributes ---
 	// 2.3.3.9: add atts for specific posts
+	// 2.4.0.4: added optional view attribute
 	$defaults = array(
 		// --- shortcode display ----
 		'description'  => 'excerpt',
 		'hide_empty'   => 0,
 		'time'         => $time_format,
+		'view'         => 0,
 		// --- taxonomy queries ---
 		'genre'        => '',
 		'language'     => '',
@@ -307,7 +312,7 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 			$atts['offset'] = (int) $atts['perpage'] * $page;
 		}
 	}
-	$atts = shortcode_atts( $defaults, $atts, $type . '-archive' );
+	$atts = shortcode_atts( $defaults, $atts, $post_type . '-archive' );
 	if ( RADIO_STATION_DEBUG ) {
 		echo '<span style="display:none;">Shortcode Atts: ' . print_r( $atts, true ) . '</span>';
 	}
@@ -315,7 +320,7 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 	// --- get published shows ---
 	// 2.3.3.9: ignore offset and limit and reapply later
 	$args = array(
-		'post_type'   => $type,
+		'post_type'   => $post_type,
 		'post_status' => $atts['status'],
 		'numberposts' => - 1,
 		// 'numberposts' => $atts['perpage'],
@@ -325,7 +330,7 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 	);
 
 	// --- extra queries for shows ---
-	if ( RADIO_STATION_SHOW_SLUG == $type ) {
+	if ( RADIO_STATION_SHOW_SLUG == $post_type ) {
 
 		if ( $atts['with_shifts'] ) {
 
@@ -357,7 +362,7 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 	}
 
 	// --- specific genres taxonomy query ---
-	if ( !empty( $atts['genre'] ) && in_array( $type, array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG ) ) ) {
+	if ( !empty( $atts['genre'] ) && in_array( $post_type, array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG ) ) ) {
 
 		// --- check for provided genre(s) as slug or ID ---
 		if ( strstr( $atts['genre'], ',' ) ) {
@@ -380,7 +385,7 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 
 	// --- specific languages taxonomy query ---
 	// 2.3.0: added language taxonomy support
-	if ( !empty( $atts['language'] ) && in_array( $type, array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG ) ) ) {
+	if ( !empty( $atts['language'] ) && in_array( $post_type, array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG ) ) ) {
 
 		// --- check for provided genre(s) as slug or ID ---
 		if ( strstr( $atts['language'], ',' ) ) {
@@ -404,11 +409,11 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 
 	// 2.3.3.9: allow for selective post specifications
 	// 2.4.0: fix selective posts for default (false)
-	if ( ( RADIO_STATION_SHOW_SLUG == $type ) && isset( $atts['show'] ) && $atts['show'] ) {
+	if ( ( RADIO_STATION_SHOW_SLUG == $post_type ) && isset( $atts['show'] ) && $atts['show'] ) {
 		$args['include'] = explode( ',', $atts['show'] );		
-	} elseif ( ( RADIO_STATION_OVERRIDE_SLUG == $type ) && isset( $atts['override'] ) && $atts['override'] ) {
+	} elseif ( ( RADIO_STATION_OVERRIDE_SLUG == $post_type ) && isset( $atts['override'] ) && $atts['override'] ) {
 		$args['include'] = explode( ',', $atts['override'] );
-	} elseif ( ( RADIO_STATION_PLAYLIST_SLUG == $type ) && isset( $atts['playlist'] ) && $atts['playlist'] ) {
+	} elseif ( ( RADIO_STATION_PLAYLIST_SLUG == $post_type ) && isset( $atts['playlist'] ) && $atts['playlist'] ) {
 		$args['include'] = explode( ',', $atts['playlist'] );
 	}
 
@@ -423,7 +428,7 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 	}
 	
 	// --- process playlist taxonomy query ---
-	if ( RADIO_STATION_PLAYLIST_SLUG == $type ) {
+	if ( RADIO_STATION_PLAYLIST_SLUG == $post_type ) {
 		// 2.3.3.9: added missing check for matching archive post results	
 		if ( $archive_posts && is_array( $archive_posts ) && ( count( $archive_posts ) > 0 ) ) {
 
@@ -478,7 +483,7 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 
 	// --- check override dates ---
 	// (overrides without a date set will not be displayed)
-	if ( RADIO_STATION_OVERRIDE_SLUG == $type ) {
+	if ( RADIO_STATION_OVERRIDE_SLUG == $post_type ) {
 		if ( $archive_posts && is_array( $archive_posts ) && ( count( $archive_posts ) > 0 ) ) {
 			foreach( $archive_posts as $i => $archive_post ) {
 				// 2.3.3.9: set singular to false to allow for multiple override times
@@ -514,8 +519,8 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 		$start_data_format = $end_data_format = 'g:i a';
 	}
 	$start_data_format = 'j, ' . $start_data_format;
-	$start_data_format = apply_filters( 'radio_station_time_format_start', $start_data_format, $type . '-archive', $atts );
-	$end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_format, $type . '-archive', $atts );
+	$start_data_format = apply_filters( 'radio_station_time_format_start', $start_data_format, $post_type . '-archive', $atts );
+	$end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_format, $post_type . '-archive', $atts );
 
 	// --- check for results ---
 	if ( !$archive_posts || !is_array( $archive_posts ) || ( count( $archive_posts ) == 0 ) ) {
@@ -548,11 +553,18 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 	}
 
 	// --- output list or no results message ---
-	$list = '<div class="' . esc_attr( $type ) . '-archives">';
+	// 2.4.0.4: remove rs- prefix from element classes
+	// 2.4.0.4: maybe add view class
+	$classes = array( $type . '-archives' );
+	if ( $atts['view'] ) {
+		$classes[] = $atts['view'];
+	}
+	$class_list = implode( ' ', $classes );
+	$list = '<div class="' . esc_attr( $class_list ) . '">';
 	if ( !$archive_posts || !is_array( $archive_posts ) || ( count( $archive_posts ) == 0 ) ) {
 
 		// --- no shows messages ----
-		if ( RADIO_STATION_SHOW_SLUG == $type ) {
+		if ( RADIO_STATION_SHOW_SLUG == $post_type ) {
 			// 2.3.3.9: improve messages if genre / language specificed
 			if ( ( !empty( $atts['genre'] ) ) && ( !empty( $atts['genre'] ) ) ) {
 				$message = __( 'No Shows in the requested Genre and Language were found.', 'radio-station' );
@@ -563,14 +575,14 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 			} else {
 				$message = __( 'No Shows were found to display.', 'radio-station' );
 			}
-		} elseif ( RADIO_STATION_PLAYLIST_SLUG == $type ) {
+		} elseif ( RADIO_STATION_PLAYLIST_SLUG == $post_type ) {
 			$message = __( 'No Playlists were found to display.', 'radio-station' );
-		} elseif ( RADIO_STATION_OVERRIDE_SLUG == $type ) {
+		} elseif ( RADIO_STATION_OVERRIDE_SLUG == $post_type ) {
 			$message = __( 'No Overrides were found to display.', 'radio-station' );
 		}
 
 		// 2.3.3.9: filter message to allow for other possible types
-		$message = apply_filters( 'radio_station_archive_shortcode_no_records', $message, $type, $atts );
+		$message = apply_filters( 'radio_station_archive_shortcode_no_records', $message, $post_type, $atts );
 		$list .= esc_html( $message );
 
 	} else {
@@ -585,7 +597,7 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 		// --- set info keys ---
 		// (note: meta is dates for overrides, shifts for shows, tracks for playlists etc.)
 		$infokeys = array( 'avatar', 'title', 'meta', 'genres', 'languages', 'description', 'custom' );
-		$infokeys = apply_filters( 'radio_station_archive_shortcode_info_order', $infokeys, $type, $atts );
+		$infokeys = apply_filters( 'radio_station_archive_shortcode_info_order', $infokeys, $post_type, $atts );
 
 		// --- loop post archive ---
 		foreach ( $archive_posts as $archive_post ) {
@@ -601,7 +613,7 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 			$post_excerpt = $archive_post->post_excerpt;
 
 			// --- check linked Show for overrides ---
-			if ( RADIO_STATION_OVERRIDE_SLUG == $type ) {
+			if ( RADIO_STATION_OVERRIDE_SLUG == $post_type ) {
 				$linked_show = get_post_meta( $archive_post->ID, 'linked_show_id', true );
 				if ( $linked_show ) {
 
@@ -627,7 +639,7 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 			// --- show avatar or thumbnail fallback ---
 			$info['avatar'] = '<div class="' . esc_attr( $type ) . '-archive-item-thumbnail">';
 			$show_avatar = false;
-			if ( $atts['show_avatars'] && in_array( $type, array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG ) ) ) {
+			if ( $atts['show_avatars'] && in_array( $post_type, array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG ) ) ) {
 				$attr = array( 'class' => esc_attr( $type ) . '-thumbnail-image' );
 				$show_avatar = radio_station_get_show_avatar( $image_post_id, 'thumbnail', $attr );
 			}
@@ -635,8 +647,9 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 				$info['avatar'] .= $show_avatar;
 			} elseif ( $atts['thumbnails'] ) {
 				if ( has_post_thumbnail( $image_post_id ) ) {
-					$atts = array( 'class' => esc_attr( $type ) . '-thumbnail-image' );
-					$thumbnail = get_the_post_thumbnail( $image_post_id, 'thumbnail', $atts );
+					// 2.4.0.4: use attr not atts to prevent possible shortcode variable conflict
+					$attr = array( 'class' => esc_attr( $type ) . '-thumbnail-image' );
+					$thumbnail = get_the_post_thumbnail( $image_post_id, 'thumbnail', $attr );
 					$info['avatar'] .= $thumbnail;
 				}
 			}
@@ -649,7 +662,7 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 			$info['title'] .= '</div>';
 
 			// --- display Override date(s) ---
-			if ( ( RADIO_STATION_OVERRIDE_SLUG == $type ) && ( $atts['show_dates'] ) ) {
+			if ( ( RADIO_STATION_OVERRIDE_SLUG == $post_type ) && ( $atts['show_dates'] ) ) {
 
 				// 2.3.3.9: set third attribute to false to allow for multiple override times
 				$override_times = get_post_meta( $archive_post->ID, 'show_override_sched', true );
@@ -703,7 +716,7 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 			}
 
 			// TODO: display Show shifts meta 
-			// if ( RADIO_STATION_SHOW_SLUG == $type ) {
+			// if ( RADIO_STATION_SHOW_SLUG == $post_type ) {
 			//	if ( $atts['show_shifts'] ) {
 			//		$shifts = radio_station_get_show_schedule( $post_id );
 			//	}
@@ -711,7 +724,7 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 			// }
 
 			// TODO: playlist tracks / track count meta
-			// if ( RADIO_STATION_PLAYLIST_SLUG == $type ) {
+			// if ( RADIO_STATION_PLAYLIST_SLUG == $post_type ) {
 			// 	$tracks = get_post_meta( $post_id, 'playlist', true );
 			//	$track_count = count( $tracks );
 			//	$info['meta'] = '';
@@ -721,10 +734,10 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 			if ( !isset( $info['meta'] ) ) {
 				$info['meta'] = '';
 			}
-			$info['meta'] = apply_filters ( 'radio_station_archive_shortcode_meta', $info['meta'], $post_id, $type, $atts );
+			$info['meta'] = apply_filters ( 'radio_station_archive_shortcode_meta', $info['meta'], $post_id, $post_type, $atts );
 
 			// TODO: display genre and language terms ?
-			// if ( in_array( $type, array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG ) ) ) {
+			// if ( in_array( $post_type, array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG ) ) ) {
 			//	if ( $atts['show_genres'] ) {
 			//		$genres = wp_get_post_terms( $post_id, RADIO_STATION_GENRES_SLUG );
 			//		$info['genres'] = '';
@@ -736,7 +749,8 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 			// }
 
 			// --- description ---
-			if ( 'none' == $atts['description'] ) {
+			// 2.4.0.4: remove description for grid view
+			if ( ( 'none' == $atts['description'] ) || ( 'grid' == $atts['view'] ) ) {
 				$info['description'] = '';
 			} elseif ( 'full' == $atts['description'] ) {
 				$info['description'] = '<div class="' . esc_attr( $type ) . '-archive-item-content">';
@@ -757,10 +771,10 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 			}
 
 			// 2.3.3.9: add filter for custom HTML info			
-			$info['custom'] = apply_filters( 'radio_station_archive_shortcode_info_custom', '', $post_id, $type, $atts );
+			$info['custom'] = apply_filters( 'radio_station_archive_shortcode_info_custom', '', $post_id, $post_type, $atts );
 
 			// 2.3.3.9: filter info and loop info keys to add to archive list
-			$info = apply_filters( 'radio_station_archive_shortcode_info', $info, $post_id, $type, $atts );
+			$info = apply_filters( 'radio_station_archive_shortcode_info', $info, $post_id, $post_type, $atts );
 			foreach ( $infokeys as $infokey ) {
 				if ( isset( $info[$infokey] ) ) {
 					$list .= $info[$infokey];
@@ -776,7 +790,7 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
  	// --- add archive_pagination ---
 	if ( $atts['pagination'] && ( $atts['perpage'] > 0 ) && ( $post_count > 0 ) ) {
 		if ( $post_count > $atts['perpage'] ) {
-			$list .= radio_station_archive_pagination( $type, $atts, $post_count );
+			$list .= radio_station_archive_pagination( $post_type, $atts, $post_count );
 		}
 	}
 
@@ -787,7 +801,8 @@ function radio_station_archive_list_shortcode( $type, $atts ) {
 	radio_station_enqueue_style( 'shortcodes' );
 
 	// --- filter and return  ---
-	$list = apply_filters( 'radio_station_' . $type . '_archive_list', $list, $atts );
+	// 2.4.0.4: added third argument for post type
+	$list = apply_filters( 'radio_station_' . $type . '_archive_list', $list, $atts, $post_type );
 
 	return $list;
 }
@@ -2203,57 +2218,63 @@ function radio_station_current_show_shortcode( $atts ) {
 
 			$hosts = '';
 			$show_hosts = get_post_meta( $show_id, 'show_user_list', true );
-			if ( $show_hosts && is_array( $show_hosts ) && ( count( $show_hosts ) > 0 ) ) {
-
-				$hosts = '<div class="current-show-hosts on-air-dj-names">';
-
-				$hosts .= esc_html( __( 'with', 'radio-station' ) ) . ' ';
-
-				$count = 0;
-				// 2.3.3.9: fix to host count
-				$host_count = count( $show_hosts );
-				foreach ( $show_hosts as $host ) {
-
-					$count ++;
-
-					// 2.3.0: maybe get stored user data
-					// $user = get_userdata( $host );
-					if ( isset( $radio_station_data['user-' . $host] ) ) {
-						$user = $radio_station_data['user-' . $host];
-					} else {
-						$user = get_user_by( 'ID', $host );
-						$radio_station_data['user-' . $host] = $user;
-					}
-
-					if ( $atts['link_hosts'] ) {
-						// 2.3.0: use new get host URL function
-						$host_link = radio_station_get_host_url( $host );
-						$host_link = apply_filters( 'radio_station_dj_link', $host_link, $host );
-
-						// 2.3.3.5: only wrap with tags if there is a link
-						if ( $host_link ) {
-							$hosts .= '<a href="' . esc_url( $host_link ) . '">';
-						}
-						$hosts .= esc_html( $user->display_name );
-						if ( $host_link ) {
-							$hosts .= '</a>';
-						}
-					} else {
-						$hosts .= esc_html( $user->display_name );
-					}
-
-					if ( ( ( 1 == $count ) && ( 2 == $host_count ) )
-					     || ( ( $host_count > 2 ) && ( ( $host_count - 1 ) == $count ) ) ) {
-						$hosts .= ' ' . esc_html( __( 'and', 'radio-station' ) ) . ' ';
-					} elseif ( ( $count < $host_count ) && ( $host_count > 2 ) ) {
-						$hosts .= ', ';
-					}
+			if ( $show_hosts ) {
+				// 2.4.0.4: convert possible (old) non-array value
+				if ( !is_array( $show_hosts ) ) {
+					$show_hosts = array( $show_hosts );
 				}
-				$hosts .= '</div>';
-			}
-			$hosts = apply_filters( 'radio_station_current_show_hosts_display', $hosts, $show_id, $atts );
-			if ( ( '' != $hosts ) && is_string( $hosts ) ) {
-				$html['hosts'] = $hosts;
+				if ( is_array( $show_hosts ) && ( count( $show_hosts ) > 0 ) ) {
+
+					$hosts = '<div class="current-show-hosts on-air-dj-names">';
+
+					$hosts .= esc_html( __( 'with', 'radio-station' ) ) . ' ';
+
+					$count = 0;
+					// 2.3.3.9: fix to host count
+					$host_count = count( $show_hosts );
+					foreach ( $show_hosts as $host ) {
+
+						$count ++;
+
+						// 2.3.0: maybe get stored user data
+						// $user = get_userdata( $host );
+						if ( isset( $radio_station_data['user-' . $host] ) ) {
+							$user = $radio_station_data['user-' . $host];
+						} else {
+							$user = get_user_by( 'ID', $host );
+							$radio_station_data['user-' . $host] = $user;
+						}
+
+						if ( $atts['link_hosts'] ) {
+							// 2.3.0: use new get host URL function
+							$host_link = radio_station_get_host_url( $host );
+							$host_link = apply_filters( 'radio_station_dj_link', $host_link, $host );
+
+							// 2.3.3.5: only wrap with tags if there is a link
+							if ( $host_link ) {
+								$hosts .= '<a href="' . esc_url( $host_link ) . '">';
+							}
+							$hosts .= esc_html( $user->display_name );
+							if ( $host_link ) {
+								$hosts .= '</a>';
+							}
+						} else {
+							$hosts .= esc_html( $user->display_name );
+						}
+
+						if ( ( ( 1 == $count ) && ( 2 == $host_count ) )
+							 || ( ( $host_count > 2 ) && ( ( $host_count - 1 ) == $count ) ) ) {
+							$hosts .= ' ' . esc_html( __( 'and', 'radio-station' ) ) . ' ';
+						} elseif ( ( $count < $host_count ) && ( $host_count > 2 ) ) {
+							$hosts .= ', ';
+						}
+					}
+					$hosts .= '</div>';
+				}
+				$hosts = apply_filters( 'radio_station_current_show_hosts_display', $hosts, $show_id, $atts );
+				if ( ( '' != $hosts ) && is_string( $hosts ) ) {
+					$html['hosts'] = $hosts;
+				}
 			}
 		}
 
@@ -2865,56 +2886,62 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 				$hosts = '';
 				$show_hosts = get_post_meta( $show_id, 'show_user_list', true );
-				if ( isset( $show_hosts ) && is_array( $show_hosts ) && ( count( $show_hosts ) > 0 ) ) {
-
-					$hosts = '<div class="upcoming-show-hosts on-air-dj-names">';
-					$hosts .= esc_html( __( 'with', 'radio-station' ) ) . ' ';
-
-					$count = 0;
-					// 2.3.3.9: fix to host count
-					$host_count = count( $show_hosts );
-					foreach ( $show_hosts as $host ) {
-
-						$count ++;
-
-						// 2.3.0: maybe get stored user data
-						// $user = get_userdata( $host );
-						if ( isset( $radio_station_data['user-' . $host] ) ) {
-							$user = $radio_station_data['user-' . $host];
-						} else {
-							$user = get_user_by( 'ID', $host );
-							$radio_station_data['user-' . $host] = $user;
+				if ( $show_hosts ) {
+						// 2.4.0.4: convert possible (old) non-array value
+						if ( !is_array( $show_hosts ) ) {
+							$show_hosts = array( $show_hosts );
 						}
+						if ( is_array( $show_hosts ) && ( count( $show_hosts ) > 0 ) ) {
 
-						if ( $atts['link_hosts'] ) {
-							// 2.3.0: use new get host URL function
-							$host_link = radio_station_get_host_url( $host );
-							$host_link = apply_filters( 'radio_station_dj_link', $host_link, $host );
+						$hosts = '<div class="upcoming-show-hosts on-air-dj-names">';
+						$hosts .= esc_html( __( 'with', 'radio-station' ) ) . ' ';
 
-							// 2.3.3.5: only wrap with tags if there is a link
-							if ( $host_link ) {
-								$hosts .= '<a href="' . esc_url( $host_link ) . '">';
+						$count = 0;
+						// 2.3.3.9: fix to host count
+						$host_count = count( $show_hosts );
+						foreach ( $show_hosts as $host ) {
+
+							$count ++;
+
+							// 2.3.0: maybe get stored user data
+							// $user = get_userdata( $host );
+							if ( isset( $radio_station_data['user-' . $host] ) ) {
+								$user = $radio_station_data['user-' . $host];
+							} else {
+								$user = get_user_by( 'ID', $host );
+								$radio_station_data['user-' . $host] = $user;
 							}
-							$hosts .= esc_html( $user->display_name );
-							if ( $host_link ) {
-								$hosts .= '</a>';
-							}
-						} else {
-							$hosts .= esc_html( $user->display_name );
-						}
 
-						if ( ( ( 1 == $count ) && ( 2 == $host_count ) )
-						     || ( ( $host_count > 2 ) && ( $count == ( $host_count - 1 ) ) ) ) {
-							$hosts .= ' ' . esc_html( __( 'and', 'radio-station' ) ) . ' ';
-						} elseif ( ( $count < $host_count ) && ( $host_count > 2 ) ) {
-							$hosts .= ', ';
+							if ( $atts['link_hosts'] ) {
+								// 2.3.0: use new get host URL function
+								$host_link = radio_station_get_host_url( $host );
+								$host_link = apply_filters( 'radio_station_dj_link', $host_link, $host );
+
+								// 2.3.3.5: only wrap with tags if there is a link
+								if ( $host_link ) {
+									$hosts .= '<a href="' . esc_url( $host_link ) . '">';
+								}
+								$hosts .= esc_html( $user->display_name );
+								if ( $host_link ) {
+									$hosts .= '</a>';
+								}
+							} else {
+								$hosts .= esc_html( $user->display_name );
+							}
+
+							if ( ( ( 1 == $count ) && ( 2 == $host_count ) )
+								 || ( ( $host_count > 2 ) && ( $count == ( $host_count - 1 ) ) ) ) {
+								$hosts .= ' ' . esc_html( __( 'and', 'radio-station' ) ) . ' ';
+							} elseif ( ( $count < $host_count ) && ( $host_count > 2 ) ) {
+								$hosts .= ', ';
+							}
 						}
+						$hosts .= '</div>';
 					}
-					$hosts .= '</div>';
-				}
-				$hosts = apply_filters( 'radio_station_upcoming_show_hosts_display', $hosts, $show_id, $atts );
-				if ( ( '' != $hosts ) && is_string( $hosts ) ) {
-					$html['hosts'] = $hosts;
+					$hosts = apply_filters( 'radio_station_upcoming_show_hosts_display', $hosts, $show_id, $atts );
+					if ( ( '' != $hosts ) && is_string( $hosts ) ) {
+						$html['hosts'] = $hosts;
+					}
 				}
 			}
 

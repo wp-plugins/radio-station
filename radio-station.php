@@ -7,14 +7,14 @@
 /*
 
 Plugin Name: Radio Station
-Plugin URI: https://netmix.com/radio-station
+Plugin URI: https://radiostation.pro/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.4.0.3.4
+Version: 2.4.0.3.5
 Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
-Author URI: https://netmix.com/radio-station
+Author URI: https://netmix.com/
 GitHub Plugin URI: netmix/radio-station
 
 Copyright 2019 Digital Strategy Works  (email : info@digitalstrategyworks.com)
@@ -93,7 +93,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 define( 'RADIO_STATION_FILE', __FILE__ );
 define( 'RADIO_STATION_DIR', dirname( __FILE__ ) );
 define( 'RADIO_STATION_BASENAME', plugin_basename( __FILE__ ) );
-define( 'RADIO_STATION_HOME_URL', 'https://radiostation.pro/' );
+define( 'RADIO_STATION_HOME_URL', 'https://radiostation.pro/radio-station/' );
 define( 'RADIO_STATION_DOCS_URL', 'https://radiostation.pro/docs/' );
 // define( 'RADIO_STATION_API_DOCS_URL', 'https://radiostation.pro/docs/api/' );
 define( 'RADIO_STATION_PRO_URL', 'https://radiostation.pro/' );
@@ -134,34 +134,32 @@ require RADIO_STATION_DIR . '/includes/support-functions.php';
 require RADIO_STATION_DIR . '/includes/data-feeds.php';
 require RADIO_STATION_DIR . '/includes/legacy.php';
 
+// --- Player ---
+// 2.4.0.4: include player as standard
+require RADIO_STATION_DIR . '/player/radio-player.php';
+
 // --- Shortcodes ---
 require RADIO_STATION_DIR . '/includes/master-schedule.php';
 require RADIO_STATION_DIR . '/includes/shortcodes.php';
 
 // --- Widgets ---
+// 2.4.0.4: move player widget here
 require RADIO_STATION_DIR . '/includes/class-current-show-widget.php';
 require RADIO_STATION_DIR . '/includes/class-upcoming-shows-widget.php';
 require RADIO_STATION_DIR . '/includes/class-current-playlist-widget.php';
 require RADIO_STATION_DIR . '/includes/class-radio-clock-widget.php';
+require RADIO_STATION_DIR . '/includes/class-radio-player-widget.php';
 
 // --- Feature Development ---
 // 2.3.0: add feature branch development includes
 // 2.3.1: added radio player widget file
-$features = array( 'class-radio-player-widget', 'import-export' );
+$features = array( 'import-export' );
 foreach ( $features as $feature ) {
 	$filepath = RADIO_STATION_DIR . '/includes/' . $feature . '.php';
 	if ( file_exists ( $filepath ) ) {
 		include $filepath;
 	}
 }
-
-// --- Player ---
-// 2.3.1.1: load radio player prototype (if present)
-$player_file = RADIO_STATION_DIR . '/player/radio-player.php';
-if ( file_exists( $player_file ) ) {
-	require $player_file;
-}
-
 
 // ---------------------------
 // Plugin Options and Defaults
@@ -1449,10 +1447,14 @@ $options = array(
 // Pro Version Install Check
 // -------------------------
 // 2.4.0.3: added check active/installed Pro version
+// 2.4.0.4: add defaults for has_addons and has_plans
+$has_addons = false;
+$has_plans = true;
 $plan = 'free';
 
 // --- check for deactivated pro plugin ---
-$plugins = wp_cache_get( 'plugins', 'plugins' );
+// 2.4.0.4: remove unnecessary second argument to wp_cache_get
+$plugins = wp_cache_get( 'plugins' );
 if ( !$plugins ) {
 	if ( function_exists( 'get_plugins' ) ) {
 		$plugins = get_plugins();
@@ -1467,8 +1469,17 @@ if ( !$plugins ) {
 if ( $plugins && is_array( $plugins ) && ( count( $plugins ) > 0 ) ) {
 	foreach ( $plugins as $slug => $plugin ) {
 		if ( strstr( $slug, 'radio-station-pro.php' ) ) {
-			$plan = 'premium';
-			break;
+			// 2.4.0.4: only set premium for upgrade version
+			if ( isset( $plugin['Name'] ) && strstr( $plugin['Name'], '(Premium)' ) ) {
+				$plan = 'premium';
+				break;
+			} else {
+				// 2.4.0.4: detect and force enable addon version
+				$plan = 'premium';
+				$has_addons = true;
+				$has_plans = false;
+				break;
+			}
 		}
 	}
 }
@@ -1515,13 +1526,13 @@ $settings = array(
 	// 2.4.0.1: turn on addons switch for Pro
 	// 2.4.0.3: turn on plans switch for Pro also
 	// 2.4.0.3: set Pro details and Upgrade links
+	// 2.4.0.4: change upgrade_link to -upgrade
 	'freemius_id'  => '4526',
 	'freemius_key' => 'pk_aaf375c4fb42e0b5b3831e0b8476b',
-	'hasplans'     => true,
-	// 'upgrade_link' => RADIO_STATION_PRO_URL . 'pricing/',
-	'upgrade_link' => add_query_arg( 'page', $slug . '-addons', admin_url( 'admin.php' ) ),
+	'hasplans'     => $has_plans,
+	'upgrade_link' => add_query_arg( 'page', $slug . '-upgrade', admin_url( 'admin.php' ) ),
 	'pro_link'     => RADIO_STATION_PRO_URL . 'pricing/',
-	'hasaddons'    => false,
+	'hasaddons'    => $has_addons,
 	'addons_link'  => add_query_arg( 'page', $slug . '-addons', admin_url( 'admin.php' ) ),
 	'plan'         => $plan,
 );
@@ -3036,7 +3047,7 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 
 		// --- get more Shows related to this related Post ---
 		// 2.3.3.6: allow for multiple related posts
-		// 2.3.3.9: added 'i:' prefix to LIKE vlaue matches
+		// 2.3.3.9: added 'i:' prefix to LIKE value matches
 		global $wpdb;
 		$query = "SELECT post_id,meta_value FROM " . $wpdb->prefix . "postmeta"
 				. " WHERE meta_key = 'post_showblog_id' AND meta_value LIKE '%i:" . $related_shows[0] . "%'";
@@ -3567,11 +3578,16 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args, $user ) {
 				$hosts = get_post_meta( $post->ID, 'show_user_list', true );
 				$producers = get_post_meta( $post->ID, 'show_producer_list', true );
 
+				// 2.3.0.4: convert possible (old) non-array values
 				if ( !$hosts || empty( $hosts ) ) {
 					$hosts = array();
+				} elseif ( !is_array( $hosts ) ) {
+					$hosts = array( $hosts );
 				}
 				if ( !$producers || empty( $producers ) ) {
 					$producers = array();
+				} elseif ( !is_array( $producers ) ) {
+					$producers = array( $producers );
 				}
 
 				// ---- revoke editing capability if not assigned to this show ---
@@ -3683,5 +3699,17 @@ function radio_station_debug( $data, $echo = true, $file = false ) {
 		}
 		$file = RADIO_STATION_DIR . '/debug/' . $file;
 		error_log( $data, 3, $file );
+	}
+}
+
+// ---------------------
+// Freemius Object Debug
+// ---------------------
+// 2.4.0.4: added to debug freemius instance
+add_action( 'shutdown', 'radio_station_freemius_debug' );
+function radio_station_freemius_debug() {
+	if ( is_admin() && RADIO_STATION_DEBUG && current_user_can( 'manage_options' ) ) {
+		$instance = radio_station_freemius_instance();
+		echo '<span style="display:none;">Freemius Object: ' . print_r( $instance, true ) . '</span>';
 	}
 }

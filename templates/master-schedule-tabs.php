@@ -118,7 +118,9 @@ foreach ( $weekdays as $i => $weekday ) {
 
 		// 2.3.2: set day start and end times
 		// 2.3.2: replace strtotime with to_time for timezones
+		// 2.4.0.4: adjust day start time for daylight saving
 		$day_start_time = radio_station_to_time( $weekdates[$weekday] . ' 00:00' );
+		$day_start_adjusted = $day_start_time + ( 2 * 60 * 60 );
 		$day_end_time = $day_start_time + ( 24 * 60 * 60 );
 
 		// 2.2.2: use translate function for weekday string
@@ -137,16 +139,16 @@ foreach ( $weekdays as $i => $weekday ) {
 		if ( $atts['display_date'] ) {
 			// 2.3.3.5: allow for attribute to be set to 1 for default display
 			if ( '1' == $atts['display_date'] ) {
-				$date_subheading = radio_station_get_time( 'jS', $day_start_time );
+				$date_subheading = radio_station_get_time( 'jS', $day_start_adjusted );
 			} else {
-				$date_subheading = radio_station_get_time( $atts['display_date'], $day_start_time );
+				$date_subheading = radio_station_get_time( $atts['display_date'], $day_start_adjusted );
 			}
 		} else {
-			$date_subheading = radio_station_get_time( 'j', $day_start_time );
+			$date_subheading = radio_station_get_time( 'j', $day_start_adjusted );
 		}
 
 		// 2.3.2: add attribute for short or long month display
-		$month = radio_station_get_time( 'F', $day_start_time );
+		$month = radio_station_get_time( 'F', $day_start_adjusted );
 		if ( $atts['display_month'] && !in_array( $atts['display_month'], array( 'short', 'full', 'long' ) ) ) {
 			$atts['display_month'] = 'short';
 		}
@@ -476,7 +478,7 @@ foreach ( $weekdays as $i => $weekday ) {
 				$times .= '<div class="show-user-time" id="show-user-time-' . esc_attr( $tcount ) . '">' . $newline;
 				$times .= '[<span class="rs-time rs-start-time"></span>' . $newline;
 				$times .= '<span class="rs-sep"> ' . esc_html( __( 'to', 'radio-station' ) ) . ' </span>' . $newline;
-				$times .= '<span class="rs-time rs-end-time"></span>]' . $newline;				
+				$times .= '<span class="rs-time rs-end-time"></span>]' . $newline;
 				$times .= '</div>' . $newline;
 				$info['times'] = $times;
 				$tcount ++;

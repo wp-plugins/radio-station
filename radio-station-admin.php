@@ -617,23 +617,25 @@ function radio_station_get_upgrade_notice() {
 	}
 	if ( property_exists( $pluginupdates, 'response' ) ) {
 		foreach ( $pluginupdates->response as $file => $update ) {
-			if ( $update->slug == $pluginslug ) {
-				if ( property_exists( $update, 'upgrade_notice' ) ) {
+			if ( is_object( $update ) && property_exists( $update, 'slug' ) ) {
+				if ( $update->slug == $pluginslug ) {
+					if ( property_exists( $update, 'upgrade_notice' ) ) {
 
-					// 2.3.3.9: compare new version with installed version
-					$new_version = $update->new_version;
-					$version = radio_station_plugin_version();
-					if ( version_compare( $version, $new_version, '<' ) ) {
+						// 2.3.3.9: compare new version with installed version
+						$new_version = $update->new_version;
+						$version = radio_station_plugin_version();
+						if ( version_compare( $version, $new_version, '<' ) ) {
 
-						// --- parse upgrade notice ---
-						$notice = $update->upgrade_notice;
-						$notice = radio_station_parse_upgrade_notice( $notice );
-						$notice['update_id'] = str_replace( '.', '', $new_version );
-						if ( property_exists( $update, 'icons' ) && isset( $update->icons['1x'] ) ) {
-							$notice['icon_url'] = $update->icons['1x'];
+							// --- parse upgrade notice ---
+							$notice = $update->upgrade_notice;
+							$notice = radio_station_parse_upgrade_notice( $notice );
+							$notice['update_id'] = str_replace( '.', '', $new_version );
+							if ( property_exists( $update, 'icons' ) && isset( $update->icons['1x'] ) ) {
+								$notice['icon_url'] = $update->icons['1x'];
+							}
+							$notice['plugin_file'] = $file;
+							break;
 						}
-						$notice['plugin_file'] = $file;
-						break;
 					}
 				}
 			}

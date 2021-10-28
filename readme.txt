@@ -8,7 +8,7 @@ Stable tag: 2.4.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Radio Station let's you build and manage a Show Schedule for a radio station or Internet broadcaster's WordPress website. 
+Radio Station lets you build and manage a Show Schedule for a radio station or Internet broadcaster's WordPress website. 
 
 == Description ==
 
@@ -116,7 +116,7 @@ Try re-saving your site's permalink settings via Settings -> Permalinks.  Wordpr
 
 = What if I want to change or style the plugin's displays? =
 
-The default styles for Radio Station have intionally kept fairly minimal so as to be compatible with most themes, so you may wish to add your own styles to suit your site's look and feel. The best way to do this is to add your own `rs-custom.css` to your Child Theme's directory, and add more specific style rules that modify or override the existing styles. Radio Station will automatically detect the presence of this file and enqueue it. You can find the base styles in the `/css/` directory of the plugin.
+The default styles for Radio Station have intentionally been kept fairly minimal so as to be compatible with most themes, so you may wish to add your own styles to suit your site's look and feel. The best way to do this is to add your own `rs-custom.css` to your Child Theme's directory, and add more specific style rules that modify or override the existing styles. Radio Station will automatically detect the presence of this file and enqueue it. You can find the base styles in the `/css/` directory of the plugin.
 
 = What Widgets are available with this plugin? =
 
@@ -219,11 +219,13 @@ You can now visit your site to make sure nothing is broken. If you experience is
 == Changelog ==
 
 = 2.4.0.4 =
+* Improved: clear cache on show/override status transitions
 * Fixed: DJ / Host can edit own/others Show permissions
 * Fixed: Override link to show dropdown query
 * Fixed: Fallback scripts and fallback stream URLs
 * Fixed: Radio Clock responsive width display
 * Fixed: Collapse descriptions for non-show pages
+* Fixed: adjust Tabbed schedule dates for daylight saving
 
 = 2.4.0.3 =
 * Update: Plugin Panel (1.2.1) with zero value save and tab fixes
@@ -346,7 +348,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Improved: show shifts interface background colors
 * Added: navigate away from page on shift change check
 * Added: default time format option to Widgets
-* Removed: current show transients (intermittant unreliability)
+* Removed: current show transients (intermittent unreliability)
 * Fixed: AJAX call causing plugin conflicts via save_post action
 * Fixed: calculation of Upcoming Shows near end of the week
 * Fixed: remove and duplicate actions on new shifts
@@ -447,7 +449,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Add Show list columns with active, shift, DJs and show image displays
 * Add Schedule Override list columns with date sorting and filtering
 * Add playlist track information labels to Now Playing Widget
-* Added meridiem (am/pm) translations via WP Locale class
+* Added meridian (am/pm) translations via WP Locale class
 * Added star rating link to plugin announcement box
 * Added update subscription form to plugin Help page
 * Fix to checkbox value saving for On Air/Upcoming Widgets
@@ -490,7 +492,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * shift main playlist and show metaboxes above editor
 * set plugin custom post types editor to Classic Editor
 * add high priority to side metaboxes for plugin post types
-* added dismissable development changeover admin notice
+* added dismissible development changeover admin notice
 * added simple Patreon supporter image button and blurb
 * added filter for DJ Avatar size on Author page template
 * fix to Schedule Override metabox value saving
@@ -554,7 +556,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Fixed issue on the master schedule where genres containing more than one work wouldn't highlight when clicked
 * Added ability to display DJ names on the master schedule.
 * Fixed bug in the Upcoming widget.  Override Schedule no longer display as upcoming when they are on-air.
-* Verified compatibility woth WordPress 4.0
+* Verified compatibility with WordPress 4.0
 
 = 2.0.13 =
 * Added the ability to display show avatars on the program grid.
@@ -600,7 +602,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Master Schedule bug for shows that start at midnight and end before the hour is up fixed.
 
 = 2.0.3 =
-* Compatibility fix: Fixed a jquery conflict in the backend that was occuring in certain themes
+* Compatibility fix: Fixed a jquery conflict in the backend that was occurring in certain themes
 
 = 2.0.2 =
 * Bug fix: Scheduling issue with overnight shows fixed
@@ -664,7 +666,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Fixed some areas of the code that were generating PHP notices in WordPress 3.6
 
 = 1.4.3 =
-* Master schedule shortcode now displays indiviual shows in both 24 and 12 hour time
+* Master schedule shortcode now displays individual shows in both 24 and 12 hour time
 * Fixed some areas of the code that were generating PHP notices in WordPress 3.6
 * Added example of how to display show schedule to single-show.php template
 * Added more options to the plugin's widgets
@@ -726,7 +728,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Reduced the size of the content field in the playlist post type
 * Some minor formatting changes to default templates
 * Added genre highlighter to the master programming schedule page
-* Added a second Update button on the bottom of the playlist edit page for convinience.
+* Added a second Update button on the bottom of the playlist edit page for convenience.
 * Added sample template for DJ user pages
 * Fixed a bug in the master schedule shortcode that messed up the table for shows that are more than two hours in duration
 * Fixed a bug in the master schedule shortcode to accomodate shows that run from late night into the following morning.

@@ -1,6 +1,6 @@
 # Radio Station
 
-Radio Station let's you build and manage a Show Schedule for a radio station or Internet broadcaster's WordPress website. 
+Radio Station lets you build and manage a Show Schedule for a radio station or Internet broadcaster's WordPress website. 
 
 ## Plugin Details
 
@@ -23,11 +23,11 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 ## Description
 
-Radio Station by NetMix is a plugin to build and manage a Show Schedule for a radio station or internet broadcaster's WordPress website, including podcasters. It's functionality was originally based on Drupal 6's Station plugin, reworked for use in Wordpress and then extended.
+Radio Station by NetMix is a plugin to build and manage a Show Schedule for a radio station or internet broadcaster's WordPress website, including podcasters. Its functionality was originally based on Drupal 6's Station plugin, reworked for use in Wordpress and then extended.
 
 The plugin adds a new "Show" post type, schedulable blocks of time that contain a Show description, a Show shifts repeater field, assignable images and other meta information. You can also create Playlists associated with those shows, or assign standard blog posts to relate to a Show. It also supports adding Schedule Overrides for specific dates and times, and adds the ability to associate users (given a role of "Host" or "Producer") to Shows, so they can be displayed for that Show and to give them edit access.
 
-A schedule of all Shows can be generated and added to a page with a shortcode (or simple page selection in the Plugin Settings) which has a number of Layout and display options. Shows can be categorized into Genres and a Genre highlighting filter appears on the embedded Schedule view. Each Show has it's own dedicated page to display all the Show details in a responsive layout.
+A schedule of all Shows can be generated and added to a page with a shortcode (or simple page selection in the Plugin Settings) which has a number of Layout and display options. Shows can be categorized into Genres and a Genre highlighting filter appears on the embedded Schedule view. Each Show has its own dedicated page to display all the Show details in a responsive layout.
 
 The plugin contains a widget to display the on-air Current Show linked to the Show page, with various widget display options, and further widgets for displaying Upcoming Shows and current Playlist tracks. Shortcodes are available for these widgets, as well as for displaying archive lists of any of the plugin's custom post types.
 
@@ -47,7 +47,7 @@ Since 2.3.0, the first major feature update since plugin takeover in July 2019, 
 * Admin Plugin Settings Page (with a plethora of new options)
 * ...and a Radio Station Data API via the WordPress REST API! 
 
-If you have been using Radio Station prior to version 2.3.0 and want to update, it is recommended that you read [the blog post for the 2.3.0 release](https://netmix.com/2-3-0-release-announcement/). As there is quite a lot of refactoring and changes in this version, you will want to check the details of the new changes with your current usage - especially if you have been using any custom page templates in your theme or other plugin-related custom code on your site. As these are probably the most significant changes that will ever be made to the plugin in a release, we have worked hard to maintain backwards oompatibility and test the new features thoroughly, but it's important you know what is going and test things out yourself in the update process.
+If you have been using Radio Station prior to version 2.3.0 and want to update, it is recommended that you read [the blog post for the 2.3.0 release](https://netmix.com/2-3-0-release-announcement/). As there is quite a lot of refactoring and changes in this version, you will want to check the details of the new changes with your current usage - especially if you have been using any custom page templates in your theme or other plugin-related custom code on your site. As these are probably the most significant changes that will ever be made to the plugin in a release, we have worked hard to maintain backwards compatibility and test the new features thoroughly, but it's important you know what is going and test things out yourself in the update process.
 
 ### Support and Contribution
 
@@ -128,7 +128,7 @@ Try re-saving your site's permalink settings via Settings -> Permalinks.  Wordpr
 
 #### What if I want to change or style the plugin's displays?
 
-The default styles for Radio Station have intionally kept fairly minimal so as to be compatible with most themes, so you may wish to add your own styles to suit your site's look and feel. The best way to do this is to add your own `rs-custom.css` to your Child Theme's directory, and add more specific style rules that modify or override the existing styles. Radio Station will automatically detect the presence of this file and enqueue it. You can find the base styles in the `/css/` directory of the plugin.
+The default styles for Radio Station have intentionally been kept fairly minimal so as to be compatible with most themes, so you may wish to add your own styles to suit your site's look and feel. The best way to do this is to add your own `rs-custom.css` to your Child Theme's directory, and add more specific style rules that modify or override the existing styles. Radio Station will automatically detect the presence of this file and enqueue it. You can find the base styles in the `/css/` directory of the plugin.
 
 #### What Widgets are available with this plugin?
 
