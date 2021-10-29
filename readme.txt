@@ -3,8 +3,8 @@ Contributors: tonyzeoli, majick
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
-Tested up to: 5.8
-Stable tag: 2.4.0.3
+Tested up to: 5.8.1
+Stable tag: 2.4.0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -225,7 +225,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Fixed: Fallback scripts and fallback stream URLs
 * Fixed: Radio Clock responsive width display
 * Fixed: Collapse descriptions for non-show pages
-* Fixed: adjust Tabbed schedule dates for daylight saving
+* Fixed: Deduplicate dates in week (daylight saving fix)
 
 = 2.4.0.3 =
 * Update: Plugin Panel (1.2.1) with zero value save and tab fixes

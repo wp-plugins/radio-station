@@ -213,6 +213,40 @@ The following attributes are available for this shortcode:
 
 [Demo Site Example Output](https://radiostationdemo.com/archive-shortcodes/languages-archive/)
 
+### [Pro] Hosts Archive Shortcode
+
+`[host-archive]` or `[hosts-archive]`
+
+* *description* : Profile description display. 'none', 'full' or 'excerpt'. Default 'excerpt'.
+* *view* : View option. 'grid' option. Default 0 (list)
+* *status* : Query for Host status. Default 'publish'.
+* *perpage* : Query for number of Hosts. Default -1 (all)
+* *offset* : Query for Host offset. Default '' (no offset)
+* *orderby* : Query to order Host display by. Default 'title'.
+* *order* : Query order for Hosts. Default 'ASC'.
+* *thumbnails* : Display profile image. 0 or 1. Default 0.
+* *social* : Display social profile icons. 0 or 1. Default 1.
+* *shows* : Display a list of Shows assigned to Host. 0 or 1. Default 1.
+
+[Demo Site Example Output](https://radiostationdemo.com/archive-shortcodes/hosts-archive/)
+
+### [Pro] Producers Archive Shortcode
+
+`[producer-archive]` or `[producers-archive]`
+
+* *description* : Profile description display. 'none', 'full' or 'excerpt'. Default 'excerpt'.
+* *view* : View option. 'grid' option. Default 0 (list)
+* *status* : Query for Producer status. Default 'publish'.
+* *perpage* : Query for number of Producers. Default -1 (all)
+* *offset* : Query for producer offset. Default '' (no offset)
+* *orderby* : Query to order Producer display by. Default 'title'.
+* *order* : Query order for Producers. Default 'ASC'.
+* *thumbnails* : Display profile image. 0 or 1. Default 0.
+* *social* : Display social profile icons. 0 or 1. Default 1.
+* *shows* : Display a list of Shows assigned to Producer. 0 or 1. Default 1.
+
+[Demo Site Example Output](https://radiostationdemo.com/archive-shortcodes/producers-archive/)
+
 ### Show Posts Archive Shortcode
 
 `[show-posts-archive]` (or `[show-post-archive]`)

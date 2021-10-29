@@ -38,7 +38,9 @@ Note that additional Pro Documentation will be added as new Features are release
 [Schedule Grid View](./Shortcodes.md#master-schedule-shortcode)
 [Schedule Calendar View](./Shortcodes.md#master-schedule-shortcode)
 [Multiple View Switching](./Shortcodes.md#pro-multiple-view-switching)
-[Show Episodes Archive Shortcode](./Shortcodes.md#pro-show-episodes-archive-shortcode
+[Hosts Archive Shortcode](./Shortcodes.md#pro-hosts-archive-shortcode)
+[Producers Archive Shortcode](./Shortcodes.md#pro-producers-archive-shortcode)
+[Show Episodes Archive Shortcode](./Shortcodes.md#pro-show-episodes-archive-shortcode)
 
 #### Widgets
 [Sitewide Bar Player(./Player.md#pro-sitewide-bar-player)

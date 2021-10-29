@@ -61,7 +61,8 @@ function radio_station_create_post_types() {
 		'show_in_menu'      => false, // now added to main menu
 		'show_in_admin_bar' => false, // this is done manually
 		'show_in_rest'      => true,
-		'description'       => __( 'Post type for Shows', 'radio-station' ),
+		// 2.4.0.4: change to description (as displayed in some archive templates)
+		'description'       => __( 'Shows Archive', 'radio-station' ),
 		'public'            => true,
 		'taxonomies'        => array( RADIO_STATION_GENRES_SLUG, RADIO_STATION_LANGUAGES_SLUG ),
 		'hierarchical'      => false,
@@ -110,7 +111,8 @@ function radio_station_create_post_types() {
 		'show_in_menu'      => false, // now added to main menu
 		'show_in_admin_bar' => false, // this is done manually
 		'show_in_rest'      => true,
-		'description'       => __( 'Post type for Playlists', 'radio-station' ),
+		// 2.4.0.4: change to description (as displayed in some archive templates)
+		'description'       => __( 'Playlists Archive', 'radio-station' ),
 		'public'            => true,
 		'hierarchical'      => false,
 		// 2.3.0: added thumbnail, custom field and revision support
@@ -156,7 +158,8 @@ function radio_station_create_post_types() {
 		'show_in_menu'      => false, // now added to main menu
 		'show_in_admin_bar' => false, // this is done manually
 		'show_in_rest'      => true,
-		'description'       => __( 'Post type for Schedule Overrides', 'radio-station' ),
+		// 2.4.0.4: change to description (as displayed in some archive templates)
+		'description'       => __( 'Schedule Overrides Archive', 'radio-station' ),
 		'public'            => true,
 		// 2.3.0: added taxonomies to overrides
 		'taxonomies'        => array( RADIO_STATION_GENRES_SLUG, RADIO_STATION_LANGUAGES_SLUG ),
@@ -208,7 +211,8 @@ function radio_station_create_post_types() {
 		'show_in_admin_bar'   => false,
 		'show_in_nav_menus'   => false,
 		'show_in_rest'        => true,
-		'description'         => __( 'Post type for DJ / Host Profiles', 'radio-station' ),
+		// 2.4.0.4: change to description (as displayed in some archive templates)
+		'description'         => __( 'Host Profiles Archive', 'radio-station' ),
 		'exclude_from_search' => false,
 		'public'              => true,
 		'hierarchical'        => false,
@@ -259,11 +263,12 @@ function radio_station_create_post_types() {
 		'show_in_admin_bar'   => false,
 		'show_in_nav_menus'   => false,
 		'show_in_rest'        => true,
-		'description'         => __( 'Post type for Producer Profiles', 'radio-station' ),
+		// 2.4.0.4: change to description (as displayed in some archive templates)
+		'description'         => __( 'Producer Profiles Archive', 'radio-station' ),
 		'exclude_from_search' => false,
 		'public'              => true,
 		'hierarchical'        => false,
-		// 2.3.3.9: set can_export true 
+		// 2.3.3.9: set can_export true
 		'can_export'          => true,
 		// 2.3.3.9: added all post type supports
 		// 2.4.1.4: added author support for quick edit
@@ -298,8 +303,8 @@ add_filter( 'use_block_editor_for_post_type', 'radio_station_post_type_editor', 
 function radio_station_post_type_editor( $can_edit, $post_type ) {
 	// 2.3.2: added host and producer slugs
 	$post_types = array(
-		RADIO_STATION_SHOW_SLUG, 
-		RADIO_STATION_PLAYLIST_SLUG, 
+		RADIO_STATION_SHOW_SLUG,
+		RADIO_STATION_PLAYLIST_SLUG,
 		RADIO_STATION_OVERRIDE_SLUG,
 		RADIO_STATION_HOST_SLUG.
 		RADIO_STATION_PRODUCER_SLUG,
@@ -324,7 +329,7 @@ function radio_station_add_featured_image_support() {
 	$supported_types = get_theme_support( 'post-thumbnails' );
 	if ( false === $supported_types ) {
 		$post_types = array(
-			RADIO_STATION_SHOW_SLUG, 
+			RADIO_STATION_SHOW_SLUG,
 			RADIO_STATION_OVERRIDE_SLUG,
 			RADIO_STATION_HOST_SLUG,
 			RADIO_STATION_PRODUCER_SLUG,
@@ -607,7 +612,7 @@ function radio_station_override_show_avatar_id( $avatar_id, $post_id ) {
 		if ( false !== $override ) {
 			return $override;
 		}
-	}	
+	}
 	return $avatar_id;
 }
 
@@ -630,7 +635,7 @@ function radio_station_override_thumbnail_id( $id, $object_id, $meta_key, $singl
 		$override = radio_station_get_show_override( $object_id, 'show_image' );
 		if ( false !== $override ) {
 			return $override;
-		}		
+		}
 	}
 	return $id;
 }
@@ -643,7 +648,7 @@ function radio_station_override_show_hosts( $hosts, $post_id ) {
 	}
 	return $hosts;
 }
- 
+
 // --- Show Producers ---
 function radio_station_override_show_producers( $producers, $post_id ) {
 	$override = radio_station_get_show_override( $post_id, 'show_producer_list' );
@@ -652,7 +657,7 @@ function radio_station_override_show_producers( $producers, $post_id ) {
 	}
 	return $producers;
 }
- 
+
 // --- Show Website Link ---
 function radio_station_override_show_link( $show_link, $post_id ) {
 	$override = radio_station_get_show_override( $post_id, 'show_link' );
@@ -661,7 +666,7 @@ function radio_station_override_show_link( $show_link, $post_id ) {
 	}
 	return $show_link;
 }
- 
+
 // --- Show Email ---
 function radio_station_override_show_email( $show_email, $post_id ) {
 	$override = radio_station_get_show_override( $post_id, 'show_email' );
@@ -670,7 +675,7 @@ function radio_station_override_show_email( $show_email, $post_id ) {
 	}
 	return $show_email;
 }
- 
+
 // --- Show Phone ---
 function radio_station_override_show_phone( $show_phone, $post_id ) {
 	$override = radio_station_get_show_override( $post_id, 'show_phone' );
@@ -679,7 +684,7 @@ function radio_station_override_show_phone( $show_phone, $post_id ) {
 	}
 	return $show_phone;
 }
- 
+
 // --- Show File ---
 function radio_station_override_show_file( $show_file, $post_id ) {
 	$override = radio_station_get_show_override( $post_id, 'show_file' );
@@ -688,7 +693,7 @@ function radio_station_override_show_file( $show_file, $post_id ) {
 	}
 	return $show_file;
 }
- 
+
 // --- Disable Download ---
 function radio_station_override_show_download( $show_download, $post_id ) {
 	$override = radio_station_get_show_override( $post_id, 'show_download' );
@@ -697,7 +702,7 @@ function radio_station_override_show_download( $show_download, $post_id ) {
 	}
 	return $show_download;
 }
- 
+
 // --- Show Patreon ---
 function radio_station_override_show_patreon( $show_patreon, $post_id ) {
 	$override = radio_station_get_show_override( $post_id, 'show_patreon' );
