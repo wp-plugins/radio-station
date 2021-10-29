@@ -36,7 +36,7 @@ Since 2.3.0, the first major feature update since plugin takeover in July 2019, 
 * Admin Plugin Settings Page (with a plethora of new options)
 * ...and a Radio Station Data API via the WordPress REST API! 
 
-If you have been using Radio Station prior to version 2.3.0 and want to update, it is recommended that you read [the blog post for the 2.3.0 release](https://netmix.com/2-3-0-release-announcement/). As there is quite a lot of refactoring and changes in this version, you will want to check the details of the new changes with your current usage - especially if you have been using any custom page templates in your theme or other plugin-related custom code on your site. As these are probably the most significant changes that will ever be made to the plugin in a release, we have worked hard to maintain backwards oompatibility and test the new features thoroughly, but it's important you know what is going and test things out yourself in the update process.
+If you have been using Radio Station prior to version 2.3.0 and want to update, it is recommended that you read [the blog post for the 2.3.0 release](https://netmix.com/2-3-0-release-announcement/). As there is quite a lot of refactoring and changes in this version, you will want to check the details of the new changes with your current usage - especially if you have been using any custom page templates in your theme or other plugin-related custom code on your site. As these are probably the most significant changes that will ever be made to the plugin in a release, we have worked hard to maintain backwards compatibility and test the new features thoroughly, but it's important you know what is going and test things out yourself in the update process.
 
 = Support and Contribution =
 
@@ -444,7 +444,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Fix to not 404 author pages for DJs without blog posts
 
 = 2.2.7 =
-* Dutch translation added (Thank you to André Dortmont for the file!)
+* Dutch translation added (Thank you to AndrÃ© Dortmont for the file!)
 * Added Tabbed Display for Master Schedule Shortcode (via Tutorial)
 * Add Show list columns with active, shift, DJs and show image displays
 * Add Schedule Override list columns with date sorting and filtering
