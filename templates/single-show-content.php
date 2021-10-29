@@ -332,6 +332,10 @@ if ( $show_phone || $hosts || $producers || $genres || $languages ) {
 		$label = apply_filters( 'radio_station_show_hosts_label', $label, $post_id );
 		$meta_blocks['hosts'] .= '<span class="show-hosts-label show-label">' . esc_html( $label ) . '</span>: ' . $newline;
 		$count = 0;
+		// 2.4.0.4: convert possible (old) non-array values
+		if ( !is_array( $hosts ) ) {
+			$hosts = array( $hosts );
+		}
 		$host_count = count( $hosts );
 		foreach ( $hosts as $host ) {
 			$count ++;
@@ -367,6 +371,10 @@ if ( $show_phone || $hosts || $producers || $genres || $languages ) {
 		$label = apply_filters( 'radio_station_show_producers_label', $label, $post_id );
 		$meta_blocks['producers'] .= '<span class="show-producers-label show-label">' . esc_html( $label ) . '</span>: ' . $newline;
 		$count = 0;
+		// 2.4.0.4: convert possible (old) non-array values
+		if ( !is_array( $producers ) ) {
+			$producers = array( $producers );		
+		}
 		$producer_count = count( $producers );
 		foreach ( $producers as $producer ) {
 			$count ++;

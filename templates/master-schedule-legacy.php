@@ -209,7 +209,8 @@ foreach ( $master_list as $hour => $days ) {
 					$times .= ' - ';
 					$times .= date( 'H:i', strtotime( '1981-04-28 ' . $show['time']['end_hour'] . ':' . $show['time']['end_min'] . ':00 ' ) );
 				}
-				$time = apply_filters( 'radio_station_schedule_show_time', $times, $show['id'], 'legacy' );
+				// 2.4.0.4: added missing filter arguments for Pro
+				$time = apply_filters( 'radio_station_schedule_show_time', $times, $show['id'], 'legacy', false, false );
 				$output .= $time;
 				$output .= '</span>';
 			}

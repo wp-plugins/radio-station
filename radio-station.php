@@ -7,14 +7,14 @@
 /*
 
 Plugin Name: Radio Station
-Plugin URI: https://netmix.com/radio-station
+Plugin URI: https://radiostation.pro/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.4.0.3
+Version: 2.4.0.4
 Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
-Author URI: https://netmix.com/radio-station
+Author URI: https://netmix.com/
 GitHub Plugin URI: netmix/radio-station
 
 Copyright 2019 Digital Strategy Works  (email : info@digitalstrategyworks.com)
@@ -93,7 +93,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 define( 'RADIO_STATION_FILE', __FILE__ );
 define( 'RADIO_STATION_DIR', dirname( __FILE__ ) );
 define( 'RADIO_STATION_BASENAME', plugin_basename( __FILE__ ) );
-define( 'RADIO_STATION_HOME_URL', 'https://radiostation.pro/' );
+define( 'RADIO_STATION_HOME_URL', 'https://radiostation.pro/radio-station/' );
 define( 'RADIO_STATION_DOCS_URL', 'https://radiostation.pro/docs/' );
 // define( 'RADIO_STATION_API_DOCS_URL', 'https://radiostation.pro/docs/api/' );
 define( 'RADIO_STATION_PRO_URL', 'https://radiostation.pro/' );
@@ -134,34 +134,32 @@ require RADIO_STATION_DIR . '/includes/support-functions.php';
 require RADIO_STATION_DIR . '/includes/data-feeds.php';
 require RADIO_STATION_DIR . '/includes/legacy.php';
 
+// --- Player ---
+// 2.4.0.4: include player as standard
+require RADIO_STATION_DIR . '/player/radio-player.php';
+
 // --- Shortcodes ---
 require RADIO_STATION_DIR . '/includes/master-schedule.php';
 require RADIO_STATION_DIR . '/includes/shortcodes.php';
 
 // --- Widgets ---
+// 2.4.0.4: move player widget here
 require RADIO_STATION_DIR . '/includes/class-current-show-widget.php';
 require RADIO_STATION_DIR . '/includes/class-upcoming-shows-widget.php';
 require RADIO_STATION_DIR . '/includes/class-current-playlist-widget.php';
 require RADIO_STATION_DIR . '/includes/class-radio-clock-widget.php';
+require RADIO_STATION_DIR . '/includes/class-radio-player-widget.php';
 
 // --- Feature Development ---
 // 2.3.0: add feature branch development includes
 // 2.3.1: added radio player widget file
-$features = array( 'class-radio-player-widget', 'import-export' );
+$features = array( 'import-export' );
 foreach ( $features as $feature ) {
 	$filepath = RADIO_STATION_DIR . '/includes/' . $feature . '.php';
 	if ( file_exists ( $filepath ) ) {
 		include $filepath;
 	}
 }
-
-// --- Player ---
-// 2.3.1.1: load radio player prototype (if present)
-$player_file = RADIO_STATION_DIR . '/player/radio-player.php';
-if ( file_exists( $player_file ) ) {
-	require $player_file;
-}
-
 
 // ---------------------------
 // Plugin Options and Defaults
@@ -520,7 +518,7 @@ $options = array(
 	),
 
 	// === Player Colours ===
-	
+
 	// --- [Pro] Playing Highlight Color ---
 	'player_playing_color'        => array(
 		'type'    => 'color',
@@ -767,7 +765,8 @@ $options = array(
 	// --- Metadata URL ---
 	// 2.4.0.3: added for alternative stream metadata URL
 	'player_bar_metadata'     => array(
-		'type'    => 'url',
+		'type'    => 'text',
+		'options' => 'URL',
 		'label'   => __( 'Metadata URL', 'radio-station' ),
 		'default' => '',
 		'tab'     => 'player',
@@ -846,7 +845,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro] Available Views ===
+	// --- [Pro] Available Views ---
 	// 2.3.2: added additional views option
 	'schedule_views'      => array(
 		'type'    => 'multicheck',
@@ -862,6 +861,19 @@ $options = array(
 			'calendar' => __( 'Calendar View', 'radio-station' ),
 		),
 		'helper'  => __( 'Switcher Views available on automatic Master Schedule page.', 'radio-station' ),
+		'tab'     => 'pages',
+		'section' => 'schedule',
+		'pro'     => true,
+	),
+
+	// --- [Pro] Time Spaced Grid View ---
+	// 2.4.0.4: added grid view time spacing option
+	'schedule_timegrid'      => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Time Spaced Grid', 'radio-station' ),
+		'default' => '',
+		'value'	  => 'yes',
+		'helper'  => __( 'Enable Grid View option for equalized time spacing and background imsges.', 'radio-station' ),
 		'tab'     => 'pages',
 		'section' => 'schedule',
 		'pro'     => true,
@@ -1306,7 +1318,7 @@ $options = array(
 		'section' => 'loading',
 		'pro'     => true,
 	),
-	
+
 	// --- [Pro] Timezone Switching ---
 	'timezone_switching' => array(
 		'type'    => 'checkbox',
@@ -1335,7 +1347,7 @@ $options = array(
 
 	// --- Playlist Editing Role Note ---
 	// 2.4.0.3: added role to playlist assignment note
-	'permissions_playlistow_role_note'      => array(
+	'permissions_playlist_role_note'      => array(
 		'type'    => 'note',
 		'label'   => __( 'Playlist Permissions', 'radio-station' ),
 		'helper'  => __( 'Any user with a Host or Producer role can create Playlists.', 'radio-station' ),
@@ -1434,11 +1446,15 @@ $options = array(
 // -------------------------
 // Pro Version Install Check
 // -------------------------
-// 2.4.0.3: added check active/installed Pro version 
+// 2.4.0.3: added check active/installed Pro version
+// 2.4.0.4: add defaults for has_addons and has_plans
+$has_addons = false;
+$has_plans = true;
 $plan = 'free';
 
 // --- check for deactivated pro plugin ---
-$plugins = wp_cache_get( 'plugins', 'plugins' );
+// 2.4.0.4: remove unnecessary second argument to wp_cache_get
+$plugins = wp_cache_get( 'plugins' );
 if ( !$plugins ) {
 	if ( function_exists( 'get_plugins' ) ) {
 		$plugins = get_plugins();
@@ -1453,8 +1469,17 @@ if ( !$plugins ) {
 if ( $plugins && is_array( $plugins ) && ( count( $plugins ) > 0 ) ) {
 	foreach ( $plugins as $slug => $plugin ) {
 		if ( strstr( $slug, 'radio-station-pro.php' ) ) {
-			$plan = 'premium';
-			break;
+			// 2.4.0.4: only set premium for upgrade version
+			if ( isset( $plugin['Name'] ) && strstr( $plugin['Name'], '(Premium)' ) ) {
+				$plan = 'premium';
+				break;
+			} else {
+				// 2.4.0.4: detect and force enable addon version
+				$plan = 'premium';
+				$has_addons = true;
+				$has_plans = false;
+				break;
+			}
 		}
 	}
 }
@@ -1501,13 +1526,13 @@ $settings = array(
 	// 2.4.0.1: turn on addons switch for Pro
 	// 2.4.0.3: turn on plans switch for Pro also
 	// 2.4.0.3: set Pro details and Upgrade links
+	// 2.4.0.4: change upgrade_link to -upgrade
 	'freemius_id'  => '4526',
 	'freemius_key' => 'pk_aaf375c4fb42e0b5b3831e0b8476b',
-	'hasplans'     => true,
-	// 'upgrade_link' => RADIO_STATION_PRO_URL . 'pricing/',
-	'upgrade_link' => add_query_arg( 'page', $slug . '-addons', admin_url( 'admin.php' ) ),
+	'hasplans'     => $has_plans,
+	'upgrade_link' => add_query_arg( 'page', $slug . '-upgrade', admin_url( 'admin.php' ) ),
 	'pro_link'     => RADIO_STATION_PRO_URL . 'pricing/',
-	'hasaddons'    => false,
+	'hasaddons'    => $has_addons,
 	'addons_link'  => add_query_arg( 'page', $slug . '-addons', admin_url( 'admin.php' ) ),
 	'plan'         => $plan,
 );
@@ -1605,7 +1630,7 @@ function radio_station_plugin_activation() {
 	// 2.3.3: added clear transients on (re)activation
 	// 2.3.3.9: just use clear cached data function
 	radio_station_clear_cached_data( false );
-	
+
 	// --- set welcome redirect transient ---
 	// TODO: check if handled by Freemius activation
 	// set_transient( 'radio_station_welcome', 1, 7 );
@@ -2262,7 +2287,7 @@ function radio_station_automatic_pages_content_set( $content ) {
 			}
 		}
 	}
-	
+
 	// --- languages archive page ---
 	// 2.3.3.9: added automatic display of language archive page
 	$language_archive_page = radio_station_get_setting( '' );
@@ -2421,7 +2446,7 @@ function radio_station_override_linked_show_data( $post, $post_type ) {
 					}
 				}
 			}
-		}	
+		}
 	}
 	return $post;
 }
@@ -2479,7 +2504,7 @@ function radio_station_override_content( $content ) {
 	$override = radio_station_get_show_override( $post->ID, 'show_content' );
 	if ( false !== $override ) {
 		$override = radio_station_override_linked_show_data( $post, RADIO_STATION_OVERRIDE_SLUG );
-		$content = $override->post_content;			
+		$content = $override->post_content;
 	}
 	add_filter( 'the_content', 'radio_station_override_content', 0 );
 	return $content;
@@ -2854,7 +2879,7 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 		if ( RADIO_STATION_OVERRIDE_SLUG == $post->post_type ) {
 			// 2.3.3.6: get next/previous Show for override date/time
 			// 2.3.3.9: modified to handle multiple override times
-			// 2.3.3.9: added check that schedule key is set 
+			// 2.3.3.9: added check that schedule key is set
 			$scheds = get_post_meta( $post->ID, 'show_override_sched', true );
 			if ( $scheds && is_array( $scheds ) ) {
 				if ( array_key_exists( 'date', $scheds ) ) {
@@ -3022,7 +3047,7 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 
 		// --- get more Shows related to this related Post ---
 		// 2.3.3.6: allow for multiple related posts
-		// 2.3.3.9: added 'i:' prefix to LIKE vlaue matches
+		// 2.3.3.9: added 'i:' prefix to LIKE value matches
 		global $wpdb;
 		$query = "SELECT post_id,meta_value FROM " . $wpdb->prefix . "postmeta"
 				. " WHERE meta_key = 'post_showblog_id' AND meta_value LIKE '%i:" . $related_shows[0] . "%'";
@@ -3468,13 +3493,10 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args, $user ) {
 
 	global $post, $wp_roles;
 
-	// --- get the current user ---
-	// 2.3.3.6: get user object from fourth argument instead
-	// $user = wp_get_current_user();
-
 	// --- check if super admin ---
+	// 2.3.3.6: get user object from fourth argument instead
 	// ? fix to not revoke edit caps from super admin ?
-	// (not implemented, as causing a connection reset error)
+	// (not implemented, as causing a connection reset error!)
 	// if ( function_exists( 'is_super_admin' ) && is_super_admin() ) {
 	//	return $allcaps;
 	// }
@@ -3485,11 +3507,16 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args, $user ) {
 		echo '<span style="display:none;">Cap Args: ' . print_r( $args, true ) . '</span>';
 	}
 
-	// --- check for editor
+	// --- check for editor role ---
 	// 2.3.3.6: check editor roles first separately
-	$editor_roles = array( 'administrator', 'editor', 'show-editor' );
+	// 2.4.0.4: only add WordPress editor role if on in settings
+	$editor_roles = array( 'administrator', 'show-editor' );
+	$editor_role_caps = radio_station_get_setting( 'add_editor_capabilities' );
+	if ( 'yes' == $editor_role_caps ) {
+		$editor_roles[] = 'editor';
+	}
 	foreach ( $editor_roles as $role ) {
-		if ( in_array( $role, $user->roles ) ) {
+	 	if ( in_array( $role, $user->roles ) ) {
 			return $allcaps;
 		}
 	}
@@ -3521,7 +3548,9 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args, $user ) {
 	// 2.3.3.6: preserve if user has edit_others_shows capability
 	foreach ( $edit_others_shows_roles as $role ) {
 		if ( in_array( $role, $user->roles ) ) {
-			return $allcaps;
+			// 2.4.0.4: do not automatically assume capability match
+			// return $allcaps;
+			$found = true;
 		}
 	}
 
@@ -3539,7 +3568,7 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args, $user ) {
 
 		// --- limit this to published shows ---
 		// 2.3.0: added object and property_exists check to be safe
-		if ( is_object( $post ) && property_exists( $post, 'post_type' ) && isset( $post->post_type ) ) {
+		if ( isset( $post ) && is_object( $post ) && property_exists( $post, 'post_type' ) && isset( $post->post_type ) ) {
 
 			// 2.3.0: removed is_admin check (so works with frontend edit show link)
 			// 2.3.0: moved check if show is published inside
@@ -3549,11 +3578,16 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args, $user ) {
 				$hosts = get_post_meta( $post->ID, 'show_user_list', true );
 				$producers = get_post_meta( $post->ID, 'show_producer_list', true );
 
+				// 2.3.0.4: convert possible (old) non-array values
 				if ( !$hosts || empty( $hosts ) ) {
 					$hosts = array();
+				} elseif ( !is_array( $hosts ) ) {
+					$hosts = array( $hosts );
 				}
 				if ( !$producers || empty( $producers ) ) {
 					$producers = array();
+				} elseif ( !is_array( $producers ) ) {
+					$producers = array( $producers );
 				}
 
 				// ---- revoke editing capability if not assigned to this show ---
@@ -3563,11 +3597,24 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args, $user ) {
 
 					// --- remove the edit_shows capability ---
 					$allcaps['edit_shows'] = false;
+					$allcaps['edit_others_shows'] = false;
+					if ( RADIO_STATION_DEBUG ) {
+						echo "Removed Edit Show Caps (" . $post->ID . ")";
+					}
 
 					// 2.3.0: move check if show is published inside
 					if ( 'publish' == $post->post_status ) {
 						$allcaps['edit_published_shows'] = false;
 					}
+				} else {
+					// 2.4.0.4: add edit others shows capability
+					// (fix for when not original show author)
+					$allcaps['edit_shows'] = true;
+					$allcaps['edit_others_shows'] = true;
+					if ( RADIO_STATION_DEBUG ) {
+						echo "Added Edit Show Caps (" . $post->ID . ")";
+					}
+
 				}
 			}
 		}
@@ -3652,5 +3699,17 @@ function radio_station_debug( $data, $echo = true, $file = false ) {
 		}
 		$file = RADIO_STATION_DIR . '/debug/' . $file;
 		error_log( $data, 3, $file );
+	}
+}
+
+// ---------------------
+// Freemius Object Debug
+// ---------------------
+// 2.4.0.4: added to debug freemius instance
+add_action( 'shutdown', 'radio_station_freemius_debug' );
+function radio_station_freemius_debug() {
+	if ( is_admin() && RADIO_STATION_DEBUG && current_user_can( 'manage_options' ) ) {
+		$instance = radio_station_freemius_instance();
+		echo '<span style="display:none;">Freemius Object: ' . print_r( $instance, true ) . '</span>';
 	}
 }

@@ -48,6 +48,7 @@ The following attributes are available for the shortcode:
 * *hide_past_shows* : Hide shows that are finished in the Schedule for Tabs view. 0 or 1. Default 0.
 * *divheight* : Set the height, in pixels, of the individual divs. For legacy 'divs' view only. Default 45.
 * *gridheight* : Set the width, in pixels, of the grid columns. For Pro 'grid' view only. Default 150.
+* 'time_spaced* : Enabled time spacing with background images. For Pro 'grid' view only. 0 or 1. Default 0.
 * *weeks* : Number of weeks to display in calendar. For Pro 'calendar' view only. Default 4.
 * *previous_weeks* : Number of past weeks to display in calendar. For Pro 'calendar' view only. Default 1.
 
@@ -211,6 +212,40 @@ The following attributes are available for this shortcode:
 * *show_desc* : Display Show Descriptions. 'none', 'full' or 'excerpt'. Default 'none'.
 
 [Demo Site Example Output](https://radiostationdemo.com/archive-shortcodes/languages-archive/)
+
+### [Pro] Hosts Archive Shortcode
+
+`[host-archive]` or `[hosts-archive]`
+
+* *description* : Profile description display. 'none', 'full' or 'excerpt'. Default 'excerpt'.
+* *view* : View option. 'grid' option. Default 0 (list)
+* *status* : Query for Host status. Default 'publish'.
+* *perpage* : Query for number of Hosts. Default -1 (all)
+* *offset* : Query for Host offset. Default '' (no offset)
+* *orderby* : Query to order Host display by. Default 'title'.
+* *order* : Query order for Hosts. Default 'ASC'.
+* *thumbnails* : Display profile image. 0 or 1. Default 0.
+* *social* : Display social profile icons. 0 or 1. Default 1.
+* *shows* : Display a list of Shows assigned to Host. 0 or 1. Default 1.
+
+[Demo Site Example Output](https://radiostationdemo.com/archive-shortcodes/hosts-archive/)
+
+### [Pro] Producers Archive Shortcode
+
+`[producer-archive]` or `[producers-archive]`
+
+* *description* : Profile description display. 'none', 'full' or 'excerpt'. Default 'excerpt'.
+* *view* : View option. 'grid' option. Default 0 (list)
+* *status* : Query for Producer status. Default 'publish'.
+* *perpage* : Query for number of Producers. Default -1 (all)
+* *offset* : Query for producer offset. Default '' (no offset)
+* *orderby* : Query to order Producer display by. Default 'title'.
+* *order* : Query order for Producers. Default 'ASC'.
+* *thumbnails* : Display profile image. 0 or 1. Default 0.
+* *social* : Display social profile icons. 0 or 1. Default 1.
+* *shows* : Display a list of Shows assigned to Producer. 0 or 1. Default 1.
+
+[Demo Site Example Output](https://radiostationdemo.com/archive-shortcodes/producers-archive/)
 
 ### Show Posts Archive Shortcode
 

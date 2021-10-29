@@ -149,7 +149,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			unset( $args['options'] );
 
 			// --- set plugin args and namespace ---
-			// 1.1.9: filter all arguments 
+			// 1.1.9: filter all arguments
 			$args = apply_filters( $args['namespace'] . '_args', $args );
 			$this->args = $args;
 			$this->namespace = $args['namespace'];
@@ -806,13 +806,13 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				$settings = call_user_func( $funcname, $settings );
 			}
 
-			// --- output new settings ---			
+			// --- output new settings ---
 			if ( $this->debug ) {
 				echo "<br><b>All New Settings:</b><br>";
 				print_r( $settings );
 				echo "<br><br>";
 			}
-				
+
 			if ( $settings && is_array( $settings ) ) {
 
 				// --- loop default keys to remove others ---
@@ -843,7 +843,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						}
 					}
 				}
-				
+
 
 				// --- update the plugin settings ---
 				$settings['savetime'] = time();
@@ -1159,11 +1159,11 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 			// --- AJAX readme viewer ---
 			add_action( 'wp_ajax_' . $namespace . '_readme_viewer', array( $this, 'readme_viewer' ) );
-			
+
 			// --- load Freemius (requires PHP 5.4+) ---
 			// 1.2.1: move Freemius loading to plugins_loaded hook
 			if ( version_compare( PHP_VERSION, '5.4.0' ) >= 0 ) {
-				add_action( 'plugins_loaded', array( $this, 'load_freemius' ) );
+				add_action( 'plugins_loaded', array( $this, 'load_freemius' ), 5 );
 			}
 		}
 
@@ -1345,10 +1345,10 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 		// ====================
 		public function load_freemius() {
 
-			// 1.2.1: no need to laod if not in admin area
+			// 1.2.1: no need to load if not in admin area
 			if ( !is_admin() ) {
-				return;
-			}
+			 	return;
+			}		
 
 			$args = $this->args;
 			$namespace = $this->namespace;
@@ -1357,7 +1357,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			if ( !isset( $args['freemius_id'] ) || !isset( $args['freemius_key'] ) ) {
 				return;
 			}
-
+			
 			// --- check for free / premium plan ---
 			// convert plan string value of 'free' or 'premium' to boolean premium switch
 			// TODO: check for active addons also ?
@@ -1451,8 +1451,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						'support'    => $args['support'],
 						'account'    => $args['account'],
 					),
-				);		
-				
+				);
+
 				// --- maybe add plugin submenu to parent menu ---
 				if ( isset( $args['parentmenu'] ) ) {
 					$settings['menu']['parent'] = array( 'slug' => $args['parentmenu'] );
@@ -1460,12 +1460,18 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 				// --- filter settings before initializing ---
 				$settings = apply_filters( 'freemius_init_settings_' . $args['namespace'], $settings );
+				if ( $this->debug ) {
+					echo '<span style="display:none;">Freemius Settings: ' . print_r( $settings, true ) . '</span>';
+				}
 				if ( !$settings || !is_array( $settings ) ) {
 					return;
 				}
 
 				// --- initialize Freemius now ---
 				$freemius = $GLOBALS[$namespace . '_freemius'] = fs_dynamic_init( $settings );
+				if ( $this->debug ) {
+					echo '<span style="display:none;">Freemius Object: ' . print_r( $freemius, true ) . '</span>';
+				}
 
 				// --- set plugin basename ---
 				// 1.0.1: set free / premium plugin basename
@@ -1475,7 +1481,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 				// --- add Freemius connect message filter ---
 				$this->freemius_connect();
-				
+
 				// --- fire Freemius loaded action ---
 				do_action( $args['namespace'] . '_loaded' );
 			}
@@ -1588,7 +1594,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 				// --- maybe add Pro upgrade link ---
 				if ( isset( $args['hasplans'] ) && $args['hasplans'] ) {
-				
+
 					// 1.2.1: add check if premium is already installed
 					if ( !isset( $args['plan'] ) || ( 'premium' != $args['plan'] ) ) {
 
@@ -1604,7 +1610,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						array_unshift( $links, $upgrade_link );
 
 						// --- external pro link ---
-						// 1.2.0: added separate pro details link 
+						// 1.2.0: added separate pro details link
 						if ( isset( $args['pro_link'] ) ) {
 							$pro_target = !strstr( $args['pro_link'], '/wp-admin/' ) ? ' target="_blank"' : '';
 							$pro_link = "<b><a href='" . esc_url( $args['pro_link'] ) . "'" . $pro_target . ">" . esc_html( __('Pro Details' ) ) . "</a></b>";
@@ -1615,16 +1621,14 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 				// --- maybe add Addons link ---
 				// 1.2.0: activated add-ons link
-				if ( isset( $args['hasaddons'] ) && $args['hasaddons'] ) {
+				// 1.2.2: remove duplication of addons link
+				if ( !isset( $args['hasaddons'] ) || !$args['hasaddons'] ) {
 					if ( isset( $args['addons_link'] ) ) {
 						$addons_url = $args['addons_link'];
 						$addons_target = !strstr( $addons_url, '/wp-admin/' ) ? ' target="_blank"' : '';
-					} else {
-						$addons_url = add_query_arg( 'page', $args['slug'] . '-addons', admin_url( 'admin.php' ) );
-						$addons_target = '';
+						$addons_link = "<a href='" . esc_url( $addons_url )."'" . $addons_target . ">" . esc_html( __( 'Add Ons' ) ) . "</a>";
+						array_unshift( $links, $addons_link );
 					}
-					$addons_link = "<a href='" . esc_url( $addons_url )."'" . $addons_target . ">" . esc_html( __( 'Add Ons' ) ) . "</a>";
-					array_unshift( $links, $addons_link );
 				}
 			}
 
@@ -1755,7 +1759,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// 1.1.9: add filter for plugin icon url
 			$icon_url = apply_filters( $namespace . '_settings_page_icon_url', $icon_url );
 			echo '<td>';
-			if ( $icon_url ) {				
+			if ( $icon_url ) {
 				echo '<img class="plugin-settings-page-icon" src="' . esc_url( $icon_url ) . '" width="128" height="128">';
 			}
 			echo '</td>';
@@ -1781,7 +1785,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// --- subtitle ---
 			// 1.1.9: added optional subtitle filter display
 			$subtitle = apply_filters( $namespace . '_settings_page_subtitle', '' );
-			if ( '' != $subtitle ) { 
+			if ( '' != $subtitle ) {
 				echo '<tr><td colspan="3" align="center">';
 				echo '<h4 class="plugins-settings-page-subtitle" style="font-size:14px; margin-top:0;">' . esc_html( $subtitle ) . '</h4>';
 				echo '</td></tr>';
@@ -2011,7 +2015,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			$defaults = $this->default_settings();
 			$settings = $this->get_settings( false );
 
-			// --- output saved settings ---			
+			// --- output saved settings ---
 			if ( $this->debug ) {
 				echo "<br><b>Saved Settings:</b><br>";
 				print_r( $settings );
@@ -3207,8 +3211,8 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // - added media library upload image field type
 // - added color picker and color picker alpha field types
 // - automatically remove unused settings tabs
-// - fix to text field attribute quoting 
-// - fix to not escape number step button function 
+// - fix to text field attribute quoting
+// - fix to not escape number step button function
 // - remove FILTER_VALIDATE_URL from URL saving (not working)
 
 // == 1.1.6 ==

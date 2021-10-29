@@ -2519,10 +2519,10 @@ function radio_station_player_control_styles( $instance ) {
 	// --- Volume Range Input and Container ---
 	// ref: http://danielstern.ca/range.css/#/
 	// ref: https://css-tricks.fcom/sliding-nightmare-understanding-range-input/
+	// 2.4.0.4: added no border style to range input (border added on some themes)
 	$css .= "/* Range Input */
-" . $container . " .rp-volume-controls input[type=range] {
-	margin: 0; background-color: transparent; vertical-align: middle; -webkit-appearance: none;
-}
+" . $container . " .rp-volume-controls input[type=range] {";
+	$css .= "margin: 0; background-color: transparent; vertical-align: middle; -webkit-appearance: none; border: none;}
 " . $container . " .rp-volume-controls input[type=range]:focus {outline: none; box-shadow: none;}
 " . $container . " .rp-volume-controls input[type=range]::-moz-focus-inner,
 " . $container . " .rp-volume-controls input[type=range]::-moz-focus-outer {outline: none; box-shadow: none;}" . PHP_EOL;

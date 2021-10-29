@@ -85,6 +85,10 @@
 // - Sanitize Input Value
 // - Get Meta Input Types
 // - Sanitize Shortcode Values
+// === Transient Caching ===
+// - Delete Prefixed Transients
+// - Clear Cached Data
+// - Clear Cache on Status Transitions
 // === Translations ===
 // - Translate Weekday
 // - Replace Weekdays
@@ -525,7 +529,7 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 				$title = $linked_show->post_title;
 			}
 		}
-	
+
 		// 2.3.3.9: get possible array of override shifts
 		$override_shifts = get_post_meta( $override['ID'], 'show_override_sched', true );
 		// 2.3.3.9: convert possible single override to array
@@ -533,7 +537,7 @@ function radio_station_get_overrides( $start_date = false, $end_date = false ) {
 			$override_shifts = array( $override_shifts );
 			update_post_meta( $override['ID'], 'show_override_sched', $override_shifts );
 		}
-		
+
 		if ( $override_shifts && is_array( $override_shifts ) && ( count( $override_shifts ) > 0 ) )  {
 
 			// 2.2.3.9: loop to add unique shift IDs and maybe resave
@@ -796,7 +800,7 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array() ) {
 		}
 
 	} elseif ( ( 'hosts' == $datatype ) || ( 'producers' == $datatype ) ) {
-		
+
 		// 2.3.3.9; added get host/producer profile posts
 		$user_ids = get_post_meta( $show_id, $metakey, true );
 		if ( !$user_ids ) {
@@ -918,37 +922,49 @@ function radio_station_get_show_data_meta( $show, $single = false ) {
 	$show_hosts = get_post_meta( $show->ID, 'show_user_list', true );
 	$show_producers = get_post_meta( $show->ID, 'show_producer_list', true );
 	$hosts = $producers = array();
-	if ( is_array( $show_hosts ) && ( count( $show_hosts ) > 0 ) ) {
-		foreach ( $show_hosts as $host ) {
-			if ( isset( $radio_station_data['user-' . $host] ) ) {
-				$user = $radio_station_data['user-' . $host];
-			} else {
-				$user = get_user_by( 'ID', $host );
-				$radio_station_data['user-' . $host] = $user;
-			}
-			// 2.3.3.9: added check user still exists
-			if ( $user ) {
-				$hosts[] = array(
-					'name'  => $user->display_name,
-					'url'   => radio_station_get_host_url( $host ),
-				);
+	if ( $show_hosts ) {
+		// 2.4.0.4: convert possible (old) non-array value
+		if ( !is_array( $show_hosts ) ) {
+			$show_hosts = array( $show_hosts );
+		}
+		if ( is_array( $show_hosts ) && ( count( $show_hosts ) > 0 ) ) {
+			foreach ( $show_hosts as $host ) {
+				if ( isset( $radio_station_data['user-' . $host] ) ) {
+					$user = $radio_station_data['user-' . $host];
+				} else {
+					$user = get_user_by( 'ID', $host );
+					$radio_station_data['user-' . $host] = $user;
+				}
+				// 2.3.3.9: added check user still exists
+				if ( $user ) {
+					$hosts[] = array(
+						'name'  => $user->display_name,
+						'url'   => radio_station_get_host_url( $host ),
+					);
+				}
 			}
 		}
 	}
-	if ( is_array( $show_producers ) && ( count( $show_producers ) > 0 ) ) {
-		foreach ( $show_producers as $producer ) {
-			if ( isset( $radio_station_data['user-' . $producer] ) ) {
-				$user = $radio_station_data['user-' . $producer];
-			} else {
-				$user = get_user_by( 'ID', $producer );
-				$radio_station_data['user-' . $producer] = $user;
-			}
-			// 2.3.3.9: added check user still exists
-			if ( $user ) {
-				$producers[] = array(
-					'name'  => $user->display_name,
-					'url'   => radio_station_get_producer_url( $producer ),
-				);
+	if ( $show_producers ) {
+		// 2.4.0.4: convert possible (old) non-array value
+		if ( !is_array( $show_producers ) ) {
+			$show_producers = array( $show_producers );
+		}
+		if ( is_array( $show_producers ) && ( count( $show_producers ) > 0 ) ) {
+			foreach ( $show_producers as $producer ) {
+				if ( isset( $radio_station_data['user-' . $producer] ) ) {
+					$user = $radio_station_data['user-' . $producer];
+				} else {
+					$user = get_user_by( 'ID', $producer );
+					$radio_station_data['user-' . $producer] = $user;
+				}
+				// 2.3.3.9: added check user still exists
+				if ( $user ) {
+					$producers[] = array(
+						'name'  => $user->display_name,
+						'url'   => radio_station_get_producer_url( $producer ),
+					);
+				}
 			}
 		}
 	}
@@ -1149,7 +1165,7 @@ function radio_station_get_override_data_meta( $override ) {
 			'avatar_url' => 'show_avatar',
 			// 'image_url' => 'show_thumbnail',
 		);
-	
+
 		// --- apply selected show data to override ---
 		foreach ( $fields as $key => $meta_key ) {
 			if ( isset( $show_fields[$meta_key] ) && $show_fields[$meta_key] ) {
@@ -1214,7 +1230,7 @@ function radio_station_get_show_override( $override_id, $meta_key ) {
 // -----------------------------
 // Get Linked Overrides for Show
 // -----------------------------
-// 2.3.3.9: added for getting linked show overrides 
+// 2.3.3.9: added for getting linked show overrides
 function radio_station_get_linked_overrides( $post_id ) {
 
 	// -- get show ID for override or show post ---
@@ -1234,7 +1250,7 @@ function radio_station_get_linked_overrides( $post_id ) {
 	if ( $results && is_array( $results ) && ( count( $results ) > 0 ) ) {
 		foreach ( $results as $result ) {
 			$override_id = $result['post_id'];
-			
+
 			// --- check for published post status ---
 			$query = "SELECT post_status FROM " . $wpdb->prefix . "posts WHERE ID = %d";
 			$query = $wpdb->prepare( $query, $override_id );
@@ -1242,7 +1258,7 @@ function radio_station_get_linked_overrides( $post_id ) {
 			if ( 'publish' == $status ) {
 				$override_ids[] = $override_id;
 			}
-		}	
+		}
 	}
 
 	// --- filter and return ---
@@ -1272,7 +1288,7 @@ function radio_station_get_linked_override_times( $post_id ) {
 			}
 		}
 	}
-	
+
 	// --- filter and return ---
 	$overrides = apply_filters( 'radio_station_linked_override_times', $overrides, $post_id );
 	return $overrides;
@@ -2293,7 +2309,7 @@ function radio_station_get_current_playlist() {
 			}
 		}
 	}
-	
+
 	$latest = array();
 	if ( isset( $queued[0] ) ) {
 		$latest = $queued[0];
@@ -4048,7 +4064,7 @@ function radio_station_get_schedule_weekdates( $weekdays, $time = false ) {
 	if ( defined( 'RADIO_STATION_USE_SERVER_TIMES' ) && RADIO_STATION_USE_SERVER_TIMES ) {
 		$today = date( 'l', $time );
 	} else {
-		// 2.3.3.9: fix to use radio_station_get_time 
+		// 2.3.3.9: fix to use radio_station_get_time
 		// $timezone = radio_station_get_timezone();
 		// $datetime = radio_station_get_date_time( '@' . $time, $timezone );
 		// $today = $datetime->format( 'l' );
@@ -4069,12 +4085,29 @@ function radio_station_get_schedule_weekdates( $weekdays, $time = false ) {
 		if ( defined( 'RADIO_STATION_USE_SERVER_TIMES' ) && RADIO_STATION_USE_SERVER_TIMES ) {
 			$weekdate = date( 'Y-m-d', $weekdate_time );
 		} else {
-			// 2.3.3.9: fix to use radio_station_get_time 
+			// 2.3.3.9: fix to use radio_station_get_time
 			// $weekdatetime = radio_station_get_date_time( '@' . $weekdate_time, $timezone );
 			// $weekdate = $weekdatetime->format( 'Y-m-d' );
 			$weekdate = radio_station_get_time( 'Y-m-d', $weekdate_time );
 		}
 		$weekdates[$weekday] = $weekdate;
+	}
+
+	// 2.4.0.4: check/fix for duplicate date crackliness (daylight saving?)
+	foreach ( $weekdates as $day => $date ) {
+		if ( isset( $prevdate ) && ( $prevdate == $date ) ) {
+			$weekdates[$day] = radio_station_get_next_date( $date );
+			$found = false;
+			foreach ( $weekdates as $k => $v ) {
+				if ( $found ) {
+					$weekdates[$k] = radio_station_get_next_date( $v );
+				}
+				if ( $k == $day ) {
+					$found = true;
+				}
+			}
+		}
+		$prevdate = $date;
 	}
 
 	if ( RADIO_STATION_DEBUG ) {
@@ -4348,7 +4381,7 @@ function radio_station_convert_show_shifts( $show ) {
 				'day'	 => $shift['day'],
 				'start'	 => $start_hour . ':' . $shift['start_min'],
 				'end'	 => $end_hour . ':' . $shift['end_min'],
-				'encore' => $encore,				
+				'encore' => $encore,
 			);
 		}
 		$show['schedule'] = $schedule;
@@ -4710,7 +4743,7 @@ function radio_station_sanitize_input( $prefix, $key ) {
 
 	} elseif ( in_array( $key, $types['checkbox'] ) ) {
 
-		// --- checkbox inputs ---	
+		// --- checkbox inputs ---
 		// 2.2.8: removed strict in_array checking
 		// 2.3.2: fix for unchecked boxes index warning
 		$value = '';
@@ -4742,7 +4775,7 @@ function radio_station_sanitize_input( $prefix, $key ) {
 
 	} elseif ( in_array( $key, $types['date'] ) ) {
 
-		// --- datepicker date field ---	
+		// --- datepicker date field ---
 		$date = $_POST[$postkey];
 		$parts = explode( '-', $date );
 		if ( 3 == count( $parts ) ) {
@@ -4750,7 +4783,7 @@ function radio_station_sanitize_input( $prefix, $key ) {
 				$value = $date;
 			}
 		}
-	
+
 	} elseif ( in_array( $key, $types['hour'] ) ) {
 
 		// --- hours (24) ---
@@ -4785,7 +4818,7 @@ function radio_station_sanitize_input( $prefix, $key ) {
 		}
 
 	}
-	
+
 	return $value;
 }
 
@@ -4844,17 +4877,17 @@ function radio_station_sanitize_playlist_entry( $entry ) {
 			} elseif ( in_array( $key, $numeric_keys ) ) {
 				$value = absint( $value );
 				if ( ( 'seconds' == $key ) && ( $value < 10 ) ) {
-				
+
 				}
 			} elseif ( 'status' == $key ) {
 				if ( $value != 'played' ) {
 					$value = 'queued';
 				}
-			}		
+			}
 			$entry[$entry_key] = $value;
-		}					
+		}
 	}
-	
+
 	return $entry;
 }
 
@@ -4940,11 +4973,11 @@ function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
 			'for_time'  => 'integer',
 		);
 	} elseif ( 'master-schedule' == $type ) {
-	
+
 		// --- master schedule attribute keys ---
 		// 2.3.3.9: added for AJAX schedule loading
 		$keys = array(
-	
+
 			// --- schedule display options ---
 			'time'              => 'text',
 			'show_times'        => 'boolean',
@@ -4965,13 +4998,13 @@ function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
 			'show_genres'       => 'boolean',
 			'show_encore'       => 'boolean',
 			'show_file'         => 'boolean',
-			
+
 			// --- view specific options ---
 			'divheight'         => 'integer',
 			'gridwidth'         => 'integer',
 			'hide_past_shows'   => 'boolean',
 			'image_position'    => 'text',
-	
+
 		);
 
 	}
@@ -4986,6 +5019,10 @@ function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
 	return $atts;
 }
 
+// -------------------------
+// === Transient Caching ===
+// -------------------------
+
 // --------------------------
 // Delete Prefixed Transients
 // --------------------------
@@ -4995,8 +5032,8 @@ function radio_station_delete_transients_with_prefix( $prefix ) {
 
 	// 2.3.3.9: add trailing underscore to prefix
 	$prefix = $wpdb->esc_like( '_transient_' . $prefix . '_' );
-	
-	// 2.3.3.9: fix to LIKE match 
+
+	// 2.3.3.9: fix to LIKE match
 	$query = "SELECT `option_name` FROM " . $wpdb->prefix . "options WHERE `option_name` LIKE '%" . $prefix . "%'";
 	$results = $wpdb->get_results( $query, ARRAY_A );
 	// if ( RADIO_STATION_DEBUG ) {
@@ -5008,7 +5045,7 @@ function radio_station_delete_transients_with_prefix( $prefix ) {
 	}
 
 	foreach ( $results as $option ) {
-		// 2.3.3.9: fix to replace malgunctioning ltrim 
+		// 2.3.3.9: fix to replace malgunctioning ltrim
 		// $key = ltrim( $option['option_name'], '_transient_' );
 		$key = substr( $option['option_name'], 11 );
 		delete_transient( $key );
@@ -5043,7 +5080,9 @@ function radio_station_clear_cached_data( $post_id = false, $post_type = false )
 	// --- maybe clear show meta data ---
 	if ( $post_id ) {
 		do_action( 'radio_station_clear_data', $post_type, $post_id );
-		do_action( 'radio_station_clear_data', $post_type . '_meta', $post_id );
+		if ( $post_type ) {
+			do_action( 'radio_station_clear_data', $post_type . '_meta', $post_id );
+		}
 	}
 
 	// --- maybe send directory ping ---
@@ -5055,6 +5094,21 @@ function radio_station_clear_cached_data( $post_id = false, $post_type = false )
 	// 2.3.2: added for data API use
 	update_option( 'radio_station_schedule_updated', time() );
 
+}
+
+// ---------------------------------
+// Clear Cache on Status Transitions
+// ---------------------------------
+// 2.4.0.4: clear show and override caches on post status changes
+add_action( 'transition_post_status', 'radio_station_clear_cache_on_transitions', 10, 3 );
+function radio_station_clear_cache_on_transitions( $new_status, $old_status, $post ) {
+	if ( $new_status == $old_status ) {
+		return;
+	}
+	$post_types = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG );
+	if ( in_array( $post->post_type, $post_types ) ) {
+		radio_station_clear_cached_data( $post->ID, $post->post_type );
+	}
 }
 
 

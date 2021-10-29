@@ -57,8 +57,10 @@ function radio_page_responsive() {
 		if (info && desc) {
 			descheight = info.offsetHeight - 30;
 			if (about) {descheight = descheight - about.offsetHeight;}
-			if (descheight < desc.style.minHeight) {desc.style.maxHeight = 'none';}
-			else {desc.style.maxHeight = descheight+'px';}
+			if (descheight > 30) {
+				if (descheight < desc.style.minHeight) {desc.style.maxHeight = '';}
+				else {desc.style.maxHeight = descheight+'px';}
+			} else {desc.style.maxHeight = '';}
 		}
 	}
 
@@ -89,7 +91,7 @@ function radio_show_desc(moreless) {
         document.getElementById('show-desc-less').style.display = 'inline-block';
     }
     if (moreless == 'less') {
-        if (typeof jQuery == 'function') {jQuery('.show-description').removeClass('expanded');}
+        if (typeof jQuery == 'function') {jQuery('#'+prefix+'-description').removeClass('expanded');}
         else {document.getElementById(prefix+'-description').classList.remove('expanded');}
         document.getElementById('show-more-overlay').style.display = 'block';
         document.getElementById('show-desc-less').style.display = 'none';
