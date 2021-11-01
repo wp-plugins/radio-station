@@ -3493,6 +3493,11 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args, $user ) {
 
 	global $post, $wp_roles;
 
+	// 2.4.0.4.1: fix for early capability check plugin conflict
+	if ( !function_exists( 'radio_station_get_setting' ) ) {
+		return $allcaps;
+	}
+
 	// --- check if super admin ---
 	// 2.3.3.6: get user object from fourth argument instead
 	// ? fix to not revoke edit caps from super admin ?
