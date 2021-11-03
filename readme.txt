@@ -4,7 +4,7 @@ Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
 Tested up to: 5.8.1
-Stable tag: 2.4.0.4
+Stable tag: 2.4.0.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -217,6 +217,9 @@ You can now visit your site to make sure nothing is broken. If you experience is
 8. Show Conflict Display
 
 == Changelog ==
+
+= 2.4.0.5 =
+* Fixed: plugin conflicts causing fatal errors
 
 = 2.4.0.4 =
 * Improved: clear cache on show/override status transitions
