@@ -2,7 +2,7 @@
 
 ***
 
-For live display examples see [Radio Station Demo Site](http://radiostationdemo.com).
+For live display examples see [Radio Station Demo Site](http://demo.radiostation.pro).
 
 ## Styling
 

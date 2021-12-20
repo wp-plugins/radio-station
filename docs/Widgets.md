@@ -6,7 +6,7 @@ You can add any of the Radio Station Plugin Widgets to your site's sidebar widge
 
 Note Widgets are displayed via their corresponding Shortcodes to prevent code duplication and maintain display consistency. (The selected Widget options are simply converted into Shortcode attributes.) This also means if you want to display a Widget within a custom Template, you can use the corresponding shortcode in your template file. eg. `do_shortcode('[current-show]');`
 
-[Radio Station Demo Site](http://radiostationdemo.com)
+[Radio Station Demo Site](http://demo.radiostation.pro)
 
 
 ## Radio Player Widget
@@ -45,7 +45,7 @@ The following attributes are available for this shortcode:
 
 Example: `[current-show title="Now On-Air" show_avatar="1" show_link="1" show_sched="1"]`
 
-[Demo Site Example Output](https://radiostationdemo.com/extra-shortcodes/current-show-widget/)
+[Demo Site Example Output](https://demo.radiostation.pro/extra-shortcodes/current-show-widget/)
 
 
 ## Upcoming Shows Widget
@@ -72,7 +72,7 @@ The following attributes are available for this shortcode:
 
 Example: `[upcoming-shows title="Coming Up On-Air" show_avatar="1" show_link="1" limit="3" time="12" schow_sched="1"]`
 
-[Demo Site Example Output](https://radiostationdemo.com/extra-shortcodes/upcoming-shows-widget/)
+[Demo Site Example Output](https://demo.radiostation.pro/extra-shortcodes/upcoming-shows-widget/)
 
 
 ## Current Playlist Widget
@@ -94,7 +94,7 @@ The following attributes are available for this shortcode:
 
 Example: `[current-playlist title="Current Song" artist="1" song="1" album="1" label="1" comments="0"]`
 
-[Demo Site Example Output](https://radiostationdemo.com/extra-shortcodes/current-playlist-widget/)
+[Demo Site Example Output](https://demo.radiostation.pro/extra-shortcodes/current-playlist-widget/)
 
 
 ## Radio Clock Widget

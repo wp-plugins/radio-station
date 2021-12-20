@@ -4,7 +4,7 @@
 
 Note if you want to display a Shortcode within a custom Template, you can use the WordPress `do_shortcode` function. eg. `do_shortcode('[master-schedule]');`
 
-Shortcode Output Examples can be seen on the [Radio Station Demo Site](http://radiostationdemo.com)
+Shortcode Output Examples can be seen on the [Radio Station Demo Site](http://demo.radiostation.pro)
 
 
 ## Master Schedule
@@ -13,13 +13,13 @@ Shortcode Output Examples can be seen on the [Radio Station Demo Site](http://ra
 
 Use the shortcode `[master-schedule]` on any page. This will generate a full-page schedule in one of five Views: 
 
-* [Table](https://radiostationdemo.com/master-schedule/table-view/) (default) - responsive program in table form
-* [Tabbed](https://radiostationdemo.com/master-schedule/tabbed-view/) - responsive styled list view with day selection tabs
-* [List](https://radiostationdemo.com/master-schedule/list-view/) - unstyled plain list view for custom development use
-* [Divs](https://radiostationdemo.com/master-schedule/divs-view/) - (deprecated - display issues) legacy unstyled div-based view 
-* [Legacy](https://radiostationdemo.com/master-schedule/legacy-view/) - (deprecated) legacy table view
-* [Grid](https://radiostationdemo.com/master-schedule/grid-view/) - [Pro] extra grid style view available in Pro version
-* [Calendar](https://radiostationdemo.com/master-schedule/calendar-view/) - [Pro] extra calendar style view available in Pro version
+* [Table](https://demo.radiostation.pro/master-schedule/table-view/) (default) - responsive program in table form
+* [Tabbed](https://demo.radiostation.pro/master-schedule/tabbed-view/) - responsive styled list view with day selection tabs
+* [List](https://demo.radiostation.pro/master-schedule/list-view/) - unstyled plain list view for custom development use
+* [Divs](https://demo.radiostation.pro/master-schedule/divs-view/) - (deprecated - display issues) legacy unstyled div-based view 
+* [Legacy](https://demo.radiostation.pro/master-schedule/legacy-view/) - (deprecated) legacy table view
+* [Grid](https://demo.radiostation.pro/master-schedule/grid-view/) - [Pro] extra grid style view available in Pro version
+* [Calendar](https://demo.radiostation.pro/master-schedule/calendar-view/) - [Pro] extra calendar style view available in Pro version
 
 The above View names are linked to examples on the Demo Site.
 
@@ -71,7 +71,7 @@ function my_custom_multiview_attributes( $atts ) {
 }
 ```
 
-[Demo Site Example Output](https://radiostationdemo.com/master-schedule/multiple-view-switching/)
+[Demo Site Example Output](https://demo.radiostation.pro/master-schedule/multiple-view-switching/)
 
 
 #### Radio Timezone Shortcode
@@ -122,7 +122,7 @@ The following attributes are available for this shortcode:
 * *thumbnails* : Display Show Featured image if no Show Avatar. 0 or 1. Default 0.
 * *with_shifts* : Only display Shows with active Shifts. 0 or 1. Default 0.
 
-[Demo Site Example Output](https://radiostationdemo.com/archive-shortcodes/shows-archive/)
+[Demo Site Example Output](https://demo.radiostation.pro/archive-shortcodes/shows-archive/)
 
 ### Overrides Archive Shortcode
 
@@ -145,7 +145,7 @@ The following attributes are available for this shortcode:
 * *thumbnails* : Display Override Featured image if no Overide Avatar. 0 or 1. Default 0.
 * *with_dates* : Only display Shows with Date set. 0 or 1. Default 0.
 
-[Demo Site Example Output](https://radiostationdemo.com/archive-shortcodes/overrides-archive/)
+[Demo Site Example Output](https://demo.radiostation.pro/archive-shortcodes/overrides-archive/)
 
 ### Playlists Archive Shortcode
 
@@ -163,7 +163,7 @@ The following attributes are available for this shortcode:
 * *orderby* : Query to order Playlists display by. Default 'title'.
 * *order* : Query order for Playlists. Default 'ASC'.
 
-[Demo Site Example Output](https://radiostationdemo.com/archive-shortcodes/playlists-archive/)
+[Demo Site Example Output](https://demo.radiostation.pro/archive-shortcodes/playlists-archive/)
 
 ### Genres Archive Shortcode
 
@@ -188,7 +188,7 @@ The following attributes are available for this shortcode:
 * *avatar_width* : * *avatar_width* : Set a width style in pixels for Show Avatars. Default is 75.
 * *show_desc* : Display Show Descriptions. 'none', 'full' or 'excerpt'. Default 'none'.
 
-[Demo Site Example Output](https://radiostationdemo.com/archive-shortcodes/genres-archive/)
+[Demo Site Example Output](https://demo.radiostation.pro/archive-shortcodes/genres-archive/)
 
 ### Language Archive Shortcode
 
@@ -211,13 +211,13 @@ The following attributes are available for this shortcode:
 * *avatar_width* : * *avatar_width* : Set a width style in pixels for Show Avatars. Default is 75.
 * *show_desc* : Display Show Descriptions. 'none', 'full' or 'excerpt'. Default 'none'.
 
-[Demo Site Example Output](https://radiostationdemo.com/archive-shortcodes/languages-archive/)
+[Demo Site Example Output](https://demo.radiostation.pro/archive-shortcodes/languages-archive/)
 
 ### [Pro] Hosts Archive Shortcode
 
 `[host-archive]` or `[hosts-archive]`
 
-* *description* : Profile description display. 'none', 'full' or 'excerpt'. Default 'excerpt'.
+* *content* : Profile description display. 'none', 'full' or 'excerpt'. Default 'excerpt'.
 * *view* : View option. 'grid' option. Default 0 (list)
 * *status* : Query for Host status. Default 'publish'.
 * *perpage* : Query for number of Hosts. Default -1 (all)
@@ -228,13 +228,13 @@ The following attributes are available for this shortcode:
 * *social* : Display social profile icons. 0 or 1. Default 1.
 * *shows* : Display a list of Shows assigned to Host. 0 or 1. Default 1.
 
-[Demo Site Example Output](https://radiostationdemo.com/archive-shortcodes/hosts-archive/)
+[Demo Site Example Output](https://demo.radiostation.pro/archive-shortcodes/hosts-archive/)
 
 ### [Pro] Producers Archive Shortcode
 
 `[producer-archive]` or `[producers-archive]`
 
-* *description* : Profile description display. 'none', 'full' or 'excerpt'. Default 'excerpt'.
+* *content* : Profile description display. 'none', 'full' or 'excerpt'. Default 'excerpt'.
 * *view* : View option. 'grid' option. Default 0 (list)
 * *status* : Query for Producer status. Default 'publish'.
 * *perpage* : Query for number of Producers. Default -1 (all)
@@ -245,7 +245,7 @@ The following attributes are available for this shortcode:
 * *social* : Display social profile icons. 0 or 1. Default 1.
 * *shows* : Display a list of Shows assigned to Producer. 0 or 1. Default 1.
 
-[Demo Site Example Output](https://radiostationdemo.com/archive-shortcodes/producers-archive/)
+[Demo Site Example Output](https://demo.radiostation.pro/archive-shortcodes/producers-archive/)
 
 ### Show Posts Archive Shortcode
 
@@ -259,7 +259,7 @@ The following attributes are available for this shortcode:
 * *thumbnails* : Display Show Post Thumbnails. 0 or 1. Default 1.
 * *pagination* : Paginate Show Post Display. 0 or 1. Default 1.
 
-[Demo Site Example Output](https://radiostationdemo.com/archive-shortcodes/show-posts-archive/)
+[Demo Site Example Output](https://demo.radiostation.pro/archive-shortcodes/show-posts-archive/)
 
 ### Show Playlists Archive Shortcode
 
@@ -272,7 +272,7 @@ The following attributes are available for this shortcode:
 * *content* : Playlist Content display. 'none', 'full' or 'excerpt. Default 'excerpt'.
 * *pagination* : Paginate Show Post Display. 0 or 1. Default 1.
 
-[Demo Site Example Output](https://radiostationdemo.com/archive-shortcodes/show-playlists-archive/)
+[Demo Site Example Output](https://demo.radiostation.pro/archive-shortcodes/show-playlists-archive/)
 
 ### [Pro] Show Episodes Archive Shortcode
 

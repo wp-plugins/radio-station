@@ -40,7 +40,7 @@ The following attributes are available for this shortcode:
 * *image* : Player/Station Image. URL (recommended size 256x256). Default none.
 * *volume* : Initial Player Volume. 0-100. Default: 77
 
-[Demo Site Example Output](https://radiostationdemo.com/player-shortcode/)
+[Demo Site Example Output](https://demo.radiostation.pro/player-shortcode/)
 
 
 #### Shortcode in Templates
