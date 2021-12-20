@@ -5948,11 +5948,16 @@ function radio_station_post_save_data( $post_id ) {
 add_action( 'quick_edit_custom_box', 'radio_station_quick_edit_post', 10, 2 );
 function radio_station_quick_edit_post( $column_name, $post_type ) {
 
-	global $post;
+	global $post, $radio_station_data;
 	$stored_post = $post;
 
 	// 2.3.3.5: added fix for post type context
 	if ( $post_type != 'post' ) {
+		return;
+	}
+
+	// 2.4.0.6: add fix for duplicate related show box
+	if ( isset( $radio_station_data['related-post-quick-edit'] ) ) {
 		return;
 	}
 
@@ -5999,6 +6004,9 @@ function radio_station_quick_edit_post( $column_name, $post_type ) {
 
 	// 2.3.3.6: restore stored post object
 	$post = $stored_post;
+	
+	// 2.4.0.6: add fix for duplicate related show box
+	$radio_station_data['related-post-quick-edit'] = true;
 }
 
 // ----------------------------------
