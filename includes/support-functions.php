@@ -1468,6 +1468,10 @@ function radio_station_get_current_schedule( $time = false, $weekstart = false )
 										}
 
 										if ( $day == $debugday ) {
+											// 2.4.0.6: fix to undefined variable warning
+											if ( !isset( $debugshifts ) ) {
+													$debugshifts = '';
+											}
 											$debugshifts .= $day . ' Show from ' . $shift['start'] . ': ' . $start_time . ' to ' . $shift['end'] . ': ' . $end_time . PHP_EOL;
 											$debugshifts .= $day . ' Override from ' . $override['start'] . ': ' . $override_start_time . ' to ' . $override['end'] . ': ' . $override_end_time . PHP_EOL;
 										}
