@@ -109,6 +109,7 @@ Note for ease of use either the singular or plural version of each archive short
 The following attributes are available for this shortcode:
 
 * *description* : Show description display. 'none', 'full' or 'excerpt'. Default 'excerpt'.
+* *view* : Display view option. 'list' or 'grid' option. Default 'list'.
 * *hide_empty* : Only display if Shows are found. 0 or 1. Default 0.
 * *time* : Display time format you with to use.  Valid values are 12 and 24. Default is the Plugin Setting.
 * *genre* : Genres to display (ID or slug). Separate multiple values with commas. Default empty (all)
@@ -131,6 +132,7 @@ The following attributes are available for this shortcode:
 The following attributes are available for this shortcode:
 
 * *description* : Override description display. 'none', 'full' or 'excerpt'. Default 'excerpt'.
+* *view* : Display view option. 'list' or 'grid' option. Default 'list'.
 * *hide_empty* : Only display if Overides are found. 0 or 1. Default 0.
 * *show_dates* : Display the Schedule Override dates and start/end times. 0 or 1. Default 1.
 * *time* : Display time format you with to use.  Valid values are 12 and 24. Default is the Plugin Setting.
@@ -154,6 +156,7 @@ The following attributes are available for this shortcode:
 The following attributes are available for this shortcode:
 
 * *description* : Playlist description display. 'none', 'full' or 'excerpt'. Default 'excerpt'.
+* *view* : Display view option. 'list' or 'grid' option. Default 'list'.
 * *hide_empty* : Only display if Playlists are found. 0 or 1. Default 0.
 * *genre* : Genres to display (ID or slug). Separate multiple values with commas. Default empty (all)
 * *language* : Languages to display (ID or slug). Separate multiple values with commas. Default empty (all)
@@ -217,8 +220,8 @@ The following attributes are available for this shortcode:
 
 `[host-archive]` or `[hosts-archive]`
 
-* *content* : Profile description display. 'none', 'full' or 'excerpt'. Default 'excerpt'.
-* *view* : View option. 'grid' option. Default 0 (list)
+* *description* : Profile description display. 'none', 'full' or 'excerpt'. Default 'excerpt', default 'none' for grid view.
+* *view* : Display view option. 'list' or 'grid' option. Default 'list'.
 * *status* : Query for Host status. Default 'publish'.
 * *perpage* : Query for number of Hosts. Default -1 (all)
 * *offset* : Query for Host offset. Default '' (no offset)
@@ -234,8 +237,8 @@ The following attributes are available for this shortcode:
 
 `[producer-archive]` or `[producers-archive]`
 
-* *content* : Profile description display. 'none', 'full' or 'excerpt'. Default 'excerpt'.
-* *view* : View option. 'grid' option. Default 0 (list)
+* *description* : Profile description display. 'none', 'full' or 'excerpt'. Default 'excerpt', default 'none' for grid view.
+* *view* : Display view option. 'list' or 'grid' option. Default 'list'.
 * *status* : Query for Producer status. Default 'publish'.
 * *perpage* : Query for number of Producers. Default -1 (all)
 * *offset* : Query for producer offset. Default '' (no offset)
