@@ -218,6 +218,12 @@ You can now visit your site to make sure nothing is broken. If you experience is
 
 == Changelog ==
 
+= 2.4.0.6 =
+* Updated: documentation links to new demo site address
+* Fixed: remove duplicate Related Show box in Post Quick Edit
+* Fixed: multiple attributes for automatic pages shortcodes
+* Fixed: undefined warning for debugshifts
+
 = 2.4.0.5 =
 * Fixed: plugin conflicts causing fatal errors
 

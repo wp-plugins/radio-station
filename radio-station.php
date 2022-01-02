@@ -1213,6 +1213,32 @@ $options = array(
 	//	'section' => 'archives',
 	// ),
 
+	// --- Teams Archive Page ---
+	// 2.4.0.6: added team archive page
+	'team_archive_page' => array(
+		'label'   => __( 'Team Archive Page', 'radio-station' ),
+		'type'    => 'select',
+		'options' => 'PAGEID',
+		'default' => '',
+		'helper'  => __( 'Select the Page for displaying the Team archive list.', 'radio-station' ),
+		'tab'     => 'pages',
+		'section' => 'archives',
+		'pro'     => true,
+	),
+
+	// --- Automatic Display ---
+	// 2.4.0.6: added teams archive automatic page
+	'team_archive_auto' => array(
+		'label'   => __( 'Automatic Display', 'radio-station' ),
+		'type'    => 'checkbox',
+		'value'   => 'yes',
+		'default' => 'yes',
+		'helper'  => __( 'Replaces selected page content with default Team Archive. Alternatively customize display using the shortcode:', 'radio-station' ) . ' [teams-archive]',
+		'tab'     => 'pages',
+		'section' => 'archives',
+		'pro'     => true,
+	),
+
 	// === Single Templates ===
 
 	// --- Templates Change Note ---
@@ -2163,6 +2189,7 @@ function radio_station_email_address( $email, $post_id ) {
 // 2.3.0: standalone filter for automatic page content
 // 2.3.1: re-add filter so the_content can be processed multiple times
 // 2.3.3.6: set automatic content early and clear existing content
+// 2.4.0.6: fix to concatenate multiple atts values from filtering
 add_filter( 'the_content', 'radio_station_automatic_pages_content_set', 1 );
 function radio_station_automatic_pages_content_set( $content ) {
 
@@ -2184,7 +2211,8 @@ function radio_station_automatic_pages_content_set( $content ) {
 				$atts_string = '';
 				if ( is_array( $atts ) && ( count( $atts ) > 0 ) ) {
 					foreach ( $atts as $key => $value ) {
-						$atts_string = ' ' . $key . '="' . $value . '"';
+						// 2.4.0.6: fix to append multiple atts values
+						$atts_string .= ' ' . $key . '="' . $value . '"';
 					}
 				}
 				$shortcode = '[master-schedule' . $atts_string . ']';
@@ -2208,7 +2236,8 @@ function radio_station_automatic_pages_content_set( $content ) {
 				$atts_string = '';
 				if ( is_array( $atts ) && ( count( $atts ) > 0 ) ) {
 					foreach ( $atts as $key => $value ) {
-						$atts_string = ' ' . $key . '="' . $value . '"';
+						// 2.4.0.6: fix to append multiple atts values
+						$atts_string .= ' ' . $key . '="' . $value . '"';
 					}
 				}
 				$shortcode = '[shows-archive' . $atts_string . ']';
@@ -2232,7 +2261,8 @@ function radio_station_automatic_pages_content_set( $content ) {
 				$atts_string = '';
 				if ( is_array( $atts ) && ( count( $atts ) > 0 ) ) {
 					foreach ( $atts as $key => $value ) {
-						$atts_string = ' ' . $key . '="' . $value . '"';
+						// 2.4.0.6: fix to append multiple atts values
+						$atts_string .= ' ' . $key . '="' . $value . '"';
 					}
 				}
 				$shortcode = '[overrides-archive' . $atts_string . ']';
@@ -2256,7 +2286,8 @@ function radio_station_automatic_pages_content_set( $content ) {
 				$atts_string = '';
 				if ( is_array( $atts ) && ( count( $atts ) > 0 ) ) {
 					foreach ( $atts as $key => $value ) {
-						$atts_string = ' ' . $key . '="' . $value . '"';
+						// 2.4.0.6: fix to append multiple atts values
+						$atts_string .= ' ' . $key . '="' . $value . '"';
 					}
 				}
 				$shortcode = '[playlists-archive' . $atts_string . ']';
@@ -2280,7 +2311,8 @@ function radio_station_automatic_pages_content_set( $content ) {
 				$atts_string = '';
 				if ( is_array( $atts ) && ( count( $atts ) > 0 ) ) {
 					foreach ( $atts as $key => $value ) {
-						$atts_string = ' ' . $key . '="' . $value . '"';
+						// 2.4.0.6: fix to append multiple atts values
+						$atts_string .= ' ' . $key . '="' . $value . '"';
 					}
 				}
 				$shortcode = '[genres-archive' . $atts_string. ']';
@@ -2304,7 +2336,8 @@ function radio_station_automatic_pages_content_set( $content ) {
 				$atts_string = '';
 				if ( is_array( $atts ) && ( count( $atts ) > 0 ) ) {
 					foreach ( $atts as $key => $value ) {
-						$atts_string = ' ' . $key . '="' . $value . '"';
+						// 2.4.0.6: fix to append multiple atts values
+						$atts_string .= ' ' . $key . '="' . $value . '"';
 					}
 				}
 				$shortcode = '[languages-archive' . $atts_string. ']';
@@ -2314,6 +2347,9 @@ function radio_station_automatic_pages_content_set( $content ) {
 
 	// 2.3.3.6: moved out to reduce repetitive code
 	if ( isset( $shortcode ) ) {
+		if ( RADIO_STATION_DEBUG ) {
+			echo '<span style="display:none;">Automatic Content Shortcode: ' . $shortcode . '</span>';
+		}
 		remove_filter( 'the_content', 'radio_station_automatic_pages_content_set', 1 );
 		remove_filter( 'the_content', 'radio_station_automatic_pages_content_get', 11 );
 		$radio_station_data['automatic_content'] = do_shortcode( $shortcode );
