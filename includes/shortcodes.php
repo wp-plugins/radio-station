@@ -271,7 +271,7 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
 	// --- merge defaults with passed attributes ---
 	// 2.3.3.9: add atts for specific posts
 	// 2.4.0.4: added optional view attribute
-	// 2.4.1.8: change default view value to list
+	// 2.4.0.6: change default view value to list
 	$defaults = array(
 		// --- shortcode display ----
 		'description'  => 'excerpt',
@@ -306,7 +306,7 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
 		'playlist'     => false,
 	);
 
-	// 2.4.1.8: change default description value for grid view
+	// 2.4.0.6: change default description value for grid view
 	if ( isset( $atts['view'] ) && ( 'grid' == $atts['view'] ) ) {
 		$defaults['description'] = 'none';
 	}
@@ -756,7 +756,7 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
 
 			// --- description ---
 			// 2.4.0.4: remove description for grid view
-			// 2.4.1.8: set different grid default earlier instead
+			// 2.4.0.6: set different grid default earlier instead
 			if ( 'none' == $atts['description'] ) {
 				$info['description'] = '';
 			} elseif ( 'full' == $atts['description'] ) {

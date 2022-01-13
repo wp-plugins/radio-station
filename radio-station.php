@@ -519,7 +519,7 @@ $options = array(
 
 	// === Player Colours ===
 
-	// --- [Pro] Playing Highlight Color ---
+	// --- [Pro/Player] Playing Highlight Color ---
 	'player_playing_color'        => array(
 		'type'    => 'color',
 		'label'   => __( 'Playing Icon Highlight Color', 'radio-station' ),
@@ -530,7 +530,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro] Control Icons Highlight Color ---
+	// --- [Pro/Player] Control Icons Highlight Color ---
 	'player_buttons_color'        => array(
 		'type'    => 'color',
 		'label'   => __( 'Control Icons Highlight Color', 'radio-station' ),
@@ -541,7 +541,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro] Volume Knob Color ---
+	// --- [Pro/Player] Volume Knob Color ---
 	'player_thumb_color'        => array(
 		'type'    => 'color',
 		'label'   => __( 'Volume Knob Color', 'radio-station' ),
@@ -552,7 +552,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro] Volume Track Color ---
+	// --- [Pro/Player] Volume Track Color ---
 	'player_range_color'        => array(
 		'type'    => 'coloralpha',
 		'label'   => __( 'Volume Track Color', 'radio-station' ),
@@ -591,7 +591,7 @@ $options = array(
 		'pro'     => false,
 	),
 
-	// --- [Pro] Player Autoresume ---
+	// --- [Pro/Player] Player Autoresume ---
 	'player_autoresume' => array(
 		'type'    => 'checkbox',
 		'label'   => __( 'Autoresume Playback', 'radio-station' ),
@@ -625,10 +625,9 @@ $options = array(
 			     . ' ' . __( 'You can override these in specific Player Widgets.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'bar',
-		// 'pro'  => true,
 	),
 
-	// --- [Pro] Sitewide Player Bar ---
+	// --- [Pro/Player] Sitewide Player Bar ---
 	'player_bar'        => array(
 		'type'    => 'select',
 		'label'   => __( 'Sitewide Player Bar', 'radio-station' ),
@@ -644,7 +643,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro] Player Bar Height ---
+	// --- [Pro/Player] Player Bar Height ---
 	'player_bar_height'        => array(
 		'type'    => 'number',
 		'min'     => 40,
@@ -658,7 +657,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro] Fade In Player Bar ---
+	// --- [Pro/Player] Fade In Player Bar ---
 	'player_bar_fadein'        => array(
 		'type'    => 'number',
 		'label'   => __( 'Fade In Player Bar', 'radio-station' ),
@@ -672,7 +671,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro] Continuous Playback ---
+	// --- [Pro/Player] Continuous Playback ---
 	// 2.4.0.1: fix for missing value field
 	'player_bar_continuous' => array(
 		'type'    => 'checkbox',
@@ -685,7 +684,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro] Player Page Fade ---
+	// --- [Pro/Player] Player Page Fade ---
 	'player_bar_pagefade' => array(
 		'type'    => 'number',
 		'label'   => __( 'Page Fade Time', 'radio-station' ),
@@ -699,7 +698,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro] Page Load Timeout ---
+	// --- [Pro/Player] Page Load Timeout ---
 	// 2.4.0.3: add page load timeout option
 	'player_bar_timeout' => array(
 		'type'    => 'number',
@@ -714,7 +713,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro] Bar Player Text Color ---
+	// --- [Pro/Player] Bar Player Text Color ---
 	'player_bar_text'        => array(
 		'type'    => 'color',
 		'label'   => __( 'Bar Player Text Color', 'radio-station' ),
@@ -725,7 +724,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro] Bar Player Background Color ---
+	// --- [Pro/Player] Bar Player Background Color ---
 	'player_bar_background'        => array(
 		'type'    => 'coloralpha',
 		'label'   => __( 'Bar Player Background Color', 'radio-station' ),
@@ -736,7 +735,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro] Display Current Show ---
+	// --- [Pro/Player] Display Current Show ---
 	// 2.4.0.3: added for current show display
 	'player_bar_currentshow'     => array(
 		'type'    => 'checkbox',
@@ -749,7 +748,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro] Display Metadata ---
+	// --- [Pro/Player] Display Metadata ---
 	// 2.4.0.3: added for now playing metadata display
 	'player_bar_nowplaying'     => array(
 		'type'    => 'checkbox',
@@ -762,7 +761,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- Metadata URL ---
+	// --- [Pro/Player] Metadata URL ---
 	// 2.4.0.3: added for alternative stream metadata URL
 	'player_bar_metadata'     => array(
 		'type'    => 'text',
@@ -833,7 +832,7 @@ $options = array(
 		'section' => 'schedule',
 	),
 
-	// --- [Pro] Schedule Switcher ---
+	// --- [Pro/Plus] Schedule Switcher ---
 	'schedule_switcher'   => array(
 		'type'    => 'checkbox',
 		'label'   => __( 'View Switching', 'radio-station' ),
@@ -845,7 +844,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro] Available Views ---
+	// --- [Pro/Plus] Available Views ---
 	// 2.3.2: added additional views option
 	'schedule_views'      => array(
 		'type'    => 'multicheck',
@@ -866,7 +865,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro] Time Spaced Grid View ---
+	// --- [Pro/Plus] Time Spaced Grid View ---
 	// 2.4.0.4: added grid view time spacing option
 	'schedule_timegrid'      => array(
 		'type'    => 'checkbox',
@@ -978,7 +977,7 @@ $options = array(
 	// === Profile Pages ===
 	// 2.3.3.9: added proflie page settings
 
-	// --- [Pro] Profile Blocks Position ---
+	// --- [Pro/Plus] Profile Blocks Position ---
 	'profile_block_position' => array(
 		'type'    => 'select',
 		'label'   => __( 'Info Blocks Position', 'radio-station' ),
@@ -994,7 +993,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// ---- [Pro] Profile Section Layout ---
+	// ---- [Pro/Plus] Profile Section Layout ---
 	'profile_section_layout' => array(
 		'type'    => 'select',
 		'label'   => __( 'Profile Content Layout', 'radio-station' ),
@@ -1213,32 +1212,6 @@ $options = array(
 	//	'section' => 'archives',
 	// ),
 
-	// --- Teams Archive Page ---
-	// 2.4.0.6: added team archive page
-	'team_archive_page' => array(
-		'label'   => __( 'Team Archive Page', 'radio-station' ),
-		'type'    => 'select',
-		'options' => 'PAGEID',
-		'default' => '',
-		'helper'  => __( 'Select the Page for displaying the Team archive list.', 'radio-station' ),
-		'tab'     => 'pages',
-		'section' => 'archives',
-		'pro'     => true,
-	),
-
-	// --- Automatic Display ---
-	// 2.4.0.6: added teams archive automatic page
-	'team_archive_auto' => array(
-		'label'   => __( 'Automatic Display', 'radio-station' ),
-		'type'    => 'checkbox',
-		'value'   => 'yes',
-		'default' => 'yes',
-		'helper'  => __( 'Replaces selected page content with default Team Archive. Alternatively customize display using the shortcode:', 'radio-station' ) . ' [teams-archive]',
-		'tab'     => 'pages',
-		'section' => 'archives',
-		'pro'     => true,
-	),
-
 	// === Single Templates ===
 
 	// --- Templates Change Note ---
@@ -1321,7 +1294,7 @@ $options = array(
 		'section' => 'loading',
 	),
 
-	// --- [Pro] Dynamic Reloading ---
+	// --- [Pro/Plus] Dynamic Reloading ---
 	'dynamic_reload' => array(
 		'type'    => 'checkbox',
 		'label'   => __( 'Dynamic Reloading?', 'radio-station' ),
@@ -1333,7 +1306,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- Translate User Times ---
+	// --- [Pro/Plus] Translate User Times ---
 	'convert_show_times' => array(
 		'type'    => 'checkbox',
 		'label'   => __( 'Convert Show Times', 'radio-station' ),
@@ -1345,7 +1318,7 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro] Timezone Switching ---
+	// --- [Pro/Plus] Timezone Switching ---
 	'timezone_switching' => array(
 		'type'    => 'checkbox',
 		'label'   => __( 'User Timezone Switching', 'radio-station' ),
@@ -1561,6 +1534,10 @@ $settings = array(
 	'hasaddons'    => $has_addons,
 	'addons_link'  => add_query_arg( 'page', $slug . '-addons', admin_url( 'admin.php' ) ),
 	'plan'         => $plan,
+	// 2.4.0.6: add bundles configuration
+	'bundle_id'           => '9521',
+	'bundle_public_key'   => 'pk_a2650f223ef877e87fe0fdfc4442b',
+	'bundle_license_auto_activation' => true,
 );
 
 // -------------------------
@@ -2189,7 +2166,6 @@ function radio_station_email_address( $email, $post_id ) {
 // 2.3.0: standalone filter for automatic page content
 // 2.3.1: re-add filter so the_content can be processed multiple times
 // 2.3.3.6: set automatic content early and clear existing content
-// 2.4.0.6: fix to concatenate multiple atts values from filtering
 add_filter( 'the_content', 'radio_station_automatic_pages_content_set', 1 );
 function radio_station_automatic_pages_content_set( $content ) {
 
@@ -2211,8 +2187,7 @@ function radio_station_automatic_pages_content_set( $content ) {
 				$atts_string = '';
 				if ( is_array( $atts ) && ( count( $atts ) > 0 ) ) {
 					foreach ( $atts as $key => $value ) {
-						// 2.4.0.6: fix to append multiple atts values
-						$atts_string .= ' ' . $key . '="' . $value . '"';
+						$atts_string = ' ' . $key . '="' . $value . '"';
 					}
 				}
 				$shortcode = '[master-schedule' . $atts_string . ']';
@@ -2236,8 +2211,7 @@ function radio_station_automatic_pages_content_set( $content ) {
 				$atts_string = '';
 				if ( is_array( $atts ) && ( count( $atts ) > 0 ) ) {
 					foreach ( $atts as $key => $value ) {
-						// 2.4.0.6: fix to append multiple atts values
-						$atts_string .= ' ' . $key . '="' . $value . '"';
+						$atts_string = ' ' . $key . '="' . $value . '"';
 					}
 				}
 				$shortcode = '[shows-archive' . $atts_string . ']';
@@ -2261,8 +2235,7 @@ function radio_station_automatic_pages_content_set( $content ) {
 				$atts_string = '';
 				if ( is_array( $atts ) && ( count( $atts ) > 0 ) ) {
 					foreach ( $atts as $key => $value ) {
-						// 2.4.0.6: fix to append multiple atts values
-						$atts_string .= ' ' . $key . '="' . $value . '"';
+						$atts_string = ' ' . $key . '="' . $value . '"';
 					}
 				}
 				$shortcode = '[overrides-archive' . $atts_string . ']';
@@ -2286,8 +2259,7 @@ function radio_station_automatic_pages_content_set( $content ) {
 				$atts_string = '';
 				if ( is_array( $atts ) && ( count( $atts ) > 0 ) ) {
 					foreach ( $atts as $key => $value ) {
-						// 2.4.0.6: fix to append multiple atts values
-						$atts_string .= ' ' . $key . '="' . $value . '"';
+						$atts_string = ' ' . $key . '="' . $value . '"';
 					}
 				}
 				$shortcode = '[playlists-archive' . $atts_string . ']';
@@ -2311,8 +2283,7 @@ function radio_station_automatic_pages_content_set( $content ) {
 				$atts_string = '';
 				if ( is_array( $atts ) && ( count( $atts ) > 0 ) ) {
 					foreach ( $atts as $key => $value ) {
-						// 2.4.0.6: fix to append multiple atts values
-						$atts_string .= ' ' . $key . '="' . $value . '"';
+						$atts_string = ' ' . $key . '="' . $value . '"';
 					}
 				}
 				$shortcode = '[genres-archive' . $atts_string. ']';
@@ -2336,8 +2307,7 @@ function radio_station_automatic_pages_content_set( $content ) {
 				$atts_string = '';
 				if ( is_array( $atts ) && ( count( $atts ) > 0 ) ) {
 					foreach ( $atts as $key => $value ) {
-						// 2.4.0.6: fix to append multiple atts values
-						$atts_string .= ' ' . $key . '="' . $value . '"';
+						$atts_string = ' ' . $key . '="' . $value . '"';
 					}
 				}
 				$shortcode = '[languages-archive' . $atts_string. ']';
@@ -2347,9 +2317,6 @@ function radio_station_automatic_pages_content_set( $content ) {
 
 	// 2.3.3.6: moved out to reduce repetitive code
 	if ( isset( $shortcode ) ) {
-		if ( RADIO_STATION_DEBUG ) {
-			echo '<span style="display:none;">Automatic Content Shortcode: ' . $shortcode . '</span>';
-		}
 		remove_filter( 'the_content', 'radio_station_automatic_pages_content_set', 1 );
 		remove_filter( 'the_content', 'radio_station_automatic_pages_content_get', 11 );
 		$radio_station_data['automatic_content'] = do_shortcode( $shortcode );
