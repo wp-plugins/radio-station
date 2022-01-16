@@ -1526,19 +1526,29 @@ $settings = array(
 	// 2.4.0.3: turn on plans switch for Pro also
 	// 2.4.0.3: set Pro details and Upgrade links
 	// 2.4.0.4: change upgrade_link to -upgrade
+	// 2.4.0.6: change upgrade_link to -pricing
 	'freemius_id'  => '4526',
 	'freemius_key' => 'pk_aaf375c4fb42e0b5b3831e0b8476b',
 	'hasplans'     => $has_plans,
-	'upgrade_link' => add_query_arg( 'page', $slug . '-upgrade', admin_url( 'admin.php' ) ),
+	'upgrade_link' => add_query_arg( 'page', $slug . '-pricing', admin_url( 'admin.php' ) ),
 	'pro_link'     => RADIO_STATION_PRO_URL . 'pricing/',
 	'hasaddons'    => $has_addons,
 	'addons_link'  => add_query_arg( 'page', $slug . '-addons', admin_url( 'admin.php' ) ),
 	'plan'         => $plan,
-	// 2.4.0.6: add bundles configuration
-	'bundle_id'           => '9521',
-	'bundle_public_key'   => 'pk_a2650f223ef877e87fe0fdfc4442b',
-	'bundle_license_auto_activation' => true,
 );
+// print_r( $settings );
+
+// ----------------------
+// Config Upgrade Bundles
+// ----------------------
+// 2.4.0.6: add bundles configuration
+add_filter( 'freemius_init_settings_radio_station', 'radio_station_bundles_init' );
+function radio_station_bundles_init( $settings ) {
+	$settings['bundle_id'] = '9521';
+	$settings['bundle_public_key'] = 'pk_a2650f223ef877e87fe0fdfc4442b';
+	$settings['bundle_license_auto_activation'] = true;
+	return $settings;
+}
 
 // -------------------------
 // Set Plugin Option Globals

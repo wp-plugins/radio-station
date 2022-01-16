@@ -219,9 +219,11 @@ You can now visit your site to make sure nothing is broken. If you experience is
 == Changelog ==
 
 = 2.4.0.6 =
+* Updated: Plugin Panel (1.2.2)
 * Updated: documentation links to new demo site address
 * Fixed: remove duplicate Related Show box in Post Quick Edit
 * Fixed: multiple attributes for automatic pages shortcodes
+* Fixed: undefined warning in current playlist when no current show
 * Fixed: undefined warning for debugshifts
 
 = 2.4.0.5 =

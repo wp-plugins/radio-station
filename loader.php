@@ -5,7 +5,7 @@
 // ===========================
 //
 // --------------
-// Version: 1.2.1
+// Version: 1.2.2
 // --------------
 // Note: Changelog and structure at end of file.
 //
@@ -119,6 +119,10 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 		// Initialize Loader
 		// -----------------
 		public function __construct( $args ) {
+
+			if ( !is_array( $args ) ) {
+				return;
+			}
 
 			// --- set debug switch ---
 			// 1.1.2: added debug switch check
@@ -1663,11 +1667,16 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 			$args = $this->args;
 
-			// --- bug out if not on radio station pages ---
+			// --- bug out if not on plugin page ---
 			if ( !isset( $_REQUEST['page'] ) ) {
 				return;
 			}
 			if ( $args['slug'] != substr( $_REQUEST['page'], 0, strlen( $args['slug'] ) ) ) {
+				return;
+			}
+			
+			// 1.2.2: bug out if adminsanity notices are loaded
+			if ( isset( $GLOBALS['radio_station_data']['load']['notices'] ) && $GLOBALS['radio_station_data']['load']['notices'] ) {
 				return;
 			}
 
@@ -1863,7 +1872,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				} elseif ( isset( $args['type'] ) && ( 'theme' == $args['type'] ) ) {
 					$rate_url = 'https://wordpress.org/support/theme/' . $args['wporgslug'] . '/reviews/#new-post';
 				} else {
-					$rate_url = 'https://wordpress.org/plugins/' . $args['wporgslug'] . '/reviews/#new-post';
+					// 1.2.2: update rating URL to match new repo scheme
+					$rate_url = 'https://wordpress.org/support/plugins/' . $args['wporgslug'] . '/reviews/#new-post';
 				}
 				if ( isset( $args['ratetext'] ) ) {
 					$rate_text = $args['ratetext'];
@@ -3188,6 +3198,11 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // =========
 // CHANGELOG
 // =========
+
+// == 1.2.2 ==
+// - update plugin repository rating URL
+// - remove duplication of addons link
+// - no notice boxer if adminsanity notices loaded
 
 // == 1.2.1 ==
 // - added filters for premium and addons init
