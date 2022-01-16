@@ -4,6 +4,8 @@
  * ref: http://nlb-creations.com/2014/06/06/radio-station-tutorial-creating-a-tabbed-programming-schedule/
  */
 
+$newline = RADIO_STATION_DEBUG ? "\n" : '';
+
 // --- get all the required info ---
 $hours = radio_station_get_hours();
 $now = radio_station_get_now();

@@ -176,10 +176,7 @@ function radio_station_master_schedule( $atts ) {
 
 	// 2.3.3.9: remove check if clock shortcode present
 	// 2.3.3.6: set new line for easier debug viewing
-	$newline = '';
-	if ( RADIO_STATION_DEBUG ) {
-		$newline = "\n";
-	}
+	$newline = RADIO_STATION_DEBUG ? "\n" : '';
 
 	// --- table for selector and clock  ---
 	// 2.3.0: moved out from templates to apply to all views

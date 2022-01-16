@@ -3,6 +3,8 @@
  * Template for master schedule shortcode list style.
  */
 
+$newline = RADIO_STATION_DEBUG ? "\n" : '';
+
 // --- get all the required info ---
 $hours = radio_station_get_hours();
 $now = radio_station_get_now();
