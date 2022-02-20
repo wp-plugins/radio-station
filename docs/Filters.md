@@ -282,6 +282,7 @@ Here is a full list of available filters within the plugin, grouped by file and 
 |**includes/class-radio-clock-widget.php**||||
 | |`radio_station_radio_clock_widget_override` | ` $output` | `$args`, `$atts`|
 |**templates/master-schedule-table.php**||||
+| |`radio_station_schedule_show_time_separator` | ` $shifts_separator` | `'table'`|
 | |`radio_station_time_format_start` | ` $start_data_format` | `'schedule-table'`, `$atts`|
 | |`radio_station_time_format_end` | ` $end_data_format` | `'schedule-table'`, `$atts`|
 | |`radio_station_schedule_start_day` | ` false` | `'table'`|
@@ -307,6 +308,7 @@ Here is a full list of available filters within the plugin, grouped by file and 
 | |`radio_station_schedule_show_excerpt_display` | ` $excerpy` | `$show_id`, `'table'`|
 | |`radio_station_schedule_show_custom_display` | ` ''` | `$show_id`, `'table'`|
 |**templates/master-schedule-tabs.php**||||
+| |`radio_station_schedule_show_time_separator` | ` $shifts_separator` | `'tabs'`|
 | |`radio_station_time_format_start` | ` $start_data_format` | `'schedule-tabs'`, `$atts`|
 | |`radio_station_time_format_end` | ` $end_data_format` | `'schedule-tabs'`, `$atts`|
 | |`radio_station_schedule_start_day` | ` false` | `'tabs'`|
@@ -341,6 +343,7 @@ Here is a full list of available filters within the plugin, grouped by file and 
 | |`radio_station_schedule_show_encore` | ` $encore` | `$show['id']`, `'legacy'`|
 | |`radio_station_schedule_show_file` | ` $show_file` | `$show['id']`, `'legacy'`|
 |**templates/master-schedule-list.php**||||
+| |`radio_station_schedule_show_time_separator` | ` $shifts_separator` | `'list'`|
 | |`radio_station_time_format_start` | ` $start_data_format` | `'schedule-list'`, `$atts`|
 | |`radio_station_time_format_end` | ` $end_data_format` | `'schedule-list'`, `$atts`|
 | |`radio_station_schedule_start_day` | ` false` | `'list'`|
@@ -452,3 +455,7 @@ Here is a full list of available filters within the plugin, grouped by file and 
 Below is a list of filters that are available within [Radio Station Pro](https://radiostation.pro).
 
 *TODO*
+
+
+
+

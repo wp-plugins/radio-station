@@ -5,7 +5,7 @@
 // ===========================
 //
 // --------------
-// Version: 1.2.2
+// Version: 1.2.1
 // --------------
 // Note: Changelog and structure at end of file.
 //
@@ -1350,9 +1350,10 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 		public function load_freemius() {
 
 			// 1.2.1: no need to load if not in admin area
-			if ( !is_admin() ) {
-			 	return;
-			}		
+			// if ( !is_admin() ) {
+			//	return;
+			// }
+			echo '<span style="display:none;">Freemius Loading...</span>';
 
 			$args = $this->args;
 			$namespace = $this->namespace;
@@ -1437,6 +1438,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 				// --- set Freemius settings from plugin settings ---
 				// 1.1.1: remove admin_url wrapper on Freemius first-path value
+				// TODO: further possible args for Freemius init (eg. bundle_id)
+				// ref: https://freemius.com/help/documentation/wordpress-sdk/integrating-freemius-sdk/
 				$first_path = add_query_arg( 'page', $args['slug'], 'admin.php' );
 				$first_path = add_query_arg( 'welcome', 'true', $first_path );
 				$settings = array(
@@ -1464,9 +1467,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 				// --- filter settings before initializing ---
 				$settings = apply_filters( 'freemius_init_settings_' . $args['namespace'], $settings );
-				if ( $this->debug ) {
+				// if ( $this->debug ) {
 					echo '<span style="display:none;">Freemius Settings: ' . print_r( $settings, true ) . '</span>';
-				}
+				// }
 				if ( !$settings || !is_array( $settings ) ) {
 					return;
 				}
@@ -1667,7 +1670,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 			$args = $this->args;
 
-			// --- bug out if not on plugin page ---
+			// --- bug out if not on radio station pages ---
 			if ( !isset( $_REQUEST['page'] ) ) {
 				return;
 			}
@@ -2423,7 +2426,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						$pro_target = !strstr( $pro_link, '/wp-admin/' ) ? ' target="_blank"' : '';
 					}
 					if ( $upgrade_link || $pro_link ) {
-						$row .= __( 'Available in Pro.' ) . '<br>';
+						// 1.2.2: change text from Available in Pro
+						$row .= __( 'Premium Feature.' ) . '<br>';
 						if ( $upgrade_link ) {
 							$row .= '<a href="' . esc_url( $upgrade_link ) . '"' . $upgrade_target . '>' . esc_html( __( 'Upgrade Now' ) ) . '</a>';
 						}
@@ -2431,7 +2435,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 							$row .= ' | ';
 						}
 						if ( $pro_link ) {
-							$row .= '<a href="' . esc_url( $pro_link ) . '"' . $pro_target . '>' . esc_html( __( 'Pro Details' ) ) . '</a>';
+							// 1.2.2: change text from Pro details
+							$row .= '<a href="' . esc_url( $pro_link ) . '"' . $pro_target . '>' . esc_html( __( 'Details' ) ) . '</a>';
 						}
 					} else {
 						$row .= esc_html( __( 'Coming soon in Pro version!' ) );
@@ -3203,6 +3208,7 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // - update plugin repository rating URL
 // - remove duplication of addons link
 // - no notice boxer if adminsanity notices loaded
+// - change upgrade texts
 
 // == 1.2.1 ==
 // - added filters for premium and addons init

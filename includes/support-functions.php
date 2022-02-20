@@ -1972,7 +1972,8 @@ function radio_station_get_current_show( $time = false ) {
 
 				// --- set current show ---
 				// 2.3.3: get current show directly and remove transient
-				if ( ( $now > $shift_start_time ) && ( $now < $shift_end_time ) ) {
+				// 2.4.0.6: fix to add equal to operator for start time
+				if ( ( $now >= $shift_start_time ) && ( $now < $shift_end_time ) ) {
 					if ( RADIO_STATION_DEBUG ) {
 						echo '^^^ Current ^^^' . PHP_EOL;
 					}
@@ -2281,10 +2282,6 @@ function radio_station_get_next_shows( $limit = 3, $show_shifts = false, $time =
 function radio_station_get_current_playlist() {
 
 	$current_show = radio_station_get_current_show();
-	// 2.4.0.6: bug out if there is no current show 
-	if ( !$current_show || !isset( $current_show['show'] ) || !isset( $current_show['show']['id'] ) ) {
-		return false;
-	}
 	$show_id = $current_show['show']['id'];
 	$playlists = radio_station_get_show_playlists( $show_id );
 	if ( !$playlists || !is_array( $playlists ) || ( count ( $playlists ) < 1 ) ) {

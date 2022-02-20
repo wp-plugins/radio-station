@@ -172,7 +172,7 @@
 // Accepts: $args (Array)
 // Array Key    | Accepts
 // 'script'	| 'amplitude' (default), 'jplayer', 'howler', // 'mediaelements'
-// 'layout'	| 'horizontal', 'vertical
+// 'layout'	| 'horizontal', 'vertical'
 // 'theme'      | 'light', 'dark'
 // 'buttons'	| 'circular', 'rounded', 'square'
 // 'skin'	| // (Media Elements: 'wordpress', 'minimal');

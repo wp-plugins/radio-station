@@ -32,10 +32,10 @@ function radio_time_string(datetime, hours, seconds, override) {
 	}
 
 	timestring = '<span class="rs-hour">'+h+'</span>';
-	timestring += '<span class="rs-sep">:</span>';
+	timestring += '<span class="rs-sep rs-time-sep">'+radio.sep+'</span>';
 	timestring += '<span class="rs-minutes">'+m+'</span>';
 	if (seconds) {
-		timestring += '<span class="rs-sep">:</span>';
+		timestring += '<span class="rs-sep rs-time-sep">'+radio.sep+'</span>';
 		timestring += '<span class="rs-seconds">'+s+'</span>';
 	}
 	if (mer != '') {timestring += ' <span class="rs-meridiem">'+mer+'</span>';}

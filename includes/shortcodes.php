@@ -271,7 +271,7 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
 	// --- merge defaults with passed attributes ---
 	// 2.3.3.9: add atts for specific posts
 	// 2.4.0.4: added optional view attribute
-	// 2.4.0.6: change default view value to list
+	// 2.4.1.8: change default view value to list
 	$defaults = array(
 		// --- shortcode display ----
 		'description'  => 'excerpt',
@@ -306,7 +306,7 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
 		'playlist'     => false,
 	);
 
-	// 2.4.0.6: change default description value for grid view
+	// 2.4.1.8: change default description value for grid view
 	if ( isset( $atts['view'] ) && ( 'grid' == $atts['view'] ) ) {
 		$defaults['description'] = 'none';
 	}
@@ -709,9 +709,13 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
 						$start = radio_station_translate_time( $start );
 						$end = radio_station_translate_time( $end );
 
+						// 2.4.0.6: use filtered shift separator
+						$separator =  ' - ';
+						$separator = apply_filters( 'radio_station_times_separator', $separator, 'override' );
+
 						// 2.3.1: fix to append not echo override date to archive list
 						$info['meta'] .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $start_data_format ) . '">' . esc_html( $start ) . '</span>';
-						$info['meta'] .= '<span class="rs-sep"> - </span>';
+						$info['meta'] .= '<span class="rs-sep rs-shift-sep">' . esc_html( $separator ) . '</span>';
 						$info['meta'] .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $end_data_format ) . '">' . esc_html( $end ) . '</span>';
 						$info['meta'] .= '<br>';
 
@@ -756,7 +760,7 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
 
 			// --- description ---
 			// 2.4.0.4: remove description for grid view
-			// 2.4.0.6: set different grid default earlier instead
+			// 2.4.1.8: set different grid default earlier instead
 			if ( 'none' == $atts['description'] ) {
 				$info['description'] = '';
 			} elseif ( 'full' == $atts['description'] ) {
@@ -2130,21 +2134,29 @@ function radio_station_current_show_shortcode( $atts ) {
 					$classes[] = 'current-shift';
 					$class = implode( ' ', $classes );
 
+					// 2.4.0.6: use filtered shift separator
+					$separator =  ' - ';
+					$separator = apply_filters( 'radio_station_times_separator', $separator, 'override' );
+
 					$current_shift_display = '<div class="' . esc_attr( $class ) . '">';
 					$current_shift_display .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $start_data_format ) . '">' . esc_html( $start ) . '</span>';
-					$current_shift_display .= '<span class="rs-sep"> - </span>';
+					$current_shift_display .= '<span class="rs-sep rs-shift-sep">' . esc_html( $separator ) . '</span>';
 					$current_shift_display .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $end_data_format ) . '">' . esc_html( $end ) . '</span>';
 					$current_shift_display .= '</div>';
 
 					// 2.3.3.9: add show user time div
 					$current_shift_display .= '<div class="show-user-time">';
 					$current_shift_display .= '[<span class="rs-user-time rs-start-time"></span>';
-					$current_shift_display .= '<span class="rs-sep"> - </span>';
+					$current_shift_display .= '<span class="rs-sep rs-shift-sep">' . esc_html( $separator ) . '</span>';
 					$current_shift_display .= '<span class="rs-user-time rs-end-time"></span>]';
 					$current_shift_display .= '</div>';
 					
 				}
 				$class = implode( ' ', $classes );
+
+				// 2.4.0.6: use filtered shift separator
+				$separator =  ' - ';
+				$separator = apply_filters( 'radio_station_times_separator', $separator, 'current-show' );
 
 				// --- shift display output ---
 				$shift_display .= '<div class="' . esc_attr( $class ) . '">';
@@ -2153,13 +2165,13 @@ function radio_station_current_show_shortcode( $atts ) {
 					$shift_display .= '<ul class="current-shift-list"><li class="current-shift-list-item">';
 				}
 				$shift_display .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $start_data_format ) . '">' . esc_html( $start ) . '</span>';
-				$shift_display .= '<span class="rs-sep"> - </span>';
+				$shift_display .= '<span class="rs-sep rs-shift-sep">' . esc_html( $separator ) . '</span>';
 				$shift_display .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $end_data_format ) . '">' . esc_html( $end ) . '</span>';
 
 				// 2.3.3.9: add show user time div
 				$shift_display .= '<div class="show-user-time">';
 				$shift_display .= '[<span class="rs-user-time rs-start-time"></span>';
-				$shift_display .= '<span class="rs-sep"> - </span>';
+				$shift_display .= '<span class="rs-sep rs-shift-sep">' . esc_html( $separator ) . '</span>';
 				$shift_display .= '<span class="rs-user-time rs-end-time"></span>]';
 				$shift_display .= '</div>';
 
@@ -2822,17 +2834,21 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 				$start = radio_station_translate_time( $start );
 				$end = radio_station_translate_time( $end );
 
+				// 2.4.0.6: use filtered shift separator
+				$separator =  ' - ';
+				$separator = apply_filters( 'radio_station_times_separator', $separator, 'upcoming-shows' );
+
 				// --- set shift display output ---
 				$shift_display = '<div class="upcoming-show-schedule on-air-dj-schedule">';
 				$shift_display .= '<div class="' . esc_attr( $class ) . '">';
 				$shift_display .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $start_data_format ) . '">' . esc_html( $start ) . '</span>';
-				$shift_display .= '<span class="rs-sep"> - </span>';
+				$shift_display .= '<span class="rs-sep rs-shift-sep">' . esc_html( $separator ) . '</span>';
 				$shift_display .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $end_data_format ) . '">' . esc_html( $end ) . '</span>';
 				$shift_display .= '</div>';
 				// 2.3.3.9: add empty user time div
 				$shift_display .= '<div class="show-user-time">';
 				$shift_display .= '[<span class="rs-time rs-start-time"></span>';
-				$shift_display .= '<span class="rs-sep"> - </span>';
+				$shift_display .= '<span class="rs-sep rs-shift-sep">' . esc_html( $separator ) . '</span>';
 				$shift_display .= '<span class="rs-time rs-end-time"></span>]';
 				$shift_display .= '</div>';
 				$shift_display .= '</div>';

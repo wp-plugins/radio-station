@@ -101,22 +101,44 @@ function radio_station_admin_styles() {
 add_filter( 'plugin_action_links_' . RADIO_STATION_BASENAME, 'radio_station_license_activation_link', 20, 2 );
 // add_filter( 'network_admin_plugin_action_links_' . RADIO_STATION_BASENAME, , 'radio_station_license_activation_link', 20, 2 );
 function radio_station_license_activation_link( $links, $file ) {
+
+	if ( RADIO_STATION_DEBUG ) {
+		echo '<span style="display:none;">RS Plugin Links A: ' . print_r( $links, true ) . '</span>' . PHP_EOL;
+	}
+
 	foreach ( $links as $key => $link ) {
+
 		// if ( RADIO_STATION_DEBUG ) {
 		// 	echo '<span style="display:none;">Plugin Link ' . $key . ': ' . $link . '</span>' . PHP_EOL;
 		// }
+		
+		// 2.4.0.6: remove addons link from Free by default
+		if ( strstr( $link, '-addons' ) ) {
+			global $radio_station_data;
+			if ( !$radio_station_data['settings']['hasaddons'] ) {
+				unset( $links[$key] );
+			}
+		}
+
 		// --- remove activate premium license link from free version ---
 		if ( strstr( $key, 'activate-license' ) ) {
+			if ( defined( 'RADIO_STATION_PRO_FILE' ) ) {
+				global $radio_station_activation_link;
+				$radio_station_activation_link = $link;
+			}
 			unset( $links[$key] );
 		}
+
 		// --- remove upgrade link if Pro is already installed ---
 		if ( defined( 'RADIO_STATION_PRO_FILE' ) && strstr( $key, 'upgrade' ) ) {
 			unset( $links[$key] );
 		}
 	}
-	// if ( RADIO_STATION_DEBUG ) {
-	//	echo '<span style="display:none;">Plugin Links: ' . print_r( $links, true ) . '</span>' . PHP_EOL;
-	// }
+
+	if ( RADIO_STATION_DEBUG ) {
+		echo '<span style="display:none;">RS Plugin Links B: ' . print_r( $links, true ) . '</span>' . PHP_EOL;
+	}
+
 	return $links;
 }
 

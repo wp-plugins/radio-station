@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://radiostation.pro/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.4.0.5
+Version: 2.4.0.5.3
 Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
@@ -35,6 +35,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // === Setup ===
 // - Define Plugin Constants
+// - Set Debug Mode Constant
 // - Define Plugin Data Slugs
 // - Include Plugin Files
 // - Plugin Options and Defaults
@@ -75,7 +76,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // - Admin Fix for DJ / Host Role Label
 // - maybe Revoke Edit Show Capability
 // === Debugging ===
-// - Set Debug Mode Constant
 // - maybe Clear Transient Data
 // - Debug Output and Logging
 
@@ -120,6 +120,25 @@ if ( get_option( 'radio_show_cpts_prefixed' ) ) {
 	define( 'RADIO_STATION_GENRES_SLUG', 'genres' );
 }
 
+// -----------------------
+// Set Debug Mode Constant
+// -----------------------
+// 2.3.0: added debug mode constant
+// 2.3.2: added saving debug mode constant
+if ( !defined( 'RADIO_STATION_DEBUG' ) ) {
+	$rs_debug = false;
+	if ( isset( $_REQUEST['rs-debug'] ) && ( '1' == $_REQUEST['rs-debug'] ) ) {
+		$rs_debug = true;
+	}
+	define( 'RADIO_STATION_DEBUG', $rs_debug );
+}
+if ( !defined( 'RADIO_STATION_SAVE_DEBUG' ) ) {
+	$rs_save_debug = false;
+	if ( isset( $_REQUEST['rs-save-debug'] ) && ( '1' == $_REQUEST['rs-save-debug'] ) ) {
+		$rs_save_debug = true;
+	}
+	define( 'RADIO_STATION_SAVE_DEBUG', $rs_save_debug );
+}
 
 // --------------------
 // Include Plugin Files
@@ -1526,7 +1545,6 @@ $settings = array(
 	// 2.4.0.3: turn on plans switch for Pro also
 	// 2.4.0.3: set Pro details and Upgrade links
 	// 2.4.0.4: change upgrade_link to -upgrade
-	// 2.4.0.6: change upgrade_link to -pricing
 	'freemius_id'  => '4526',
 	'freemius_key' => 'pk_aaf375c4fb42e0b5b3831e0b8476b',
 	'hasplans'     => $has_plans,
@@ -1535,20 +1553,11 @@ $settings = array(
 	'hasaddons'    => $has_addons,
 	'addons_link'  => add_query_arg( 'page', $slug . '-addons', admin_url( 'admin.php' ) ),
 	'plan'         => $plan,
+	// 2.4.0.6: add bundles configuration
+	// 'bundle_id'           => '9521',
+	// 'bundle_public_key'   => 'pk_a2650f223ef877e87fe0fdfc4442b',
+	// 'bundle_license_auto_activation' => true,
 );
-// print_r( $settings );
-
-// ----------------------
-// Config Upgrade Bundles
-// ----------------------
-// 2.4.0.6: add bundles configuration
-add_filter( 'freemius_init_settings_radio_station', 'radio_station_bundles_init' );
-function radio_station_bundles_init( $settings ) {
-	$settings['bundle_id'] = '9521';
-	$settings['bundle_public_key'] = 'pk_a2650f223ef877e87fe0fdfc4442b';
-	$settings['bundle_license_auto_activation'] = true;
-	return $settings;
-}
 
 // -------------------------
 // Set Plugin Option Globals
@@ -1556,6 +1565,9 @@ function radio_station_bundles_init( $settings ) {
 global $radio_station_data;
 $radio_station_data['options'] = $options;
 $radio_station_data['settings'] = $settings;
+if ( RADIO_STATION_DEBUG ) {
+	echo '<span style="display:none;">Radio Station Settings: ' . print_r( $settings, true ) . '</span>';
+}
 
 // ----------------------------
 // Start Plugin Loader Instance
@@ -1813,6 +1825,10 @@ function radio_station_localization_script() {
 
 	// --- create settings objects ---
 	$js = "var radio = {}; radio.timezone = {}; radio.time = {}; radio.labels = {}; radio.units = {};";
+	
+	// 2.4.0.6: add filterable time display separator
+	$time_separator = apply_filters( 'radio_station_time_separator', ':' );
+	$js .= " radio.sep = '" . esc_js( $time_separator ) . "';";
 
 	// --- set AJAX URL ---
 	// 2.3.2: add admin AJAX URL
@@ -1829,7 +1845,7 @@ function radio_station_localization_script() {
 	$js .= "if (window.matchMedia('(pointer: coarse)').matches) {radio.touchscreen = true;} else {radio.touchscreen = false;}" . PHP_EOL;
 
 	// --- set debug flag ---
-	if ( defined( 'RADIO_STATION_DEBUG' ) && RADIO_STATION_DEBUG ) {
+	if ( RADIO_STATION_DEBUG ) {
 		$js .= "radio.debug = true;" . PHP_EOL;
 	} else {
 		$js .= "radio.debug = false;" . PHP_EOL;
@@ -3646,26 +3662,6 @@ function radio_station_revoke_show_edit_cap( $allcaps, $caps, $args, $user ) {
 // --- Debugging ---
 // =================
 
-// -----------------------
-// Set Debug Mode Constant
-// -----------------------
-// 2.3.0: added debug mode constant
-// 2.3.2: added saving debug mode constant
-if ( !defined( 'RADIO_STATION_DEBUG' ) ) {
-	$rs_debug = false;
-	if ( isset( $_REQUEST['rs-debug'] ) && ( '1' == $_REQUEST['rs-debug'] ) ) {
-		$rs_debug = true;
-	}
-	define( 'RADIO_STATION_DEBUG', $rs_debug );
-}
-if ( !defined( 'RADIO_STATION_SAVE_DEBUG' ) ) {
-	$rs_save_debug = false;
-	if ( isset( $_REQUEST['rs-save-debug'] ) && ( '1' == $_REQUEST['rs-save-debug'] ) ) {
-		$rs_save_debug = true;
-	}
-	define( 'RADIO_STATION_SAVE_DEBUG', $rs_save_debug );
-}
-
 // --------------------------
 // maybe Clear Transient Data
 // --------------------------
@@ -3727,7 +3723,10 @@ function radio_station_debug( $data, $echo = true, $file = false ) {
 add_action( 'shutdown', 'radio_station_freemius_debug' );
 function radio_station_freemius_debug() {
 	if ( is_admin() && RADIO_STATION_DEBUG && current_user_can( 'manage_options' ) ) {
-		$instance = radio_station_freemius_instance();
-		echo '<span style="display:none;">Freemius Object: ' . print_r( $instance, true ) . '</span>';
+		// 2.4.0.6: check if global instance is set directly
+		if ( isset( $GLOBALS['radio_station_freemius'] ) ) {
+			$instance = $GLOBALS['radio_station_freemius'];
+			echo '<span style="display:none;">Freemius Object: ' . print_r( $instance, true ) . '</span>';
+		}
 	}
 }

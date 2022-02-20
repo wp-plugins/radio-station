@@ -74,8 +74,8 @@ function radio_countdown_display(diff, label) {
 	if (minutes < 10) {minutes = '0'+minutes;}
 	seconds = diff;
 	if (seconds < 10) {seconds = '0'+seconds;}
-    display = '<span class="rs-label">'+label+'</span>: <span class="rs-hours">'+hours+'</span><span "rs-sep">:</span>';
-    display += '<span class="rs-minutes">'+minutes+'</span><span class="rs-sep">:</span><span class="rs-seconds">'+seconds+'</span>';
+    display = '<span class="rs-label">'+label+'</span>: <span class="rs-hours">'+hours+'</span><span "rs-sep rs-time-sep">'+radio.sep+'</span>';
+    display += '<span class="rs-minutes">'+minutes+'</span><span class="rs-sep rs-time-sep">'+radio.sep+'</span><span class="rs-seconds">'+seconds+'</span>';
     return display;
 }
 

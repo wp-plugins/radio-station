@@ -602,6 +602,10 @@ if ( !$active || !$shifts ) {
 					}
 					$class = implode( ' ', $classes );
 
+					// 2.4.0.6: use filtered shift separator
+					$separator =  ' - ';
+					$separator = apply_filters( 'radio_station_times_separator', $separator, 'show-content' );
+
 					// --- set show time output ---
 					// 2.3.4: fix to start data_format attribute
 					$show_time = '<div class="' . esc_attr( $class ) . '">' . $newline;
@@ -617,7 +621,7 @@ if ( !$active || !$shifts ) {
 					// 2.3.3.9: add user show time div
 					$show_time .= '<div class="show-user-time">' . $newline;
 					$show_time .= '[<span class="rs-time rs-start-time"></span>' . $newline;
-					$show_time .= '<span class="rs-sep"> - </span>' . $newline;
+					$show_time .= '<span class="rs-sep">' . esc_html( $separator ) . '</span>' . $newline;
 					$show_time .= '<span class="rs-time rs-end-time"></span>]' . $newline;
 					$show_time .= '</div>' . $newline;
 
@@ -685,17 +689,21 @@ if ( $overrides && is_array( $overrides ) && ( count( $overrides ) > 0 ) ) {
 				$date_time = radio_station_to_time( $override['date'] . ' 00:00' );
 				$date = radio_station_get_time( $date_format, $date_time );
 
+				// 2.4.0.6: use filtered shift separator
+				$separator =  ' - ';
+				$separator = apply_filters( 'radio_station_times_separator', $separator, 'override-content' );
+
 				$scheduled .= '<div class="override-time">' . $newline;
 				$scheduled .= '<span class="rs-date rs-start-date" data-format="' . esc_attr( $date_format ) . '" data="' . esc_attr( $date_time ) . '">' . esc_html( $date ) . '</span>' . $newline;
 				$scheduled .= '<span class="rs-time rs-start-time" data-format="' . esc_attr( $start_data_format ) . '" data="' . esc_attr( $override_start_time ) . '">' . esc_html( $start_display ) . '</span>' . $newline;
-				$scheduled .= '<span class="rs-sep"> - </span>' . $newline;
+				$scheduled .= '<span class="rs-sep">' . esc_html( $separator ) . '</span>' . $newline;
 				$scheduled .= '<span class="rs-time rs-end-time" data-format="' . esc_attr( $end_data_format ) . '" data="' . esc_attr( $override_end_time ) . '">' . esc_html( $end_display ) . '</span>' . $newline;
 				$scheduled .= '</div>' . $newline;
 
 				$scheduled .= '<div class="show-user-time">' . $newline;
 				$scheduled .= '[<span class="rs-date rs-start-date"></span>' . $newline;
 				$scheduled .= '<span class="rs-time rs-start-time"></span>' . $newline;
-				$scheduled .= '<span class="rs-sep"> - </span>' . $newline;
+				$scheduled .= '<span class="rs-sep">' . esc_html( $separator ) . '</span>' . $newline;
 				$scheduled .= '<span class="rs-time rs-end-time"></span>]' . $newline;
 				$scheduled .= '</div>' . $newline;
 			}

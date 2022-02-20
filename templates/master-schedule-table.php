@@ -3,8 +3,6 @@
  * Template for master schedule shortcode default (table) style.
  */
 
-$newline = RADIO_STATION_DEBUG ? "\n" : '';
-
 // --- get all the required info ---
 $hours = radio_station_get_hours();
 $now = radio_station_get_now();
@@ -27,6 +25,9 @@ $start_time = apply_filters( 'radio_station_schedule_start_time', $start_time, '
 
 // --- set shift time formats ---
 // 2.3.2: set time formats early
+// 2.4.0.6: add filter for shift times separator
+$shifts_separator = __( 'to', 'radio-station' );
+$shifts_separator = apply_filters( 'radio_station_schedule_show_time_separator', $shifts_separator, 'table' );
 if ( 24 == (int) $atts['time'] ) {
 	$start_data_format = $end_data_format = 'H:i';
 } else {
@@ -557,7 +558,7 @@ foreach ( $hours as $hour ) {
 
 								// --- set show time output ---
 								$show_time = '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $start_data_format ) . '">' . esc_html( $start ) . '</span>' . $newline;
-								$show_time .= '<span class="rs-sep"> ' . esc_html( __( 'to', 'radio-station' ) ) . ' </span>' . $newline;
+								$show_time .= '<span class="rs-sep rs-shift-sep"> ' . esc_html( $shifts_separator ) . ' </span>' . $newline;
 								$show_time .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $end_data_format ) . '">' . esc_html( $end ) . '</span>' . $newline;
 
 							} else {

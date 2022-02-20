@@ -8,13 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### 2.4.0.6
-* Updated: Plugin Panel (1.2.2)
 * Updated: documentation links to new demo site address
 * Fixed: remove duplicate Related Show box in Post Quick Edit
 * Fixed: multiple attributes for automatic pages shortcodes
-* Fixed: undefined warning in current playlist when no current show
-* Fixed: undefined warning for newline in schedule templates
+* Fixed: hide inactive tab shortcode section on tab click
 * Fixed: undefined warning for debugshifts
+* Fixed: current show in schedule when on exact start second
+* Added: filters for time and date separators
 
 ### 2.4.0.5
 * Fixed: plugin conflicts causing fatal errors
