@@ -26,11 +26,13 @@ $start_time = radio_station_to_time( $start_date . ' 00:00:00' );
 // 2.3.2: set time formats early
 // 2.4.0.6: add filter for shift times separator
 $shifts_separator = __( 'to', 'radio-station' );
-$shifts_separator = apply_filters( 'radio_station_schedule_show_time_separator', $shifts_separator, 'list' );
+$shifts_separator = apply_filters( 'radio_station_show_times_separator', $shifts_separator, 'schedule-list' );
+$time_separator = ':';
+$time_separator = apply_filters( 'radio_station_time_separator', $time_separator, 'schedule-list' );
 if ( 24 == (int) $atts['time'] ) {
-	$start_data_format = $end_data_format = 'H:i';
+	$start_data_format = $end_data_format = 'H' . $time_separator . 'i';
 } else {
-	$start_data_format = $end_data_format = 'g:i a';
+	$start_data_format = $end_data_format = 'g' . $time_separator . 'i a';
 }
 $start_data_format = apply_filters( 'radio_station_time_format_start', $start_data_format, 'schedule-list', $atts );
 $end_data_format = apply_filters( 'radio_station_time_format_end', $end_data_format, 'schedule-list', $atts );

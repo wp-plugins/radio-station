@@ -604,7 +604,7 @@ if ( !$active || !$shifts ) {
 
 					// 2.4.0.6: use filtered shift separator
 					$separator =  ' - ';
-					$separator = apply_filters( 'radio_station_times_separator', $separator, 'show-content' );
+					$separator = apply_filters( 'radio_station_show_times_separator', $separator, 'show-content' );
 
 					// --- set show time output ---
 					// 2.3.4: fix to start data_format attribute
@@ -691,7 +691,7 @@ if ( $overrides && is_array( $overrides ) && ( count( $overrides ) > 0 ) ) {
 
 				// 2.4.0.6: use filtered shift separator
 				$separator =  ' - ';
-				$separator = apply_filters( 'radio_station_times_separator', $separator, 'override-content' );
+				$separator = apply_filters( 'radio_station_show_times_separator', $separator, 'override-content' );
 
 				$scheduled .= '<div class="override-time">' . $newline;
 				$scheduled .= '<span class="rs-date rs-start-date" data-format="' . esc_attr( $date_format ) . '" data="' . esc_attr( $date_time ) . '">' . esc_html( $date ) . '</span>' . $newline;

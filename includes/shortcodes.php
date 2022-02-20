@@ -519,10 +519,13 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
 	// --- set time data formats ---
 	// 2.3.0: added once-off meridiem pre-conversions
 	// 2.3.2: replaced meridiem conversions with data formats
+	// 2.4.0.6: added filter for default time format separator
+	$time_separator = ':';
+	$time_separator = apply_filters( 'radio_station_time_separator', $time_separator, $post_type . '-archive' );
 	if ( 24 == (int) $atts['time'] ) {
-		$start_data_format = $end_data_format = 'H:i';
+		$start_data_format = $end_data_format = 'H' . $time_separator . 'i';
 	} else {
-		$start_data_format = $end_data_format = 'g:i a';
+		$start_data_format = $end_data_format = 'g' . $time_separator . 'i a';
 	}
 	$start_data_format = 'j, ' . $start_data_format;
 	$start_data_format = apply_filters( 'radio_station_time_format_start', $start_data_format, $post_type . '-archive', $atts );
@@ -711,7 +714,7 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
 
 						// 2.4.0.6: use filtered shift separator
 						$separator =  ' - ';
-						$separator = apply_filters( 'radio_station_times_separator', $separator, 'override' );
+						$separator = apply_filters( 'radio_station_show_times_separator', $separator, 'override' );
 
 						// 2.3.1: fix to append not echo override date to archive list
 						$info['meta'] .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $start_data_format ) . '">' . esc_html( $start ) . '</span>';
@@ -2022,10 +2025,13 @@ function radio_station_current_show_shortcode( $atts ) {
 
 		// --- get time formats ---
 		// 2.3.2: moved out to get once
+		// 2.4.0.6: added filter for default time format separator
+		$time_separator = ':';
+		$time_separator = apply_filters( 'radio_station_time_separator', $time_separator, 'current-show' );
 		if ( 24 == (int) $atts['time'] ) {
-			$start_data_format = $end_data_format = 'H:i';
+			$start_data_format = $end_data_format = 'H' . $time_separator . 'i';
 		} else {
-			$start_data_format = $end_data_format = 'g:i a';
+			$start_data_format = $end_data_format = 'g' . $time_separator . 'i a';
 		}
 		$start_data_format = 'l, ' . $start_data_format;
 		$start_data_format = apply_filters( 'radio_station_time_format_start', $start_data_format, 'current-show', $atts );
@@ -2126,17 +2132,18 @@ function radio_station_current_show_shortcode( $atts ) {
 				$start = radio_station_translate_time( $start );
 				$end = radio_station_translate_time( $end );
 
+				// 2.4.0.6: use filtered shift separator
+				$separator =  ' - ';
+				$separator = apply_filters( 'radio_station_show_times_separator', $separator, 'current-show' );
+
 				// --- set shift classes ---
+				// 2.4.0.6: fix for exact current time as start time
 				$classes = array( 'current-show-shifts', 'on-air-dj-sched' );
-				if ( ( $now > $shift_start_time ) && ( $now < $shift_end_time ) ) {
+				if ( ( $now >= $shift_start_time ) && ( $now < $shift_end_time ) ) {
 					$current_shift_start = $shift_start_time;
 					$current_shift_end = $shift_end_time;
 					$classes[] = 'current-shift';
 					$class = implode( ' ', $classes );
-
-					// 2.4.0.6: use filtered shift separator
-					$separator =  ' - ';
-					$separator = apply_filters( 'radio_station_times_separator', $separator, 'override' );
 
 					$current_shift_display = '<div class="' . esc_attr( $class ) . '">';
 					$current_shift_display .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $start_data_format ) . '">' . esc_html( $start ) . '</span>';
@@ -2153,10 +2160,6 @@ function radio_station_current_show_shortcode( $atts ) {
 					
 				}
 				$class = implode( ' ', $classes );
-
-				// 2.4.0.6: use filtered shift separator
-				$separator =  ' - ';
-				$separator = apply_filters( 'radio_station_times_separator', $separator, 'current-show' );
 
 				// --- shift display output ---
 				$shift_display .= '<div class="' . esc_attr( $class ) . '">';
@@ -2735,10 +2738,13 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 		// --- set shift display data formats ---
 		// 2.2.7: fix to convert time to integer
 		// 2.3.2: moved outside shift loop
+		// 2.4.0.6: added filter for default time format separator
+		$time_separator = ':';
+		$time_separator = apply_filters( 'radio_station_time_separator', $time_separator, 'upcoming-shows' );
 		if ( 24 == (int) $atts['time'] ) {
-			$start_data_format = $end_data_format = 'H:i';
+			$start_data_format = $end_data_format = 'H' . $time_separator . 'i';
 		} else {
-			$start_data_format = $end_data_format = 'g:i a';
+			$start_data_format = $end_data_format = 'g' . $time_separator . 'i a';
 		}
 		$start_data_format = 'l, ' . $start_data_format;
 		$start_data_format = apply_filters( 'radio_station_time_format_start', $start_data_format, 'upcoming-shows', $atts );
@@ -2836,7 +2842,7 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 				// 2.4.0.6: use filtered shift separator
 				$separator =  ' - ';
-				$separator = apply_filters( 'radio_station_times_separator', $separator, 'upcoming-shows' );
+				$separator = apply_filters( 'radio_station_show_times_separator', $separator, 'upcoming-shows' );
 
 				// --- set shift display output ---
 				$shift_display = '<div class="upcoming-show-schedule on-air-dj-schedule">';

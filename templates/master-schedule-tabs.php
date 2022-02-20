@@ -28,7 +28,9 @@ $start_time = apply_filters( 'radio_station_schedule_start_time', $start_time, '
 // 2.3.2: set time formats early
 // 2.4.0.6: add filter for shift times separator
 $shifts_separator = __( 'to', 'radio-station' );
-$shifts_separator = apply_filters( 'radio_station_schedule_show_time_separator', $shifts_separator, 'tabs' );
+$shifts_separator = apply_filters( 'radio_station_show_times_separator', $shifts_separator, 'schedule-tabs' );
+$time_separator = ':';
+$time_separator = apply_filters( 'radio_station_time_separator', $time_separator, 'schedule-tabs' );
 if ( 24 == (int) $atts['time'] ) {
 	$start_data_format = $end_data_format = 'H:i';
 } else {

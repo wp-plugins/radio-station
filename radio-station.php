@@ -1827,7 +1827,7 @@ function radio_station_localization_script() {
 	$js = "var radio = {}; radio.timezone = {}; radio.time = {}; radio.labels = {}; radio.units = {};";
 	
 	// 2.4.0.6: add filterable time display separator
-	$time_separator = apply_filters( 'radio_station_time_separator', ':' );
+	$time_separator = apply_filters( 'radio_station_time_separator', ':', 'javascript' );
 	$js .= " radio.sep = '" . esc_js( $time_separator ) . "';";
 
 	// --- set AJAX URL ---
