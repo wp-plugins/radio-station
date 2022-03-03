@@ -767,7 +767,7 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array() ) {
 		if ( $default_data ) {
 			return $default_data;
 			if ( RADIO_STATION_DEBUG ) {
-				echo '<span style="display:none;">Using Cacehed Data:' . print_r( $default_data, true ) . '</span>';
+				echo '<span style="display:none;">Using Cached Data:' . print_r( $default_data, true ) . '</span>';
 			}
 		}
 	}
@@ -855,6 +855,18 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array() ) {
 		$query .= $wpdb->prepare( " LIMIT %d", $args['limit'] );
 	}
 	$results = $wpdb->get_results( $query, ARRAY_A );
+	
+	// 2.4.0.6: add processing of post excerpts
+	if ( $results && is_array( $results ) ) {
+		foreach ( $results as $i => $result ) {
+			if ( empty( $result['post_excerpt'] ) ) {
+				$length = apply_filters( 'radio_station_show_data_excerpt_length', 55 );
+				$more = apply_filters( 'radio_station_show_data_excerpt_more', '' );
+				$result['post_excerpt'] = radio_station_trim_excerpt( $result['post_content'], $length, $more, false );
+				$results[$i] = $result;
+			}
+		}
+	}
 
 	// --- non-post (user) IDS ---
 	if ( isset( $no_profile_ids ) && ( count( $no_profile_ids ) > 0 ) ) {
@@ -971,6 +983,8 @@ function radio_station_get_show_data_meta( $show, $single = false ) {
 
 	// --- get avatar and thumbnail URL ---
 	// 2.3.1: added show avatar and image URLs
+	// 2.4.0.6: added get show avatar ID
+	$avatar_id = radio_station_get_show_avatar_id( $show->ID );
 	$avatar_url = radio_station_get_show_avatar_url( $show->ID );
 	if ( !$avatar_url ) {
 		$avatar_url = '';
@@ -984,6 +998,7 @@ function radio_station_get_show_data_meta( $show, $single = false ) {
 
 	// --- create array and return ---
 	// 2.3.1: added show avatar and image URLs
+	// 2.4.0.6: added avatar and image IDs
 	$show_data = array(
 		'id'        => $show->ID,
 		'name'      => $show->post_title,
@@ -999,7 +1014,9 @@ function radio_station_get_show_data_meta( $show, $single = false ) {
 		'languages' => $language_list,
 		'schedule'  => $show_shifts,
 		'avatar_url' => $avatar_url,
+		'avatar_id'  => $avatar_id,
 		'image_url'  => $thumbnail_url,
+		'image_id'   => $thumbnail_id,
 	);
 
 	// --- data route / feed for show ---
@@ -1047,7 +1064,7 @@ function radio_station_get_show_description( $show_data ) {
 	if ( !empty( $show_post->post_excerpt ) ) {
 		$excerpt = $show_post->post_excerpt;
 	} else {
-		$length = apply_filters( 'radio_station_show_data_excerpt_length', false );
+		$length = apply_filters( 'radio_station_show_data_excerpt_length', 55 );
 		$more = apply_filters( 'radio_station_show_data_excerpt_more', '' );
 		$excerpt = radio_station_trim_excerpt( $description, $length, $more, false );
 	}
@@ -1059,6 +1076,9 @@ function radio_station_get_show_description( $show_data ) {
 	// --- add to existing show data ---
 	$show_data['description'] = $description;
 	$show_data['excerpt'] = $excerpt;
+	
+	// echo "Description: " . print_r( $description, true ) . PHP_EOL;
+	// echo "Excerpt: " . print_r( $excerpt, true ) . PHP_EOL;
 
 	return $show_data;
 }
@@ -1122,6 +1142,8 @@ function radio_station_get_override_data_meta( $override ) {
 
 	// --- get avatar and thumbnail URL ---
 	// 2.3.1: added show avatar and image URLs
+	// 2.4.0.6: get avatar image attachment ID
+	$avatar_id = radio_station_get_show_avatar_id( $override_id );
 	$avatar_url = radio_station_get_show_avatar_url( $override_id );
 	if ( !$avatar_url ) {
 		$avatar_url = '';
@@ -1135,6 +1157,7 @@ function radio_station_get_override_data_meta( $override ) {
 
 	// --- create array and return ---
 	// 2.3.1: added show avatar and image URLs
+	// 2.4.0.6: added avatar and image IDs
 	$override_data = array(
 		'id'         => $override_id,
 		'name'       => $override->post_title,
@@ -1145,7 +1168,9 @@ function radio_station_get_override_data_meta( $override ) {
 		'hosts'      => $hosts,
 		'producers'  => $producers,
 		'avatar_url' => $avatar_url,
+		'avatar_id'  => $avatar_id,
 		'image_url'  => $thumbnail_url,
+		'image_id'   => $thumbnail_id,
 	);
 
 	// --- linked Show ID ---
@@ -3339,12 +3364,15 @@ function radio_station_get_show_avatar_url( $show_id, $size = 'thumbnail' ) {
 	// --- get the attachment image source ---
 	$avatar_url = false;
 	if ( $avatar_id ) {
+		// 2.4.0.6: added show avatar size filter
+		$size = apply_filters( 'radio_station_show_avatar_size', $size );
 		$avatar_src = wp_get_attachment_image_src( $avatar_id, $size );
 		$avatar_url = $avatar_src[0];
 	}
 
 	// --- filter and return ---
-	$avatar_url = apply_filters( 'radio_station_show_avatar_url', $avatar_url, $show_id );
+	// 2.4.0.6: added third argument for avatar size
+	$avatar_url = apply_filters( 'radio_station_show_avatar_url', $avatar_url, $show_id, $size );
 	return $avatar_url;
 }
 
@@ -3360,12 +3388,15 @@ function radio_station_get_show_avatar( $show_id, $size = 'thumbnail', $attr = a
 	// --- get the attachment image tag ---
 	$avatar = false;
 	if ( $avatar_id ) {
+		// 2.4.0.6: added show avatar size filter
+		$size = apply_filters( 'radio_station_show_avatar_size', $size );
 		$avatar = wp_get_attachment_image( $avatar_id, $size, false, $attr );
 	}
 
 	// --- filter and return ---
 	// 2.3.3.9: change conflicting (duplicate) filter name for show avatar
-	$avatar = apply_filters( 'radio_station_show_avatar_output', $avatar, $show_id );
+	// 2.4.0.6: added third argument for avatar size
+	$avatar = apply_filters( 'radio_station_show_avatar_output', $avatar, $show_id, $size );
 	return $avatar;
 }
 
@@ -4381,7 +4412,8 @@ function radio_station_convert_show_shifts( $show ) {
 			$start_hour = substr( radio_station_convert_shift_time( $shift['start_hour'] . $shift['start_meridian'], 24 ), 0, 2 );
 			$end_hour = substr( radio_station_convert_shift_time( $shift['end_hour'] . $shift['end_meridian'], 24 ), 0, 2 );
 			// 2.3.3.9: added missing shift encore designation
-			$encore = ( 'on' == $shift['encore'] ) ? true : false;
+			// 2.4.0.6: fix to undefined index warning for encore
+			$encore = ( isset( $shift['encore'] ) && ( 'on' == $shift['encore'] ) ) ? true : false;
 			$schedule[$i] = array(
 				'day'	 => $shift['day'],
 				'start'	 => $start_hour . ':' . $shift['start_min'],

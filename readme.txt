@@ -227,6 +227,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Fixed: undefined warning for debugshifts
 * Fixed: current show in schedule when on exact start second
 * Added: filters for time and date separators
+* Added: description/excerpt to single show data endpoint
 
 = 2.4.0.5 =
 * Fixed: plugin conflicts causing fatal errors

@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed: undefined warning for debugshifts
 * Fixed: current show in schedule when on exact start second
 * Added: filters for time and date separators
+* Added: description/excerpt to single show data endpoint
 
 ### 2.4.0.5
 * Fixed: plugin conflicts causing fatal errors

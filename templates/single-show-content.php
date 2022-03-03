@@ -961,7 +961,7 @@ echo '<input type="hidden" id="radio-page-type" value="show">' . $newline;
 					} else {
 						$class = "tab-inactive";
 					}
-					echo '<div id="show-' . esc_attr( $section ) . '-tab" class="show-tab ' . esc_attr( $class ) . '" onclick="radio_show_tab(\'' . esc_attr( $section ) . '\');">' . $newline;
+					echo '<div id="show-' . esc_attr( $section ) . '-tab" class="show-tab ' . esc_attr( $class ) . '" onclick="radio_show_tab(\'show\',\'' . esc_attr( $section ) . '\');">' . $newline;
 					echo esc_html( $sections[$section]['anchor'] ) . $newline;
 					echo '</div>' . $newline;
 					if ( ( $i + 1 ) < count( $sections ) ) {
@@ -1047,7 +1047,7 @@ if ( 'tabbed' == $section_layout ) {
 	$js .= "  hash = window.location.hash.substring(1);";
 	$js .= "  if (hash.indexOf('show-') > -1) {";
 	$js .= "   tab = hash.replace('show-', '');";
-	$js .= "   radio_show_tab(tab);";
+	$js .= "   radio_show_tab('show',tab);";
 	$js .= "  }";
 	$js .= " }";
 	$js .= "}, 500);";

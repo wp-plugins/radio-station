@@ -245,7 +245,8 @@ function radio_station_get_shows_data( $show = false ) {
 				$show = radio_station_get_show( $show );
 				$show = radio_station_get_show_data_meta( $show, true );
 				$show = radio_station_convert_show_shifts( $show );
-				// $show = radio_station_get_show_description( $show );
+				// 2.4.0.6: enabled show description/excerpt for multiple single shows
+				$show = radio_station_get_show_description( $show );
 				$shows[] = $show;
 			}
 		} else {
@@ -258,10 +259,12 @@ function radio_station_get_shows_data( $show = false ) {
 			$show = radio_station_get_show( $show );
 			$show = radio_station_get_show_data_meta( $show, true );
 			$show = radio_station_convert_show_shifts( $show );
-			// $show = radio_station_get_show_description( $show );
+			// 2.4.0.6: enabled show description/excerpt for single show
+			$show = radio_station_get_show_description( $show );
 			$shows = array( $show );
 		}
 	} else {
+		// --- all shows ---
 		$shows = radio_station_get_shows();
 		if ( count( $shows ) > 0 ) {
 			foreach ( $shows as $i => $show ) {

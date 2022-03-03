@@ -16,8 +16,8 @@ function radio_show_player() {
 }
 
 /* Switch Section Tabs */
-function radio_show_tab(tab) {
-	prefix = radio_page_type();
+function radio_show_tab(prefix,tab) {
+	/* prefix = radio_page_type(); */
 	if ( (typeof jQuery == 'function') && jQuery('#'+prefix+'-'+tab+'-tab') ) {
 		jQuery('.'+prefix+'-tab').removeClass('tab-active').addClass('tab-inactive');
 		jQuery('#'+prefix+'-'+tab+'-tab').removeClass('tab-inactive').addClass('tab-active');

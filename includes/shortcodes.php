@@ -1571,7 +1571,9 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 
 		// --- new item div ---
 		$classes = array( 'show-' . $type );
-		if ( $newpage ) {$classes[] = 'first-item';}
+		if ( $newpage ) {
+			$classes[] = 'first-item';
+		}
 		$class = implode( ' ', $classes );
 		$list .= '<div class="' . esc_attr( $class ) . '">';
 
@@ -1582,7 +1584,7 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 			$user = $post;
 			$user_id = $user->data->ID;
 
-			// TODO: check for user avatar ?
+			// TODO: add check for user avatar ?
 		
 			$list .= '<div class="show-' . esc_attr( $type ) . '-info">';
 		
