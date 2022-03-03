@@ -20,11 +20,16 @@ function radio_show_tab(prefix,tab) {
 	/* prefix = radio_page_type(); */
 	if ( (typeof jQuery == 'function') && jQuery('#'+prefix+'-'+tab+'-tab') ) {
 		jQuery('.'+prefix+'-tab').removeClass('tab-active').addClass('tab-inactive');
+		jQuery('.'+prefix+'-section').removeClass('tab-active').addClass('tab-inactive');
 		jQuery('#'+prefix+'-'+tab+'-tab').removeClass('tab-inactive').addClass('tab-active');
 		jQuery('#'+prefix+'-'+tab).removeClass('tab-inactive').addClass('tab-active');
 	} else if (document.getElementById(prefix+'-'+tab+'-tab')) {
 		tabs = document.getElementsByClassName(prefix+'-tab');
 		for (i = 0; i < tabs.length; i++) {
+			tabs[i].className = tabs[i].className.replace('-tab-active', '-tab-inactive');
+		}
+		tabs = document.getElementsByClassName(prefix+'-section');
+		for (i = 0; i < sections.length; i++) {
 			tabs[i].className = tabs[i].className.replace('-tab-active', '-tab-inactive');
 		}
 		button = document.getElementById(prefix+'-'+tab+'-tab');
@@ -37,6 +42,7 @@ function radio_show_tab(prefix,tab) {
 /* Responsive Page */
 function radio_page_responsive() {
 	prefix = radio_page_type();
+	if (!document.getElementById(prefix+'-content')) {return;}
 
     /* Check to Add Narrow Class */
     if (typeof jQuery == 'function') {
