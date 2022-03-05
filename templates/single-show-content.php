@@ -945,6 +945,7 @@ echo '<input type="hidden" id="radio-page-type" value="show">' . $newline;
 			if ( isset( $sections[$section_order[0]] ) ) {
 				// phpcs:ignore WordPress.Security.OutputNotEscaped
 				echo $sections[$section_order[0]]['heading'];
+				// phpcs:ignore WordPress.Security.OutputNotEscaped
 				echo $sections[$section_order[0]]['content'];
 			}
 			unset( $section_order[0] );
@@ -956,11 +957,7 @@ echo '<input type="hidden" id="radio-page-type" value="show">' . $newline;
 			foreach ( $section_order as $section ) {
 				if ( isset( $sections[$section] ) ) {
 					$found_section = true;
-					if ( 0 == $i ) {
-						$class = "tab-active";
-					} else {
-						$class = "tab-inactive";
-					}
+					$class = ( 0 == $i ) ? 'tab-active' : 'tab-inactive';
 					echo '<div id="show-' . esc_attr( $section ) . '-tab" class="show-tab ' . esc_attr( $class ) . '" onclick="radio_show_tab(\'show\',\'' . esc_attr( $section ) . '\');">' . $newline;
 					echo esc_html( $sections[$section]['anchor'] ) . $newline;
 					echo '</div>' . $newline;
@@ -972,7 +969,8 @@ echo '<input type="hidden" id="radio-page-type" value="show">' . $newline;
 			}
 			// 2.3.3.9: add end tab right spacer
 			if ( $found_section ) {
-				echo '<div class="show-tab-spacer">&nbsp;</div>' . $newline;
+				// 2.4.0.6: add class to last spacer
+				echo '<div class="show-tab-spacer last">&nbsp;</div>' . $newline;
 			}
 			echo '</div>' . $newline;
 		}
@@ -1011,11 +1009,8 @@ echo '<input type="hidden" id="radio-page-type" value="show">' . $newline;
 
 					// --- add tab classes to section ---
 					$classes = array( 'show-tab' );
-					if ( 0 == $i ) {
-						$classes[] = 'tab-active';
-					} else {
-						$classes[] = 'tab-inactive';
-					}
+					$tab_class = ( 0 == $i ) ? 'tab-active' : 'tab-inactive';
+					$classes[] = $tab_class;
 					$class = implode( ' ', $classes );
 					$sections[$section]['content'] = str_replace( 'class="show-section-content"', 'class="' . esc_attr( $class ) . '"', $sections[$section]['content'] );
 

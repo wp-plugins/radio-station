@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://radiostation.pro/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.4.0.5.6
+Version: 2.4.0.6
 Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
@@ -378,15 +378,19 @@ $options = array(
 		'section' => 'feeds',
 	),
 
-	// --- Clear Transients ---
+	// === Performance ===
+	// 2.4.0.6: separated performance section
+
+	// --- Disable Transients ---
+	// 2.4.0.6: change label from Clear Transients
 	'clear_transients' => array(
 		'type'    => 'checkbox',
-		'label'   => __( 'Clear Transients', 'radio-station' ),
+		'label'   => __( 'Disable Transients', 'radio-station' ),
 		'default' => '',
 		'value'   => 'yes',
 		'helper'  => __( 'Clear Schedule transients with every pageload. Less efficient but more reliable.', 'radio-station' ),
 		'tab'     => 'general',
-		'section' => 'feeds',
+		'section' => 'performance',
 	),
 
 	// --- Transient Caching ---
@@ -397,7 +401,7 @@ $options = array(
 		'value'   => 'yes',
 		'helper'  => __( 'Use Show Transient Data to improve Schedule calculation performance.', 'radio-station' ),
 		'tab'     => 'general',
-		'section' => 'feeds',
+		'section' => 'performance',
 		'pro'     => true,
 	),
 
@@ -1062,7 +1066,9 @@ $options = array(
 	),
 
 
-	// ==== Archives ===
+	// ==== Post Type Archives ===
+	// 2.4.0.6: move archives to separate tab
+	// 2.4.0.6: added post type archives section
 
 	// --- Shows Archive Page ---
 	'show_archive_page'       => array(
@@ -1071,8 +1077,8 @@ $options = array(
 		'options' => 'PAGEID',
 		'default' => '',
 		'helper'  => __( 'Select the Page for displaying the Show archive list.', 'radio-station' ),
-		'tab'     => 'pages',
-		'section' => 'archives',
+		'tab'     => 'archives',
+		'section' => 'posttypes',
 	),
 
 	// --- Automatic Display ---
@@ -1082,8 +1088,8 @@ $options = array(
 		'value'   => 'yes',
 		'default' => 'yes',
 		'helper'  => __( 'Replaces selected page content with default Show Archive. Alternatively customize display using the shortcode:', 'radio-station' ) . ' [shows-archive]',
-		'tab'     => 'pages',
-		'section' => 'archives',
+		'tab'     => 'archives',
+		'section' => 'posttypes',
 	),
 
 	// ? --- Redirect Shows Archive --- ?
@@ -1093,8 +1099,8 @@ $options = array(
 	// 	'value'   => 'yes',
 	// 	'default' => '',
 	// 	'helper'  => __( 'Redirect Custom Post Type Archive for Shows to Shows Archive Page.', 'radio-station' ),
-	// 	'tab'     => 'pages',
-	// 	'section' => 'archives',
+	// 	'tab'     => 'archives',
+	// 	'section' => 'posttypes',
 	// ),
 
 	// --- Overrides Archive Page ---
@@ -1104,8 +1110,8 @@ $options = array(
 		'options' => 'PAGEID',
 		'default' => '',
 		'helper'  => __( 'Select the Page for displaying the Override archive list.', 'radio-station' ),
-		'tab'     => 'pages',
-		'section' => 'archives',
+		'tab'     => 'archives',
+		'section' => 'posttypes',
 	),
 
 	// --- Automatic Display ---
@@ -1115,8 +1121,8 @@ $options = array(
 		'value'   => 'yes',
 		'default' => 'yes',
 		'helper'  => __( 'Replaces selected page content with default Override Archive. Alternatively customize display using the shortcode:', 'radio-station' ) . ' [overrides-archive]',
-		'tab'     => 'pages',
-		'section' => 'archives',
+		'tab'     => 'archives',
+		'section' => 'posttypes',
 	),
 
 	// ? --- Redirect Overrides Archive --- ?
@@ -1126,8 +1132,8 @@ $options = array(
 	// 	'value'   => 'yes',
 	// 	'default' => '',
 	// 	'helper'  => __( 'Redirect Custom Post Type Archive for Overrides to Overrides Archive Page.', 'radio-station' ),
-	// 	'tab'     => 'pages',
-	// 	'section' => 'archives',
+	// 	'tab'     => 'archives',
+	// 	'section' => 'posttypes',
 	// ),
 
 	// --- Playlists Archive Page ---
@@ -1137,8 +1143,8 @@ $options = array(
 		'options' => 'PAGEID',
 		'default' => '',
 		'helper'  => __( 'Select the Page for displaying the Playlist archive list.', 'radio-station' ),
-		'tab'     => 'pages',
-		'section' => 'archives',
+		'tab'     => 'archives',
+		'section' => 'posttypes',
 	),
 
 	// --- Automatic Display ---
@@ -1148,8 +1154,8 @@ $options = array(
 		'value'   => 'yes',
 		'default' => 'yes',
 		'helper'  => __( 'Replaces selected page content with default Playlist Archive. Alternatively customize display using the shortcode:', 'radio-station' ) . ' [playlists-archive]',
-		'tab'     => 'pages',
-		'section' => 'archives',
+		'tab'     => 'archives',
+		'section' => 'posttypes',
 	),
 
 	// ? --- Redirect Playlists Archive --- ?
@@ -1159,9 +1165,43 @@ $options = array(
 	// 	'value'   => 'yes',
 	// 	'default' => '',
 	// 	'helper'  => __( 'Redirect Custom Post Type Archive for Playlists to Playlist Archive Page.', 'radio-station' ),
-	// 	'tab'     => 'pages',
-	// 	'section' => 'archives',
+	// 	'tab'     => 'archives',
+	// 	'section' => 'posttypes',
 	// ),
+
+	// --- [Pro] Team Archive Page ---
+	// 2.4.0.6: added option for team archive page
+	'team_archive_page' => array(
+		'label'   => __( 'Team Archive Page', 'radio-station' ),
+		'type'    => 'select',
+		'options' => 'PAGEID',
+		'default' => '',
+		'helper'  => __( 'Select the Page for displaying the Team archive list.', 'radio-station' ),
+		'tab'     => 'archives',
+		'section' => 'posttypes',
+		'pro'     => true,
+	),
+
+	// --- [Pro] Automatic Display ---
+	// 2.4.0.6: added option for team archive page
+	'team_archive_auto' => array(
+		'label'   => __( 'Automatic Display', 'radio-station' ),
+		'type'    => 'select',
+		'options' => array(
+			''     => __( 'Off', 'radio-station' ),
+			'yes'  => __( 'List', 'radio-station' ),
+			// 'grid' => __( 'Grid', 'radio-station' ),		
+		),
+		'value'   => 'yes',
+		'default' => 'yes',
+		'helper'  => __( 'Replaces selected page content with default Team Archive. Alternatively customize display using the shortcode:', 'radio-station' ) . ' [teams-archive]',
+		'tab'     => 'archives',
+		'section' => 'posttypes',
+		'pro'     => true,
+	),
+
+	// === Taxonomy Archives ===
+	// 2.4.0.6: added taxonomy archives section
 
 	// --- Genres Archive Page ---
 	'genre_archive_page' => array(
@@ -1170,8 +1210,8 @@ $options = array(
 		'options' => 'PAGEID',
 		'default' => '',
 		'helper'  => __( 'Select the Page for displaying the Genre archive list.', 'radio-station' ),
-		'tab'     => 'pages',
-		'section' => 'archives',
+		'tab'     => 'archives',
+		'section' => 'taxonomies',
 	),
 
 	// --- Automatic Display ---
@@ -1181,8 +1221,8 @@ $options = array(
 		'value'   => 'yes',
 		'default' => 'yes',
 		'helper'  => __( 'Replaces selected page content with default Genre Archive. Alternatively customize display using the shortcode:', 'radio-station' ) . ' [genres-archive]',
-		'tab'     => 'pages',
-		'section' => 'archives',
+		'tab'     => 'archives',
+		'section' => 'taxonomies',
 	),
 
 	// ? --- Redirect Genres Archives --- ?
@@ -1192,8 +1232,8 @@ $options = array(
 	//	'value'   => 'yes',
 	//	'default' => '',
 	//	'helper'  => __( 'Redirect Taxonomy Archive for Genres to Genres Archive Page.', 'radio-station' ),
-	//	'tab'     => 'pages',
-	//	'section' => 'archives',
+	//	'tab'     => 'archives',
+	//	'section' => 'taxonomies',
 	// ),
 
 	// --- Languages Archive Page ---
@@ -1204,8 +1244,8 @@ $options = array(
 		'options' => 'PAGEID',
 		'default' => '',
 		'helper'  => __( 'Select the Page for displaying the Language archive list.', 'radio-station' ),
-		'tab'     => 'pages',
-		'section' => 'archives',
+		'tab'     => 'archives',
+		'section' => 'taxonomies',
 	),
 
 	// --- Automatic Display ---
@@ -1216,8 +1256,8 @@ $options = array(
 		'value'   => 'yes',
 		'default' => 'yes',
 		'helper'  => __( 'Replaces selected page content with default Language Archive. Alternatively customize display using the shortcode:', 'radio-station' ) . ' [languages-archive]',
-		'tab'     => 'pages',
-		'section' => 'archives',
+		'tab'     => 'archives',
+		'section' => 'taxonomies',
 	),
 
 	// ? --- Redirect Languages Archives --- ?
@@ -1227,8 +1267,8 @@ $options = array(
 	//	'value'   => 'yes',
 	//	'default' => '',
 	//	'helper'  => __( 'Redirect Taxonomy Archive for Languages to Languages Archive Page.', 'radio-station' ),
-	//	'tab'     => 'pages',
-	//	'section' => 'archives',
+	//	'tab'     => 'archives',
+	//	'section' => 'taxonomies',
 	// ),
 
 	// === Single Templates ===
@@ -1429,10 +1469,12 @@ $options = array(
 	// 2.3.2: add widget options tab
 	// 2.3.3.8: added player options tab
 	// 2.3.3.8: move templates section onto pages tab
+	// 2.4.0.6: added separate archives tab
 	'tabs'                    => array(
 		'general'   => __( 'General', 'radio-station' ),
-		'pages'     => __( 'Pages', 'radio-station' ),
 		'player'    => __( 'Player', 'radio-station' ),
+		'pages'     => __( 'Pages', 'radio-station' ),
+		'archives'  => __( 'Archives', 'radio-station' ),
 		// 'templates' => __( 'Templates', 'radio-station' ),
 		'widgets'   => __( 'Widgets', 'radio-station' ),
 		'roles'     => __( 'Roles', 'radio-station' ),
@@ -1441,21 +1483,26 @@ $options = array(
 	// --- Section Labels ---
 	// 2.3.2: add widget loading section
 	// 2.3.3.9: added profile pages section
+	// 2.4.0.6: added performance section
+	// 2.4.0.6: added posttypes and taxonomies archive sections
 	'sections'                => array(
 		'broadcast'   => __( 'Broadcast', 'radio-station' ),
 		'station'     => __( 'Station', 'radio-station' ),
 		'feeds'       => __( 'Feeds', 'radio-station' ),
+		'performance' => __( 'Performance', 'radio-station' ),
 		'basic'       => __( 'Basic Defaults', 'radio-station' ),
 		'advanced'    => __( 'Advanced Defaults', 'radio-station' ),
 		'colors'      => __( 'Player Colors', 'radio-station' ),
 		'bar'         => __( 'Sitewide Bar Player', 'radio-station' ),
-		'single'      => __( 'Single Templates', 'radio-station' ),
-		'archive'     => __( 'Archive Templates', 'radio-station' ),
 		'schedule'    => __( 'Schedule Page', 'radio-station' ),
+		'single'      => __( 'Single Templates', 'radio-station' ),
+		// 'archive'     => __( 'Archive Templates', 'radio-station' ),
 		'show'        => __( 'Show Pages', 'radio-station' ),
 		'profile'     => __( 'Profile Pages', 'radio-station' ),
 		'episode'     => __( 'Episode Pages', 'radio-station' ),
 		'archives'    => __( 'Archives', 'radio-station' ),
+		'posttypes'   => __( 'Post Types', 'radio-station' ),
+		'taxonomies'  => __( 'Taxonomies', 'radio-station' ),
 		'loading'     => __( 'Widget Loading', 'radio-station' ),
 		'permissions' => __( 'Permissions', 'radio-station' ),
 	),

@@ -28,9 +28,9 @@ function radio_show_tab(prefix,tab) {
 		for (i = 0; i < tabs.length; i++) {
 			tabs[i].className = tabs[i].className.replace('-tab-active', '-tab-inactive');
 		}
-		tabs = document.getElementsByClassName(prefix+'-section');
+		sections = document.getElementsByClassName(prefix+'-section');
 		for (i = 0; i < sections.length; i++) {
-			tabs[i].className = tabs[i].className.replace('-tab-active', '-tab-inactive');
+			sections[i].className = sections[i].className.replace('-tab-active', '-tab-inactive');
 		}
 		button = document.getElementById(prefix+'-'+tab+'-tab');
 		button.className = button.className.replace('-tab-inactive', '-tab-active');
