@@ -3644,7 +3644,11 @@ if (!class_exists('GHF_Markdown_Parser')) {
 		 *
 		 * @param boolean $preserve_shortcodes Defaults to $this->preserve_shortcodes.
 		 */
-		$this->preserve_shortcodes = apply_filters( 'jetpack_markdown_preserve_shortcodes', $this->preserve_shortcodes ) && function_exists( 'get_shortcode_regex' );
+		if ( function_exists( 'apply_filters' ) ) {
+			$this->preserve_shortcodes = apply_filters( 'jetpack_markdown_preserve_shortcodes', $this->preserve_shortcodes ) && function_exists( 'get_shortcode_regex' );
+		} else {
+			$this->preserve_shortcodes = $this->preserve_shortcodes && function_exists( 'get_shortcode_regex' );
+		}
 		$this->preserve_latex      = function_exists( 'latex_markup' );
 		$this->strip_paras         = function_exists( 'wpautop' );
 
@@ -3689,7 +3693,10 @@ if (!class_exists('GHF_Markdown_Parser')) {
 		 *
 		 * @param array $custom_patterns Array of custom patterns to be ignored by Markdown.
 		 */
-		$custom_patterns = apply_filters( 'jetpack_markdown_preserve_pattern', array() );
+		$custom_patterns = array();
+		if ( function_exists( 'apply_filters' ) ) {
+			$custom_patterns = apply_filters( 'jetpack_markdown_preserve_pattern', $custom_patterns );
+		}
 		if ( is_array( $custom_patterns ) && ! empty( $custom_patterns ) ) {
 			foreach ( $custom_patterns as $pattern ) {
 				$text = preg_replace_callback( $pattern, array( $this, '_doRemoveText'), $text );

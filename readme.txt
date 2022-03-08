@@ -4,7 +4,7 @@ Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
 Tested up to: 5.9
-Stable tag: 2.4.0.6
+Stable tag: 2.4.0.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -217,6 +217,11 @@ You can now visit your site to make sure nothing is broken. If you experience is
 8. Show Conflict Display
 
 == Changelog ==
+
+= 2.4.0.7 =
+* Fix: remove debug output breaking redirects/data endpoints
+* Updated: main language translation file
+* Added: list of Pro filters to documentation
 
 = 2.4.0.6 =
 * Update: Freemius SDK (2.4.3)
