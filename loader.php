@@ -1353,7 +1353,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// if ( !is_admin() ) {
 			//	return;
 			// }
-			echo '<span style="display:none;">Freemius Loading...</span>';
+			// echo '<span style="display:none;">Freemius Loading...</span>';
 
 			$args = $this->args;
 			$namespace = $this->namespace;
@@ -1467,9 +1467,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 				// --- filter settings before initializing ---
 				$settings = apply_filters( 'freemius_init_settings_' . $args['namespace'], $settings );
-				// if ( $this->debug ) {
+				if ( $this->debug ) {
 					echo '<span style="display:none;">Freemius Settings: ' . print_r( $settings, true ) . '</span>';
-				// }
+				}
 				if ( !$settings || !is_array( $settings ) ) {
 					return;
 				}

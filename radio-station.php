@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://radiostation.pro/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.4.0.6
+Version: 2.4.0.7
 Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
@@ -995,6 +995,23 @@ $options = array(
 	 	'tab'     => 'pages',
 	 	'section' => 'show',
 	 	'pro'     => true,
+	),
+
+	// --- [Pro] Combined Team Tab ---
+	// 2.4.0.7: added combined team grid option
+	'combined_team_tab' => array(
+		'type'    => 'select',
+		'label'   => __( 'Combined Team Tab', 'radio-station' ),
+		'default' => 'yes',
+		'options' => array(
+			''     => __( 'Do Not Combine', 'radio-station' ),
+			'yes'  => __( 'Combined List', 'radio-station' ),
+			// 'grid' => __( 'Combined Grid', 'radio-station' ),
+		),
+		'helper'  => __( 'Combine team members (eg. hosts, producers) into a single display tab.', 'radio-station' ),
+		'tab'     => 'pages',
+		'section' => 'show',
+		'pro'     => true,
 	),
 
 	// === Profile Pages ===
