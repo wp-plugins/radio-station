@@ -1711,6 +1711,7 @@ function radio_station_check_version() {
 // 2.2.8: fix for mismatched flag function name
 register_activation_hook( RADIO_STATION_FILE, 'radio_station_plugin_activation' );
 function radio_station_plugin_activation() {
+
 	// --- flag to flush rewrite rules ---
 	// 2.2.3: added this for custom post types rewrite flushing
 	add_option( 'radio_station_flush_rewrite_rules', true );
@@ -1723,6 +1724,9 @@ function radio_station_plugin_activation() {
 	// --- set welcome redirect transient ---
 	// TODO: check if handled by Freemius activation
 	// set_transient( 'radio_station_welcome', 1, 7 );
+	
+	// 2.4.0.8: clear plugin updates transient on activation
+	delete_site_transient( 'update_plugins' );
 }
 
 // ---------------------------
@@ -1734,14 +1738,39 @@ function radio_station_welcome_redirect() {
 		return;
 	}
 	delete_transient( 'radio_station_welcome' );
-	wp_safe_redirect( admin_url( 'admin.php?page=radio-station&welcome=1' ) );
+	$location = admin_url( 'admin.php?page=radio-station&welcome=1' );
+	wp_safe_redirect( $location );
 	exit;
 } */
 
 // -----------------------------------
 // Flush Rewrite Rules on Deactivation
 // -----------------------------------
-register_deactivation_hook( RADIO_STATION_FILE, 'flush_rewrite_rules' );
+// 2.4.0.8: clear plugin updates transient on deactivation
+register_deactivation_hook( RADIO_STATION_FILE, 'radio-station_deactivatoin');
+function radio_station_deactivation() {
+	flush_rewrite_rules();
+	delete_site_transient( 'update_plugins' );
+}
+
+// -------------------------------
+// Filter Plugin Updates Transient
+// -------------------------------
+// 2.4.0.8: added to ensure Pro never overwrites free on update
+add_filter( 'pre_set_site_transient_update_plugins', 'radio_station_transient_update_plugins', 999 );
+add_filter( 'site_transient_update_plugins', 'radio_station_transient_update_plugins', 999 );
+function radio_station_transient_update_plugins( $transient_data ) {
+	if ( property_exists( $transient_data, 'response' ) ) {
+		$response = $transient_data->response;
+		if ( isset( $response[RADIO_STATION_BASENAME] ) ) {
+			if ( strstr( $response[RADIO_STATION_BASENAME]->url, 'freemius' ) ) {
+				unset( $response[RADIO_STATION_BASENAME] );
+			}
+		}
+		$transient_data->response = $response;
+	}
+	return $transient_data;
+}
 
 // ----------------------
 // Enqueue Plugin Scripts

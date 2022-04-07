@@ -111,6 +111,7 @@
       <workItem from="1583424666269" duration="583000" />
       <workItem from="1584356055304" duration="7703000" />
       <workItem from="1626695125388" duration="1227000" />
+      <workItem from="1647486982279" duration="94000" />
     </task>
     <servers />
   </component>
@@ -118,10 +119,10 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="508" y="222" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1626764163195">
+    <state x="446" y="184" key="com.intellij.ide.util.TipDialog" timestamp="1647487113248">
       <screen x="218" y="0" width="1062" height="720" />
     </state>
-    <state x="508" y="222" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/218.0.1062.720@218.0.1062.720" timestamp="1626764163195" />
+    <state x="446" y="184" key="com.intellij.ide.util.TipDialog/218.0.1062.720@218.0.1062.720" timestamp="1647487113248" />
   </component>
   <component name="WordPressConfiguration" enabled="true">
     <wordpressPath>C:\!WP\InstantWP_4.5\iwpserver\htdocs\wordpress</wordpressPath>

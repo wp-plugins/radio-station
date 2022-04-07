@@ -121,13 +121,14 @@ function radio_station_license_activation_link( $links, $file ) {
 		}
 
 		// --- remove activate premium license link from free version ---
-		if ( strstr( $key, 'activate-license' ) ) {
+		// 2.4.0.8: moved handling of this to within Pro
+		/* if ( strstr( $key, 'activate-license' ) ) {
 			if ( defined( 'RADIO_STATION_PRO_FILE' ) ) {
 				global $radio_station_activation_link;
 				$radio_station_activation_link = $link;
 			}
 			unset( $links[$key] );
-		}
+		} */
 
 		// --- remove upgrade link if Pro is already installed ---
 		if ( defined( 'RADIO_STATION_PRO_FILE' ) && strstr( $key, 'upgrade' ) ) {

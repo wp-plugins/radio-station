@@ -218,6 +218,10 @@ You can now visit your site to make sure nothing is broken. If you experience is
 
 == Changelog ==
 
+= 2.4.0.8 =
+* Updated: clear plugin updates transient on activation/deactivation
+* Fixed: filter plugin updates to prevent Pro ever overwriting Free
+
 = 2.4.0.7 =
 * Fix: remove debug output breaking redirects/data endpoints
 * Updated: main language translation file

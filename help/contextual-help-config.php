@@ -30,7 +30,7 @@ function radio_station_contextual_help( $contextual_help, $screen_id, $screen ) 
 			$content = radio_station_get_help_output( $help_file );
 			$screen->add_help_tab( array(
 				'id'        =>  'rs-edit-show',
-				'title'     =>  __( 'Managing Shows' ), // tab name
+				'title'     =>  __( 'Managing Shows' ),
 				'content'   =>  $content,
 			) );
 		}
@@ -46,7 +46,7 @@ function radio_station_contextual_help( $contextual_help, $screen_id, $screen ) 
 		  $content = radio_station_get_help_output( $help_file );
 		  $screen->add_help_tab( array(
 			'id'        =>  'rs-import',
-			'title'     =>  __( 'Import' ), // tab name
+			'title'     =>  __( 'Import' ),
 			'content'   =>  $content,
 		  ) );
 		}
@@ -54,10 +54,10 @@ function radio_station_contextual_help( $contextual_help, $screen_id, $screen ) 
 		// --- export feature documentation tab ---
 		$help_file = RADIO_STATION_DIR . '/help/export.php';
 		if ( file_exists( $help_file ) ) {
-		  $content = radio_station_get_help_output($help_file);
+		  $content = radio_station_get_help_output( $help_file );
 		  $screen->add_help_tab( array(
 			'id'        =>  'rs-export',
-			'title'     =>  __( 'Export' ),  // tab name
+			'title'     =>  __( 'Export' ),
 			'content'   =>  $content,
 		  ) );
 		}
@@ -68,7 +68,7 @@ function radio_station_contextual_help( $contextual_help, $screen_id, $screen ) 
 			$content = radio_station_get_help_output( $help_file );
 			$screen->add_help_tab( array(
 				'id'        =>  'yaml-data-format',
-				'title'     =>  __( 'YAML format '), // tab name
+				'title'     =>  __( 'YAML format '),
 				'content'   =>  $content,
 			) );
 		}
@@ -79,7 +79,7 @@ function radio_station_contextual_help( $contextual_help, $screen_id, $screen ) 
 			$content = radio_station_get_help_output( $help_file );
 			$screen->add_help_tab( array(
 				'id'        =>  'rs-show-schedule',
-				'title'     =>  __ ('show-schedule:' ),  // tab name
+				'title'     =>  __ ('Show Schedule' ),
 				'content'   =>  $content,
 			) );
 		}
