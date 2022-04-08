@@ -147,7 +147,7 @@
 .show-post-thumbnail, .show-playlist-thumbnail, .show-host-thumbnail, .show-producer-thumbnail, .show-episode-thumbnail {
 	padding-right: 30px;
 	margin-top: 10px;
-	min-width: 150px;
+	min-width:! 150px;
 }
 
 .show-post-info, .show-playlist-info, .show-host-thumbnail, .show-producer-thumbnail .show-episode-info {

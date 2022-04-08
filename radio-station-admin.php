@@ -98,9 +98,18 @@ function radio_station_admin_styles() {
 // ------------------------------
 // 2.4.0.3: filter license activation link for free version on plugin page
 // note: this is because Pro is a separate plugin not a replacement one
-add_filter( 'plugin_action_links_' . RADIO_STATION_BASENAME, 'radio_station_license_activation_link', 20, 2 );
+// add_filter( 'plugin_action_links', 'radio_station_plugin_links', 99, 2 );
+function radio_station_plugin_links( $links, $file ) {
+	if ( RADIO_STATION_BASENAME == $file ) {
+		echo '<span style="display:none;">RS Plugin Links: ' . print_r( $links, true ) . '</span>';
+	}
+	return $links;
+}
+add_filter( 'plugin_action_links_' . RADIO_STATION_BASENAME, 'radio_station_plugin_page_links', 20, 2 );
 // add_filter( 'network_admin_plugin_action_links_' . RADIO_STATION_BASENAME, , 'radio_station_license_activation_link', 20, 2 );
-function radio_station_license_activation_link( $links, $file ) {
+function radio_station_plugin_page_links( $links, $file ) {
+
+	global $radio_station_data;
 
 	if ( RADIO_STATION_DEBUG ) {
 		echo '<span style="display:none;">RS Plugin Links A: ' . print_r( $links, true ) . '</span>' . PHP_EOL;
@@ -114,7 +123,6 @@ function radio_station_license_activation_link( $links, $file ) {
 		
 		// 2.4.0.6: remove addons link from Free by default
 		if ( strstr( $link, '-addons' ) ) {
-			global $radio_station_data;
 			if ( !$radio_station_data['settings']['hasaddons'] ) {
 				unset( $links[$key] );
 			}
@@ -122,13 +130,11 @@ function radio_station_license_activation_link( $links, $file ) {
 
 		// --- remove activate premium license link from free version ---
 		// 2.4.0.8: moved handling of this to within Pro
-		/* if ( strstr( $key, 'activate-license' ) ) {
-			if ( defined( 'RADIO_STATION_PRO_FILE' ) ) {
-				global $radio_station_activation_link;
-				$radio_station_activation_link = $link;
-			}
-			unset( $links[$key] );
-		} */
+		// if ( 'activate-license radio-station' == $key ) {
+		//	if ( !defined( 'RADIO_STATION_PRO_FILE' ) && !$radio_station_data['settings']['hasaddons'] ) {
+		//		unset( $links[$key] );
+		//	}
+		// }
 
 		// --- remove upgrade link if Pro is already installed ---
 		if ( defined( 'RADIO_STATION_PRO_FILE' ) && strstr( $key, 'upgrade' ) ) {
