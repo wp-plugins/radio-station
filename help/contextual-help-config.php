@@ -6,11 +6,14 @@
  * Licence: GPL3
  */
 
+ define( 'RADIO_STATION_PREFIX', 'radio-station' );
+
 // -----------------------
 // Contextual Help Screens
 // -----------------------
-add_action( 'contextual_help', 'radio_station_contextual_help', 10, 3 );
-function radio_station_contextual_help( $contextual_help, $screen_id, $screen ) {
+add_action( 'current_screen', 'radio_station_contextual_help', 10, 3 );
+function radio_station_contextual_help() {
+	$screen = get_current_screen();
 
 	// Add a custom if statement stanza per screen you wish to include help on.
 	// Make sure the screen id in the if condition matches the page where you want the included help to appear
@@ -19,7 +22,7 @@ function radio_station_contextual_help( $contextual_help, $screen_id, $screen ) 
 	// if statement multiple times (with a unique help tab id for each one).
 
 	// uncomment line below and view log file to id a particular screen
-	// error_log("Displaying screen '". print_r($screen->id,true)."'\n", 3, "/tmp/my-errors.log"); //code to write a line to wp-content/debug.log (works)
+	// error_log("Displaying screen '". print_r($screen->id,true)."'\n", 0); //code to write a line to wp-content/debug.log (works)
 
 	// --- edit show contextual help ---
 	// TODO: re-enable when Managing Shows help text is written
@@ -37,7 +40,7 @@ function radio_station_contextual_help( $contextual_help, $screen_id, $screen ) 
 	} */
 
 	// --- contextual help for import/export screen ---
-	$prefix = $screen->parent_base . '_page_';
+	$prefix = RADIO_STATION_PREFIX . '_page_';
 	if ( $prefix . 'import-export-shows' == $screen->id ) {
 
 		// --- import feature documentation tab ---
@@ -85,7 +88,7 @@ function radio_station_contextual_help( $contextual_help, $screen_id, $screen ) 
 		}
 	}
 
-	return $contextual_help;
+	// return $contextual_help;
 
 }
 
