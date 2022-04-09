@@ -6,15 +6,15 @@ Radio Station lets you build and manage a Show Schedule for a radio station or I
 
 Contributors: tonyzeoli, majick
 
-Donate link: https://www.patreon.com/radiostation
+Donate link: https://netmix.co/donate
 
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 
 Requires at least: 3.3.1
 
-Tested up to: 5.9
+Tested up to: 5.9.3
 
-Stable tag: 2.4.0.7
+Stable tag: 2.4.0.8
 
 License: GPLv2 or later
 
