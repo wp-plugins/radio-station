@@ -7,6 +7,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### 2.4.0.8
+* Update: Plugin Panel (1.2.2)
+* Added: filter plugin icon for Freemius activation screen
+* Updated: clear plugin updates transient on activation/deactivation
+* Fixed: filter plugin updates to prevent Pro ever overwriting Free
+* Changed: plugin options array moved to a separate file
+
 ### 2.4.0.7
 * Fix: remove debug output breaking redirects/data endpoints
 * Updated: main language translation file
