@@ -424,9 +424,11 @@ function radio_station_add_show_info_metabox() {
 function radio_station_show_info_metabox() {
 
 	global $post;
-	$post_id = 0;
-	if ( property_exists( $post, 'ID' ) ) {
+	// 2.4.0.9: added check for object for PHP8
+	if ( is_object( $post ) && property_exists( $post, 'ID' ) ) {
 		$post_id = $post->ID;
+	} else {
+		$post_id = 0;
 	}
 
 	// 2.3.0: added missing nonce field
@@ -2442,7 +2444,7 @@ function radio_station_show_save_data( $post_id ) {
 add_action( 'delete_post', 'radio_station_show_delete', 10, 2 );
 function radio_station_show_delete( $post_id, $post ) {
 
-	if ( !property_exists( $post, 'post_type' ) ) {
+	if ( !is_object( $post ) || !property_exists( $post, 'post_type' ) ) {
 		$post = get_post( $post_id );
 	}
 	// 2.4.0.3: also trigger clear data for playlists

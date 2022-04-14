@@ -644,7 +644,8 @@ function radio_station_get_upgrade_notice() {
 	if ( RADIO_STATION_DEBUG ) {
 		echo '<span style="display:none;">Update Transient: ' . print_r( $pluginupdates, true ) . '</span>';
 	}
-	if ( property_exists( $pluginupdates, 'response' ) ) {
+	// 2.4.0.9: check for object for PHP8
+	if ( $pluginupdates && is_object( $pluginupdates ) && property_exists( $pluginupdates, 'response' ) ) {
 		foreach ( $pluginupdates->response as $file => $update ) {
 			if ( is_object( $update ) && property_exists( $update, 'slug' ) ) {
 				if ( $update->slug == $pluginslug ) {
