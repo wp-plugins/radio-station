@@ -218,6 +218,9 @@ You can now visit your site to make sure nothing is broken. If you experience is
 
 == Changelog ==
 
+= 2.4.0.9 =
+* Update: Sysend (1.11.1) for Radio Player
+
 = 2.4.0.8 =
 * Update: Plugin Panel (1.2.2)
 * Added: filter plugin icon for Freemius activation screen

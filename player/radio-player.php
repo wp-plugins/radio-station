@@ -941,7 +941,8 @@ function radio_station_player_core_scripts() {
 	}
 
 	// --- enqueue sysend message script ---
-	$version = '1.3.3';
+	// 2.4.0.9: update sysend to version 1.11.1
+	$version = '1.11.1';
 	if ( function_exists( 'wp_enqueue_script' ) ) {
 
 		// --- enqueue player script ---
@@ -958,7 +959,9 @@ function radio_station_player_core_scripts() {
 
 		// --- output script tag directly ---
 		$url = 'js/sysend.js';
-		if ( defined( 'RADIO_PLAYER_URL' ) ) {$url = RADIO_PLAYER_URL . $url;}
+		if ( defined( 'RADIO_PLAYER_URL' ) ) {
+			$url = RADIO_PLAYER_URL . $url;
+		}
 		echo radio_station_player_script_tag( $url, $version );
 		$radio_player['printed_sysend'] = true;
 
@@ -993,7 +996,9 @@ function radio_station_player_core_scripts() {
 
 		// --- output script tag directly ---
 		$url = 'js/radio-player' . $suffix . '.js';
-		if ( defined( 'RADIO_PLAYER_URL' ) ) {$url = RADIO_PLAYER_URL . $url;}
+		if ( defined( 'RADIO_PLAYER_URL' ) ) {
+			$url = RADIO_PLAYER_URL . $url;
+		}
 		echo radio_station_player_script_tag( $url, $version );
 		$radio_player['printed_player'] = true;
 
@@ -1017,7 +1022,9 @@ function radio_station_player_core_scripts() {
 
 	} else {
 		$url = 'js/amplitude' . $suffix . '.js';
-		if ( defined( 'RADIO_PLAYER_URL' ) ) {$url = RADIO_PLAYER_URL . $url;}
+		if ( defined( 'RADIO_PLAYER_URL' ) ) {
+			$url = RADIO_PLAYER_URL . $url;
+		}
 	}
 	$radio_player['amplitude_script'] = array( 'version' => '5.0.3', 'url' => $url, 'path' => $path );
 
@@ -1049,7 +1056,9 @@ function radio_station_player_core_scripts() {
 		}
 	} else {
 		$url = 'js/howler' . $suffix . '.js';
-		if ( defined( 'RADIO_PLAYER_URL' ) ) {$url = RADIO_PLAYER_URL . $url;}
+		if ( defined( 'RADIO_PLAYER_URL' ) ) {
+			$url = RADIO_PLAYER_URL . $url;
+		}
 	}
 	$radio_player['howler_script'] = array( 'version' => '2.3.1', 'url' => $url, 'path' => $path );
 
