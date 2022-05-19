@@ -328,6 +328,7 @@ function radio_player_play_instance(instance) {
 	player = radio_data.players[instance]; script = radio_data.scripts[instance];
 	if ((script == 'amplitude') || (script == 'howler')) {player.play();}
 	else if (script == 'jplayer') {player.jPlayer('play');}
+	if (radio_player.debug) {console.log('Playing '+script+' Player Instance '+instance); radio_player_is_playing(instance);}
 	radio_player_custom_event('rp-play', {player: player, script: script, instance: instance});
 }
 
@@ -335,6 +336,7 @@ function radio_player_play_instance(instance) {
 function radio_player_pause_instance(instance) {
 	radio_player.loading = false;
 	player = radio_data.players[instance]; script = radio_data.scripts[instance];
+	if (radio_player.debug) {console.log('Pausing '+script+' Player Instance '+instance); radio_player_is_playing(instance);}
 	if ((script == 'amplitude') || (script == 'howler')) {player.pause();}
 	else if (script == 'jplayer') {player.jPlayer('pause');}
 	radio_player_custom_event('rp-pause', {player:player, script:script, instance: instance});
@@ -344,6 +346,7 @@ function radio_player_pause_instance(instance) {
 function radio_player_stop_instance(instance, fadeout) {
 	radio_player.loading = false;
 	player = radio_data.players[instance]; script = radio_data.scripts[instance];
+	if (radio_player.debug) {console.log('Stopping '+script+' Player Instance '+instance); radio_player_is_playing(instance);}
 	if (fadeout) {radio_player_fade_volume(instance, fadeout, 0, 'stop');}
 	else {
 		if (script == 'amplitude') {
@@ -608,7 +611,7 @@ function radio_player_load_state() {
 			radio_data.state.data = data;
 			if ((data.instance == false) || (data.instance == 'undefined')) {data.instance = 1;}
 			radio_data.data[data.instance] = data;
-			console.log(radio_data.data);
+			if (radio_player.debug) {console.log('Radio State Data:'); console.log(radio_data.data);}
 		}
 		if ((volume != null) && (data != null)) {
 			radio_player_volume_slider(data.instance, volume);
@@ -712,23 +715,26 @@ function radio_player_broadcast_playing(instance) {
 		if (typeof radio_data.types[instance] == 'undefined') {type = 0;}
 		else {type = radio_data.types[instance];}
 		if (typeof radio_data.channels[instance] == 'undefined') {channel = 0;}
-		else {channel = radio_data.channels[instance];}
+		else {
+			channel = radio_data.channels[instance];
+			if (typeof channel == 'object') {console.log('Channel Data:'); console.log(channel);}
+			data = channel;
+		}
 		windowid = radio_player_window_guid();
 		if (!instance) {instance = 0;}
-		message = windowid+':'+instance+':'+type+':'+channel;
+		message = windowid+'::'+instance+'::'+type+'::'+data;
 		console.log('Broadcast Message: '+message);
-		if (typeof channel == 'object') {console.log(channel);}
 		sysend.broadcast('radio-play', {message: message});
 	}
 }
 
 /* --- check to pause player on receiving message --- */
 function radio_player_check_to_pause(broadcast) {
-	console.log('Received Message: '+broadcast);
+	console.log('Received Message: '); console.log(broadcast);
 	if (!radio_player.settings.singular) {return;}
-	parts = broadcast.message.split(':');
+	parts = broadcast.message.split('::');
 	winid = parseInt(parts[0]); var radio_player_id = parseInt(parts[1]);
-	type = parseInt(parts[2]); channel = parseInt(parts[3]);
+	type = parseInt(parts[2]); data = parseInt(parts[3]);
 	windowid = radio_player_window_guid();
 	if (radio_data.players.length) {
 		for (i = 0; i < radio_data.players.length; i++) {
@@ -739,29 +745,32 @@ function radio_player_check_to_pause(broadcast) {
 			}
 		}
 	}
+	if (data != '0') {
+		// TODO: get channel data ?
+	}
 }
 
 /* --- send radio broadcast request --- */
-function radio_player_broadcast_request(windowid, instance, action, value) {
-	message = windowid+':'+instance+':'+action+':'+value;
+function radio_player_broadcast_request(windowid, instance, action, data) {
+	message = windowid+'::'+instance+'::'+action+'::'+data;
 	console.log('Broadcast Message: '+message);
 	sysend.broadcast('radio-request', {message: message});
 }
 
 /* --- respond to broadcast with radio action --- */
 function radio_player_broadcast_action(broadcast) {
-	parts = broadcast.message.split(':');
+	parts = broadcast.message.split('::');
 	winid = parseInt(parts[0]); parseInt(instance = parts[1]);
-	action = parts[2]; value = parseInt(parts[3]);
+	action = parts[2]; data = parseInt(parts[3]);
 	windowid = radio_player_window_guid();
 	if (windowid != winid) {return;}
 	if (instance in radio_data.players) {
 		if (action == 'play') {radio_player_play_instance(instance);}
 		else if (action == 'pause') {radio_player_pause_instance(instance);}
 		else if (action == 'stop') {radio_player_stop_instance(instance, false);}
-		else if (action == 'volume') {radio_player_change_volume(instance, value);}
+		else if (action == 'volume') {radio_player_change_volume(instance, data);}
 		else if (action == 'mute') {
-			if (value == 1) {mute = true;} else {mute = false;}
+			if (data == 1) {mute = true;} else {mute = false;}
 			radio_player_mute_unmute(instance, mute);
 		}
 	}
@@ -801,6 +810,8 @@ jQuery(document).ready(function() {
 	jQuery('.rp-play-pause-button').on('click', function() {
 		container = jQuery(this).parents('.radio-container');
 		instance = container.attr('id').replace('radio_container_','');
+		radio_player.debug = true; // DEV TEMP
+		if (radio_player.debug) {console.log('Play/Pause Button Click:'); console.log(jQuery(this));}
 		if (radio_player_is_playing(instance)) {
 			if (radio_player.debug) {console.log('Trigger Pause of Player Instance '+instance);}
 			radio_player_pause_instance(instance);
