@@ -740,7 +740,8 @@ function radio_station_register_rest_routes() {
 	$languages = apply_filters( 'radio_station_route_slug_languages', 'languages' );
 
 	// --- set request method ---
-	$args = array( 'methods' => 'GET' );
+	// 2.4.0.9: fix for missing permission_callback argument warning (WP 5.5+)
+	$args = array( 'methods' => 'GET', 'permission_callback' => '__return_true' );
 
 	// --- Station Route ---
 	// default URL: /wp-json/radio/station/
