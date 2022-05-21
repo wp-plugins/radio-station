@@ -7,6 +7,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### 2.4.0.9
+* Update: Sysend (1.11.1) for Radio Player
+* Fixed: missing register REST routes permission_callback argument
+* Fixed: added property_exists checks for PHP8 TypeErrors
+
 ### 2.4.0.8
 * Update: Plugin Panel (1.2.2)
 * Added: filter plugin icon for Freemius activation screen

@@ -4,7 +4,7 @@ Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
 Tested up to: 5.9.3
-Stable tag: 2.4.0.8
+Stable tag: 2.4.0.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -221,6 +221,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 = 2.4.0.9 =
 * Update: Sysend (1.11.1) for Radio Player
 * Fixed: missing register REST routes permission_callback argument
+* Fixed: added property_exists checks for PHP8 TypeErrors
 
 = 2.4.0.8 =
 * Update: Plugin Panel (1.2.2)
