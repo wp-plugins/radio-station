@@ -45,6 +45,11 @@ function radio_station_master_schedule( $atts ) {
 		$atts['days'] = $atts['single_day'];
 		unset( $atts['single_day'] );
 	}
+	// 2.5.0: convert time attribute to time_format
+	if ( isset( $atts['time'] ) ) {
+		$atts['time_format'] = $atts['time'];
+		unset( $atts['time'] );
+	}
 
 	// --- get default clock display setting ---
 	$clock = radio_station_get_setting( 'schedule_clock' );
@@ -65,6 +70,8 @@ function radio_station_master_schedule( $atts ) {
 	// 2.3.3.9: added active_date attribute for schedule switching
 	$time_format = (int) radio_station_get_setting( 'clock_time_format' );
 	$defaults = array(
+		// --- schedule view ---
+		'view'              => 'table',
 
 		// --- control display options ---
 		'selector'          => 1,
@@ -72,10 +79,6 @@ function radio_station_master_schedule( $atts ) {
 		'timezone'          => 1,
 
 		// --- schedule display options ---
-		'time'              => $time_format,
-		'show_times'        => 1,
-		'show_link'         => 1,
-		'view'              => 'table',
 		'days'              => false,
 		'start_day'         => false,
 		'start_date'        => false,
@@ -83,13 +86,11 @@ function radio_station_master_schedule( $atts ) {
 		'display_day'       => 'short',
 		'display_date'      => 'jS',
 		'display_month'	    => 'short',
-
-		// --- converted and deprecated ---
-		// 'list'              => 0,
-		// 'show_djs'          => 0,
-		// 'display_show_time' => 1,
+		'time_format'       => $time_format,
 
 		// --- show display options ---
+		'show_link'         => 1,
+		'show_times'        => 1,
 		'show_image'        => 0,
 		'show_desc'         => 0,
 		'show_hosts'        => 0,
@@ -97,6 +98,11 @@ function radio_station_master_schedule( $atts ) {
 		'show_genres'       => 0,
 		'show_encore'       => 1,
 		'show_file'         => 0,
+
+		// --- converted and deprecated ---
+		// 'list'              => 0,
+		// 'show_djs'          => 0,
+		// 'display_show_time' => 1,
 	);
 	// 2.3.0: change some defaults for tabbed and list view
 	// 2.3.2: check for comma separated view list
@@ -150,7 +156,7 @@ function radio_station_master_schedule( $atts ) {
 			$defaults['display_date'] = false;
 		} elseif ( in_array( 'list', $views ) ) {
 			$defaults['list_show_genres'] = 1;
-			$defaults['list_display_date'] = false;		
+			$defaults['list_display_date'] = false;
 		}
 		if ( ( 'divs' == $atts['view'] ) || ( in_array( 'divs', $views ) ) ) {
 			// 2.3.3.8: moved divs view only default here
@@ -164,7 +170,11 @@ function radio_station_master_schedule( $atts ) {
 	// --- merge attributes with defaults ---
 	$atts = shortcode_atts( $defaults, $atts, 'master-schedule' );
 	if ( RADIO_STATION_DEBUG ) {
-		echo '<span style="display:none;">Master Schedule Shortcode Attributes: ' . print_r( $atts, true ) . '</span>';
+		echo '<span style="display:none;">Master Schedule Shortcode Attributes: ' . esc_html( print_r( $atts, true ) ) . '</span>';
+	}
+	// 2.5.0: force empty start_day string to false
+	if ( '' == $atts['start_day'] ) {
+		$atts['start_day'] = false;
 	}
 
 	// --- enqueue schedule stylesheet ---
@@ -176,15 +186,13 @@ function radio_station_master_schedule( $atts ) {
 
 	// 2.3.3.9: remove check if clock shortcode present
 	// 2.3.3.6: set new line for easier debug viewing
-	$newline = '';
-	if ( RADIO_STATION_DEBUG ) {
-		$newline = "\n";
-	}
+	// 2.5.0: just set new line for output readability
+	// $newline = "\n";
 
 	// --- table for selector and clock  ---
 	// 2.3.0: moved out from templates to apply to all views
 	// 2.3.2: moved shortcode calls inside and added filters
-	$output .= '<div id="master-schedule-controls-wrapper">' . $newline;
+	$output .= '<div id="master-schedule-controls-wrapper">' . "\n";
 
 		$controls = array();
 
@@ -192,26 +200,26 @@ function radio_station_master_schedule( $atts ) {
 		if ( $atts['clock'] ) {
 
 			// --- radio clock ---
-			$controls['clock'] = '<div id="master-schedule-clock-wrapper">' . $newline;
+			$controls['clock'] = '<div id="master-schedule-clock-wrapper">' . "\n";
 			$clock_atts = apply_filters( 'radio_station_schedule_clock', array(), $atts );
 			$controls['clock'] .= radio_station_clock_shortcode( $clock_atts );
-			$controls['clock'] .= PHP_EOL . '</div>' . $newline;
+			$controls['clock'] .= "\n" . '</div>' . "\n";
 
 		} elseif ( $atts['timezone'] ) {
 
 			// --- radio timezone ---
-			$controls['timezone'] = '<div id="master-schedule-timezone-wrapper">' . $newline;
+			$controls['timezone'] = '<div id="master-schedule-timezone-wrapper">' . "\n";
 			$timezone_atts = apply_filters( 'radio_station_schedule_clock', array(), $atts );
 			$controls['timezone'] .= radio_station_timezone_shortcode( $timezone_atts );
-			$controls['timezone'] .= PHP_EOL . '</div>' . $newline;
+			$controls['timezone'] .= "\n" . '</div>' . "\n";
 
 		}
 
 		// --- genre selector ---
 		if ( $atts['selector'] ) {
-			$controls['selector'] = '<div id="master-schedule-selector-wrapper">' . $newline;
+			$controls['selector'] = '<div id="master-schedule-selector-wrapper">' . "\n";
 			$controls['selector'] .= radio_station_master_schedule_genre_selector();
-			$controls['selector'] .= PHP_EOL . '</div>' . $newline;
+			$controls['selector'] .= "\n" . '</div>' . "\n";
 		}
 
 		// 2.3.1: add filters for control order
@@ -230,13 +238,13 @@ function radio_station_master_schedule( $atts ) {
 			}
 		}
 
-	$output .= '<br></div><br>' . $newline;
+	$output .= '<br></div><br>' . "\n";
 	$output = apply_filters( 'radio_station_schedule_controls_output', $output, $atts );
 
 	// --- hidden inputs for calendar start/active dates ---
 	// 2.3.3.9: added for schedule week change reloading
 	if ( isset( $atts['start_date'] ) && $atts['start_date'] ) {
-		if ( $atts['start_date'] == date( 'Y-m-d', strtotime( $atts['start_date'] ) ) ) {
+		if ( date( 'Y-m-d', strtotime( $atts['start_date'] ) ) == $atts['start_date'] ) {
 			$start_date = $atts['start_date'];
 		}
 	}
@@ -281,35 +289,65 @@ function radio_station_master_schedule( $atts ) {
 	// 2.3.3.9: use output buffering on templates
 	// 2.3.3.9: get and enqueue scripts inline directly
 	if ( 'table' == $atts['view'] ) {
+
+		// --- load table view template ---
 		ob_start();
 		$template = radio_station_get_template( 'file', 'master-schedule-table.php' );
 		require $template;
 		$html = ob_get_contents();
 		ob_end_clean();
-		$html = apply_filters( 'master_schedule_table_view', $html, $atts );
+
+		// --- enqueue table view script ---
 		$js = radio_station_master_schedule_table_js();
 		wp_add_inline_script( 'radio-station', $js );
+
+		// --- filter and return ---
+		// 2.5.0: added prefixed filter for consistency
+		$html = apply_filters( 'radio_station_master_schedule_table_view', $html, $atts );
+		// note: keep backwards compatible non-prefixed filter
+		$html = apply_filters( 'master_schedule_table_view', $html, $atts );
 		return $output . $html;
+
 	} elseif ( 'tabs' == $atts['view'] ) {
+
+		// --- load tabs view template ---
 		ob_start();
 		$template = radio_station_get_template( 'file', 'master-schedule-tabs.php' );
 		require $template;
 		$html = ob_get_contents();
 		ob_end_clean();
-		$html = apply_filters( 'master_schedule_tabs_view', $html, $atts );
+
+		// --- enqueue tabs view script ---
 		$js = radio_station_master_schedule_tabs_js();
-		wp_add_inline_script( 'radio-station', $js );		
+		wp_add_inline_script( 'radio-station', $js );
+
+		// --- filter and return ---
+		// 2.5.0: added prefixed filter for consistency
+		$html = apply_filters( 'radio_station_master_schedule_tabs_view', $html, $atts );
+		// note: keep backwards compatible non-prefixed filter
+		$html = apply_filters( 'master_schedule_tabs_view', $html, $atts );
 		return $output . $html;
+
 	} elseif ( 'list' == $atts['view'] ) {
+
+		// --- load list view template ---
 		ob_start();
 		$template = radio_station_get_template( 'file', 'master-schedule-list.php' );
 		require $template;
 		$html = ob_get_contents();
 		ob_end_clean();
-		$html = apply_filters( 'master_schedule_list_view', $html, $atts );
+
+		// --- enqueue list view script ---
 		$js = radio_station_master_schedule_list_js();
 		wp_add_inline_script( 'radio-station', $js );
+
+		// --- filter and return ---
+		// 2.5.0: added prefixed filter for consistency
+		$html = apply_filters( 'radio_station_master_schedule_list_view', $html, $atts );
+		// note: keep backwards compatible non-prefixed filter
+		$html = apply_filters( 'master_schedule_list_view', $html, $atts );
 		return $output . $html;
+
 	}
 
 	// ----------------------
@@ -425,10 +463,10 @@ function radio_station_master_schedule( $atts ) {
 				// if it ends after midnight, fix it
 				// if it starts at night and ends in the morning, end hour is on the following day
 				if ( ( 'pm' === $time['time']['start_meridian'] && 'am' === $time['time']['end_meridian'] ) ||
-				     // if the start and end times are identical, assume the end time is the following day
-				     ( $time['time']['start_hour'] . $time['time']['start_min'] . $time['time']['start_meridian'] === $time['time']['end_hour'] . $time['time']['end_min'] . $time['time']['end_meridian'] ) ||
-				     // if the start hour is in the morning, and greater than the end hour, assume end hour is the following day
-				     ( 'am' === $time['time']['start_meridian'] && $time['time']['start_hour'] > $time['time']['end_hour'] )
+					// if the start and end times are identical, assume the end time is the following day
+					( $time['time']['start_hour'] . $time['time']['start_min'] . $time['time']['start_meridian'] === $time['time']['end_hour'] . $time['time']['end_min'] . $time['time']['end_meridian'] ) ||
+					// if the start hour is in the morning, and greater than the end hour, assume end hour is the following day
+					( 'am' === $time['time']['start_meridian'] && $time['time']['start_hour'] > $time['time']['end_hour'] )
 				) {
 
 					if ( 12 === (int) $atts['time'] ) {
@@ -459,7 +497,7 @@ function radio_station_master_schedule( $atts ) {
 	// --- include the specified master schedule output template ---
 	// 2.3.0: check for user theme templates
 	if ( 'divs' == $atts['view'] ) {
-		$output = ''; // no selector / clock support yet
+		$output = ''; // no selector / clock support
 		$template = radio_station_get_template( 'file', 'master-schedule-div.php' );
 		require $template;
 	} elseif ( 'legacy' == $atts['view'] ) {
@@ -509,7 +547,7 @@ function radio_station_master_schedule_loader_js( $atts ) {
 		else if (direction == 'previous') {offset = -(7 * 24 * 60 * 60 * 1000);}
 		else if (direction == 'next') {offset = (7 * 24 * 60 * 60 * 1000);}
 		newdate = new Date(new Date(startdate).getTime() + offset).toISOString().substr(0,10);
-		url = '" . $loader_url . "&view='+view;
+		url = '" . esc_urL( $loader_url ) . "&view='+view;
 		timestamp = Math.floor((new Date()).getTime() / 1000);
 		url += '&timestamp='+timestamp+'&start_date='+newdate+'&active_date='+activedate;
 		if (startday != '') {url += '&start_day='+startday;}
@@ -518,13 +556,13 @@ function radio_station_master_schedule_loader_js( $atts ) {
 		if (document.getElementById('schedule-'+view+'-loader').src != url) {
 			document.getElementById('schedule-'+view+'-loader').src = url;
 		}
-	}" . PHP_EOL;
+	}" . "\n";
 
 	// --- filter and return ---
 	$js = apply_filters( 'radio_station_master_schedule_loader_js', $js );
 	return $js;
-} 
-	
+}
+
 // --------------------
 // AJAX Schedule Loader
 // --------------------
@@ -533,21 +571,21 @@ add_action( 'wp_ajax_nopriv_radio_station_schedule', 'radio_station_ajax_schedul
 function radio_station_ajax_schedule_loader() {
 
 	// --- maybe clear cached data ---
-	if ( isset( $_REQUEST['clear'] ) && ( '1' == $_REQUEST['clear'] ) ) {
+	if ( isset( $_REQUEST['clear'] ) && ( '1' == sanitize_title( $_REQUEST['clear'] ) ) ) {
 		radio_station_clear_cached_data( false );
 	}
 
 	// --- sanitize shortcode attributes ---
+	$debug = true;
 	$atts = radio_station_sanitize_shortcode_values( 'master-schedule' );
-	if ( RADIO_STATION_DEBUG ) {
-		print_r( $_REQUEST );
-		echo "Sanitized Master Schedule Shortcode Attributes: " . print_r( $atts, true );
+	if ( RADIO_STATION_DEBUG || $debug ) {
+		echo esc_html( print_r( $_REQUEST, true ) );
+		echo "Sanitized Master Schedule Shortcode Attributes: " . esc_html( print_r( $atts, true ) );
 	}
 
 	// --- output schedule contents ---
-	echo '<div id="schedule-contents">';
+	// 2.5.0: remove unused schedule contents wrap
 	echo radio_station_master_schedule( $atts );
-	echo '</div>';
 
 	$js = '';
 	if ( strstr( $atts['view'], ',' ) ) {
@@ -574,50 +612,68 @@ function radio_station_ajax_schedule_loader() {
 		}
 
 		// --- send new schedule to parent window ---
-		// $js .= "document.getElementById('schedule-contents').innerHTML = '';" . PHP_EOL;
-		$js .= "schedule = document.getElementById('" . esc_attr( $schedule_id ) . "').innerHTML;" . PHP_EOL;
-		$js .= "parent.document.getElementById('" . esc_attr( $schedule_id ) . "').innerHTML = schedule;" . PHP_EOL;
+		$js .= "schedule = document.getElementById('" . esc_attr( $schedule_id ) . "').innerHTML;" . "\n";
+		$js .= "parent.document.getElementById('" . esc_attr( $schedule_id ) . "').innerHTML = schedule;" . "\n";
 		if ( isset( $panels_id ) ) {
-			$js .= "panels = document.getElementById('" . esc_attr( $panels_id ) . "').innerHTML;" . PHP_EOL;
-			$js .= "parent.document.getElementById('" . esc_attr( $panels_id ) . "').innerHTML = panels;" . PHP_EOL;
+			$js .= "panels = document.getElementById('" . esc_attr( $panels_id ) . "').innerHTML;" . "\n";
+			$js .= "parent.document.getElementById('" . esc_attr( $panels_id ) . "').innerHTML = panels;" . "\n";
+			// 2.5.0: unset panels to prevent possible multiple view conflict
+			unset( $panels_id );
 		}
 
 		// --- copy the new start date value to the parent window ---
-		$js .= "start_date = document.getElementById('schedule-start-date').value;" . PHP_EOL;
-		$js .= "parent.document.getElementById('schedule-start-date').value = start_date;" . PHP_EOL;
+		// TODO: get by child class of schedule_id!
+		$js .= "start_date = document.getElementById('schedule-start-date').value;" . "\n";
+		$js .= "parent.document.getElementById('schedule-start-date').value = start_date;" . "\n";
 
-		// --- maybe retrigger view(s) javascript in parent window ---
-		// (uses set interval cycle in case script not yet loaded)
-		$js .= "var genres_highlighted = false;" . PHP_EOL;
-		$js .= "schedule_loader = setInterval(function() {" . PHP_EOL;
-			$js .= "if (!genres_highlighted && (typeof parent.radio_genre_highlight == 'function')) {" . PHP_EOL;
-				$js .= "parent.radio_genre_highlight();" . PHP_EOL;
-				$js .= "genres_highlighted = true;" . PHP_EOL;
-			$js .= "}" . PHP_EOL;
-			if ( 'table' == $view ) {
-				$js .= "if (typeof parent.radio_table_initialize == 'function') {";
-					$js .= "parent.radio_table_initialize();" . PHP_EOL;
-					$js .= "clearInterval(schedule_loader);" . PHP_EOL;
-				$js .= "}" . PHP_EOL;
-			} elseif ( 'tabs' == $view ) {
-				$js .= "if (typeof parent.radio_tabs_initialize == 'function') {";
-					$js .= "parent.radio_tabs_init = false;" . PHP_EOL;
-					$js .= "parent.radio_tabs_initialize();" . PHP_EOL;
-					$js .= "clearInterval(schedule_loader);" . PHP_EOL;
-				$js .= "}" . PHP_EOL;
-			} elseif ( 'list' == $view ) {
-				$js .= "if (typeof parent.radio_list_highlight == 'function') {";
-					$js .= "parent.radio_list_highlight();" . PHP_EOL;
-					$js .= "clearInterval(schedule_loader);" . PHP_EOL;
-			}
-			$js .= "if (typeof parent.radio_convert_times == 'function') {parent.radio_convert_times();}" . PHP_EOL;
-
-			// --- placeholder for extra loader functions ---
-			// (do not remove or modify this line)
-			$js .= "/* LOADER PLACEHOLDER */";
-
-		$js .= "}, 2000);" . PHP_EOL;
 	}
+
+	// --- maybe retrigger view(s) javascript in parent window ---
+	// (uses set interval cycle in case script not yet loaded)
+	$js .= "var genres_highlighted = false;" . "\n";
+	$js .= "schedule_loader = setInterval(function() {" . "\n";
+
+		// --- genre highlighter ---
+		$js .= "if (!genres_highlighted && (typeof parent.radio_genre_highlight == 'function')) {" . "\n";
+			$js .= "parent.radio_genre_highlight();" . "\n";
+			$js .= "genres_highlighted = true;" . "\n";
+		$js .= "}" . "\n";
+
+		// 2.5.0: loop views to add individual init scripts
+		foreach ( $views as $view ) {
+
+			$init_js = '';
+			if ( 'table' == $view ) {
+				$init_js .= "if (typeof parent.radio_table_initialize == 'function') {" . "\n";
+					$init_js .= "parent.radio_table_initialize();" . "\n";
+					// $init_js .= "clearInterval(schedule_loader);" . "\n";
+				$init_js .= "}" . "\n";
+			} elseif ( 'tabs' == $view ) {
+				$init_js .= "if (typeof parent.radio_tabs_initialize == 'function') {" . "\n";
+					$init_js .= "parent.radio_tabs_init = false;" . "\n";
+					$init_js .= "parent.radio_tabs_initialize();" . "\n";
+					// $init_js .= "clearInterval(schedule_loader);" . "\n";
+				$init_js .= "}" . "\n";
+			} elseif ( 'list' == $view ) {
+				$init_js .= "if (typeof parent.radio_list_highlight == 'function') {" . "\n";
+					$init_js .= "parent.radio_list_highlight();" . "\n";
+					// $init_js .= "clearInterval(schedule_loader);" . "\n";
+				$init_js .= "}" . "\n";
+			}
+			// 2.5.0: added individual init script filtering
+			$init_js = apply_filters( 'radio_station_master_schedule_init_script', $init_js, $view, $atts );
+
+		}
+
+		$js .= "if (typeof parent.radio_convert_times == 'function') {parent.radio_convert_times();}" . "\n";
+
+		// --- placeholder for extra loader functions ---
+		// (do not remove or modify this line - for backwards compatibility)
+		$js .= "/* LOADER PLACEHOLDER */";
+
+		$js .= "clearInterval(schedule_loader);" . "\n";
+
+	$js .= "}, 2000);" . "\n";
 
 	// --- filter load script and output ---
 	$js = apply_filters( 'radio_station_master_schedule_load_script', $js, $atts );
@@ -626,7 +682,6 @@ function radio_station_ajax_schedule_loader() {
 	}
 
 	exit;
-
 }
 
 
@@ -658,7 +713,7 @@ function radio_station_master_schedule_genre_selector() {
 	$genre_links = array();
 	foreach ( $genres as $i => $genre ) {
 		$slug = sanitize_title_with_dashes( $genre->name );
-		$onclick = "radio_genre_highlight('" . esc_attr( $slug  ) . "');";
+		$onclick = "radio_genre_highlight('" . esc_attr( $slug ) . "');";
 		$title = __( 'Click to toggle Highlight of Shows with this Genre.', 'radio-station' );
 		$genre_link = '<a id="genre-highlight-' . esc_attr( $slug ) . '" class="genre-highlight" href="javascript:void(0);" onclick="' . $onclick . '" title="' . esc_attr( $title ) . '">';
 		$genre_link .= esc_html( $genre->name ) . '</a>';
@@ -884,7 +939,7 @@ function radio_station_master_schedule_table_js() {
 	/* Shift Day Left /  Right */
 	function radio_shift_day(leftright) {
 		radio_table_responsive(leftright); return false;
-	}" . PHP_EOL;
+	}" . "\n";
 
 	// --- filter and return ---
 	// 2.3.3.9: add filter and return instead of inline enqueue
@@ -924,7 +979,7 @@ function radio_station_master_schedule_tabs_js() {
 			jQuery('.master-schedule-tabs-panel').removeClass('active-day-panel');
 			jQuery('#'+panelID).addClass('active-day-panel');
 		});
-	}" . PHP_EOL;
+	}" . "\n";
 
 	// --- tabbed view responsiveness ---
 	// 2.3.0: added for tabbed responsiveness
@@ -1121,7 +1176,7 @@ function radio_station_master_schedule_tabs_js() {
 	/* Shift Day Left / Right */
 	function radio_shift_tab(leftright) {
 		radio_tabs_responsive(leftright); return false;
-	}" . PHP_EOL;
+	}" . "\n";
 
 	// --- filter and return ---
 	// 2.3.3.9: add filter and return instead of inline enqueue
@@ -1182,10 +1237,11 @@ function radio_station_master_schedule_list_js() {
 		if (radio_list_split) {
 			jQuery('.'+radio_list_split).removeClass('before-current').removeClass('after-current').addClass('nowplaying');
 		}
-	}" . PHP_EOL;
+	}" . "\n";
 
 	// --- filter and return ---
 	// 2.3.3.9: add filter and return instead of inline enqueue
-	$js = apply_filters( 'radio_station_master_schedule_list_js', $js );	
+	$js = apply_filters( 'radio_station_master_schedule_list_js', $js );
 	return $js;
 }
+

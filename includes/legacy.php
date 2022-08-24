@@ -403,10 +403,11 @@ function radio_station_get_now_playing( $time = false ) {
 
 	// TODO: improve handling of playlists for overrides
 	if ( isset( $current_show['override'] ) && $current_show['override'] ) {
+		// TODO: check if override is linked to show
 		$playlist = apply_filters( 'radio_station_override_now_playing', false, $current_show['override'] );
 		return $playlist;
 	}
-	
+
 	// 2.3.3.9: fix to assign current show shifts to playlist data
 	// TODO: match current playlist to assigned show shift ?
 	$playlist = array();
@@ -432,6 +433,9 @@ function radio_station_get_now_playing( $time = false ) {
 		),
 	);
 	$playlist_posts = get_posts( $args );
+	// 2.5.0: added filter for playlist posts
+	$playlist_posts = apply_filters( 'radio_station_playlist_posts', $playlist_posts, $show_id, $time );
+
 	$playlist['query'] = $args;
 	$playlist['posts'] = $playlist_posts;
 
@@ -481,7 +485,6 @@ function radio_station_get_now_playing( $time = false ) {
 	// --- filter and return tracks ---
 	// 2.3.2: added time argument to filter
 	$playlist = apply_filters( 'radio_station_show_now_playing', $playlist, $show_id, $time );
-
 	return $playlist;
 }
 
@@ -663,7 +666,7 @@ function radio_station_legacy_functions() {
 			}
 		}
     }
-    
+
 	if ( !function_exists( 'station_current_schedule' ) ) {
 		function station_current_schedule( $scheds = array() ) {
 			radio_station_deprecated_function( __FUNCTION__, 'radio_station_current_schedule', '2.2.0' );
@@ -677,7 +680,7 @@ function radio_station_legacy_functions() {
 			return radio_station_convert_time( $time );
 		}
 	}
-	
+
 	if ( !function_exists( 'station_convert_schedule_to_24hour' ) ) {
 		function station_convert_schedule_to_24hour( $sched = array() ) {
 			radio_station_deprecated_function( __FUNCTION__, 'radio_station_convert_schedule_to_24hour', '2.2.0' );
@@ -705,7 +708,7 @@ function radio_station_legacy_functions() {
 			return radio_station_get_now_playing();
 		}
 	}
-	
+
 	if ( !function_exists( 'master_get_overrides' ) ) {
 		function master_get_overrides( $currenthour = false, $date = false ) {
 			radio_station_deprecated_function( __FUNCTION__, 'radio_station_master_get_overrides', '2.2.0' );

@@ -72,6 +72,7 @@
 .radio-station-clock-widget .radio-station-server-clock, .radio-station-clock-widget .radio-station-user-clock {
 	font-size: 0.9em;
 	margin-top: 10px;
+	display: inline-block;
 }
 
 .radio-station-clock-widget .radio-server-zone, .radio-station-clock-widget .radio-user-zone {
@@ -135,11 +136,8 @@
 	padding-bottom: 5px;
 }
 
-.show-post-thumbnail, .show-post-info,
-.show-playlist-thumbnail, .show-playlist-info,
-.show-host-thumbnail, .show-host-info,
-.show-producer-thumbnail, .show-producer-info,
-.show-episode-thumbnail, .show-episode-info {
+.show-post-thumbnail, .show-playlist-thumbnail, .show-host-thumbnail, .show-producer-thumbnail, .show-episode-thumbnail,
+.show-post-info, .show-playlist-info, .show-host-info, .show-producer-info, .show-episode-info {
 	display: table-cell;
 	vertical-align: top;
 }
@@ -147,10 +145,10 @@
 .show-post-thumbnail, .show-playlist-thumbnail, .show-host-thumbnail, .show-producer-thumbnail, .show-episode-thumbnail {
 	padding-right: 30px;
 	margin-top: 10px;
-	min-width:! 150px;
+	min-width: 150px;
 }
 
-.show-post-info, .show-playlist-info, .show-host-thumbnail, .show-producer-thumbnail .show-episode-info {
+.show-post-info, .show-playlist-info, .show-host-info, .show-producer-info, .show-episode-info {
 	max-width: 600px;
 }
 

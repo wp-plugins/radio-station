@@ -19,7 +19,7 @@ function radio_countdown() {
 	}
 
     /* Current Show Countdown */
-    jQuery('.current-show-end').each(function() {
+    jQuery('.current-show-list.countdown .current-show-end').each(function() {
     	showendtime = parseInt(jQuery(this).val());
         diff = showendtime - radio.time.current;
         if (radio.debug) {
@@ -33,7 +33,7 @@ function radio_countdown() {
     });
 
     /* Upcoming Show Countdown */
-    jQuery('.upcoming-show-times').each(function() {
+    jQuery('.upcoming-shows-list.countdown .upcoming-show-times').each(function() {
         times = jQuery(this).val().split('-');
         times[0] = parseInt(times[0]); diffa = times[0] - radio.time.current;
         times[1] = parseInt(times[1]); diffb = times[1] - radio.time.current;         
@@ -60,7 +60,9 @@ function radio_countdown() {
     });
     
     /* Continue Countdown */
-    if ( jQuery('.current-show-end') || jQuery('.upcoming-show-times') || jQuery('.current-playlist-end') ) {
+    if ( jQuery('.current-show-list.countdown .current-show-end')
+		|| jQuery('.upcoming-shows-list.countdown .upcoming-show-times')
+		|| jQuery('.current-playlist-end') ) {
         setTimeout('radio_countdown();', 1000);
     }
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="Radio-Station">
+<ruleset name="Radio Station">
 	
 	<!-- Based on 10up-Default Rulset -->
 	<!-- https://raw.githubusercontent.com/10up/phpcs-composer/master/10up-Default/ruleset.xml -->
@@ -7,8 +7,6 @@
 	<description>A Ruleset for checking Radio Station plugin.</description>
 
 	<exclude-pattern>*/phpunit.xml*</exclude-pattern>
-	<exclude-pattern>*/languages/*</exclude-pattern>
-	<exclude-pattern>*/templates/legacy/*</exclude-pattern>
 	<exclude-pattern>*/tests/*</exclude-pattern>
 	<exclude-pattern>*\.(css|js)</exclude-pattern>
 
@@ -27,20 +25,25 @@
 	<config name="ignore_warnings_on_exit" value="1"/>
 
 	<rule ref="WordPress-Extra">
+
+		<!-- General Rules -->
 		<exclude name="WordPress.Files.FileName"/>
 		<exclude name="Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace"/>
 		<exclude name="Squiz.Commenting.InlineComment.InvalidEndChar"/>
+		<exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine"/>
 		<exclude name="Generic.CodeAnalysis.EmptyStatement.DetectedCatch"/>
 		<exclude name="Squiz.Commenting.FunctionComment.ParamCommentFullStop"/>
 		<exclude name="Squiz.Commenting.FunctionComment.ThrowsNoFullStop"/>
 		<exclude name="Generic.Arrays.DisallowShortArraySyntax.Found"/>
 		<exclude name="WordPress.WP.GlobalVariablesOverride.Prohibited"/>
 
+		<!-- Strict Comparisons -->
+		<exclude name="WordPress.PHP.StrictInArray.MissingTrueStrict"/>
+		<exclude name="WordPress.PHP.StrictComparisons.LooseComparison"/>
+
 		<!-- Overzealous Rules -->
 		<exclude name="Squiz.PHP.CommentedOutCode.Found"/>
 		<exclude name="Generic.Files.LineLength.TooLong"/>
-		<exclude name="WordPress.PHP.StrictInArray.MissingTrueStrict"/>
-		<exclude name="WordPress.PHP.StrictComparisons.LooseComparison"/>
 		<exclude name="Generic.Formatting.MultipleStatementAlignment.NotSameWarning"/>
 		<exclude name="Generic.WhiteSpace.ArbitraryParenthesesSpacing.SpaceBeforeClose"/>
 		<exclude name="Generic.WhiteSpace.ArbitraryParenthesesSpacing.SpaceAfterOpen"/>
@@ -66,6 +69,7 @@
 		<exclude name="WordPress.WhiteSpace.DisallowInlineTabs.NonIndentTabsUsed"/>
 		<exclude name="WordPress.WhiteSpace.PrecisionAlignment.Found"/>
 		<exclude name="WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterStructureOpen"/>
+		<exclude name="Squiz.WhiteSpace.SuperfluousWhitespace.EmptyLines"/>
 
 	</rule>
 
@@ -92,6 +96,6 @@
 		<type>warning</type>
 	</rule>
 
-	<rule ref="PHPCompatibilityWP" />
+	<!-- <rule ref="PHPCompatibilityWP" /> -->
 
 </ruleset>

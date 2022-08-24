@@ -7,6 +7,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### 2.5.0
+* Added: Wordpress Radio Blocks (converted Widgets)
+* Updated: Plugin Panel (1.2.6)
+* Updated: Moment JS (2.29.4) with WP Loading
+* Improved: Refactored Schedule Engine Class (1.0.0)
+* Improved: Standardized Widget Input Fields
+* Improved: WordPress Coding Standards
+* Improved: Sanitization using KSES
+* Improved: Translation Implementation
+* Improved: use WP JSON functions for data endpoints
+* Fixed: Countdowns with multiple widget instances
+* Fixed: Radio Player iOS no volume control detection
+
 ### 2.4.0.9
 * Update: Sysend (1.11.1) for Radio Player
 * Fixed: missing register REST routes permission_callback argument

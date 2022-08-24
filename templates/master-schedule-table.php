@@ -18,7 +18,7 @@ if ( isset( $atts['start_date'] ) && $atts['start_date'] ) {
 	$atts['display_month'] = ( !$atts['display_month'] ) ? 'short' : $atts['display_month'];
 } else {
 	// 2.3.3.9: set start date to current date
-	$start_date = $date;	
+	$start_date = $date;
 }
 $start_time = radio_station_to_time( $start_date . ' 00:00:00' );
 $start_time = apply_filters( 'radio_station_schedule_start_time', $start_time, 'table', $atts );
@@ -30,7 +30,7 @@ $shifts_separator = __( 'to', 'radio-station' );
 $shifts_separator = apply_filters( 'radio_station_show_time_separator', $shifts_separator, 'schedule-table' );
 $time_separator = ':';
 $time_separator = apply_filters( 'radio_station_time_separator', $time_separator, 'schedule-table' );
-if ( 24 == (int) $atts['time'] ) {
+if ( 24 == (int) $atts['time_format'] ) {
 	$start_data_format = $end_data_format = 'H' . $time_separator . 'i';
 } else {
 	$start_data_format = $end_data_format = 'g' . $time_separator . 'i a';
@@ -77,19 +77,19 @@ $infokeys = array( 'avatar', 'title', 'hosts', 'times', 'encore', 'file', 'excer
 $infokeys = apply_filters( 'radio_station_schedule_table_info_order', $infokeys );
 
 // --- clear floats ---
-$table = '<div style="clear:both;"></div>' . $newline;
+$table = '<div style="clear:both;"></div>' . "\n";
 
 // --- start master program table ---
-$table .= '<table id="master-program-schedule" cellspacing="0" cellpadding="0">' . $newline;
+$table .= '<table id="master-program-schedule" cellspacing="0" cellpadding="0">' . "\n";
 
 // --- weekday table headings row ---
 // 2.3.2: added hour column heading id
-$table .= '<tr class="master-program-day-row">' . $newline;
-$table .= '<th id="master-program-hour-heading">' . $newline;
+$table .= '<tr class="master-program-day-row">' . "\n";
+$table .= '<th id="master-program-hour-heading">' . "\n";
 // 2.3.3.9: added filters for week loader controls
 $table .= apply_filters( 'radio_station_schedule_loader_control', '', 'table', 'left' );
 $table .= apply_filters( 'radio_station_schedule_loader_control', '', 'table', 'right' );
-$table .= '</th>' . $newline;
+$table .= '</th>' . "\n";
 
 foreach ( $weekdays as $i => $weekday ) {
 
@@ -161,38 +161,37 @@ foreach ( $weekdays as $i => $weekday ) {
 			$classes[] = 'current-day';
 			// $classes[] = 'selected-day';
 		}
-		$class = implode( ' ', $classes );
+		$classlist = implode( ' ', $classes );
 
 		// --- output table column heading ---
 		// 2.3.0: added left/right arrow responsive controls
 		// 2.3.1: added (negative) return to arrow onclick functions
 		// 2.3.2: added check for optional display_date attribute
-		$table .= '<th class="' . esc_attr( $class ) . '">' . $newline;
-		$table .= '<div class="shift-left-arrow">' . $newline;
-		$table .= '<a href="javascript:void(0);" onclick="return radio_shift_day(\'left\');" title="' . esc_attr( __( 'Previous Day', 'radio-station' ) ) . '">' . $arrows['left'] . '</a>' . $newline;
-		$table .= '</div>' . $newline;
-		$table .= '<div class="headings">' . $newline;
-		$table .= '<div class="day-heading"';
-		if ( $atts['display_date'] ) {
-			$table .= ' title="' . esc_attr( $date_subheading ) . '"';
-		}
-		$table .= '>' . esc_html( $display_day ) . '</div>' . $newline;
-		if ( $atts['display_date'] ) {
-			$table .= '<div class="date-subheading">' . esc_html( $date_subheading ) . '</div>' . $newline;
-		}
-		$table .= '</div>' . $newline;
-		$table .= '<div class="shift-right-arrow">' . $newline;
-		$table .= '<a href="javacript:void(0);" onclick="return radio_shift_day(\'right\');" title="' . esc_attr( __( 'Next Day', 'radio-station' ) ) . '">' . $arrows['right'] . '</a>' . $newline;
-		$table .= '</div>' . $newline;
-		// 2.3.2: add day start and end time date
-		$table .= '<span class="rs-time rs-start-time" data="' . esc_attr( $day_start_time ) . '"></span>' . $newline;
-		$table .= '<span class="rs-time rs-end-time" data="' . esc_attr( $day_end_time ) . '"></span>' . $newline;
-
-		$table .= '</th>' . $newline;
+		$table .= '<th class="' . esc_attr( $classlist ) . '">' . "\n";
+			$table .= '<div class="shift-left-arrow">' . "\n";
+				$table .= '<a href="javascript:void(0);" onclick="return radio_shift_day(\'left\');" title="' . esc_attr( __( 'Previous Day', 'radio-station' ) ) . '">' . $arrows['left'] . '</a>' . "\n";
+			$table .= '</div>' . "\n";
+			$table .= '<div class="headings">' . "\n";
+				$table .= '<div class="day-heading"';
+				if ( $atts['display_date'] ) {
+					$table .= ' title="' . esc_attr( $date_subheading ) . '"';
+				}
+				$table .= '>' . esc_html( $display_day ) . '</div>' . "\n";
+				if ( $atts['display_date'] ) {
+					$table .= '<div class="date-subheading">' . esc_html( $date_subheading ) . '</div>' . "\n";
+				}
+			$table .= '</div>' . "\n";
+			$table .= '<div class="shift-right-arrow">' . "\n";
+				$table .= '<a href="javacript:void(0);" onclick="return radio_shift_day(\'right\');" title="' . esc_attr( __( 'Next Day', 'radio-station' ) ) . '">' . $arrows['right'] . '</a>' . "\n";
+			$table .= '</div>' . "\n";
+			// 2.3.2: add day start and end time date
+			$table .= '<span class="rs-time rs-start-time" data="' . esc_attr( $day_start_time ) . '"></span>' . "\n";
+			$table .= '<span class="rs-time rs-end-time" data="' . esc_attr( $day_end_time ) . '"></span>' . "\n";
+		$table .= '</th>' . "\n";
 
 	}
 }
-$table .= '</tr>' . $newline;
+$table .= '</tr>' . "\n";
 
 // --- loop schedule hours ---
 $tcount = 0;
@@ -200,16 +199,16 @@ foreach ( $hours as $hour ) {
 
 	// 2.3.1: fix to set translated hour for display only
 	$raw_hour = $hour;
-	$hour_display = radio_station_convert_hour( $hour, $atts['time'] );
+	$hour_display = radio_station_convert_hour( $hour, $atts['time_format'] );
 	if ( 1 == strlen( $hour ) ) {
 		$hour = '0' . $hour;
 	}
 
 	// --- start hour row ---
-	$table .= '<tr class="master-program-hour-row hour-row-' . esc_attr( $raw_hour ) . '">' . $newline;
+	$table .= '<tr class="master-program-hour-row hour-row-' . esc_attr( $raw_hour ) . '">' . "\n";
 
 	// --- set data format for timezone conversions ---
-	if ( 24 == (int) $atts['time'] ) {
+	if ( 24 == (int) $atts['time_format'] ) {
 		$hour_data_format = "H:i";
 	} else {
 		$hour_data_format = "g a";
@@ -228,22 +227,21 @@ foreach ( $hours as $hour ) {
 	$class = implode( ' ', $classes );
 
 	// --- hour heading ---
-	$table .= '<th class="' . esc_attr( $class ) . '">' . $newline;
+	$table .= '<th class="' . esc_attr( $class ) . '">' . "\n";
+		if ( isset( $_GET['hourdebug'] ) && ( '1' == sanitize_title( $_GET['hourdebug'] ) ) ) {
+			$table .= '<span style="display:none;">';
+			$table .= 'Now' . esc_html( $now ) . '(' . esc_html( date( 'H:i', $now ) ) . ')<br>';
+			$table .= 'Hour Start' . esc_html( $hour_start ) . '(' . esc_html( date( 'H:i', $hour_start ) ) . ')<br>';
+			$table .= 'Hour End' . esc_html( $hour_end ) . '(' . esc_html( date( 'H:i', $hour_end ) ) . ')<br>';
+			$table .= '</span>';
+		}
 
-	if ( isset( $_GET['hourdebug'] ) && ( '1' == $_GET['hourdebug'] ) ) {
-		$table .= '<span style="display:none;">';
-		$table .= 'Now' . $now . '(' . date( 'H:i', $now ) . ')<br>';
-		$table .= 'Hour Start' . $hour_start . '(' . date( 'H:i', $hour_start ) . ')<br>';
-		$table .= 'Hour End' . $hour_end . '(' . date( 'H:i', $hour_end ) . ')<br>';
-		$table .= '</span>';
-	}
-
-	$table .= '<div class="master-program-server-hour rs-time" data="' . esc_attr( $raw_hour ) . '" data-format="' . esc_attr( $hour_data_format ) . '">';
-	$table .= esc_html( $hour_display );
-	$table .= '</div>' . $newline;
-	$table .= '<br>' . $newline;
-	$table .= '<div class="master-program-user-hour rs-time" data="' . esc_attr( $raw_hour ) . '" data-format="' . esc_attr( $hour_data_format ) . '"></div>' . $newline;
-	$table .= '</th>' . $newline;
+		$table .= '<div class="master-program-server-hour rs-time" data="' . esc_attr( $raw_hour ) . '" data-format="' . esc_attr( $hour_data_format ) . '">';
+			$table .= esc_html( $hour_display );
+		$table .= '</div>' . "\n";
+		$table .= '<br>' . "\n";
+		$table .= '<div class="master-program-user-hour rs-time" data="' . esc_attr( $raw_hour ) . '" data-format="' . esc_attr( $hour_data_format ) . '"></div>' . "\n";
+	$table .= '</th>' . "\n";
 
 	foreach ( $weekdays as $i => $weekday ) {
 
@@ -376,15 +374,15 @@ foreach ( $hours as $hour ) {
 						}
 					}
 
-					if ( isset( $_GET['rs-shift-debug'] ) && ( '1' == $_GET['rs-shift-debug'] ) ) {
+					if ( isset( $_GET['rs-shift-debug'] ) && ( '1' == sanitize_title( $_GET['rs-shift-debug'] ) ) ) {
 						if ( !isset( $shiftdebug ) ) {$shiftdebug = '';}
 						if ( $display ) {
 							$shiftdebug .= 'Now: ' . $now . ' (' . radio_station_get_time( 'datetime', $now ) . ') -- Today: ' . $today . '<br>';
 							$shiftdebug .= 'Day: ' . $weekday . ' - Raw Hour: ' . $raw_hour . ' - Hour: ' . $hour . ' - Hour Display: ' . $hour_display . '<br>';
 							$shiftdebug .= 'Hour Start: ' . $hour_start . ' (' . date( 'Y-m-d l H:i', $hour_start ) . ' - ' . radio_station_get_time( 'Y-m-d l H:i', $hour_start ) . ')<br>';
 							$shiftdebug .= 'Hour End: ' . $hour_end . ' (' . date( 'Y-m-d l H: i', $hour_end ) . ' - ' . radio_station_get_time( 'Y-m-d l H:i', $hour_end ) . ')<br>';
-							$shiftdebug .= 'Shift Start: ' . $shift_start_time . ' (' . date( 'Y-m-d l H: i', $shift_start_time ) . ' - ' . radio_station_get_time( 'Y-m-d l H:i', $shift_start_time ) . ')' . '<br>';
-							$shiftdebug .= 'Shift End: ' . $shift_end_time . ' (' . date( 'Y-m-d l H: i', $shift_end_time ) . ' - ' . radio_station_get_time( 'Y-m-d l H:i', $shift_end_time ) . ')' . '<br>';
+							$shiftdebug .= 'Shift Start: ' . $shift_start_time . ' (' . date( 'Y-m-d l H: i', $shift_start_time ) . ' - ' . radio_station_get_time( 'Y-m-d l H:i', $shift_start_time ) . ')<br>';
+							$shiftdebug .= 'Shift End: ' . $shift_end_time . ' (' . date( 'Y-m-d l H: i', $shift_end_time ) . ' - ' . radio_station_get_time( 'Y-m-d l H:i', $shift_end_time ) . ')<br>';
 							$shiftdebug .= 'Display: ' . ( $display ? 'yes' : 'no' ) . ' - ';
 							$shiftdebug .= 'New Shift: ' . ( $newshift ? 'yes' : 'no' ) . ' - ';
 							$shiftdebug .= 'Now Playing: ' . ( $nowplaying ? 'YES' : 'no' ) . ' - ';
@@ -426,13 +424,13 @@ foreach ( $hours as $hour ) {
 							$divclasses[] = 'overnight';
 							$divclasses[] = 'split-' . $split_id;
 						}
-						$divclass = implode( ' ', $divclasses );
+						$divclasslist = implode( ' ', $divclasses );
 
 						// --- start the cell contents ---
 						if ( !isset( $cell ) ) {
 							$cell = '';
 						}
-						$cell .= '<div class="' . esc_attr( $divclass ) . '">' . $newline;
+						$cell .= '<div class="' . esc_attr( $divclasslist ) . '">' . "\n";
 
 						if ( $showcontinued ) {
 
@@ -440,8 +438,8 @@ foreach ( $hours as $hour ) {
 							$cell .= '&nbsp;';
 
 							// 2.3.2: set shift times for highlighting
-							$cell .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '"></span>' . $newline;
-							$cell .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '"></span>' . $newline;
+							$cell .= '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '"></span>' . "\n";
+							$cell .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '"></span>' . "\n";
 
 						} else {
 
@@ -461,28 +459,27 @@ foreach ( $hours as $hour ) {
 							}
 							$show_avatar = apply_filters( 'radio_station_schedule_show_avatar', $show_avatar, $show_id, 'table' );
 							if ( $show_avatar ) {
-								$avatar = '<div class="show-image">' . $newline;
+								$avatar = '<div class="show-image">' . "\n";
 								if ( $show_link ) {
-									$avatar .= '<a href="' . esc_url( $show_link ) . '">' . $show_avatar . '</a>' . $newline;
+									$avatar .= '<a href="' . esc_url( $show_link ) . '">' . $show_avatar . '</a>' . "\n";
 								} else {
-									$avatar .= $show_avatar . $newline;
+									$avatar .= $show_avatar . "\n";
 								}
-								$avatar .= '</div>' . $newline;
+								$avatar .= '</div>' . "\n";
 								$avatar = apply_filters( 'radio_station_schedule_show_avatar_display', $avatar, $show_id, 'table' );
 								if ( ( '' != $avatar ) && is_string( $avatar ) ) {
 									$info['avatar'] = $avatar;
-									// $cell .= $avatar;
 								}
 							}
 
 							// --- show title ---
-							$title = '<div class="show-title">' . $newline;
+							$title = '<div class="show-title">' . "\n";
 							if ( $show_link ) {
-								$title .= '<a href="' . esc_url( $show_link ) . '">' . esc_html( $show['name'] ) . '</a>' . $newline;
+								$title .= '<a href="' . esc_url( $show_link ) . '">' . esc_html( $show['name'] ) . '</a>' . "\n";
 							} else {
-								$title .= esc_html( $show['name'] ) . $newline;
+								$title .= esc_html( $show['name'] ) . "\n";
 							}
-							$title .= '</div>' . $newline;
+							$title .= '</div>' . "\n";
 							$title = apply_filters( 'radio_station_schedule_show_title_display', $title, $show_id, 'table' );
 							if ( ( '' != $title ) && is_string( $title ) ) {
 								$info['title'] = $title;
@@ -504,8 +501,8 @@ foreach ( $hours as $hour ) {
 								if ( $show['hosts'] && is_array( $show['hosts'] ) && ( count( $show['hosts'] ) > 0 ) ) {
 
 									$show_hosts .= '<span class="show-dj-names-leader show-host-names-leader"> ';
-									$show_hosts .= esc_html( __( 'with', 'radio-station' ) );
-									$show_hosts .= ' </span>' . $newline;
+										$show_hosts .= esc_html( __( 'with', 'radio-station' ) );
+									$show_hosts .= ' </span>' . "\n";
 
 									$count = 0;
 									$host_count = count( $show['hosts'] );
@@ -513,7 +510,7 @@ foreach ( $hours as $hour ) {
 										$count ++;
 										// 2.3.0: added link_hosts attribute check
 										if ( $atts['link_hosts'] && !empty( $host['url'] ) ) {
-											$show_hosts .= '<a href="' . esc_url( $host['url'] ) . '">' . esc_html( $host['name'] ) . '</a>' . $newline;
+											$show_hosts .= '<a href="' . esc_url( $host['url'] ) . '">' . esc_html( $host['name'] ) . '</a>' . "\n";
 										} else {
 											$show_hosts .= esc_html( $host['name'] );
 										}
@@ -529,13 +526,12 @@ foreach ( $hours as $hour ) {
 
 								$show_hosts = apply_filters( 'radio_station_schedule_show_hosts', $show_hosts, $show_id, 'table' );
 								if ( $show_hosts ) {
-									$hosts = '<div class="show-dj-names show-host-names">' . $newline;
+									$hosts = '<div class="show-dj-names show-host-names">' . "\n";
 									$hosts .= $show_hosts;
-									$hosts .= '</div>' . $newline;
+									$hosts .= '</div>' . "\n";
 									$hosts = apply_filters( 'radio_station_schedule_show_hosts_display', $hosts, $show_id, 'table' );
 									if ( ( '' != $hosts ) && is_string( $hosts ) ) {
 										$info['hosts'] = $hosts;
-										// $cell .= $hosts;
 									}
 								}
 							}
@@ -559,15 +555,15 @@ foreach ( $hours as $hour ) {
 								$end = radio_station_translate_time( $end );
 
 								// --- set show time output ---
-								$show_time = '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $start_data_format ) . '">' . esc_html( $start ) . '</span>' . $newline;
-								$show_time .= '<span class="rs-sep rs-shift-sep"> ' . esc_html( $shifts_separator ) . ' </span>' . $newline;
-								$show_time .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $end_data_format ) . '">' . esc_html( $end ) . '</span>' . $newline;
+								$show_time = '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $start_data_format ) . '">' . esc_html( $start ) . '</span>' . "\n";
+								$show_time .= '<span class="rs-sep rs-shift-sep"> ' . esc_html( $shifts_separator ) . ' </span>' . "\n";
+								$show_time .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $end_data_format ) . '">' . esc_html( $end ) . '</span>' . "\n";
 
 							} else {
 
 								// 2.3.3.8: added for now playing check
-								$show_time = '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $start_data_format ) . '"></span>' . $newline;
-								$show_time .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $end_data_format ) . '"></span>' . $newline;
+								$show_time = '<span class="rs-time rs-start-time" data="' . esc_attr( $shift_start_time ) . '" data-format="' . esc_attr( $start_data_format ) . '"></span>' . "\n";
+								$show_time .= '<span class="rs-time rs-end-time" data="' . esc_attr( $shift_end_time ) . '" data-format="' . esc_attr( $end_data_format ) . '"></span>' . "\n";
 
 							}
 
@@ -575,20 +571,20 @@ foreach ( $hours as $hour ) {
 							// 2.3.3.9: added tcount argument to filter
 							$show_time = apply_filters( 'radio_station_schedule_show_time', $show_time, $show_id, 'table', $shift, $tcount );
 							$times = '<div class="show-time" id="show-time-' . esc_attr( $tcount ) . '"';
-							// note: unlike other display filters this hides/shows times rather than string filtering
-							$display = apply_filters( 'radio_station_schedule_show_time_display', true, $show_id, 'table', $shift );
-							if ( !$display ) {
-								$times .= ' style="display:none;"';
-							}
-							$times .= '>' . $show_time . '</div>' . $newline;
-							// 2.3.3.9: added internal spans for user time
-							$times .= '<div class="show-user-time" id="show-user-time-' . esc_attr( $tcount ) . '">' . $newline;
-							$times .= '[<span class="rs-time rs-start-time"></span>' . $newline;
-							$times .= '<span class="rs-sep"> ' . esc_html( __( 'to', 'radio-station' ) ) . ' </span>' . $newline;
-							$times .= '<span class="rs-time rs-end-time"></span>]' . $newline;
-							$times .= '</div>' . $newline;
+								// note: unlike other display filters this hides/shows times rather than string filtering
+								$display = apply_filters( 'radio_station_schedule_show_time_display', true, $show_id, 'table', $shift );
+								if ( !$display ) {
+									$times .= ' style="display:none;"';
+								}
+								$times .= '>' . $show_time . '</div>' . "\n";
+								// 2.3.3.9: added internal spans for user time
+								$times .= '<div class="show-user-time" id="show-user-time-' . esc_attr( $tcount ) . '">' . "\n";
+								$times .= '[<span class="rs-time rs-start-time"></span>' . "\n";
+								$times .= '<span class="rs-sep"> ' . esc_html( __( 'to', 'radio-station' ) ) . ' </span>' . "\n";
+								$times .= '<span class="rs-time rs-end-time"></span>]' . "\n";
+							$times .= '</div>' . "\n";
 							$info['times'] = $times;
-							$tcount ++;
+							$tcount++;
 
 							// --- encore airing ---
 							// 2.3.1: added isset check for encore switch
@@ -600,12 +596,11 @@ foreach ( $hours as $hour ) {
 							$show_encore = apply_filters( 'radio_station_schedule_show_encore', $show_encore, $show_id, 'table' );
 							if ( 'on' == $show_encore ) {
 								$encore = '<div class="show-encore">';
-								$encore .= esc_html( __( 'encore airing', 'radio-station' ) );
-								$encore .= '</div>' . $newline;
+									$encore .= esc_html( __( 'encore airing', 'radio-station' ) );
+								$encore .= '</div>' . "\n";
 								$encore = apply_filters( 'radio_station_schedule_show_encore_display', $encore, $show_id, 'table' );
 								if ( ( '' != $encore ) && is_string( $encore ) ) {
 									$info['encore'] = $encore;
-									// $cell .= $encore;
 								}
 							}
 
@@ -623,15 +618,14 @@ foreach ( $hours as $hour ) {
 								$anchor = __( 'Audio File', 'radio-station' );
 								// 2.3.3.8: fix to incorrect context argument 'tabs'
 								$anchor = apply_filters( 'radio_station_schedule_show_file_anchor', $anchor, $show_id, 'table' );
-								$file = '<div class="show-file">' . $newline;
-								$file .= '<a href="' . esc_url( $show_file ) . '">';
-								$file .= esc_html( $anchor );
-								$file .= '</a>' . $newline;
-								$file .= '</div>' . $newline;
+								$file = '<div class="show-file">' . "\n";
+									$file .= '<a href="' . esc_url( $show_file ) . '">';
+										$file .= esc_html( $anchor );
+									$file .= '</a>' . "\n";
+								$file .= '</div>' . "\n";
 								$file = apply_filters( 'radio_station_schedule_show_file_display', $file, $show_file, $show_id, 'table' );
 								if ( ( '' != $file ) && is_string( $file ) ) {
 									$info['file'] = $file;
-									// $cell .= $link;
 								}
 							}
 
@@ -644,7 +638,8 @@ foreach ( $hours as $hour ) {
 								// --- get show excerpt ---
 								if ( !empty( $show_post->post_excerpt ) ) {
 									$show_excerpt = $show_post->post_excerpt;
-									$show_excerpt .= ' <a href="' . esc_url( $permalink ) . '">' . $more . '</a>';
+									// 2.5.0: use esc_html on more anchor text
+									$show_excerpt .= ' <a href="' . esc_url( $permalink ) . '">' . esc_html( $more ) . '</a>' . "\n";
 								} else {
 									$show_excerpt = radio_station_trim_excerpt( $show_post->post_content, $length, $more, $permalink );
 								}
@@ -653,13 +648,13 @@ foreach ( $hours as $hour ) {
 								$show_excerpt = apply_filters( 'radio_station_schedule_show_excerpt', $show_excerpt, $show_id, 'table' );
 
 								// --- output excerpt ---
-								$excerpt = '<div class="show-desc">' . $newline;
-								$excerpt .= $show_excerpt . $newline;
-								$excerpt .= '</div>' . $newline;
-								$excerpt = apply_filters( 'radio_station_schedule_show_excerpt_display', $excerpy, $show_id, 'table' );
+								$excerpt = '<div class="show-desc">' . "\n";
+								$excerpt .= $show_excerpt . "\n";
+								$excerpt .= '</div>' . "\n";
+								// 2.5.0: fix to variable typo (excerpy)
+								$excerpt = apply_filters( 'radio_station_schedule_show_excerpt_display', $excerpt, $show_id, 'table' );
 								if ( ( '' != $excerpt ) && is_string( $excerpt ) ) {
 									$info['excerpt'] = $excerpt;
-									// $cell .= $excerpt;
 								}
 							}
 
@@ -680,7 +675,7 @@ foreach ( $hours as $hour ) {
 							}
 						}
 
-						$cell .= '</div>' . $newline;
+						$cell .= '</div>' . "\n";
 
 						// 2.3.1: fix to ensure reset showcontinued flag in cell
 						if ( isset( $shift['finished'] ) && $shift['finished'] ) {
@@ -712,28 +707,28 @@ foreach ( $hours as $hour ) {
 					$cell .= '<center>' . $add_link . '</center>';
 				}
 			}
-			$cellclass = implode( ' ', $cellclasses );
-			$table .= '<td class="' . $cellclass . '">' . $newline;
-			$table .= '<div class="show-wrap">' . $newline;
-			if ( isset( $cell ) ) {
-				$table .= $cell;
-			}
-			$table .= '</div>' . $newline;
-			$table .= '</td>' . $newline;
+			$cellclasslist = implode( ' ', $cellclasses );
+			$table .= '<td class="' . $cellclasslist . '">' . "\n";
+				$table .= '<div class="show-wrap">' . "\n";
+				if ( isset( $cell ) ) {
+					$table .= $cell;
+				}
+				$table .= '</div>' . "\n";
+			$table .= '</td>' . "\n";
 		}
 	}
 
 	// --- close hour row ---
-	$table .= '</tr>' . $newline;
+	$table .= '</tr>' . "\n";
 }
 
-$table .= '</table>' . $newline;
+$table .= '</table>' . "\n";
 
 // --- hidden iframe for schedule reloading ---
-$table .= '<iframe src="javascript:void(0);" id="schedule-table-loader" name="schedule-table-loader" style="display:none;"></iframe>' . $newline;
+$table .= '<iframe src="javascript:void(0);" id="schedule-table-loader" name="schedule-table-loader" style="display:none;"></iframe>' . "\n";
 
-if ( isset( $_GET['rs-shift-debug'] ) && ( '1' == $_GET['rs-shift-debug'] ) ) {
-	$table .= '<br><b>Shift Debug Info:</b><br>' . $shiftdebug . '<br>';
+if ( isset( $_GET['rs-shift-debug'] ) && ( '1' == sanitize_title( $_GET['rs-shift-debug'] ) ) ) {
+	$table .= '<br><b>Shift Debug Info:</b><br>' . esc_html( $shiftdebug ) . '<br>';
 }
 
 echo $table;

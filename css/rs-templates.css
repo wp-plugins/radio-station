@@ -214,6 +214,10 @@
 
 /* Show Tabs */
 /* --------- */
+#show-content .show-tabs {
+	font-size: 0;
+}
+
 #show-content .show-tabs .show-tab {
 	display: inline-block; 
 	min-width: 100px;

@@ -8,7 +8,7 @@ $date = radio_station_get_time( 'date', $now );
 
 // --- set shift time formats ---
 // 2.3.2: set time formats early
-if ( 24 == (int) $atts['time'] ) {
+if ( 24 == (int) $atts['time_format'] ) {
 	$start_data_format = $end_data_format = 'H:i';
 } else {
 	$start_data_format = $end_data_format = 'g:i a';
@@ -41,7 +41,7 @@ $output .= '#master-schedule-divs .rowspan { top: ' . $atts['divheight'] . 'px; 
 $output .= '</style>';
 
 // output the schedule
-$output  .= '<div id="master-schedule-divs">';
+$output .= '<div id="master-schedule-divs">';
 // $weekdays = array_keys( $days_of_the_week );
 
 $output .= '<div class="master-schedule-hour">';
@@ -58,9 +58,9 @@ foreach ( $master_list as $hour => $days ) {
 
 	// output the hour labels
 	$output .= '<div class="master-schedule-hour-header">';
-	if ( 12 === (int) $atts['time'] ) {
+	if ( 12 === (int) $atts['time_format'] ) {
 		// random date needed to convert time to 12-hour format
-		$output .= date( 'ga', strtotime( '1981-04-28 ' . $hour . ':00:00' ) ); 
+		$output .= date( 'ga', strtotime( '1981-04-28 ' . $hour . ':00:00' ) );
 	} else {
 		// random date needed to convert time to 24-hour format
 		$output .= date( 'H:i', strtotime( '1981-04-28 ' . $hour . ':00:00' ) );
@@ -119,7 +119,7 @@ foreach ( $master_list as $hour => $days ) {
 
 					if ( $show_names ) {
 
-						$output .= '<span class="show-dj-names-leader"> ' . esc_html(  __( 'with', 'radio-station' ) ) . '</span>';
+						$output .= '<span class="show-dj-names-leader"> ' . esc_html( __( 'with', 'radio-station' ) ) . '</span>';
 
 						foreach ( $show_names as $name ) {
 
@@ -145,7 +145,7 @@ foreach ( $master_list as $hour => $days ) {
 
 					$output .= '<span class="show-time">';
 
-					if ( 12 === (int) $atts['time'] ) {
+					if ( 12 === (int) $atts['time_format'] ) {
 						$show_time = date( 'g:i a', strtotime( '1981-04-28 ' . $show['time']['start_hour'] . ':' . $show['time']['start_min'] . ':00 ' ) );
 						$show_time .= ' - ';
 						$show_time .= date( 'g:i a', strtotime( '1981-04-28 ' . $show['time']['end_hour'] . ':' . $show['time']['end_min'] . ':00 ' ) );
@@ -155,14 +155,14 @@ foreach ( $master_list as $hour => $days ) {
 						$show_time .= date( 'H:i', strtotime( '1981-04-28 ' . $show['time']['end_hour'] . ':' . $show['time']['end_min'] . ':00 ' ) );
 					}
 
-					/* if ( 12 === (int) $atts['time'] ) {
+					/* if ( 12 === (int) $atts['time_format'] ) {
 						$start_data_format = $end_data_format = 'g:i a';
 					} else {
 						$start_data_format = $end_data_format = 'H:i';
 					}
 					$start_data_format = apply_filters( 'radio_station_time_format_start', $start_data_format, '', $atts );
 					$start_data_format = apply_filters( 'radio_station_time_format_end', $end_data_format, '', $atts );
-					
+
 					$start = radio_station_get_time( $shift_start_time );
 					$end = radio_station_get_time( $shift_end_time );
 					$start = radio_station_translate_time( $start );

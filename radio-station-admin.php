@@ -13,10 +13,13 @@
 // - Add Admin Menu and Submenu Items
 // - Fix to Expand Main Menu for Submenu Items
 // - Taxonomy Submenu Item Fix
+// - Fix to Redirect Plugin Settings Menu Link
 // - Display Import/Export Show Page
 // - Display Plugin Help Page
 // - Parse Markdown Doc File
 // x Display Playlist Export Page
+// - Display Plugin Docs Page
+// - 
 // === Update Notices ===
 // - Get Plugin Upgrade Notice
 // - Parse Plugin Update Notice
@@ -84,7 +87,7 @@ function radio_station_admin_styles() {
 	global $post;
 	if ( is_object( $post ) && property_exists( $post, 'post_type' ) ) {
 		if ( ( RADIO_STATION_PLAYLIST_SLUG === $post->post_type )
-		  || ( RADIO_STATION_OVERRIDE_SLUG === $post->post_type ) ) {
+			|| ( RADIO_STATION_OVERRIDE_SLUG === $post->post_type ) ) {
 			echo '.wp-editor-container textarea.wp-editor-area {height: 100px;}' . "\n";
 		}
 	}
@@ -98,13 +101,15 @@ function radio_station_admin_styles() {
 // ------------------------------
 // 2.4.0.3: filter license activation link for free version on plugin page
 // note: this is because Pro is a separate plugin not a replacement one
+
 // add_filter( 'plugin_action_links', 'radio_station_plugin_links', 99, 2 );
-function radio_station_plugin_links( $links, $file ) {
+/* function radio_station_plugin_links( $links, $file ) {
 	if ( RADIO_STATION_BASENAME == $file ) {
-		echo '<span style="display:none;">RS Plugin Links: ' . print_r( $links, true ) . '</span>';
+		echo '<span style="display:none;">RS Plugin Links: ' . esc_html( print_r( $links, true ) ) . '</span>';
 	}
 	return $links;
-}
+} */
+
 add_filter( 'plugin_action_links_' . RADIO_STATION_BASENAME, 'radio_station_plugin_page_links', 20, 2 );
 // add_filter( 'network_admin_plugin_action_links_' . RADIO_STATION_BASENAME, , 'radio_station_license_activation_link', 20, 2 );
 function radio_station_plugin_page_links( $links, $file ) {
@@ -112,7 +117,7 @@ function radio_station_plugin_page_links( $links, $file ) {
 	global $radio_station_data;
 
 	if ( RADIO_STATION_DEBUG ) {
-		echo '<span style="display:none;">RS Plugin Links A: ' . print_r( $links, true ) . '</span>' . PHP_EOL;
+		echo '<span style="display:none;">RS Plugin Links A: ' . esc_html( print_r( $links, true ) ) . '</span>' . PHP_EOL;
 	}
 
 	foreach ( $links as $key => $link ) {
@@ -120,7 +125,7 @@ function radio_station_plugin_page_links( $links, $file ) {
 		// if ( RADIO_STATION_DEBUG ) {
 		// 	echo '<span style="display:none;">Plugin Link ' . $key . ': ' . $link . '</span>' . PHP_EOL;
 		// }
-		
+
 		// 2.4.0.6: remove addons link from Free by default
 		if ( strstr( $link, '-addons' ) ) {
 			if ( !$radio_station_data['settings']['hasaddons'] ) {
@@ -143,7 +148,7 @@ function radio_station_plugin_page_links( $links, $file ) {
 	}
 
 	if ( RADIO_STATION_DEBUG ) {
-		echo '<span style="display:none;">RS Plugin Links B: ' . print_r( $links, true ) . '</span>' . PHP_EOL;
+		echo '<span style="display:none;">RS Plugin Links B: ' . esc_html( print_r( $links, true ) ) . '</span>' . PHP_EOL;
 	}
 
 	return $links;
@@ -277,7 +282,7 @@ function radio_station_fix_genre_parent( $parent_file = '' ) {
 	global $pagenow, $post;
 	$post_types = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_PLAYLIST_SLUG, RADIO_STATION_OVERRIDE_SLUG );
 	$taxonomies = array( RADIO_STATION_GENRES_SLUG, RADIO_STATION_LANGUAGES_SLUG );
-	if ( ( 'edit-tags.php' === $pagenow ) && isset( $_GET['taxonomy'] ) && in_array( $_GET['taxonomy'], $taxonomies ) ) {
+	if ( ( 'edit-tags.php' === $pagenow ) && isset( $_GET['taxonomy'] ) && in_array( sanitize_text_field( $_GET['taxonomy'] ), $taxonomies ) ) {
 		// 2.3.0: also apply to language taxonomy
 		$parent_file = 'radio-station';
 	} elseif ( ( 'post.php' === $pagenow ) && in_array( $post->post_type, $post_types ) ) {
@@ -296,12 +301,12 @@ add_action( 'admin_enqueue_scripts', 'radio_station_taxonomy_submenu_fix', 11 );
 function radio_station_taxonomy_submenu_fix() {
 
 	global $pagenow;
-	if ( ( 'edit-tags.php' == $pagenow ) && isset( $_GET['taxonomy'] ) ) {
+	if ( ( 'edit-tags.php' === $pagenow ) && isset( $_GET['taxonomy'] ) ) {
 
 		$js = '';
-		if ( RADIO_STATION_GENRES_SLUG == $_GET['taxonomy'] ) {
+		if ( RADIO_STATION_GENRES_SLUG == sanitize_text_field( $_GET['taxonomy'] ) ) {
 			$js = "jQuery('#toplevel_page_radio-station ul li').each(function() {
-	    		if (jQuery(this).find('a').attr('href') == 'edit-tags.php?taxonomy=" . RADIO_STATION_GENRES_SLUG . "') {
+	    		if (jQuery(this).find('a').attr('href') == 'edit-tags.php?taxonomy=" . esc_js( RADIO_STATION_GENRES_SLUG ) . "') {
 		    		jQuery(this).addClass('current').find('a').addClass('current').attr('aria-current', 'page');
 			    }
 		    });";
@@ -310,7 +315,7 @@ function radio_station_taxonomy_submenu_fix() {
 		// 2.3.0: add fix for language taxonomy also
 		if ( RADIO_STATION_LANGUAGES_SLUG == $_GET['taxonomy'] ) {
 			$js = "jQuery('#toplevel_page_radio-station ul li').each(function() {
-	    		if (jQuery(this).find('a').attr('href') == 'edit-tags.php?taxonomy=" . RADIO_STATION_LANGUAGES_SLUG . "') {
+	    		if (jQuery(this).find('a').attr('href') == 'edit-tags.php?taxonomy=" . esc_js( RADIO_STATION_LANGUAGES_SLUG ) . "') {
 		    		jQuery(this).addClass('current').find('a').addClass('current').attr('aria-current', 'page');
 			    }
 		    });";
@@ -321,6 +326,29 @@ function radio_station_taxonomy_submenu_fix() {
 		if ( '' != $js ) {
 			wp_add_inline_script( 'radio-station-admin', $js );
 		}
+	}
+}
+
+// -----------------------------------------
+// Fix to Redirect Plugin Settings Menu Link
+// -----------------------------------------
+// 2.3.2: added settings submenu page redirection fix
+// 2.5.0: moved to admin file and changed to admin_init hook
+add_action( 'admin_init', 'radio_station_settings_page_redirect' );
+function radio_station_settings_page_redirect() {
+
+	// --- bug out if not plugin settings page ---
+	if ( !isset( $_REQUEST['page'] ) || ( 'radio-station' != sanitize_text_field( $_REQUEST['page'] ) ) ) {
+		return;
+	}
+
+	// --- check if link is for options-general.php ---
+	if ( strstr( $_SERVER['REQUEST_URI'], '/options-general.php' ) ) {
+
+		// --- redirect to plugin settings page (admin.php) ---
+		$url = add_query_arg( 'page', 'radio-station', admin_url( 'admin.php' ) );
+		wp_redirect( $url );
+		exit;
 	}
 }
 
@@ -345,13 +373,23 @@ function radio_station_role_editor() {
 	// 2.4.0.3: change text to reflect inclusion in Pro
 	echo esc_html( __( 'Radio Station Pro includes a Role Assignment Interface so you can easily assign Radio Station roles to any user.', 'radio-station' ) ) . '<br>';
 
-	// --- Pro upgrade link ---
 	// TODO: maybe add picture of role editing interface ?
+
+	// --- Pro upgrade link ---
+	// 2.5.0: add direct upgrade link
+	$pricing_url = add_query_arg( 'page', 'radio-station-pricing', admin_url( 'admin.php' ) );
+	echo '<a href="' . esc_url( $pricing_url ) . '" target="_blank">';
+		echo esc_html( __( 'Upgrade Now', 'radio-station' ) );
+	echo '</a>';
+	echo '&nbsp; | &nbsp;';
+
+	// --- Pro details/pricing link ---
 	$upgrade_url = radio_station_get_upgrade_url();
 	echo '<a href="' . esc_url( $upgrade_url ) . '" target="_blank">';
 		// echo esc_html( __( 'Upgrade to Radio Station Pro', 'radio-station' ) );
-	 	echo esc_html( __( 'Find out more about Radio Station Pro', 'radio-station' ) );
+		echo esc_html( __( 'Find out more about Radio Station Pro', 'radio-station' ) );
 	echo ' &rarr;</a>.';
+	echo '<br><br>';
 }
 
 // -------------------------------
@@ -394,12 +432,13 @@ function radio_station_plugin_docs_page() {
 		if ( !in_array( $doc, array( '.', '..' ) ) ) {
 			$id = str_replace( '.md', '', $doc );
 			echo '<div id="doc-page-' . esc_attr( strtolower( $id ) ) . '" class="doc-page"';
-			if ( $id != 'index') {
+			if ( 'index' != $id ) {
 				echo ' style="display:none;"';
 			}
 			echo '>';
-			// phpcs:ignore WordPress.Security.OutputNotEscaped
-			echo radio_station_parse_doc( $id );
+				// TODO: use wp_kses with allowed HTML (needs onclick on a tag fix)
+				// phpcs:ignore WordPress.Security.OutputNotEscaped
+				echo radio_station_parse_doc( $id );
 			echo '</div>' . PHP_EOL;
 		}
 	}
@@ -434,8 +473,7 @@ function radio_station_plugin_docs_page() {
 	</style>';
 
 	// --- output announcement content ---
-	// phpcs:ignore WordPress.Security.OutputNotEscaped
-	echo radio_station_announcement_content( false );
+	radio_station_announcement_content( false );
 
 }
 
@@ -482,7 +520,7 @@ function radio_station_parse_doc( $id ) {
 				$after = substr( $formatted, $pos2, strlen( $formatted ) );
 				$pos3 = stripos( $after, $tag_end );
 				$anchor = sanitize_title( substr( $after, 0, $pos3 ) );
-				$alink = '<a id="' . esc_attr( $anchor ) . '" name="' . esc_attr( $anchor ) .'"></a>';
+				$alink = '<a id="' . esc_attr( $anchor ) . '" name="' . esc_attr( $anchor ) . '"></a>';
 				$newheading = $alink . '<h' . $i . ' class="docs-heading">';
 				$formatted = $before . $newheading . $after;
 			}
@@ -521,6 +559,7 @@ function radio_station_parse_doc( $id ) {
 // ----------------------------
 // Display Playlist Export Page
 // ----------------------------
+// note: this is a legacy export playlist function
 // TODO: rewrite playlist export function ?
 function radio_station_playlist_export_page() {
 
@@ -558,9 +597,9 @@ function radio_station_playlist_export_page() {
 			TO_DAYS(posts.post_date) >= TO_DAYS(%s) AND
 			TO_DAYS(posts.post_date) <= TO_DAYS(%s)
 		ORDER BY posts.post_date ASC";
+
 		// prepare query before executing
-		$query = $wpdb->prepare( $sql, array( $start, $end ) );
-		$playlists = $wpdb->get_results( $query );
+		$playlists = $wpdb->get_results( $wpdb->prepare( $sql, array( $start, $end ) ) );
 
 		if ( ! $playlists ) {
 			$list = 'No playlists found for this period.';
@@ -608,6 +647,7 @@ function radio_station_playlist_export_page() {
 			wp_mkdir_p( $dir );
 		}
 
+		// TODO: use WP Filesystem for writing
 		$f = fopen( $dir . $file, 'w' );
 		fwrite( $f, $output );
 		fclose( $f );
@@ -773,7 +813,7 @@ function radio_station_plugin_update_message( $plugin_data, $response ) {
 add_action( 'admin_notices', 'radio_station_admin_update_notice' );
 function radio_station_admin_update_notice() {
 	// --- do not display on settings page ---
-	if ( isset( $_GET['page'] ) && ( 'radio-station' == $_GET['page'] ) ) {
+	if ( isset( $_GET['page'] ) && ( 'radio-station' === sanitize_text_field( $_GET['page'] ) ) ) {
 		return;
 	}
 	radio_station_update_notice();
@@ -798,8 +838,8 @@ function radio_station_update_notice() {
 	}
 
 	// --- ignore if updating now ---
-	if ( isset( $_GET['action'] ) && ( 'upgrade-plugin' == $_GET['action'] )
-	  && isset( $_GET['plugin'] ) && ( $notice['plugin_file'] == $_GET['plugin'] ) ) {
+	if ( isset( $_GET['action'] ) && ( 'upgrade-plugin' === sanitize_text_field( $_GET['action'] ) )
+		&& isset( $_GET['plugin'] ) && ( $notice['plugin_file'] === sanitize_text_field( $_GET['plugin'] ) ) ) {
 		return;
 	}
 
@@ -814,50 +854,50 @@ function radio_station_update_notice() {
 	$update_url = wp_nonce_url( $update_url, 'upgrade-plugin_' . $notice['plugin_file'] );
 
 	// --- output update available notice ---
-	echo '<div id="radio-station-update-' . esc_attr( $notice['update_id'] ) . '" class="notice update-nag" style="position:relative;">';
+	echo '<div id="radio-station-update-' . esc_attr( $notice['update_id'] ) . '" class="notice update-nag" style="position:relative;">' . PHP_EOL;
 
-	echo '<ul style="list-style:none;">';
+	echo '<ul style="list-style:none;">' . PHP_EOL;
 
 	if ( isset( $notice['icon_url'] ) ) {
-		echo '<li style="display:inline-block; vertical-align:top; margin-right:40px;">';
-		echo '<img src="' . esc_url( $notice['icon_url'] ) . '" style="width:75px; height: 75px;">';
-		echo '</li>';
+		echo '<li style="display:inline-block; vertical-align:top; margin-right:40px;">' . PHP_EOL;
+		echo '<img src="' . esc_url( $notice['icon_url'] ) . '" style="width:75px; height: 75px;">' . PHP_EOL;
+		echo '</li>' . PHP_EOL;
 	}
 
-	echo '<li style="display:inline-block; text-align:center; vertical-align:top; margin-right:40px; line-height:1.8em;">';
-	echo esc_html( __( 'A new version of', 'radio-station' ) ) . '<br>';
-	echo '<b><span style="font-size:1.2em;">' . esc_html( __( 'Radio Station', 'radio-station' ) ) . '</span></b><br>';
-	echo esc_html( __( 'is available.', 'radio-station' ) );
-	echo '</li>';
+	echo '<li style="display:inline-block; text-align:center; vertical-align:top; margin-right:40px; line-height:1.8em;">' . PHP_EOL;
+	echo esc_html( __( 'A new version of', 'radio-station' ) ) . '<br>' . PHP_EOL;
+	echo '<b><span style="font-size:1.2em;">' . esc_html( __( 'Radio Station', 'radio-station' ) ) . '</span></b><br>' . PHP_EOL;
+	echo esc_html( __( 'is available.', 'radio-station' ) ) . PHP_EOL;
+	echo '</li>' . PHP_EOL;
 
-	echo '<li style="display:inline-block; vertical-align:top; margin-right:40px; max-width:600px;">';
-	echo '<b>' . esc_html( __( 'Take a moment to Update for a better experience. In this update', 'radio-station' ) ) . ":</b><br>";
-	echo '<ul style="padding:0; list-style:disc;">';
+	echo '<li style="display:inline-block; vertical-align:top; margin-right:40px; max-width:600px;">' . PHP_EOL;
+	echo '<b>' . esc_html( __( 'Take a moment to Update for a better experience. In this update', 'radio-station' ) ) . ":</b><br>" . PHP_EOL;
+	echo '<ul style="padding:0; list-style:disc;">' . PHP_EOL;
 	foreach ( $notice['lines'] as $line ) {
-		echo '<li style="text-indent:20px;">' . esc_html( $line ) . '</li>';
+		echo '<li style="text-indent:20px;">' . esc_html( $line ) . '</li>' . PHP_EOL;
 	}
-	echo '</ul>';
-	echo '</li>';
+	echo '</ul>' . PHP_EOL;
+	echo '</li>' . PHP_EOL;
 
-	echo '<li style="display:inline-block; text-align:center; vertical-align:top;">';
-	echo '<a class="button button-primary" href="' . esc_url( $update_url ) . '">' . esc_html( __( 'Update Now', 'radio-station' ) ) . '</a>';
+	echo '<li style="display:inline-block; text-align:center; vertical-align:top;">' . PHP_EOL;
+	echo '<a class="button button-primary" href="' . esc_url( $update_url ) . '">' . esc_html( __( 'Update Now', 'radio-station' ) ) . '</a>' . PHP_EOL;
 	if ( '' != $notice['url'] ) {
-		echo '<br><br>';
-		echo '<a class="button" href="' . esc_url( $notice['url'] ) . '" target="_blank">' . esc_html( __( 'Full Update Details', 'radio-station' ) ) . ' &rarr;</a>';
+		echo '<br><br>' . PHP_EOL;
+		echo '<a class="button" href="' . esc_url( $notice['url'] ) . '" target="_blank">' . esc_html( __( 'Full Update Details', 'radio-station' ) ) . ' &rarr;</a>' . PHP_EOL;
 	}
-	echo '</li>';
+	echo '</li>' . PHP_EOL;
 
-	echo '</ul>';
+	echo '</ul>' . PHP_EOL;
 
 	// --- dismiss notice link ---
 	$dismiss_url = add_query_arg( 'action', 'radio_station_notice_dismiss', admin_url( 'admin-ajax.php' ) );
 	$dismiss_url = add_query_arg( 'upgrade', $notice['update_id'], $dismiss_url );
-	echo '<div style="position:absolute; top:20px; right: 20px;">';
-	echo '<a href="' . esc_url( $dismiss_url ) . '" target="radio-station-notice-iframe" style="text-decoration:none;">';
-	echo '<span class="dashicons dashicons-dismiss" title="' . esc_attr( __( 'Dismiss this Notice', 'radio-station' ) ) . '"></span></a>';
-	echo '</div>';
+	echo '<div style="position:absolute; top:20px; right: 20px;">' . PHP_EOL;
+	echo '<a href="' . esc_url( $dismiss_url ) . '" target="radio-station-notice-iframe" style="text-decoration:none;">' . PHP_EOL;
+	echo '<span class="dashicons dashicons-dismiss" title="' . esc_attr( __( 'Dismiss this Notice', 'radio-station' ) ) . '"></span></a>' . PHP_EOL;
+	echo '</div>' . PHP_EOL;
 
-	echo '</div>';
+	echo '</div>' . PHP_EOL;
 
 	// --- notice dismissal iframe (once only) ---
 	radio_station_admin_notice_iframe();
@@ -873,7 +913,7 @@ function radio_station_notice() {
 	// --- get latest notice ---
 	$notices = radio_station_get_notices();
 	if ( RADIO_STATION_DEBUG ) {
-		echo "<span style='display:none;'>Notices: " . print_r( $notices, true ) . "</span>";
+		echo '<span style="display:none;">Notices: ' . esc_html( print_r( $notices, true ) ) . '</span>' . PHP_EOL;
 	}
 	if ( count( $notices ) < 1 ) {
 		return;
@@ -885,69 +925,73 @@ function radio_station_notice() {
 	// --- bug out if already read ---
 	$read = get_option( 'radio_station_read_notices' );
 	if ( RADIO_STATION_DEBUG ) {
-		echo "<span style='display:none;'>Read Notices: " . print_r( $read, true ) . "</span>";
-		echo "<span style='display:none;'>Latest Notices: " . print_r( $notice, true ) . "</span>";
+		echo '<span style="display:none;">Read Notices: ' . esc_html( print_r( $read, true ) ) . '</span>' . PHP_EOL;
+		echo '<span style="display:none;">Latest Notices: ' . esc_html( print_r( $notice, true ) ) . '</span>' . PHP_EOL;
 	}
 	if ( $read && isset( $read[$notice_id] ) && ( '1' == $read[$notice_id] ) ) {
 		return;
 	}
 
 	// --- display plugin notice ---
-	echo '<div id="radio-station-notice-' . esc_attr( $notice['id'] ) . '" class="notice notice-info" style="position:relative;">';
+	echo '<div id="radio-station-notice-' . esc_attr( $notice['id'] ) . '" class="notice notice-info" style="position:relative;">' . PHP_EOL;
 
 	// --- output plugin notice text ---
-	echo '<ul style="list-style:none;">';
+	echo '<ul style="list-style:none;">' . PHP_EOL;
 
 	// --- plugin icon ---
 	$icon_url = plugins_url( 'images/radio-station.png', RADIO_STATION_FILE );
-	echo '<li style="display:inline-block; text-align:center; vertical-align:top; margin-right:40px; line-height:1.8em;">';
-	echo '<img src="' . esc_url( $icon_url ) . '" style="width:75px; height:75px;">';
-	echo '</li>';
+	echo '<li style="display:inline-block; text-align:center; vertical-align:top; margin-right:40px; line-height:1.8em;">' . PHP_EOL;
+	echo '<img src="' . esc_url( $icon_url ) . '" style="width:75px; height:75px;">' . PHP_EOL;
+	echo '</li>' . PHP_EOL;
 
 	// --- notice title ---
-	echo '<li style="display:inline-block; text-align:center; vertical-align:top; margin-right:40px; line-height:1.8em;">';
-	echo '<b><span style="font-size:1.2em;">' . esc_html( __( 'Radio Station', 'radio-station' ) ) . '</span></b><br>';
-	echo '<b>' . esc_html( __( 'Update Notice', 'radio-station' ) ) . '</b>';
-	echo '</li>';
+	echo '<li style="display:inline-block; text-align:center; vertical-align:top; margin-right:40px; line-height:1.8em;">' . PHP_EOL;
+	echo '<b><span style="font-size:1.2em;">' . esc_html( __( 'Radio Station', 'radio-station' ) ) . '</span></b><br>' . PHP_EOL;
+	echo '<b>' . esc_html( __( 'Update Notice', 'radio-station' ) ) . '</b>' . PHP_EOL;
+	echo '</li>' . PHP_EOL;
 
 	// --- notice details ---
-	echo '<li style="display:inline-block; vertical-align:top; margin-right:40px; font-size:16px; line-height:22px; max-width:600px;">';
-	echo '<div style="margin-bottom:10px;">';
-	echo '<b>' . esc_html( __( 'Thanks for Updating! You can enjoy these improvements now', 'radio-station' ) ) . '</b>:';
-	echo '</div>';
-	echo '<ul style="padding:0; list-style:disc;">';
+	echo '<li style="display:inline-block; vertical-align:top; margin-right:40px; font-size:16px; line-height:22px; max-width:600px;">' . PHP_EOL;
+	echo '<div style="margin-bottom:10px;">' . PHP_EOL;
+	echo '<b>' . esc_html( __( 'Thanks for Updating! You can enjoy these improvements now', 'radio-station' ) ) . '</b>:' . PHP_EOL;
+	echo '</div>' . PHP_EOL;
+	echo '<ul style="padding:0; list-style:disc;">' . PHP_EOL;
 	foreach ( $notice['lines'] as $line ) {
-		echo '<li style="text-indent:20px;">' . $line . '</li>';
+		// 2.5.0: added wp_kses to line output
+		$allowed = radio_station_allowed_html( 'content', 'notice' );
+		echo '<li style="text-indent:20px;">' . wp_kses( $line, $allowed ) . '</li>' . PHP_EOL;
 	}
-	echo '</ul>';
-	echo '</li>';
+	echo '</ul>' . PHP_EOL;
+	echo '</li>' . PHP_EOL;
 
-	echo '<li style="display:inline-block; text-align:center; vertical-align:top;">';
+	echo '<li style="display:inline-block; text-align:center; vertical-align:top;">' . PHP_EOL;
 
 		// --- link to update blog post ---
 		if ( isset( $notice['url'] ) && ( '' != $notice['url'] ) ) {
-			echo '<a class="button" href="' . esc_url( $notice['url'] ) . '">' . esc_html( __( 'Full Update Details', 'radio-station' ) ) . ' &rarr;</a>';
-			echo '<br><br>';
+			echo '<a class="button" href="' . esc_url( $notice['url'] ) . '">' . esc_html( __( 'Full Update Details', 'radio-station' ) ) . ' &rarr;</a>' . PHP_EOL;
+			echo '<br><br>' . PHP_EOL;
 		}
 
 		// --- link to settings page ---
-		if ( !isset( $_REQUEST['page'] ) || ( 'radio-station' != $_REQUEST['page'] ) ) {
+		if ( !isset( $_REQUEST['page'] ) || ( 'radio-station' !== sanitize_text_field( $_REQUEST['page'] ) ) ) {
 			$settings_url = add_query_arg( 'page', 'radio-station', admin_url( 'admin.php' ) );
-			echo '<a class="button button-primary" href="' . esc_url( $settings_url ) . '">' . esc_html( __( 'Plugin Settings', 'radio-station' ) ) . '</a>';
+			echo '<a class="button button-primary" href="' . esc_url( $settings_url ) . '">' . esc_html( __( 'Plugin Settings', 'radio-station' ) ) . '</a>' . PHP_EOL;
 		}
 
-	echo '</li>';
+	echo '</li>' . PHP_EOL;
 
-	echo '</ul>';
+	echo '</ul>' . PHP_EOL;
 
 	// --- notice dismissal button ---
 	$dismiss_url = add_query_arg( 'action', 'radio_station_notice_dismiss', admin_url( 'admin-ajax.php' ) );
 	$dismiss_url = add_query_arg( 'notice', $notice['id'], $dismiss_url );
-	echo '<div style="position:absolute; top:20px; right: 20px;">';
-	echo '<a href="' . esc_url( $dismiss_url ) . '" target="radio-station-notice-iframe" id+style="text-decoration:none;">';
-	echo '<span class="dashicons dashicons-dismiss" title="' . esc_attr( __( 'Dismiss this Notice', 'radio-station' ) ) . '"></span></a>';
-	echo '</div>';
-	echo '</div>';
+	echo '<div style="position:absolute; top:20px; right: 20px;">' . PHP_EOL;
+		echo '<a href="' . esc_url( $dismiss_url ) . '" target="radio-station-notice-iframe" id+style="text-decoration:none;">' . PHP_EOL;
+		echo '<span class="dashicons dashicons-dismiss" title="' . esc_attr( __( 'Dismiss this Notice', 'radio-station' ) ) . '"></span></a>' . PHP_EOL;
+	echo '</div>' . PHP_EOL;
+
+	// --- close notice wrap ---
+	echo '</div>' . PHP_EOL;
 
 	// --- notice dismissal iframe (once only) ---
 	radio_station_admin_notice_iframe();
@@ -1010,6 +1054,7 @@ add_action( 'wp_ajax_radio_station_notice_dismiss', 'radio_station_notice_dismis
 function radio_station_notice_dismiss() {
 	if ( current_user_can( 'manage_options' ) || current_user_can( 'update_plugins' ) ) {
 		if ( isset( $_GET['notice'] ) ) {
+
 			$notice = absint( $_GET['notice'] );
 			if ( $notice < 0 ) {
 				return;
@@ -1020,8 +1065,10 @@ function radio_station_notice_dismiss() {
 			}
 			$notices[$notice] = '1';
 			update_option( 'radio_station_read_notices', $notices );
-			echo "<script>parent.document.getElementById('radio-station-notice-" . esc_js( $notice ) . "').style.display = 'none';</script>";
+			echo "<script>parent.document.getElementById('radio-station-notice-" . esc_js( $notice ) . "').style.display = 'none';</script>" . PHP_EOL;
+
 		} elseif ( isset( $_GET['upgrade'] ) ) {
+
 			$upgrade = absint( $_GET['upgrade'] );
 			if ( $upgrade < 0 ) {
 				return;
@@ -1032,7 +1079,8 @@ function radio_station_notice_dismiss() {
 			}
 			$upgrades[$upgrade] = '1';
 			update_option( 'radio_station_read_upgrades', $upgrades );
-			echo "<script>parent.document.getElementById('radio-station-update-" . esc_js( $upgrade ) . "').style.display = 'none';</script>";
+			echo "<script>parent.document.getElementById('radio-station-update-" . esc_js( $upgrade ) . "').style.display = 'none';</script>" . PHP_EOL;
+
 		}
 	}
 	exit;
@@ -1050,7 +1098,7 @@ function radio_station_notice_dismiss() {
 function radio_station_admin_notice_iframe() {
 	global $radio_station_notice_iframe;
 	if ( !isset( $radio_station_notice_iframe ) || !$radio_station_notice_iframe ) {
-		echo '<iframe src="javascript:void(0);" name="radio-station-notice-iframe" id="radio-station-notice-iframe" style="display:none;"></iframe>';
+		echo '<iframe src="javascript:void(0);" name="radio-station-notice-iframe" id="radio-station-notice-iframe" style="display:none;"></iframe>' . PHP_EOL;
 		$radio_station_notice_iframe = true;
 	}
 }
@@ -1070,7 +1118,7 @@ function radio_station_settings_page_top() {
 	$offer_end = strtotime( '2020-08-01 00:01' );
 	if ( $now < $offer_end ) {
 		if ( !get_option( 'radio_station_listing_offer_accepted' ) ) {
-			echo radio_station_listing_offer_content( false );
+			radio_station_listing_offer_content( false );
 		}
 	} */
 
@@ -1079,22 +1127,25 @@ function radio_station_settings_page_top() {
 	$offer_start = strtotime( '2021-07-20 00:01' );
 	$offer_end = strtotime( '2021-07-26 00:01' );
 	if ( $now < $offer_end ) {
-		$user_ids = get_current_user_id();
+		$user_id = get_current_user_id();
 		$user_ids = get_option( 'radio_station_launch_offer_accepted' );
 		if ( !$user_ids || !is_array( $user_ids ) || !in_array( $user_id, $user_ids ) ) {
 			$prelaunch = ( $now < $offer_start ) ? true : false;
-			if ( isset( $_GET['offertest'] ) && ( '1' == $_GET['offertest'] ) ) {
-				$prelaunch = false;
-			} elseif ( isset( $_GET['offertest'] ) && ( '2' == $_GET['offertest'] ) ) {
-				$prelaunch = true;
+			if ( isset( $_GET['offertest'] ) ) {
+				$offertest = sanitize_title( $_GET['offertest'] );
+				if ( '1' == $offertest ) {
+					$prelaunch = false;
+				} elseif ( '2' == $offertest ) {
+					$prelaunch = true;
+				}
 			}
-			echo radio_station_launch_offer_content( false, $prelaunch );
+			radio_station_launch_offer_content( false, $prelaunch );
 		}
 	}
 
 	// --- plugin update notice ---
 	radio_station_update_notice();
-	echo '<br>';
+	echo '<br>' . PHP_EOL;
 }
 
 // ---------------------------
@@ -1104,8 +1155,7 @@ add_action( 'radio_station_admin_page_bottom', 'radio_station_settings_page_bott
 function radio_station_settings_page_bottom() {
 	// 2.3.1: move mailchimp form for listing offer
 	radio_station_mailchimp_form();
-	// phpcs:ignore WordPress.Security.OutputNotEscaped
-	echo radio_station_announcement_content( false );
+	radio_station_announcement_content( false );
 }
 
 // ------------------------------
@@ -1118,7 +1168,7 @@ function radio_station_listing_offer_notice() {
 
 	// --- bug out on certain plugin pages ---
 	$pages = array( 'radio-station', 'radio-station-docs' );
-	if ( isset( $_REQUEST['page'] ) && in_array( $_REQUEST['page'], $pages ) ) {
+	if ( isset( $_REQUEST['page'] ) && in_array( sanitize_text_field( $_REQUEST['page'], $pages ) ) ) {
 		return;
 	}
 
@@ -1135,10 +1185,9 @@ function radio_station_listing_offer_notice() {
 	}
 
 	// --- display plugin announcement ---
-	echo '<div id="radio-station-listing-offer-notice" class="notice notice-success" style="position:relative;">';
-	// phpcs:ignore WordPress.Security.OutputNotEscaped
-	echo radio_station_listing_offer_content();
-	echo '</div>';
+	echo '<div id="radio-station-listing-offer-notice" class="notice notice-success" style="position:relative;">' . PHP_EOL;
+		radio_station_listing_offer_content();
+	echo '</div>' . PHP_EOL;
 
 	// --- notice dismissal frame (once) ---
 	radio_station_admin_notice_iframe();
@@ -1152,7 +1201,7 @@ function radio_station_launch_offer_notice( $rspage = false ) {
 
 	// --- bug out on certain plugin pages ---
 	$pages = array( 'radio-station', 'radio-station-docs' );
-	if ( isset( $_REQUEST['page'] ) && in_array( $_REQUEST['page'], $pages ) ) {
+	if ( isset( $_REQUEST['page'] ) && in_array( sanitize_text_field( $_REQUEST['page'] ), $pages ) ) {
 		return;
 	}
 
@@ -1177,11 +1226,10 @@ function radio_station_launch_offer_notice( $rspage = false ) {
 	}
 
 	// --- display plugin announcement ---
-	echo '<div id="radio-station-launch-offer-notice" class="notice notice-success" style="position:relative;">';
-	// phpcs:ignore WordPress.Security.OutputNotEscaped
+	echo '<div id="radio-station-launch-offer-notice" class="notice notice-success" style="position:relative;">' . PHP_EOL;
 		$prelaunch = ( $now < $offer_start ) ? true : false;
-	echo radio_station_launch_offer_content( true, $prelaunch );
-	echo '</div>';
+		radio_station_launch_offer_content( true, $prelaunch );
+	echo '</div>' . PHP_EOL;
 
 	// --- notice dismissal frame (once) ---
 	radio_station_admin_notice_iframe();
@@ -1195,71 +1243,70 @@ function radio_station_listing_offer_content( $dismissable = true ) {
 
 	$dismiss_url = admin_url( 'admin-ajax.php?action=radio_station_listing_offer_dismiss' );
 	$accept_dismiss_url = add_query_arg( 'accepted', '1', $dismiss_url );
-	$blurb = '<ul style="list-style:none;">';
+	echo '<ul style="list-style:none;">' . PHP_EOL;
 
 	// --- directory logo image ---
 	$logo_image = plugins_url( 'images/netmix-logo.png', RADIO_STATION_FILE );
-	$blurb .= '<li style="display:inline-block; vertical-align:middle;">';
-	$blurb .= '<img src="' . esc_url( $logo_image ) . '">';
-	$blurb .= '</li>';
+	echo '<li style="display:inline-block; vertical-align:middle;">' . PHP_EOL;
+	echo '<img src="' . esc_url( $logo_image ) . '">' . PHP_EOL;
+	echo '</li>' . PHP_EOL;
 
 	// --- free listing offer text ---
-	$blurb .= '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">';
-	$blurb .= '<center><b style="font-size:17px;">' . esc_html( __( 'Time Sensitive Free Offer', 'radio-station' ) ) . '</b></center>';
+	echo '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">' . PHP_EOL;
+	echo '<center><b style="font-size:17px;">' . esc_html( __( 'Time Sensitive Free Offer', 'radio-station' ) ) . '</b></center>' . PHP_EOL;
 
-	$blurb .= '<p style="font-size: 14px; line-height: 21px; margin-top: 0;">';
-	$blurb .= esc_html( __( 'We are excited to announce the opening of the new', 'radio-station' ) );
-	$blurb .= ' <a href="' . RADIO_STATION_NETMIX_DIR . '" target="_blank">Netmix Station Directory</a>!!!<br>';
-	$blurb .= esc_html( __( 'Allowing listeners to newly discover Stations and Shows - which can include yours...', 'radio-station' ) ) . '<br>';
+	echo '<p style="font-size: 14px; line-height: 21px; margin-top: 0;">' . PHP_EOL;
+	echo esc_html( __( 'We are excited to announce the opening of the new', 'radio-station' ) ) . PHP_EOL;
+	echo ' <a href="' . esc_url( RADIO_STATION_NETMIX_DIR ) . '" target="_blank">Netmix Station Directory</a>!!!<br>' . PHP_EOL;
+	echo esc_html( __( 'Allowing listeners to newly discover Stations and Shows - which can include yours...', 'radio-station' ) ) . '<br>' . PHP_EOL;
 
-	$blurb .= esc_html( __( 'Because while launching,') ) . ' <b>' . esc_html( __( 'we are offering 30 days free listing to all Radio Station users!', 'radio-station' ) ) . '</b><br>';
-	$blurb .= esc_html( __( 'Interested in more exposure and listeners for your Radio Station, for free?', 'radio-station' ) );
-	$blurb .= '</p></li>';
+	echo esc_html( __( 'Because while launching,' ) ) . ' <b>' . esc_html( __( 'we are offering 30 days free listing to all Radio Station users!', 'radio-station' ) ) . '</b><br>' . PHP_EOL;
+	echo esc_html( __( 'Interested in more exposure and listeners for your Radio Station, for free?', 'radio-station' ) ) . PHP_EOL;
+	echo '</p></li>';
 
 	// --- accept / decline offer button links ---
-	$blurb .= '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">';
-	$blurb .= '<center>';
-	$onclick = '';
+	echo '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">' . PHP_EOL;
+	echo '<center>' . PHP_EOL;
+	echo '<div id="directory-offer-accept-button" style="display:inline-block; margin-right:10px;">' . PHP_EOL;
+	echo '<a href="' . esc_url( RADIO_STATION_NETMIX_DIR . 'station-listing/' ) . '" style="font-size: 11px;" target="_blank" class="button-primary"';
 	if ( $dismissable ) {
-		$onclick = ' onclick="radio_display_dismiss_link();"';
+		echo ' onclick="radio_display_dismiss_link();"';
 	}
-	$blurb .= '<div id="directory-offer-accept-button" style="display:inline-block; margin-right:10px;">';
-	$blurb .= '<a href="' . RADIO_STATION_NETMIX_DIR . 'station-listing/" style="font-size: 11px;" target="_blank" class="button-primary"' . $onclick . '>' . esc_html( __( 'Yes please!', 'radio-station' ) ) . '</a>';
-	$blurb .= '</div>';
-	$blurb .= '<div id="directory-offer-blog-button" style="display:inline-block;">';
-	$blurb .= '<a href="' . RADIO_STATION_NETMIX_DIR . 'announcing-new-netmix-directory/" style="font-size: 11px;" target="_blank" class="button-secondary">' . esc_html( __( 'More Details', 'radio-station' ) ) . '</a>';
-	$blurb .= '</div><br>';
+	echo '>' . esc_html( __( 'Yes please!', 'radio-station' ) ) . '</a>' . PHP_EOL;
+	echo '</div>' . PHP_EOL;
+	echo '<div id="directory-offer-blog-button" style="display:inline-block;">' . PHP_EOL;
+	echo '<a href="' . esc_url( RADIO_STATION_NETMIX_DIR . 'announcing-new-netmix-directory/' ) . '" style="font-size: 11px;" target="_blank" class="button-secondary">' . esc_html( __( 'More Details', 'radio-station' ) ) . '</a>' . PHP_EOL;
+	echo '</div><br>' . PHP_EOL;
 
-	$blurb .= '<div id="directory-offer-dismiss-link" style="display:none;">';
-	$blurb .= '<a href="' . esc_url( $accept_dismiss_url ) . '" style="font-size: 12px;" target="radio-station-notice-iframe">' . esc_html( __( "Great! I'm listed, dismiss this notice.", 'radio-station' ) ) . '</a>';
-	$blurb .= '</div>';
-	$blurb .= '</center><br>';
+	echo '<div id="directory-offer-dismiss-link" style="display:none;">' . PHP_EOL;
+	echo '<a href="' . esc_url( $accept_dismiss_url ) . '" style="font-size: 12px;" target="radio-station-notice-iframe">' . esc_html( __( "Great! I'm listed, dismiss this notice.", 'radio-station' ) ) . '</a>' . PHP_EOL;
+	echo '</div>' . PHP_EOL;
+	echo '</center><br>' . PHP_EOL;
 
-	$blurb .= '<div style="font-size: 11px; line-height: 18px;">';
-	$blurb .= esc_html( __( 'Offer valid until end of July 2020.', 'radio-station' ) ) . '<br>';
-	$blurb .= esc_html( __( 'Activate your 30 days before it ends!', 'radio-station' ) );
-	$blurb .= '</div>';
+	echo '<div style="font-size: 11px; line-height: 18px;">' . PHP_EOL;
+	echo esc_html( __( 'Offer valid until end of July 2020.', 'radio-station' ) ) . '<br>' . PHP_EOL;
+	echo esc_html( __( 'Activate your 30 days before it ends!', 'radio-station' ) ) . PHP_EOL;
+	echo '</div>' . PHP_EOL;
 
-	$blurb .= '</li>';
+	echo '</li>' . PHP_EOL;
 
-	$blurb .= '</ul>';
+	echo '</ul>' . PHP_EOL;
 
 	// --- dismiss notice icon ---
 	if ( $dismissable ) {
-		$blurb .= '<div style="position:absolute; top:20px; right: 20px;">';
-		$blurb .= '<a href="' . esc_url( $dismiss_url ) . '" target="radio-station-notice-iframe" style="text-decoration:none;">';
-		$blurb .= '<span class="dashicons dashicons-dismiss" title="' . esc_html( __( 'Dismiss this Notice', 'radio-station' ) ) . '"></span>';
-		$blurb .= '</a>';
-		$blurb .= '</div>';
+		echo '<div style="position:absolute; top:20px; right: 20px;">' . PHP_EOL;
+			echo '<a href="' . esc_url( $dismiss_url ) . '" target="radio-station-notice-iframe" style="text-decoration:none;">' . PHP_EOL;
+				echo '<span class="dashicons dashicons-dismiss" title="' . esc_html( __( 'Dismiss this Notice', 'radio-station' ) ) . '"></span>' . PHP_EOL;
+			echo '</a>' . PHP_EOL;
+		echo '</div>' . PHP_EOL;
 	}
 
 	// --- display dismiss link script ---
-	$blurb .= "<script>function radio_display_dismiss_link() {
+	echo "<script>function radio_display_dismiss_link() {
 		document.getElementById('directory-offer-accept-button').style.display = 'none';
 		document.getElementById('directory-offer-dismiss-link').style.display = '';
-	}</script>";
+	}</script>" . PHP_EOL;
 
-	return $blurb;
 }
 
 // --------------------
@@ -1270,80 +1317,83 @@ function radio_station_launch_offer_content( $dismissable = true, $prelaunch ) {
 
 	$dismiss_url = admin_url( 'admin-ajax.php?action=radio_station_launch_offer_dismiss' );
 	$accept_dismiss_url = add_query_arg( 'accepted', '1', $dismiss_url );
-	$blurb = '<ul style="list-style:none;">';
+	echo '<ul style="list-style:none;">' . PHP_EOL;
 
 	// --- directory logo image ---
 	// $launch_image = plugins_url( 'images/netmix-logo.png', RADIO_STATION_FILE );
 	$launch_image = plugins_url( 'images/pro-launch.gif', RADIO_STATION_FILE );
-	$blurb .= '<li style="display:inline-block; vertical-align:middle;">';
-	$blurb .= '<img src="' . esc_url( $launch_image ) . '" style="width:128px; height:128px">';
-	$blurb .= '</li>';
+	echo '<li style="display:inline-block; vertical-align:middle;">' . PHP_EOL;
+		echo '<img src="' . esc_url( $launch_image ) . '" style="width:128px; height:128px">' . PHP_EOL;
+	echo '</li>' . PHP_EOL;
 
 	// --- free listing offer text ---
-	$blurb .= '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">';
+	echo '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">' . PHP_EOL;
 
 	if ( $prelaunch ) {
-		$blurb .= '<center><b style="font-size:18px;">' . esc_html( __( 'Radio Station Pro Launch Discount!', 'radio-station' ) ) . '</b></center>';
-		$blurb .= '<p style="font-size: 16px; line-height: 24px; margin-top: 0;">';
-		$blurb .= esc_html( __( 'We are thrilled to announce the upcoming launch of Radio Station PRO', 'radio-station' ) ) . ' !!!<br>';
-		$blurb .= esc_html( __( 'Jam-packed with new features to "level up" your Station\'s online presence.', 'radio-station' ) ) . '<br>';
-		$blurb .= esc_html( __( 'During the launch,') ) . ' <b>' . esc_html( __( 'we are offering 30% discount to existing Radio Station users!', 'radio-station' ) ) . '</b><br>';
-		$blurb .= esc_html( __( 'Sign up to the exclusive launch list to receive your discount code when we go LIVE.', 'radio-station' ) );
-		$blurb .= '</p>';
+		echo '<center><b style="font-size:18px;">' . esc_html( __( 'Radio Station Pro Launch Discount!', 'radio-station' ) ) . '</b></center>' . PHP_EOL;
+		echo '<p style="font-size: 16px; line-height: 24px; margin-top: 0;">' . PHP_EOL;
+		echo esc_html( __( 'We are thrilled to announce the upcoming launch of Radio Station PRO', 'radio-station' ) ) . ' !!!<br>' . PHP_EOL;
+		echo esc_html( __( 'Jam-packed with new features to "level up" your Station\'s online presence.', 'radio-station' ) ) . '<br>' . PHP_EOL;
+		echo esc_html( __( 'During the launch,' ) ) . ' <b>' . esc_html( __( 'we are offering 30% discount to existing Radio Station users!', 'radio-station' ) ) . '</b><br>' . PHP_EOL;
+		echo esc_html( __( 'Sign up to the exclusive launch list to receive your discount code when we go LIVE.', 'radio-station' ) ) . PHP_EOL;
+		echo '</p>' . PHP_EOL;
 	} else {
-		$blurb .= '<center><b style="font-size:18px;">' . esc_html( __( 'Radio Station PRO Launch is LIVE!', 'radio-station' ) ) . '</b></center>';
-		$blurb .= '<p style="font-size: 16px; line-height: 24px; margin-top: 0;">';
-		$blurb .= esc_html( __( 'The long anticipated moment has arrived. The doors are open to get PRO', 'radio-station' ) ) . ' !!!<br>';
-		$blurb .= esc_html( __( 'Jam-packed with new features to "level up" your Station\'s online presence.', 'radio-station' ) ) . '<br>';
-		$blurb .= esc_html( __( 'Remember,') ) . ' <b>' . esc_html( __( 'we are offering 30% discount to existing Radio Station users!', 'radio-station' ) ) . '</b><br>';
-		$blurb .= '<a href="' . RADIO_STATION_PRO_URL . 'plugin-launch-discount/" target="_blank">';
-			$blurb .= esc_html( __( 'Sign up here to receive your exclusive launch discount code.', 'radio-station' ) );
-		$blurb .= '</a></p>';
+		echo '<center><b style="font-size:18px;">' . esc_html( __( 'Radio Station PRO Launch is LIVE!', 'radio-station' ) ) . '</b></center>' . PHP_EOL;
+		echo '<p style="font-size: 16px; line-height: 24px; margin-top: 0;">' . PHP_EOL;
+		echo esc_html( __( 'The long anticipated moment has arrived. The doors are open to get PRO', 'radio-station' ) ) . ' !!!<br>' . PHP_EOL;
+		echo esc_html( __( 'Jam-packed with new features to "level up" your Station\'s online presence.', 'radio-station' ) ) . '<br>' . PHP_EOL;
+		echo esc_html( __( 'Remember,' ) ) . ' <b>' . esc_html( __( 'we are offering 30% discount to existing Radio Station users!', 'radio-station' ) ) . '</b><br>' . PHP_EOL;
+		echo '<a href="' . esc_url( RADIO_STATION_PRO_URL ) . 'plugin-launch-discount/" target="_blank">' . PHP_EOL;
+			echo esc_html( __( 'Sign up here to receive your exclusive launch discount code.', 'radio-station' ) ) . PHP_EOL;
+		echo '</a></p>' . PHP_EOL;
 	}
 
-	$blurb .= '</li>';
+	echo '</li>' . PHP_EOL;
 
 	// --- accept / decline offer button links ---
-	$blurb .= '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">';
-	$blurb .= '<center>';
-	$onclick = '';
-	if ( $dismissable ) {
-		$onclick = ' onclick="radio_display_dismiss_link();"';
-	}
-	$blurb .= '<div id="launch-offer-accept-button" style="display:inline-block; margin-right:10px;">';
+	echo '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">' . PHP_EOL;
+	echo '<center>' . PHP_EOL;
+	echo '<div id="launch-offer-accept-button" style="display:inline-block; margin-right:10px;">' . PHP_EOL;
 	if ( $prelaunch ) {
-		$blurb .= '<a href="' . RADIO_STATION_PRO_URL . 'plugin-launch-discount/" style="font-size: 16px;" target="_blank" class="button-primary"' . $onclick . '>' . esc_html( __( "Yes, I'm in!", 'radio-station' ) ) . '</a>';
+		echo '<a href="' . RADIO_STATION_PRO_URL . 'plugin-launch-discount/" style="font-size: 16px;" target="_blank" class="button-primary"';
+		if ( $dismissable ) {
+			echo ' onclick="radio_display_dismiss_link();"';
+		}
+		echo '>' . esc_html( __( "Yes, I'm in!", 'radio-station' ) ) . '</a>' . PHP_EOL;
 	} else {
-		$blurb .= '<a href="' . RADIO_STATION_PRO_URL . 'pricing/" style="font-size: 16px;" target="_blank" class="button-primary"' . $onclick . '>' . esc_html( __( 'Go PRO', 'radio-station' ) ) . '</a>';
+		echo '<a href="' . RADIO_STATION_PRO_URL . 'pricing/" style="font-size: 16px;" target="_blank" class="button-primary"';
+		if ( $dismissable ) {
+			echo ' onclick="radio_display_dismiss_link();"';
+		}
+		echo '>' . esc_html( __( 'Go PRO', 'radio-station' ) ) . '</a>' . PHP_EOL;
 	}
-	$blurb .= '</div>';
+	echo '</div>' . PHP_EOL;
 
-	$blurb .= '<div id="launch-offer-dismiss-link" style="display:none;">';
-	$blurb .= '<a href="' . esc_url( $accept_dismiss_url ) . '" style="font-size: 12px;" target="radio-station-notice-iframe">' . esc_html( __( 'Thanks, already done.', 'radio-station' ) ) . '</a>';
-	$blurb .= '</div>';
-	$blurb .= '</center><br>';
+	echo '<div id="launch-offer-dismiss-link" style="display:none;">' . PHP_EOL;
+	echo '<a href="' . esc_url( $accept_dismiss_url ) . '" style="font-size: 12px;" target="radio-station-notice-iframe">' . esc_html( __( 'Thanks, already done.', 'radio-station' ) ) . '</a>' . PHP_EOL;
+	echo '</div>' . PHP_EOL;
+	echo '</center><br>' . PHP_EOL;
 
-	$blurb .= '</li>';
+	echo '</li>' . PHP_EOL;
 
-	$blurb .= '</ul>';
+	echo '</ul>' . PHP_EOL;
 
 	// --- dismiss notice icon ---
 	if ( $dismissable ) {
-		$blurb .= '<div style="position:absolute; top:20px; right: 20px;">';
-		$blurb .= '<a href="' . esc_url( $dismiss_url ) . '" target="radio-station-notice-iframe" style="text-decoration:none;">';
-		$blurb .= '<span class="dashicons dashicons-dismiss" title="' . esc_html( __( 'Dismiss this Notice', 'radio-station' ) ) . '"></span>';
-		$blurb .= '</a>';
-		$blurb .= '</div>';
+		echo '<div style="position:absolute; top:20px; right: 20px;">' . PHP_EOL;
+			echo '<a href="' . esc_url( $dismiss_url ) . '" target="radio-station-notice-iframe" style="text-decoration:none;">' . PHP_EOL;
+				echo '<span class="dashicons dashicons-dismiss" title="' . esc_html( __( 'Dismiss this Notice', 'radio-station' ) ) . '"></span>' . PHP_EOL;
+			echo '</a>' . PHP_EOL;
+		echo '</div>' . PHP_EOL;
 	}
 
 	// --- display dismiss link script ---
-	$blurb .= "<script>function radio_display_dismiss_link() {
+	echo "<script>function radio_display_dismiss_link() {
 		document.getElementById('launch-offer-accept-button').style.display = 'none';
 		document.getElementById('launch-offer-dismiss-link').style.display = '';
 		document.getElementById('radio-station-notice-iframe').src = '" . esc_url( $accept_dismiss_url ) . "';
-	}</script>";
+	}</script>" . PHP_EOL;
 
-	return $blurb;
 }
 
 // --------------------------
@@ -1365,7 +1415,7 @@ function radio_station_listing_offer_dismiss() {
 	}
 
 	// --- hide the announcement in parent frame ---
-	echo "<script>parent.document.getElementById('radio-station-listing-offer-notice').style.display = 'none';</script>";
+	echo "<script>parent.document.getElementById('radio-station-listing-offer-notice').style.display = 'none';</script>" . PHP_EOL;
 	exit;
 }
 
@@ -1405,7 +1455,7 @@ function radio_station_launch_offer_dismiss() {
 	}
 
 	// --- hide the announcement in parent frame ---
-	echo "<script>parent.document.getElementById('radio-station-launch-offer-notice').style.display = 'none';</script>";
+	echo "<script>parent.document.getElementById('radio-station-launch-offer-notice').style.display = 'none';</script>" . PHP_EOL;
 	exit;
 }
 
@@ -1424,14 +1474,13 @@ function radio_station_announcement_notice() {
 	// --- bug out on certain plugin pages ---
 	// 2.2.8: remove strict in_array checking
 	$pages = array( 'radio-station', 'radio-station-docs' );
-	if ( isset( $_REQUEST['page'] ) && in_array( $_REQUEST['page'], $pages ) ) {
+	if ( isset( $_REQUEST['page'] ) && in_array( sanitize_text_field( $_REQUEST['page'] ), $pages ) ) {
 		return;
 	}
 
 	// --- display plugin announcement ---
 	echo '<div id="radio-station-announcement-notice" class="notice notice-info" style="position:relative;">';
-	// phpcs:ignore WordPress.Security.OutputNotEscaped
-	echo radio_station_announcement_content();
+		radio_station_announcement_content();
 	echo '</div>';
 
 	// --- notice dismissal frame (once) ---
@@ -1445,53 +1494,57 @@ function radio_station_announcement_notice() {
 // 2.2.2: added simple patreon supporter blurb
 function radio_station_announcement_content( $dismissable = true ) {
 
-	$blurb = '<ul style="list-style:none;">';
+	echo '<ul style="list-style:none;">' . PHP_EOL;
 
 	// --- plugin image ---
 	$plugin_image = plugins_url( 'images/radio-station.png', RADIO_STATION_FILE );
-	$blurb .= '<li style="display:inline-block; vertical-align:middle;">';
-	$blurb .= '<img src="' . esc_url( $plugin_image ) . '">';
-	$blurb .= '</li>';
+	echo '<li style="display:inline-block; vertical-align:middle;">';
+	echo '<img src="' . esc_url( $plugin_image ) . '">';
+	echo '</li>';
 
 	// --- takeover announcement ---
-	$blurb .= '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">';
-	$blurb .= '<b style="font-size:17px;">' . esc_html( __( 'Help support us to make improvements, modifications and introduce new features!', 'radio-station' ) ) . '</b><br>';
-	$blurb .= esc_html( __( 'With over a thousand radio station users thanks to the original plugin author Nikki Blight', 'radio-station' ) ) . ', <br>';
-	$blurb .= esc_html( __( 'since June 2019', 'radio-station' ) ) . ', ';
-	$blurb .= '<b>' . esc_html( __( 'Radio Station', 'radio-station' ) ) . '</b> ';
-	$blurb .= esc_html( __( ' plugin development has been actively taken over by', 'radio-station' ) );
-	$blurb .= ' <a href="https://netmix.com/" target="_blank">Netmix</a>.<br>';
-	// 2.3.3.9: add updated text after 2000 user milestone
-	$blurb .= esc_html( __( 'And due to our continued efforts we now have a community of over two thousand active stations!', 'radio-station' ) ) . '<br>';
-	$blurb .= esc_html( __( 'We invite you to', 'radio-station' ) );
-	$blurb .= ' <a href="https://patreon.com/radiostation" target="_blank">';
-	$blurb .= esc_html( __( 'Become a Radio Station Patreon Supporter', 'radio-station' ) );
-	$blurb .= '</a> ' . esc_html( __( 'to make it better for everyone', 'radio-station' ) ) . '!';
-	$blurb .= '</li>';
-	$blurb .= '<li style="display:inline-block; text-align:center; vertical-align:middle; margin-left:40px;">';
-	$blurb .= radio_station_patreon_button( 'radiostation' );
+	echo '<li style="display:inline-block; vertical-align:middle; margin-left:40px; font-size:16px; line-height:24px;">' . PHP_EOL;
+	echo '<b style="font-size:17px;">' . esc_html( __( 'Help support us to make improvements, modifications and introduce new features!', 'radio-station' ) ) . '</b><br>' . PHP_EOL;
+	echo esc_html( __( 'With over a thousand radio station users thanks to the original plugin author Nikki Blight', 'radio-station' ) ) . ', <br>' . PHP_EOL;
+	echo esc_html( __( 'since June 2019', 'radio-station' ) ) . ', ' . PHP_EOL;
+	echo '<b>' . esc_html( __( 'Radio Station', 'radio-station' ) ) . '</b> ' . PHP_EOL;
+	echo esc_html( __( ' plugin development has been actively taken over by', 'radio-station' ) ) . PHP_EOL;
+	echo ' <a href="' . esc_url( RADIO_STATION_NETMIX_DIR ) . '" target="_blank">Netmix</a>.<br>' . PHP_EOL;
+	// 2.3.3.9: add updated text after 2000 user mileston
+	echo esc_html( __( 'And due to our continued efforts we now have a community of over two thousand active stations!', 'radio-station' ) ) . '<br>' . PHP_EOL;
+	echo esc_html( __( 'We invite you to', 'radio-station' ) ) . PHP_EOL;
+	echo ' <a href="' . esc_url( RADIO_STATION_PATREON ) . '" target="_blank">' . PHP_EOL;
+	echo esc_html( __( 'Become a Radio Station Patreon Supporter', 'radio-station' ) ) . PHP_EOL;
+	echo '</a> ' . esc_html( __( 'to make it better for everyone', 'radio-station' ) ) . '!' . PHP_EOL;
+	echo '</li>' . PHP_EOL;
+	echo '<li style="display:inline-block; text-align:center; vertical-align:middle; margin-left:40px;">' . PHP_EOL;
+	
+	$button = radio_station_patreon_button( 'radiostation' );
+	// 2.5.0: added wp_kses to button output
+	$allowed = radio_station_allowed_html( 'button', 'patreon' );
+	echo wp_kses( $button , $allowed );
+
 	// 2.2.7: added WordPress.Org star rating link
 	// 2.3.0: only show for dismissable notice
 	if ( $dismissable ) {
-		$blurb .= '<br><br><span style="color:#FC5;" class="dashicons dashicons-star-filled"></span> ';
-		$blurb .= '<a class="notice-link" href="https://wordpress.org/support/plugin/radio-station/reviews/#new-post" target=_blank>';
-		$blurb .= esc_html( __( 'Rate on WordPress.Org', 'radio-station' ) );
-		$blurb .= '</a>';
+		echo '<br><br><span style="color:#FC5;" class="dashicons dashicons-star-filled"></span> ' . PHP_EOL;
+		echo '<a class="notice-link" href="https://wordpress.org/support/plugin/radio-station/reviews/#new-post" target="_blank">' . PHP_EOL;
+			echo esc_html( __( 'Rate on WordPress.Org', 'radio-station' ) ) . PHP_EOL;
+		echo '</a>' . PHP_EOL;
 	}
-	$blurb .= '</li>';
-	$blurb .= '</ul>';
+	echo '</li>' . PHP_EOL;
+	echo '</ul>' . PHP_EOL;
 
 	// --- dismiss notice icon ---
 	if ( $dismissable ) {
 		$dismiss_url = admin_url( 'admin-ajax.php?action=radio_station_announcement_dismiss' );
-		$blurb .= '<div style="position:absolute; top:20px; right: 20px;">';
-		$blurb .= '<a href="' . esc_url( $dismiss_url ) . '" target="radio-station-notice-iframe" style="text-decoration:none;">';
-		$blurb .= '<span class="dashicons dashicons-dismiss" title="' . esc_html( __( 'Dismiss this Notice', 'radio-station' ) ) . '"></span>';
-		$blurb .= '</a>';
-		$blurb .= '</div>';
+		echo '<div style="position:absolute; top:20px; right: 20px;">' . PHP_EOL;
+		echo '<a href="' . esc_url( $dismiss_url ) . '" target="radio-station-notice-iframe" style="text-decoration:none;">' . PHP_EOL;
+		echo '<span class="dashicons dashicons-dismiss" title="' . esc_html( __( 'Dismiss this Notice', 'radio-station' ) ) . '"></span>' . PHP_EOL;
+		echo '</a>' . PHP_EOL;
+		echo '</div>' . PHP_EOL;
 	}
 
-	return $blurb;
 }
 
 // ------------------------------------
@@ -1504,7 +1557,7 @@ function radio_station_announcement_dismiss() {
 		// --- set option to dismissed ---
 		update_option( 'radio_station_announcement_dismissed', true );
 		// --- hide the announcement in parent frame ---
-		echo "<script>parent.document.getElementById('radio-station-announcement-notice').style.display = 'none';</script>";
+		echo "<script>parent.document.getElementById('radio-station-announcement-notice').style.display = 'none';</script>" . PHP_EOL;
 		exit;
 	}
 }
@@ -1527,21 +1580,21 @@ function radio_station_shift_conflict_notice() {
 	$conflicts = get_option( 'radio_station_schedule_conflicts' );
 	if ( $conflicts && is_array( $conflicts ) && ( count( $conflicts ) > 0 ) ) {
 
-		echo '<div id="radio-station-conflicts" class="notice notice-error" style="position:relative;">';
+		echo '<div id="radio-station-conflicts" class="notice notice-error" style="position:relative;">' . PHP_EOL;
 
-		echo '<ul style="list-style:none;">';
+		echo '<ul style="list-style:none;">' . PHP_EOL;
 
 		// 2.3.3.9: remove unnecessary left margin on first list item
-		echo '<li style="display:inline-block; text-align:center; vertical-align:top;">';
-		echo '<b>' . esc_html( __( 'Radio Station', 'radio-station' ) ) . '</b><br>';
-		echo esc_html( __( 'has detected', 'radio-station' ) ) . '<br>';
-		echo esc_html( __( 'Schedule conflicts!', 'radio-station' ) );
-		echo '</li>';
+		echo '<li style="display:inline-block; text-align:center; vertical-align:top;">' . PHP_EOL;
+		echo '<b>' . esc_html( __( 'Radio Station', 'radio-station' ) ) . '</b><br>' . PHP_EOL;
+		echo esc_html( __( 'has detected', 'radio-station' ) ) . '<br>' . PHP_EOL;
+		echo esc_html( __( 'Schedule conflicts!', 'radio-station' ) ) . PHP_EOL;
+		echo '</li>' . PHP_EOL;
 
-		echo '<li style="display:inline-block; vertical-align:top; margin-left:40px;">';
-		echo '<b>' . esc_html( __( 'The following Shows have conflicting Shift times', 'radio-station' ) ) . ":</b><br>";
+		echo '<li style="display:inline-block; vertical-align:top; margin-left:40px;">' . PHP_EOL;
+		echo '<b>' . esc_html( __( 'The following Shows have conflicting Shift times', 'radio-station' ) ) . ":</b><br>" . PHP_EOL;
 
-		echo '<ul style="list-style:none; margin-top:5px;">';
+		echo '<ul style="list-style:none; margin-top:5px;">' . PHP_EOL;
 		$edit_link = add_query_arg( 'action', 'edit', admin_url( 'post.php' ) );
 		foreach ( $conflicts as $show => $show_conflicts ) {
 			foreach ( $show_conflicts as $conflict ) {
@@ -1577,21 +1630,21 @@ function radio_station_shift_conflict_notice() {
 
 		// --- show list link ---
 		$show_list_url = add_query_arg( 'post_type', RADIO_STATION_SHOW_SLUG, admin_url( 'edit.php' ) );
-		echo '<li style="display:inline-block; text-align:center; vertical-align:top; margin-left:40px;">';
-		echo '<a class="button" style="margin-bottom:5px;" href="' . esc_url( $show_list_url ) . '">' . esc_html( __( 'Go to Show List', 'radio-station' ) ) . ' &rarr;</a><br>';
-		echo esc_html( __( 'Conflicts are highlighted', 'radio-station' ) ) . '<br>';
-		echo esc_html( __( 'in Show Shift column.', 'radio-station' ) );
-		echo '</li>';
+		echo '<li style="display:inline-block; text-align:center; vertical-align:top; margin-left:40px;">' . PHP_EOL;
+		echo '<a class="button" style="margin-bottom:5px;" href="' . esc_url( $show_list_url ) . '">' . esc_html( __( 'Go to Show List', 'radio-station' ) ) . ' &rarr;</a><br>' . PHP_EOL;
+		echo esc_html( __( 'Conflicts are highlighted', 'radio-station' ) ) . '<br>' . PHP_EOL;
+		echo esc_html( __( 'in Show Shift column.', 'radio-station' ) ) . PHP_EOL;
+		echo '</li>' . PHP_EOL;
 
 		// --- undismissable error notice ---
-		echo '<li style="display:inline-block; text-align:center; vertical-align:top; margin-left:40px;">';
-		echo esc_html( __( 'This notice will persist', 'radio-station' ) ) . '<br>';
-		echo esc_html( __( 'until conflicts are resolved.', 'radio-station' ) );
-		echo '</li>';
+		echo '<li style="display:inline-block; text-align:center; vertical-align:top; margin-left:40px;">' . PHP_EOL;
+		echo esc_html( __( 'This notice will persist', 'radio-station' ) ) . '<br>' . PHP_EOL;
+		echo esc_html( __( 'until conflicts are resolved.', 'radio-station' ) ) . PHP_EOL;
+		echo '</li>' . PHP_EOL;
 
-		echo '</ul>';
+		echo '</ul>' . PHP_EOL;
 
-		echo '</div>';
+		echo '</div>' . PHP_EOL;
 
 	}
 }
@@ -1649,19 +1702,19 @@ function radio_station_mailchimp_form() {
 
 	<?php
 
-	echo '<iframe id="mc-subscribe-record" src="javascript:void(0);" style="display:none;"></iframe>';
+	echo '<iframe id="mc-subscribe-record" src="javascript:void(0);" style="display:none;"></iframe>' . PHP_EOL;
 
 	// --- AJAX subscription call ---
 	// 2.3.0: added to record subscribers
-	$recordurl = add_query_arg( 'action', 'radio_station_record_subscribe', admin_url( 'admin-ajax.php') );
+	$recordurl = add_query_arg( 'action', 'radio_station_record_subscribe', admin_url( 'admin-ajax.php' ) );
 	echo "<script>
 	jQuery(document).ready(function() {
 		jQuery('#mc-embedded-button').on('click', function(e) {
 			email = document.getElementById('mce-EMAIL').value;
-			url = '" . esc_url( $recordurl ) . "&email='+encodeURIComponent(email);
+			url = '" . esc_url_raw( $recordurl ) . "&email='+encodeURIComponent(email);
 			document.getElementById('mc-subscribe-record').src = url;
 		});
-	});</script>";
+	});</script>" . PHP_EOL;
 
 }
 
@@ -1672,18 +1725,21 @@ function radio_station_mailchimp_form() {
 add_action( 'wp_ajax_radio_station_record_subscribe', 'radio_station_record_subscribe' );
 function radio_station_record_subscribe() {
 
+	// note: there is a typo in this option not worth fixing
 	$email = sanitize_email( $_GET['email'] );
 	$subscribed = get_option( 'radio_station_subcribed' );
-	if ( !$subscribed || !is_array($subscribed ) ) {
+	if ( !$subscribed || !is_array( $subscribed ) ) {
 		add_option( 'radio_station_subcribed', array( $email ) );
 	} else {
 		$subscribed[] = $email;
 		update_option( 'radio_station_subcribed', $subscribed );
 	}
-	echo "<script>console.log('Subscription Recorded');
-	parent.jQuery('#mc-embedded-subscribe-form').submit();</script>";
-	exit;
 
+	// --- submit form in parent window ---
+	echo "<script>console.log('Subscription Recorded');";
+	echo "parent.jQuery('#mc-embedded-subscribe-form').submit();</script>" . PHP_EOL;
+
+	exit;
 }
 
 // ------------------
@@ -1694,27 +1750,28 @@ function radio_station_record_subscribe() {
 add_action( 'wp_ajax_radio_station_clear_option', 'radio_station_clear_plugin_options' );
 function radio_station_clear_plugin_options() {
 
-	if ( !current_user_can( 'manage_options' ) ) {return;}
+	if ( !current_user_can( 'manage_options' ) ) {
+		return;
+	}
 
-	if ( isset( $_GET['option'] ) && ( 'subscribed' == $_GET['option'] ) ) {
-		// note: there is a typo in this option not worth fixing
-		delete_option( 'radio_station_subcribed' );
-	}
-	if ( isset( $_GET['option'] ) && ( 'notices' == $_GET['option'] ) ) {
-		delete_option( 'radio_station_read_notices' );
-	}
-	if ( isset( $_GET['option'] ) && ( 'upgrades' == $_GET['option'] ) ) {
-		delete_option( 'radio_station_read_upgrades' );
-	}
-	if ( isset( $_GET['option'] ) && ( 'announcement' == $_GET['option'] ) ) {
-		delete_option( 'radio_station_announcement_dismissed' );
-	}
-	// 2.3.1: added clearing of listing offer options
-	if ( isset( $_GET['option'] ) && ( 'listingoffer' == $_GET['option'] ) ) {
-		delete_option( 'radio_station_listing_offer_dismissed' );
-	}
-	if ( isset( $_GET['option'] ) && ( 'offeraccepted' == $_GET['option'] ) ) {
-		delete_option( 'radio_station_listing_offer_accepted' );
+	if ( isset( $_GET['option'] ) ) {
+		// 2.5.0: condensed logic and added sanitize_title
+		$option = sanitize_title( $_GET['option'] );
+		if ( 'subscribed' == $option ) {
+			// note: there is a typo in this option not worth fixing
+			delete_option( 'radio_station_subcribed' );
+		} elseif ( 'notices' == $option ) {
+			delete_option( 'radio_station_read_notices' );
+		} elseif ( 'upgrades' == $option ) {
+			delete_option( 'radio_station_read_upgrades' );
+		} elseif ( 'announcement' == $option ) {
+			delete_option( 'radio_station_announcement_dismissed' );
+		} elseif ( 'listingoffer' == $option ) {
+			// 2.3.1: added clearing of listing offer options
+			delete_option( 'radio_station_listing_offer_dismissed' );
+		} elseif ( 'offeraccepted' == $option ) {
+			delete_option( 'radio_station_listing_offer_accepted' );
+		}
 	}
 
 	exit;

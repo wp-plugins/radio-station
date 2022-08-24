@@ -38,6 +38,7 @@
 .rp-interface {
 	position: relative;
 	background-color: transparent;
+	width: 36%;
 }
 
 .rp-station-info, .rp-interface, .rp-volume-controls, .rp-controls-holder , .rp-script-switcher, .rp-show-info {
@@ -47,8 +48,11 @@
 .rp-station-info, .rp-interface, .rp-show-info {
 	text-align: center;
 	vertical-align: top;
-	width: 33%;
 	margin-top: 7px;
+}
+
+.rp-station-info, .rp-show-info {
+	width: 32%;
 }
 
 .rp-station-text-alt, .rp-show-text-alt {
@@ -244,7 +248,7 @@
 }
 
 .rp-mute, .rp-volume-max, .rp-volume-down, .rp-volume-up {
-	width: 18px; height: 18px; padding: 0;
+	width: 18px; height: 18px; padding: 0; margin: 0;
 }
 
 .light .rp-mute {

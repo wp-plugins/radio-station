@@ -1,6 +1,6 @@
-/* --------------------- */
-/* Radio Station ScriptS */
-/* --------------------- */
+/* -------------------- */
+/* Radio Station Script */
+/* -------------------- */
 
 /* Smooth Scrolling */
 function radio_scroll_to(id) {
@@ -15,14 +15,14 @@ function radio_scroll_to(id) {
 }
 
 /* Get Day of Week */
-function radio_get_weekday(x) {
-	if (x == '0') {day = 'sunday';}
-	else if (x == '1') {day = 'monday';}
-	else if (x == '2') {day = 'tuesday';}
-	else if (x == '3') {day = 'wednesday';}
-	else if (x == '4') {day = 'thursday';}
-	else if (x == '5') {day = 'friday';}
-	else if (x == '6') {day = 'saturday';}
+function radio_get_weekday(d) {
+	if (d == '0') {day = 'sunday';}
+	else if (d == '1') {day = 'monday';}
+	else if (d == '2') {day = 'tuesday';}
+	else if (d == '3') {day = 'wednesday';}
+	else if (d == '4') {day = 'thursday';}
+	else if (d == '5') {day = 'friday';}
+	else if (d == '6') {day = 'saturday';}
 	return day;
 }
 
@@ -44,7 +44,10 @@ radio_cookie = {
 			while (c.charAt(0) == ' ') {
 				c = c.substring(1,c.length);
 				if (c.indexOf(nameeq) == 0) {
-					return JSON.parse(c.substring(nameeq.length, c.length));
+					/* 2.5.0: fix for possible empty value */
+					value = c.substring(nameeq.length, c.length).trim();
+					if (value == '') {return null;}
+					return JSON.parse(value);
 				}
 			}
 		}

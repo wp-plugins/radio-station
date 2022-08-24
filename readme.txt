@@ -3,8 +3,8 @@ Contributors: tonyzeoli, majick
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
-Tested up to: 5.9.3
-Stable tag: 2.4.0.9
+Tested up to: 6.0
+Stable tag: 2.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -195,7 +195,7 @@ We haven't built an interface between Google Calendar and Radio Station just yet
 
 = How do I install the latest Development version for testing? =
 
-If you are having issues with the plugin, we may recommend you install the development version for further bugix testing, as it may contain fixes that are not yet released into the next stable WordPress version. It is recommended you do this on a staging site. Instructions:
+If you are having issues with the plugin, we may recommend you install the development version for further bugfix testing, as it may contain fixes that are not yet released into the next stable WordPress version. It is recommended you do this on a staging site. Instructions:
 
 1. Download the `develop` branch zip from the Github repository at: 
 `https://github.com/netmix/radio-station/tree/develop/`
@@ -217,6 +217,19 @@ You can now visit your site to make sure nothing is broken. If you experience is
 8. Show Conflict Display
 
 == Changelog ==
+
+= 2.5.0 =
+* Added: Wordpress Radio Blocks (converted Widgets)
+* Updated: Plugin Panel (1.2.6)
+* Updated: Moment JS (2.29.4) with WP Loading
+* Improved: Refactored Schedule Engine Class (1.0.0)
+* Improved: Standardized Widget Input Fields
+* Improved: WordPress Coding Standards
+* Improved: Sanitization using KSES
+* Improved: Translation Implementation
+* Improved: use WP JSON functions for data endpoints
+* Fixed: Countdowns with multiple widget instances
+* Fixed: Radio Player iOS no volume control detection
 
 = 2.4.0.9 =
 * Update: Sysend (1.11.1) for Radio Player
@@ -769,6 +782,12 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.5.0 =
+* Radio Station Blocks for Gutenberg Block Editor!
+* https://netmix.com/radio-station-2-5-0-release-with-blocks/
+* Refactored Schedule Engine Class
+* Improved translations and sanitization
 
 = 2.4.0 =
 * Radio Station Stream Player Widget!

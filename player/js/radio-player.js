@@ -1,6 +1,6 @@
 /* =============================== */
 /* === Radio Player Javascript === */
-/* --------- Version 1.0.0 ------- */
+/* --------- Version 1.0.1 ------- */
 /* =============================== */
 
 /* === Cookie Value Function === */
@@ -20,7 +20,10 @@ radio_player_cookie = {
 			while (c.charAt(0) == ' ') {
 				c = c.substring(1, c.length);
 				if (c.indexOf(nameeq) == 0) {
-					return JSON.parse(c.substring(nameeq.length, c.length));
+					/* 1.0.1: fix for possible empty value */
+					value = c.substring(nameeq.length, c.length).trim();
+					if (value == '') {return null;}
+					return JSON.parse(value);
 				}
 			}
 		}
@@ -686,12 +689,17 @@ function radio_player_save_user_state() {
 
 /* --- volume change audio test --- */
 /* ref: https://stackoverflow.com/a/62094756/5240159 */
-function radio_player_audio_test() {
-        testaudio = new Audio();
-        try {testaudio.volume = 0.5;} catch(e) {return false;}
-        /* note: volume cannot be changed from 1 on iOS 12 and below */
-        if (testaudio.volume === 1) {return false;}
-        return true;
+function radio_player_volume_test() {
+	isIOS = ['iPad Simulator','iPhone Simulator','iPod Simulator','iPad','iPhone','iPod'].includes(navigator.platform);
+	if (radio.debug && isIOS) {console.log('iOS Mobile Device Detected. ');}
+    isAppleDevice = navigator.userAgent.includes('Macintosh');
+	if (radio.debug && isAppleDevice) {console.log('Apple Device Detected.');}
+    isTouchScreen = navigator.maxTouchPoints >= 1;
+	if (radio.debug && isTouchScreen) {console.log('Touch Screen Detected. ');}
+	iosAudioFailure = false; testaudio = new Audio();
+	try {testaudio.volume = 0.5;} catch(e) {if (radio.debug) {console.log('Caught Volume Change Error.');} iosAudioFailure = true;}
+	if (testaudio.volume === 1) {if (radio.debug) {console.log('Volume could not be changed.');} iosAudioFailure = true;}
+    return isIOS || (isAppleDevice && (isTouchScreen || iosAudioFailure));
 }
 
 /* === Multi-Window/Tab Support === */
@@ -803,14 +811,14 @@ jQuery(document).ready(function() {
 jQuery(document).ready(function() {
 
 	/* --- hide all volume controls if no support (iOS) --- */
-	volumesupport = radio_player_audio_test();
-	if (!volumesupport) {jQuery('.rp-volume-controls').hide();}
+	novolumesupport = radio_player_volume_test();
+	if (novolumesupport) {jQuery('.rp-volume-controls').hide(); jQuery('.rp-play-pause-button-bg').css('margin-right','0');}
 
 	/* --- bind pause/play button clicks --- */
 	jQuery('.rp-play-pause-button').on('click', function() {
 		container = jQuery(this).parents('.radio-container');
 		instance = container.attr('id').replace('radio_container_','');
-		radio_player.debug = true; // DEV TEMP
+		/* radio_player.debug = true; */
 		if (radio_player.debug) {console.log('Play/Pause Button Click:'); console.log(jQuery(this));}
 		if (radio_player_is_playing(instance)) {
 			if (radio_player.debug) {console.log('Trigger Pause of Player Instance '+instance);}

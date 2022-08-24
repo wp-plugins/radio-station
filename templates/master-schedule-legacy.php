@@ -38,7 +38,7 @@ foreach ( $master_list as $hour => $days ) {
 	$output .= '<th class="master-program-hour"><div>';
 
 	// 2.2.7: added meridiem translations
-	if ( 12 === (int) $atts['time'] ) {
+	if ( 12 === (int) $atts['time_format'] ) {
 		if ( 0 === $hour ) {
 			$output .= '12' . radio_station_translate_meridiem( 'am' );
 		} elseif ( (int) $hour < 12 ) {
@@ -195,7 +195,7 @@ foreach ( $master_list as $hour => $days ) {
 
 				$output .= '<span class="show-time">';
 
-				if ( 12 === (int) $atts['time'] ) {
+				if ( 12 === (int) $atts['time_format'] ) {
 
 					// 2.2.7: added meridiem translation
 					$starttime = strtotime( '1981-04-28 ' . $show['time']['start_hour'] . ':' . $show['time']['start_min'] . ':00 ' );
