@@ -59,7 +59,11 @@
 	display: none;
 }
 
-.radio-container.vertical .rp-station-info,
+.radio-container.popup {
+	padding: 10px;
+}
+
+.radio-container.vertical .rp-station-info, 
 .radio-container.vertical .rp-interface,
 .radio-container.vertical .rp-show-info {
 	display: block;
@@ -68,7 +72,7 @@
 	text-align: left;
 }
 
-.rp-controls, .rp-volume-controls, .rp-script-switcher {
+.rp-controls, .rp-volume-controls, .rp-popup, .rp-script-switcher {
 	display: inline-block;
 	vertical-align: middle;
 	margin-top: -10px;
@@ -114,6 +118,7 @@
 .rp-play-pause-button-bg, .rp-play-pause-button {
 	width: 40px;
 	height: 40px;
+	background-size: 40px 40px;
 }
 
 .radio-container.circular .rp-play-pause-button-bg {
@@ -134,51 +139,51 @@
 }
 
 .radio-container.light.circular .rp-play-pause-button {
-	background:url("../images/play-light-circular.png");
+	background-image: url("../images/play-light-circular.png?v=2");
 }
 
 .radio-container.light.rounded .rp-play-pause-button {
-	background:url("../images/play-light-rounded.png");
+	background-image: url("../images/play-light-rounded.png?v=2");
 }
 
 .radio-container.light.square .rp-play-pause-button {
-	background:url("../images/play-light-square.png");
+	background-image: url("../images/play-light-square.png?v=2");
 }
 
 .radio-container.dark.circular .rp-play-pause-button {
-	background:url("../images/play-dark-circular.png");
+	background-image: url("../images/play-dark-circular.png?v=2");
 }
 
 .radio-container.dark.rounded .rp-play-pause-button {
-	background:url("../images/play-dark-rounded.png");
+	background-image: url("../images/play-dark-rounded.png?v=2");
 }
 
 .radio-container.dark.square .rp-play-pause-button {
-	background:url("../images/play-dark-square.png");
+	background-image: url("../images/play-dark-square.png?v=2");
 }
 
 .radio-container.paused.light.circular .rp-play-pause-button {
-	background:url("../images/pause-light-circular.png");
+	background-image: url("../images/pause-light-circular.png?v=2");
 }
 
 .radio-container.paused.light.rounded .rp-play-pause-button {
-	background:url("../images/pause-light-rounded.png");
+	background-image: url("../images/pause-light-rounded.png?v=2");
 }
 
 .radio-container.paused.light.square .rp-play-pause-button {
-	background:url("../images/pause-light-square.png");
+	background-image: url("../images/pause-light-square.png?v=2");
 }
 
 .radio-container.paused.dark.circular .rp-play-pause-button {
-	background:url("../images/pause-dark-circular.png");
+	background-image: url("../images/pause-dark-circular.png?v=2");
 }
 
 .radio-container.paused.dark.rounded .rp-play-pause-button {
-	background:url("../images/pause-dark-rounded.png");
+	background-image: url("../images/pause-dark-rounded.png?v=2");
 }
 
 .radio-container.paused.dark.square .rp-play-pause-button {
-	background:url("../images/pause-dark-square.png");
+	background-image: url("../images/pause-dark-square.png?v=2");
 }
 
 /* .rp-stop, .rp-previous, .rp-next {
@@ -217,13 +222,14 @@
 .rp-volume-slider-container {
 	position: relative;
 	opacity: 0.9;
+	height: 30px;
 }
 
 .rp-volume-slider-container:hover, .rp-volume-slider-container:focus {
 	opacity: 1;
 }
 
-.rp-volume-controls button {
+.rp-volume-controls button, .rp-popup button {
 	overflow: hidden;
 	text-indent: -9999px;
 	border: none;
@@ -231,81 +237,55 @@
 	opacity: 0.9;
 }
 
+.rp-popup {
+	margin-top: -12px;
+}
+
 .rp-volume-controls button:hover, .rp-volume-controls button:focus {
 	opacity: 1;
 }
 
-.radio-container.circular .rp-volume-controls button {
+.radio-container.circular .rp-volume-controls button, .radio-container.circular .rp-popup button {
 	border-radius: 9px;
 }
 
-.radio-container.rounded .rp-volume-controls button {
+.radio-container.rounded .rp-volume-controls button, .radio-container.rounded .rp-popup button {
 	border-radius: 6px;
 }
 
-.radio-container.square .rp-volume-controls button {
+.radio-container.square .rp-volume-controls button, .radio-container.square .rp-popup button {
 	border-radius: 1px;
 }
 
-.rp-mute, .rp-volume-max, .rp-volume-down, .rp-volume-up {
-	width: 18px; height: 18px; padding: 0; margin: 0;
+button.rp-mute, button.rp-volume-max, button.rp-volume-down, button.rp-volume-up, button.rp-popup-button,
+button.rp-mute:hover, button.rp-volume-max:hover, button.rp-volume-down:hover, button.rp-volume-up:hover, button.rp-popup-button:hover,
+button.rp-mute:focus, button.rp-volume-max:focus, button.rp-volume-down:focus, button.rp-volume-up:focus, button.rp-popup-button:focus {
+	width: 18px; height: 18px; padding: 0; margin: 0; background-size: 36px; background-repeat: no-repeat;
 }
 
-.light .rp-mute {
-	background: url("../images/controls-light.png?v=2") 0px 0px no-repeat;
+.light .rp-mute, .light .rp-volume-max, .light .rp-volume-up, .light .rp-volume-down, .light .rp-popup-button {
+	background-image: url("../images/volume-controls-light.png?v=1");
 }
-.dark .rp-mute {
-	background: url("../images/controls-dark.png?v=2") 0px 0px no-repeat;
-}
-
-.light.muted .rp-mute, .light .rp-mute:hover {
-	background: url("../images/controls-light.png?v=2") -18px -18px no-repeat;
-}
-.dark.muted .rp-mute, .dark .rp-mute:hover {
-	background: url("../images/controls-dark.png?v=2") -18px -18px no-repeat;
+.dark .rp-mute, .dark .rp-volume-max, .dark .rp-volume-up, .dark .rp-volume-down, .dark .rp-popup-button {
+	background-image: url("../images/volume-controls-dark.png?v=1");
 }
 
-.light .rp-volume-max {
-	background: url("../images/controls-light.png?v=2") 0 -36px no-repeat;
-}
-.dark .rp-volume-max {
-	background: url("../images/controls-dark.png?v=2") 0 -36px no-repeat;
-}
-
-.light.maxed .rp-volume-max, .light .rp-volume-max:focus, .light .rp-volume-max:hover {
-	background: url("../images/controls-light.png?v=2") -18px -36px no-repeat;
-}
-.dark.maxed .rp-volume-max, .dark .rp-volume-max:focus, .dark .rp-volume-max:hover {
-	background: url("../images/controls-dark.png?v=2") -18px -36px no-repeat;
-}
-
-.light .rp-volume-up {
-	background: url("../images/controls-light.png?v=2") 0 -54px no-repeat;
-}
-.dark .rp-volume-up {
-	background: url("../images/controls-dark.png?v=2") 0 -54px no-repeat;
-}
-
-.light .rp-volume-up:focus, .light .rp-volume-up:hover {
-	background: url("../images/controls-light.png?v=2") -18px -54px no-repeat;
-}
-.dark .rp-volume-up:focus, .dark .rp-volume-up:hover {
-	background: url("../images/controls-dark.png?v=2") -18px -54px no-repeat;
-}
-
-.light .rp-volume-down {
-	background: url("../images/controls-light.png?v=2") 0 -72px no-repeat;
-}
-.dark .rp-volume-down {
-	background: url("../images/controls-dark.png?v=2") 0 -72px no-repeat;
-}
-
-.light .rp-volume-down:focus, .light .rp-volume-down:hover {
-	background: url("../images/controls-light.png?v=2") -18px -72px no-repeat;
-}
-.dark .rp-volume-down:focus, .dark .rp-volume-down:hover {
-	background: url("../images/controls-dark.png?v=2") -18px -72px no-repeat;
-}
+.light .rp-mute {background-position: 0px 0px;}
+.dark .rp-mute {background-position: 0px 0px;}
+.light.muted .rp-mute, .light .rp-mute:hover,
+.dark.muted .rp-mute, .dark .rp-mute:hover {background-position: -18px -18px;}
+.light .rp-volume-max, .dark .rp-volume-max {background-position: 0 -36px;}
+.light.maxed .rp-volume-max, .light .rp-volume-max:focus, .light .rp-volume-max:hover,
+.dark.maxed .rp-volume-max, .dark .rp-volume-max:focus, .dark .rp-volume-max:hover {background-position: -18px -36px;}
+.light .rp-volume-up, .dark .rp-volume-up {background-position: 0 -54px;}
+.light .rp-volume-up:focus, .light .rp-volume-up:hover,
+.dark .rp-volume-up:focus, .dark .rp-volume-up:hover {background-position: -18px -54px;}
+.light .rp-volume-down, .dark .rp-volume-down {background-position: 0 -72px;}
+.light .rp-volume-down:focus, .light .rp-volume-down:hover,
+.dark .rp-volume-down:focus, .dark .rp-volume-down:hover {background-position: -18px -72px;}
+.light .rp-popup-button, .dark .rp-popup-button {background-position: 0 -90px;}
+.light .rp-popup-button:focus, .light .rp-popup-button:hover,
+.dark .rp-popup-button:focus, .dark .rp-popup-button:hover {background-position: -18px -90px;}
 /* @end */
 
 /* @roup Now Playing Info */

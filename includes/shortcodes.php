@@ -36,8 +36,6 @@
 // - Show Playlist Shortcode
 
 
-
-
 // -----------------------
 // === Time Shortcodes ===
 // -----------------------
@@ -257,13 +255,6 @@ function radio_station_clock_shortcode( $atts = array() ) {
 			$clock .= '<div class="radio-user-zone"></div>' . "\n";
 		$clock .= '</div>' . "\n";
 
-	// 2.3.2 allow for timezone selector test
-	// $select = radio_station_timezone_select( 'radio-station-clock-' + $instance );
-	// $select = apply_filters( 'radio_station_clock_timezone_select', '', 'radio-station-clock-' . $instance, $atts );
-	// if ( '' != $select ) {
-	// 	$clock .= $select;
-	// }
-
 	$clock .= '</div>' . "\n";
 
 	// --- enqueue shortcode styles ---
@@ -367,6 +358,7 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
 		'thumbnails'   => 0,
 		// --- for playlists ---
 		// 'track_count' => 0,
+		// 'display_tracks' => 0,
 		// --- specific posts ---
 		'show'         => false,
 		'override'     => false,
@@ -379,7 +371,7 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
 	}
 
 	// --- handle possible pagination offset ---
-	if ( isset( $atts['perpage'] ) && !isset( $atts['offset'] ) && get_query_var( 'page' ) ) {
+	if ( isset( $atts['perpage'] ) && ( $atts['perpage'] > 0 ) && !isset( $atts['offset'] ) && get_query_var( 'page' ) ) {
 		$page = absint( get_query_var( 'page' ) );
 		if ( $page > -1 ) {
 			$atts['offset'] = (int) $atts['perpage'] * $page;
@@ -655,7 +647,8 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
 		$classes[] = $atts['view'];
 	}
 	$class_list = implode( ' ', $classes );
-	$list = '<div class="' . esc_attr( $class_list ) . '">';
+	// 2.5.0: add element ID for archive shortcode instance
+	$list = '<div id="' . esc_attr( $type ) . '-archives-' . esc_attr( $instance ) . '" class="' . esc_attr( $class_list ) . '">';
 	if ( !$archive_posts || !is_array( $archive_posts ) || ( count( $archive_posts ) == 0 ) ) {
 
 		// --- no shows messages ----
@@ -757,6 +750,9 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
 				$info['title'] .= '</a>' . "\n";
 			$info['title'] .= '</div>' . "\n";
 
+			// 2.5.0: added meta div open wrapper
+			$info['meta'] = '<div class="' . esc_attr( $type ) . '-archive-item-meta">' . "\n";
+
 			// --- display Override date(s) ---
 			if ( ( RADIO_STATION_OVERRIDE_SLUG == $post_type ) && ( $atts['show_dates'] ) ) {
 
@@ -768,7 +764,7 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
 				}
 
 				// 2.3.1: fix to append not echo override date to archive list
-				$info['meta'] = '<div class="override-archive-date">' . "\n";
+				$info['meta'] .= '<div class="override-archive-date">' . "\n";
 
 				foreach ( $override_times as $override_time ) {
 
@@ -816,24 +812,29 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
 			}
 
 			// TODO: display Show shifts meta 
-			// if ( RADIO_STATION_SHOW_SLUG == $post_type ) {
-			//	if ( $atts['show_shifts'] ) {
-			//		$shifts = radio_station_get_show_schedule( $post_id );
-			//	}
-			//	$info['meta'] = '';
-			// }
+			/* if ( ( RADIO_STATION_SHOW_SLUG == $post_type ) && ( $atts['show_shifts'] ) ) {
+				$shifts = radio_station_get_show_schedule( $post_id );
+				if ( $shifts && is_array( $shifts ) && ( count( $shifts ) > 0 ) ) {
+					foreach ( $shifts as $i => $shift ) {
+						$info['meta'] .= '';
+					}
+				}
+			} */
 
 			// TODO: playlist tracks / track count meta
-			// if ( RADIO_STATION_PLAYLIST_SLUG == $post_type ) {
-			// 	$tracks = get_post_meta( $post_id, 'playlist', true );
-			//	$track_count = count( $tracks );
-			//	$info['meta'] = '';
-			// }
+			/* if ( ( RADIO_STATION_PLAYLIST_SLUG == $post_type ) && $atts['display_tracks'] ) {
+			 	$tracks = get_post_meta( $post_id, 'playlist', true );
+				if ( $tracks && is_array( $tracks ) && ( count( $tracks ) > 0 ) ) {
+					$track_count = count( $tracks );
+					foreach ( $tracks as $i => $track ) {
+						$info['meta'] = '';
+					}
+				}
+			} */
 			
 			// 2.3.3.9: filter meta display for different post types
-			if ( !isset( $info['meta'] ) ) {
-				$info['meta'] = '';
-			}
+			// 2.5.0: added meta div close wrapper
+			$info['meta'] .= '</div>';
 			$info['meta'] = apply_filters ( 'radio_station_archive_shortcode_meta', $info['meta'], $post_id, $post_type, $atts );
 
 			// TODO: display genre and language terms ?
@@ -891,7 +892,7 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
  	// --- add archive_pagination ---
 	if ( $atts['pagination'] && ( $atts['perpage'] > 0 ) && ( $post_count > 0 ) ) {
 		if ( $post_count > $atts['perpage'] ) {
-			$list .= radio_station_archive_pagination( $post_type, $atts, $post_count );
+			$list .= radio_station_archive_pagination( $instance, $post_type, $atts, $post_count );
 		}
 	}
 
@@ -964,7 +965,7 @@ function radio_station_genre_archive_list( $atts ) {
 		'pagination'   => 1,
 		// --- query args ---
 		'status'       => 'publish',
-		'perpage'      => - 1,
+		'perpage'      => -1,
 		'offset'       => 0,
 		'orderby'      => 'title',
 		'order'        => 'ASC',
@@ -977,9 +978,9 @@ function radio_station_genre_archive_list( $atts ) {
 	);
 
 	// --- handle possible pagination offset ---
-	if ( isset( $atts['perpage'] ) && !isset( $atts['offset'] ) && get_query_var( 'page' ) ) {
+	if ( isset( $atts['perpage'] ) && ( $atts['perpage'] > 0 ) && !isset( $atts['offset'] ) && get_query_var( 'page' ) ) {
 		$page = absint( get_query_var( 'page' ) );
-		if ( $page > - 1 ) {
+		if ( $page > -1 ) {
 			$atts['offset'] = (int) $atts['perpage'] * $page;
 		}
 	}
@@ -1011,7 +1012,7 @@ function radio_station_genre_archive_list( $atts ) {
 		if ( $atts['hide_empty'] ) {
 			return '';
 		} else {
-			$list = '<div class="genres-archive">' . "\n";
+			$list = '<div id="genres-archive-' . esc_attr( $instance ) . '" class="genres-archive">' . "\n";
 				$list .= esc_html( __( 'No Genres were found to display.', 'radio-station' ) ) . "\n";
 			$list .= '</div>' . "\n";
 			return $list;
@@ -1019,17 +1020,20 @@ function radio_station_genre_archive_list( $atts ) {
 	}
 
 	// 2.5.0: added id attribute with instance
-	$list = '<div id="genres-archive-' . esc_attr( $intance ) . '" class="genres-archive">' . "\n";
+	$list = '<div id="genres-archive-' . esc_attr( $instance ) . '" class="genres-archive">' . "\n";
 
 	// --- loop genres ---
+	// 2.5.0: track all post count
+	$all_post_count = 0;
 	foreach ( $genres as $name => $genre ) {
 
 		// --- get published shows ---
 		// TODO: also display Overrides in Genre archive list ?
 		$args = array(
 			'post_type'   => RADIO_STATION_SHOW_SLUG,
-			'numberposts' => $atts['perpage'],
-			'offset'      => $atts['offset'],
+			// 'numberposts' => $atts['perpage'],
+			// 'offset'      => $atts['offset'],
+			'numberposts' => -1,
 			'orderby'     => $atts['orderby'],
 			'order'       => $atts['order'],
 			'post_status' => $atts['status'],
@@ -1080,7 +1084,13 @@ function radio_station_genre_archive_list( $atts ) {
 
 		$list .= '<div class="genre-archive">' . "\n";
 
-		$has_posts = ( $posts || ( count( $posts ) > 0 ) ) ? true : false;
+		if ( $posts || ( count( $posts ) > 0 ) ) {
+			$has_posts = true;
+			// 2.5.0: add to all post count
+			$all_post_count = $all_post_count + count( $posts );
+		} else {
+			$has_posts = false;
+		}
 		if ( $has_posts || ( !$has_posts && !$atts['hide_empty'] ) ) {
 
 			// --- genre image ---
@@ -1205,13 +1215,15 @@ function radio_station_genre_archive_list( $atts ) {
 	$list .= '</div>' . "\n";
 
  	// --- add archive_pagination ---
- 	// TODO: add genre archive list pagination
- 	// if ( $atts['pagination'] ) {
-	// 	$list .= radio_station_archive_pagination( 'genre', $atts, $post_count );
-	// }
+ 	// 2.5.0: enable genre archive list pagination
+	if ( $atts['pagination'] && ( $atts['perpage'] > 0 ) && ( $post_count > 0 ) ) {
+		if ( $post_count > $atts['perpage'] ) {
+			$list .= radio_station_archive_pagination( $instance, 'genre', $atts, $post_count );
+		}
+	}
 
 	// --- enqueue pagination javascript ---
-	// add_action( 'wp_footer', 'radio_station_archive_pagination_javascript' );
+	add_action( 'wp_footer', 'radio_station_archive_pagination_javascript' );
 
 	// --- enqueue shortcode styles ---
 	radio_station_enqueue_style( 'shortcodes' );
@@ -1248,7 +1260,7 @@ function radio_station_language_archive_list( $atts ) {
 		'pagination'      => 1,
 		// --- query args ---
 		'status'          => 'publish',
-		'perpage'         => - 1,
+		'perpage'         => -1,
 		'offset'          => 0,
 		'orderby'         => 'title',
 		'order'           => 'ASC',
@@ -1261,9 +1273,9 @@ function radio_station_language_archive_list( $atts ) {
 	);
 
 	// --- handle possible pagination offset ---
-	if ( isset( $atts['perpage'] ) && !isset( $atts['offset'] ) && get_query_var( 'page' ) ) {
+	if ( isset( $atts['perpage'] ) && ( $atts['perpage'] > 0 ) && !isset( $atts['offset'] ) && get_query_var( 'page' ) ) {
 		$page = absint( get_query_var( 'page' ) );
-		if ( $page > - 1 ) {
+		if ( $page > -1 ) {
 			$atts['offset'] = (int) $atts['perpage'] * $page;
 		}
 	}
@@ -1295,7 +1307,7 @@ function radio_station_language_archive_list( $atts ) {
 		if ( $atts['hide_empty'] ) {
 			return '';
 		} else {
-			$list = '<div class="languages-archive">' . "\n";
+			$list = '<div id="languages-archive-' . esc_attr( $instance ) . '" class="languages-archive">' . "\n";
 				$list .= esc_html( __( 'No Languages were found to display.', 'radio-station' ) ) . "\n";
 			$list .= '</div>' . "\n";
 			return $list;
@@ -1306,14 +1318,17 @@ function radio_station_language_archive_list( $atts ) {
 	$list = '<div id="languages-archive-' . esc_attr( $instance ) . '" class="languages-archive">' . "\n";
 
 	// --- loop languages ---
+	// 2.5.0: track all post count
+	$all_post_count = 0;
 	foreach ( $languages as $name => $language ) {
 
 		// --- get published shows ---
 		// TODO: also display Overrides in archive list ?
 		$args = array(
 			'post_type'   => RADIO_STATION_SHOW_SLUG,
-			'numberposts' => $atts['perpage'],
-			'offset'      => $atts['offset'],
+			// 'numberposts' => $atts['perpage'],
+			// 'offset'      => $atts['offset'],
+			'numberposts' => -1,
 			'orderby'     => $atts['orderby'],
 			'order'       => $atts['order'],
 			'post_status' => $atts['status'],
@@ -1365,6 +1380,8 @@ function radio_station_language_archive_list( $atts ) {
 
 		if ( $posts || ( count( $posts ) > 0 ) ) {
 			$has_posts = true;
+			// 2.5.0: add to all post count
+			$all_post_count = $all_post_count + count( $posts );
 		} else {
 			$has_posts = false;
 		}
@@ -1476,13 +1493,15 @@ function radio_station_language_archive_list( $atts ) {
 	$list .= '</div>' . "\n";
 
  	// --- add archive_pagination ---
- 	// TODO: add language archive list pagination
-	// if ( $atts['pagination'] ) {
-	// 	$list .= radio_station_archive_pagination( 'language', $atts, $post_count );
-	// }
+ 	// 2.5.0: enable language archive list pagination
+	if ( $atts['pagination'] && ( $atts['perpage'] > 0 ) && ( $post_count > 0 ) ) {
+		if ( $post_count > $atts['perpage'] ) {
+			$list .= radio_station_archive_pagination( $instance, 'language', $atts, $post_count );
+		}
+	}
 
 	// --- enqueue pagination javascript ---
-	// add_action( 'wp_footer', 'radio_station_archive_pagination_javascript' );
+	add_action( 'wp_footer', 'radio_station_archive_pagination_javascript' );
 
 	// --- enqueue shortcode styles ---
 	radio_station_enqueue_style( 'shortcodes' );
@@ -1495,35 +1514,40 @@ function radio_station_language_archive_list( $atts ) {
 // ------------------
 // Archive Pagination
 // ------------------
-function radio_station_archive_pagination( $type, $atts, $post_count ) {
+function radio_station_archive_pagination( $instance, $type, $atts, $post_count ) {
 
 	global $post;
 	$permalink = get_permalink( $post->ID );
 	$post_pages = ceil( $post_count / $atts['perpage'] );
-	$current_page = ( $atts['offset'] > 0 ) ? $atts['offset'] / $atts['perpage'] : 0;
+	$current_page = ( $atts['offset'] > 0 ) ? ( $atts['offset'] / $atts['perpage'] ) : 0;
 	$prev_page = $current_page - 1;
 	$next_page = $current_page + 1;
 
 	$pagi = '<br><br>';
 	$pagi .= '<div class="archive-' . esc_attr( $type ) . 's-page-buttons">' . "\n";
-		$url = add_query_arg( 'page', $prev_page, $permalink );
 		$pagi .= '<div class="archive-pagination-button">' . "\n";
 		if ( $prev_page > 0 ) {
-			$pagi .= '<a href="' . esc_url( $url ) . '">&larr;</a>' . "\n";
+			$url = add_query_arg( 'page', $prev_page, $permalink );
+			$onclick = "return radio_archive_page(" . esc_attr( $instance ) . ",'" . esc_attr( $type ) . "'," . esc_attr( $prev_page ) . "');";
+			$pagi .= '<a href="' . esc_url( $url ) . '" onclick="' . $onclick . '">&larr;</a>' . "\n";
 		}
 		$pagi .= '</div>' . "\n";
-		for ( $pagenum = 1; $pagenum < ( $post_pages + 1 ); $pagenum ++ ) {
-			$active = ( $current_page == $pagenum ) ? ' active' : '';
+		for ( $page_num = 1; $page_num < ( $post_pages + 1 ); $page_num++ ) {
+			$active = ( $current_page == $page_num ) ? ' active' : '';
 			$pagi .= '<div class="archive-' . esc_attr( $type ) . 's-page-button archive-pagination-button' . esc_attr( $active ) . '">' . "\n";
-			$url = add_query_arg( 'page', $pagenum, $permalink );
-				$pagi .= '<a href="' . esc_url( $url ) . '">' . "\n";
-					$pagi .= esc_html( $pagenum ) . "\n";
+			$url = add_query_arg( 'page', $page_num, $permalink );
+				$onclick = "return radio_archive_page(" . esc_attr( $instance ) . ",'" . esc_attr( $type ) . "'," . esc_attr( $page_num ) . "');";
+				$pagi .= '<a href="' . esc_url( $url ) . '" onclick="' . $onclick .'">' . "\n";
+					$pagi .= esc_html( $page_num ) . "\n";
 				$pagi .= '</a>' . "\n";
 			$pagi .= '</div>' . "\n";
 		}
-		$url = add_query_arg( 'page', $next_page, $permalink );
 		$pagi .= '<div class="archive-pagination-button">' . "\n";
-			$pagi .= '<a href="' . esc_url( $url ) . '">&rarr;</a>' . "\n";
+			if ( $next_page < ( $post_pages + 1 ) ) {
+				$url = add_query_arg( 'page', $next_page, $permalink );
+				$onclick = "return radio_archive_page(" . esc_attr( $instance ) . ",'" . esc_attr( $type ) . "'," . esc_attr( $next_page ) . "');";
+				$pagi .= '<a href="' . esc_url( $url ) . '" onclick="' . $onclick . '">&rarr;</a>' . "\n";
+			}
 		$pagi .= '</div>' . "\n";
 	$pagi .= '</div>' . "\n";
 
@@ -1536,11 +1560,9 @@ function radio_station_archive_pagination( $type, $atts, $post_count ) {
 // 2.3.3.9: renamed function to distinguish from list pagination
 function radio_station_archive_pagination_javascript() {
 
-	// TEMP
-	return;
-
 	// --- fade out current page and fade in selected page ---
 	$js = "function radio_archive_page(id, types, pagenum) {
+		return; /* TEMP */
 		currentpage = document.getElementById('archive-'+id+'-'+types+'-current-page').value;
 		if (pagenum == 'next') {
 			pagenum = parseInt(currentpage) + 1;
@@ -1551,21 +1573,9 @@ function radio_station_archive_pagination_javascript() {
 			pagenum = parseInt(currentpage) - 1;
 			if (pagenum < 1) {return;}
 		}
-		if (typeof jQuery == 'function') {
-			jQuery('.archive-'+id+'-'+types+'-page').fadeOut(500);
-			jQuery('#archive-'+id+'-'+types+'-page-'+pagenum).fadeIn(1000);
-			jQuery('.archive-'+id+'-'+types+'-page-button').removeClass('active');
-			jQuery('#archive-'+id+'-'+types+'-page-button-'+pagenum).addClass('active');
-			jQuery('#archive-'+id+'-'+types+'-current-page').val(pagenum);
-		} else {
-			pages = document.getElementsByClassName('archive-'+id+'-'+types+'-page');
-			for (i = 0; i < pages.length; i++) {pages[i].style.display = 'none';}
-			document.getElementById('archive-'+id+'-'+types+'-page-'+pagenum).style.display = '';
-			buttons = document.getElementsByClassName('archive-'+id+'-'+types+'-page-button');
-			for (i = 0; i < buttons.length; i++) {buttons[i].classList.remove('active');}
-			document.getElementById('archive-'+id+'-'+types+'-page-button-'+pagenum).classList.add('active');
-			document.getElementById('archive-'+id+'-'+types+'-current-page').value = pagenum;
-		}
+		
+		
+		return false;
 	}";
 
 	// --- enqueue script inline ---
@@ -3446,27 +3456,29 @@ function radio_station_current_playlist_shortcode( $atts ) {
 	// 2.3.2: added AJAX load attribute
 	// 2.3.2: added for_time attribute
 	// 2.5.0: added no_playlist text attribute
+	// 2.5.0: added playlist_title switch attribute
 	$defaults = array(
 		// --- widget display options ---
-		'title'       => '',
-		'ajax'        => $ajax,
-		'dynamic'     => $dynamic,
-		'hide_empty'  => 0,
+		'title'          => '',
+		'ajax'           => $ajax,
+		'dynamic'        => $dynamic,
+		'hide_empty'     => 0,
 		// --- playlist display options ---
-		'link'        => 1,
-		'no_playlist' => '',
-		'countdown'   => 0,
+		'playlist_title' => 0,
+		'link'           => 1,
+		'no_playlist'    => '',
+		'countdown'      => 0,
 		// --- track display options ---
-		'song'        => 1,
-		'artist'      => 1,
-		'album'       => 0,
-		'label'       => 0,
-		'comments'    => 0,
+		'song'           => 1,
+		'artist'         => 1,
+		'album'          => 0,
+		'label'          => 0,
+		'comments'       => 0,
 		// --- widget data ---
-		'widget'      => 0,
-		'block'       => 0,
-		'id'          => '',
-		'for_time'    => 0,
+		'widget'         => 0,
+		'block'          => 0,
+		'id'             => '',
+		'for_time'       => 0,
 	);
 
 	// 2.3.0: renamed shortcode identifier to current-playlist
@@ -3710,37 +3722,37 @@ function radio_station_current_playlist_shortcode( $atts ) {
 			// 2.2.4: check value keys are set before outputting
 			if ( $atts['song'] && isset( $track['playlist_entry_song'] ) ) {
 				$tracks .= '<div class="show-playlist-song myplaylist-song">' . "\n";
-					$tracks .= esc_html( __( 'Song', 'radio-station' ) );
-					$tracks .= ': ' . esc_html( $track['playlist_entry_song'] ) . "\n";
+					$tracks .= '<span class="playlist-label">' . esc_html( __( 'Song', 'radio-station' ) ) . '</span>';
+					$tracks .= ': <span class="playlist-info">' . esc_html( $track['playlist_entry_song'] ) . '</span>' . "\n";
 				$tracks .= '</div>' . "\n";
 			}
 
 			// 2.2.7: add label prefixes to now playing data
 			if ( $atts['artist'] && isset( $track['playlist_entry_artist'] ) ) {
 				$tracks .= '<div class="show-playlist-artist myplaylist-artist">' . "\n";
-					$tracks .= esc_html( __( 'Artist', 'radio-station' ) );
-					$tracks .= ': ' . esc_html( $track['playlist_entry_artist'] ) . "\n";
+					$tracks .= '<span class="playlist-label">' . esc_html( __( 'Artist', 'radio-station' ) ) . '</span>';
+					$tracks .= ': <span class="playlist-info">' . esc_html( $track['playlist_entry_artist'] ) . '</span>' . "\n";
 				$tracks .= '</div>' . "\n";
 			}
 
 			if ( $atts['album'] && !empty( $track['playlist_entry_album'] ) ) {
 				$tracks .= '<div class="show-playlist-album myplaylist-album">' . "\n";
-					$tracks .= esc_html( __( 'Album', 'radio-station' ) );
-					$tracks .= ': ' . esc_html( $track['playlist_entry_album'] ) . "\n";
+					$tracks .= '<span class="playlist-label">' . esc_html( __( 'Album', 'radio-station' ) ) . '</span>';
+					$tracks .= ': <span class="playlist-info">' . esc_html( $track['playlist_entry_album'] ) . '</span>' . "\n";
 				$tracks .= '</div>' . "\n";
 			}
 
 			if ( $atts['label'] && !empty( $track['playlist_entry_label'] ) ) {
 				$tracks .= '<div class="show-playlist-label myplaylist-label">' . "\n";
-					$tracks .= esc_html( __( 'Label', 'radio-station' ) );
-					$tracks .= ': ' . esc_html( $track['playlist_entry_label'] ) . "\n";
+					$tracks .= '<span class="playlist-label">' . esc_html( __( 'Label', 'radio-station' ) ) . '</span>';
+					$tracks .= ': <span class="playlist-info">' . esc_html( $track['playlist_entry_label'] ) . '</span>' . "\n";
 				$tracks .= '</div>' . "\n";
 			}
 
 			if ( $atts['comments'] && !empty( $track['playlist_entry_comments'] ) ) {
 				$tracks .= '<div class="show-playlist-comments myplaylist-comments">' . "\n";
-					$tracks .= esc_html( __( 'Comments', 'radio-station' ) );
-					$tracks .= ': ' . esc_html( $track['playlist_entry_comments'] ) . "\n";
+					$tracks .= '<span class="playlist-label">' . esc_html( __( 'Comments', 'radio-station' ) ) . '</span>';
+					$tracks .= ': <span class="playlist-info">' . esc_html( $track['playlist_entry_comments'] ) . '</span>' . "\n";
 				$tracks .= '</div>' . "\n";
 			}
 
@@ -3752,10 +3764,16 @@ function radio_station_current_playlist_shortcode( $atts ) {
 		// 2.3.3.8 added playlist_link shortcode attribute (default 1)
 		if ( $atts['link'] ) {
 			$link = '';
-			if ( isset( $playlist['playlist_permalink'] ) ) {
+			// 2.5.0: fix to playlist_permalink key
+			if ( isset( $playlist['playlist_url'] ) ) {
 				$link = '<div class="show-playlist-link myplaylist-link">' . "\n";
-					$link .= '<a href="' . esc_url( $playlist['playlist_permalink'] ) . '">' . "\n";
-						$link .= esc_html( __( 'View Playlist', 'radio-station' ) ) . "\n";
+					$link .= '<a href="' . esc_url( $playlist['playlist_url'] ) . '">';
+						// 2.5.0: maybe show playlist title
+						if ( $atts['playlist_title'] ) {
+							$link .= esc_html( $playlist['title'] );
+						} else {
+							$link .= esc_html( __( 'View Playlist', 'radio-station' ) );
+						}
 					$link .= '</a>' . "\n";
 				$link .= '</div>' . "\n";
 			}
@@ -3764,6 +3782,9 @@ function radio_station_current_playlist_shortcode( $atts ) {
 			if ( ( '' != $link ) && is_string( $link ) ) {
 				$html['link'] = $link;
 			}
+		} elseif ( $atts['playlist_title'] ) {
+			// 2.5.0: maybe show playlist title
+			$html['link'] = esc_html( $playlist['title'] );
 		}
 
 	} else {
@@ -3914,15 +3935,9 @@ function radio_station_countdown_enqueue() {
 	// --- enqueue countdown script ---
 	radio_station_enqueue_script( 'radio-station-countdown', array( 'radio-station' ), true );
 
-	// --- set countdown labels ---
-	$js = "radio.labels.showstarted = '" . esc_js( __( 'This Show has started.', 'radio-station' ) ) . "';
-	radio.labels.showended = '" . esc_js( __( 'This Show has ended.', 'radio-station' ) ) . "';
-	radio.labels.playlistended = '" . esc_js( __( 'This Playlist has ended.', 'radio-station') ) . "';
-	radio.labels.timecommencing = '" . esc_js( __( 'Commencing in', 'radio-station' ) ) . "';
-	radio.labels.timeremaining = '" . esc_js( __( 'Remaining Time', 'radio-station' ) ) . "';";
-
 	// --- add script inline ---
-	wp_add_inline_script( 'radio-station-countdown', $js );
+	// 2.5.0: moved countdown labels to main script localization
+	// wp_add_inline_script( 'radio-station-countdown', $js );
 
 	// 2.3.3.9: flag script as enqueued
 	$radio_station_data['countdown-script'] = true;

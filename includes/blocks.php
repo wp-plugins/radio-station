@@ -62,15 +62,16 @@ function radio_station_get_block_attributes() {
 			'view' => array( 'type' => 'string', 'default' => 'table' ),
 			'image_position' => array( 'type' => 'string', 'default' => 'left' ),
 			'hide_past_shows' => array( 'type' => 'boolean', 'default' => false ),
+			// --- Header Displays ---
+			'time_header' => array( 'type' => 'string', 'default' => 'clock' ),
+			'clock' => array( 'type' => 'boolean', 'default' => true ),
+			'timezone' => array( 'type' => 'boolean', 'default' => true ),
+			'selector' => array( 'type' => 'boolean', 'default' => true ),
 			// --- Time Display ---
 			'display_day' => array( 'type' => 'string', 'default' => 'short' ),
 			'display_month' => array( 'type' => 'string', 'default' => 'short' ),
 			'start_day' => array( 'type' => 'string', 'default' => '' ),
 			'time_format' => array( 'type' => 'string', 'default' => '' ),
-			// --- Extra Displays ---
-			'selector' => array( 'type' => 'boolean', 'default' => true ),
-			'clock' => array( 'type' => 'boolean', 'default' => true ),
-			'timezone' => array( 'type' => 'boolean', 'default' => true ),
 			// --- Show Display ---
 			'show_times' => array( 'type' => 'boolean', 'default' => true ),
 			'show_link' => array( 'type' => 'boolean', 'default' => true ),
@@ -92,7 +93,7 @@ function radio_station_get_block_attributes() {
 		'player' => array(
 			// --- Player Content ---
 			'url' => array( 'type' => 'string', 'default' => '' ),
-			'station' => array( 'type' => 'string', 'default' => '' ),
+			'title' => array( 'type' => 'string', 'default' => '' ),
 			'image' => array( 'type' => 'string', 'default' => 'default' ),
 			// ---- Player Options ---
 			'script' => array( 'type' => 'string', 'default' => 'default' ),
@@ -198,6 +199,7 @@ function radio_station_get_block_attributes() {
 			'no_playlist' => array( 'type' => 'string', 'default' => '' ),
 			'hide_empty' => array( 'type' => 'boolean', 'default' => false ),
 			// --- Playlist Display Options ---
+			'playlist_title' => array( 'type' => 'boolean', 'default' => false ),
 			'link' => array( 'type' => 'boolean', 'default' => true ),
 			'countdown' => array( 'type' => 'boolean', 'default' => true ),
 			// --- Track Display Options ---
@@ -316,7 +318,7 @@ function raddio_station_block_editor_assets() {
 	// - fix cutoff label widths -
 	$css = '.components-panel .components-panel__body.radio-block-controls .components-panel__row label {
 	width: 100%; max-width: 100%; min-width: 150px; overflow: visible;}' . "\n";
-	// - select multiple height fix -
+	// - multiple select minimum height fix -
 	// ref: https://github.com/WordPress/gutenberg/issues/27166
 	$css .= '.components-panel .components-panel__body.radio-block-controls .components-select-control__input[multiple] {min-height: 100px;}';
 	$css = apply_filters( 'radio_station_block_control_styles', $css );
@@ -342,6 +344,7 @@ function raddio_station_block_editor_assets() {
 // note: this is currently unnecessary as styles are enqueued in shortcodes
 // and the shortcodes are used as the block render_callback functions already
 // 2.5.0: added for any future frontend block style fixes
+// note: according to WP docs this fired on both editor and frontend
 // add_action( 'enqueue_block_assets', 'radio_station_enqueue_block_assets' );
 function radio_station_enqueue_block_assets() {
 

@@ -219,9 +219,10 @@ You can now visit your site to make sure nothing is broken. If you experience is
 == Changelog ==
 
 = 2.5.0 =
-* Added: Wordpress Radio Blocks (converted Widgets)
-* Updated: Plugin Panel (1.2.6)
+* Added: Radio Station Blocks! (converted Widgets)
+* Updated: Plugin Panel (1.2.7)
 * Updated: Moment JS (2.29.4) with WP Loading
+* Changed: Tab Schedule default date display on
 * Improved: Refactored Schedule Engine Class (1.0.0)
 * Improved: Standardized Widget Input Fields
 * Improved: WordPress Coding Standards
@@ -788,6 +789,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * https://netmix.com/radio-station-2-5-0-release-with-blocks/
 * Refactored Schedule Engine Class
 * Improved translations and sanitization
+* Numerous bugfixes and improvements
 
 = 2.4.0 =
 * Radio Station Stream Player Widget!

@@ -26,6 +26,7 @@
 			hide_empty: { type: 'boolean', default: false },
 
 			/* --- Playlist Display Options --- */
+			playlist_title: { type: 'boolean', default: false },
 			link: { type: 'boolean', default: true },
 			countdown: { type: 'boolean', default: true },
 			no_playlist: { type: 'string', default: '' },
@@ -107,6 +108,16 @@
 
 							/* === Playlist Display Panel === */
 							el( PanelBody, { title: __( 'Extra Display Options', 'radio-station' ), className: 'radio-block-controls', initialOpen: false },
+								/* --- Playlist Title --- */
+								el( PanelRow, {},
+									el( ToggleControl, {
+										label: __( 'Display Playlist Title', 'radio-station' ),
+										onChange: ( value ) => {
+											props.setAttributes( { playlist_title: value } );
+										},
+										checked: atts.playlist_title,
+									})
+								),
 								/* --- Link Playlist --- */
 								el( PanelRow, {},
 									el( ToggleControl, {

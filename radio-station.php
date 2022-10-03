@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://radiostation.pro/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.5.0
+Version: 2.4.9
 Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
@@ -451,9 +451,9 @@ function radio_station_welcome_redirect() {
 // Plugin Deactivation Action
 // --------------------------
 // 2.4.0.8: clear plugin updates transient on deactivation
-// 2.5.0: fix to typo in deactivation hook function
-register_deactivation_hook( RADIO_STATION_FILE, 'radio_station_deactivation' );
-function radio_station_deactivation() {
+// 2.5.0: fix to typo in deactivation hook function and add _plugin
+register_deactivation_hook( RADIO_STATION_FILE, 'radio_station_plugin_deactivation' );
+function radio_station_plugin_deactivation() {
 	flush_rewrite_rules();
 	delete_site_transient( 'update_plugins' );
 }
@@ -528,8 +528,9 @@ function radio_station_allowed_player_origins( $origins ) {
 // Enqueue Plugin Scripts
 // ----------------------
 // 2.3.0: added for enqueueing main Radio Station script
-add_action( 'wp_enqueue_scripts', 'radio_station_enqueue_scripts' );
-function radio_station_enqueue_scripts() {
+// 2.5.0: change to prevent conflict with radio station theme
+add_action( 'wp_enqueue_scripts', 'radio_station_enqueue_plugin_scripts' );
+function radio_station_enqueue_plugin_scripts() {
 
 	// --- enqueue custom stylesheet if found ---
 	// 2.3.0: added for automatic custom style loading
@@ -570,7 +571,7 @@ function radio_station_register_moment() {
 	// 2.5.0: add check for registered script in WP core
 	if ( !wp_script_is( 'moment', 'registered' ) ) {
 		$moment_url = plugins_url( 'js/moment' . $suffix . '.js', RADIO_STATION_FILE );
-		wp_enqueue_script( 'moment', $moment_url, array(), '2.29.4', false );
+		wp_register_script( 'moment', $moment_url, array(), '2.29.4', false );
 	}
 }
 
@@ -668,14 +669,39 @@ function radio_station_enqueue_datepicker() {
 
 }
 
+// ---------------------------
+// Enqueue Widget Color Picker
+// ---------------------------
+// 2.5.0: added for widget color options
+function radio_station_enqueue_color_picker() {
+
+	// --- enqueue color picker ---
+	$suffix = SCRIPT_DEBUG ? '' : '.min';
+	$url = plugins_url( '/js/wp-color-picker-alpha' . $suffix . '.js', RADIO_STATION_FILE );
+	wp_enqueue_script( 'wp-color-picker-a', $url, array( 'wp-color-picker' ), '3.0.0', true );
+
+	// --- init color picker fields ---
+	$js = "jQuery(document).ready(function() {";
+	$js .= "if (jQuery('.color-picker').length) {jQuery('.color-picker').wpColorPicker();}";
+	$js .= "});" . "\n";
+	wp_add_inline_script( 'wp-color-picker-a', $js );
+}
+
 // -------------------------------
 // Enqueue Localized Script Values
 // -------------------------------
 add_action( 'wp_enqueue_scripts', 'radio_station_localize_script' );
 function radio_station_localize_script() {
 
+	// 2.5.0: check flag to run once only
+	global $radio_station;
+	if ( isset( $radio_station['script-localized'] ) ) {
+		return;
+	}
+
 	$js = radio_station_localization_script();
 	wp_add_inline_script( 'radio-station', $js );
+	$radio_station['script-localized'] = true;
 }
 
 // -------------------
@@ -710,6 +736,13 @@ function radio_station_localization_script() {
 		$js .= "radio.debug = true;" . "\n";
 	} else {
 		$js .= "radio.debug = false;" . "\n";
+	}
+
+	// 2.5.0: set separate clock debug flag
+	if ( isset( $_REQUEST['rs-clock-debug'] ) && ( '1' == sanitize_text_field( $_REQUEST['rs-clock-debug'] ) ) ) {
+		$js .= "radio.clock_debug = true;" . "\n";
+	} else {
+		$js .= "radio.clock_debug = false;" . "\n";
 	}
 
 	// --- radio timezone ---
@@ -806,6 +839,14 @@ function radio_station_localization_script() {
 	$js .= ");" . "\n";
 	$js .= $short . ");" . "\n";
 
+	// --- set countdown labels ---
+	// 2.5.0: moved here from countdown enqueue function
+	$js .= "radio.labels.showstarted = '" . esc_js( __( 'This Show has started.', 'radio-station' ) ) . "';" . "\n";
+	$js .= "radio.labels.showended = '" . esc_js( __( 'This Show has ended.', 'radio-station' ) ) . "';" . "\n";
+	$js .= "radio.labels.playlistended = '" . esc_js( __( 'This Playlist has ended.', 'radio-station') ) . "';" . "\n";
+	$js .= "radio.labels.timecommencing = '" . esc_js( __( 'Commencing in', 'radio-station' ) ) . "';" . "\n";
+	$js .= "radio.labels.timeremaining = '" . esc_js( __( 'Remaining Time', 'radio-station' ) ) . "';" . "\n";
+
 	// --- translated time unit strings ---
 	$js .= "radio.units.am = '" . esc_js( radio_station_translate_meridiem( 'am' ) ) . "'; ";
 	$js .= "radio.units.pm = '" . esc_js( radio_station_translate_meridiem( 'pm' ) ) . "'; ";
@@ -827,12 +868,10 @@ function radio_station_localization_script() {
 
 	// --- convert show times ---
 	// 2.3.3.9:
+	// 2.5.0: shorten logic for convert show times
 	$usertimes = radio_station_get_setting( 'convert_show_times' );
-	if ( 'yes' === (string) $usertimes ) {
-		$js .= "radio.convert_show_times = true;" . "\n";
-	} else {
-		$js .= "radio.convert_show_times = false;" . "\n";
-	}
+	$convert_show_times = ( 'yes' === (string) $usertimes ) ? 'true' : 'false';
+	$js .= "radio.convert_show_times = " . esc_js( $convert_show_times ) . ";" . "\n";
 
 	// --- add inline script ---
 	$js = apply_filters( 'radio_station_localization_script', $js );

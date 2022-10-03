@@ -46,7 +46,7 @@ radio_cookie = {
 				if (c.indexOf(nameeq) == 0) {
 					/* 2.5.0: fix for possible empty value */
 					value = c.substring(nameeq.length, c.length).trim();
-					if (value == '') {return null;}
+					if ((value == '') || (value == 'undefined') || (typeof value == 'undefined')) {return null;}
 					return JSON.parse(value);
 				}
 			}
@@ -97,8 +97,8 @@ function radio_timezone_display() {
 
 /* Retrigger Responsive Schedules */
 function radio_responsive_schedules() {
-	if (jQuery('#master-program-schedule').length) {radio_table_responsive(false);}
-	if (jQuery('#master-schedule-tabs').length) {radio_tabs_responsive(false);}
+	if (jQuery('#master-program-schedule').length) {radio_table_responsive(false,false);}
+	if (jQuery('#master-schedule-tabs').length) {radio_tabs_responsive(false,false);}
 	if (jQuery('#master-schedule-grid').length) {radio_grid_responsive(false);}
 	if (jQuery('#master-schedule-calendar').length) {radio_calendar_responsive(false);}
 }

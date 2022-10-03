@@ -61,7 +61,7 @@
 				if (s_tabs && !jQuery('#radio-schedule-tabs-js').length) {
 					radio_station_load_block_script('schedule-tabs');
 					var radio_load_tabs = setInterval(function() { if (typeof radio_tabs_initialize == 'function') {
-						radio_tabs_init = false; radio_tabs_initialize(); clearInterval(radio_load_grid);
+						radio_tabs_init = false; radio_tabs_initialize(); clearInterval(radio_load_tabs);
 					} }, 1000);
 				}
 				if (s_list && !jQuery('#radio-schedule-list-js').length) {

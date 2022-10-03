@@ -189,6 +189,9 @@ function radio_station_get_all_overrides( $start_date = false, $end_date = false
 				}
 			}
 
+			// 2.5.0: added filter for override shifts
+			$override_shifts = apply_filters( 'radio_station_override_shifts', $override_shifts, $override, $start_date, $end_date, $timezone );
+
 			// --- set override shifts ---
 			$data['shifts'] = $override_shifts;
 			
@@ -205,7 +208,7 @@ function radio_station_get_all_overrides( $start_date = false, $end_date = false
 	// --- get all overrides list ---
 	$overrides = $rs_se->process_overrides( $overrides, $start_date, $end_date, $timezone );
 	// 2.5.0: keep filter for backwards compatibility
-	$overrides = apply_filters( 'radio_station_get_overrides', $overrides, $start_date, $end_date, $channel );
+	$overrides = apply_filters( 'radio_station_get_overrides', $overrides, $start_date, $end_date, $timezone );
 	return $overrides;
 }
 
@@ -588,8 +591,12 @@ function radio_station_get_next_shows( $limit = 3, $show_shifts = false, $time =
 
 		$next_show = $next_shows[0];
 		$next_show = apply_filters( 'radio_station_next_show', $next_show, $time, $channel );
-		// TODO: handle split shifts over midnight ?
+		$shift_start_time = radio_station_to_time( $next_show['date'] . ' ' . $next_show['start'], $timezone );
 		$shift_end_time = radio_station_to_time( $next_show['date'] . ' ' . $next_show['end'], $timezone );
+		// 2.5.0: handle split shifts over midnight
+		if ( $shift_end_time < $shift_start_time ) {
+			$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
+		}
 		$expires = $shift_end_time - $now - 1;
 
 		// 2.5.0: call next shift action to set transient data

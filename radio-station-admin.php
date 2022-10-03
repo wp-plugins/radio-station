@@ -1,6 +1,6 @@
 <?php
 /*
- *Plugin Admin Functions
+ * Radio Station Plugin Admin Functions
  * @Since: 2.2.7
  */
 
@@ -197,8 +197,9 @@ function radio_station_add_admin_menus() {
 	// 2.3.0: prefix plugin name on page titles (but not menu items)
 	// 2.3.0: remove add playlist and add override to reduce clutter
 	// 2.3.0: added actions for adding of other plugin submenu items in position
+	// 2.5.0: disabled Add Show submenu item to reduce clutter
 	add_submenu_page( 'radio-station', $rs . ' ' . __( 'Shows', 'radio-station' ), __( 'Shows', 'radio-station' ), 'edit_shows', 'shows' );
-	add_submenu_page( 'radio-station', $rs . ' ' . __( 'Add Show', 'radio-station' ), __( 'Add Show', 'radio-station' ), 'publish_shows', 'add-show' );
+	// add_submenu_page( 'radio-station', $rs . ' ' . __( 'Add Show', 'radio-station' ), __( 'Add Show', 'radio-station' ), 'publish_shows', 'add-show' );
 	do_action( 'radio_station_admin_submenu_top' );
 	add_submenu_page( 'radio-station', $rs . ' ' . __( 'Playlists', 'radio-station' ), __( 'Playlists', 'radio-station' ), 'edit_playlists', 'playlists' );
 	// add_submenu_page( 'radio-station', $rs . ' ' .  __( 'Add Playlist', 'radio-station' ), __( 'Add Playlist', 'radio-station' ), 'publish_playlists', 'add-playlist' );
@@ -910,6 +911,11 @@ function radio_station_update_notice() {
 add_action( 'admin_notices', 'radio_station_notice' );
 function radio_station_notice() {
 
+	// 2.5.0: check for user capability
+	if ( !current_user_can( 'update_plugins' ) ) {
+		return;
+	}
+
 	// --- get latest notice ---
 	$notices = radio_station_get_notices();
 	if ( RADIO_STATION_DEBUG ) {
@@ -1313,7 +1319,7 @@ function radio_station_listing_offer_content( $dismissable = true ) {
 // Launch Offer Content
 // --------------------
 // 2.3.3.9: added for Pro launch discount
-function radio_station_launch_offer_content( $dismissable = true, $prelaunch ) {
+function radio_station_launch_offer_content( $dismissable = true, $prelaunch = false ) {
 
 	$dismiss_url = admin_url( 'admin-ajax.php?action=radio_station_launch_offer_dismiss' );
 	$accept_dismiss_url = add_query_arg( 'accepted', '1', $dismiss_url );
@@ -1466,6 +1472,10 @@ function radio_station_launch_offer_dismiss() {
 add_action( 'admin_notices', 'radio_station_announcement_notice' );
 function radio_station_announcement_notice() {
 
+	if ( !current_user_can( 'manage_options' ) && !current_user_can( 'update_plugins' ) ) {
+		return;
+	}
+
 	// --- bug out if already dismissed ---
 	if ( get_option( 'radio_station_announcement_dismissed' ) ) {
 		return;
@@ -1558,8 +1568,8 @@ function radio_station_announcement_dismiss() {
 		update_option( 'radio_station_announcement_dismissed', true );
 		// --- hide the announcement in parent frame ---
 		echo "<script>parent.document.getElementById('radio-station-announcement-notice').style.display = 'none';</script>" . PHP_EOL;
-		exit;
 	}
+	exit;
 }
 
 // --------------------------
@@ -1776,3 +1786,4 @@ function radio_station_clear_plugin_options() {
 
 	exit;
 }
+

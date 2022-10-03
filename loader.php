@@ -1,11 +1,11 @@
 <?php
 
-// ===========================
-// === Plugin Loader Class ===
-// ===========================
+// =================================
+// === Plugin Panel Loader Class ===
+// =================================
 //
 // --------------
-// Version: 1.2.5
+// Version: 1.2.7
 // --------------
 // Note: Changelog and structure at end of file.
 //
@@ -2545,7 +2545,6 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						// --- maybe prepare post/page options (once) ---
 						if ( in_array( $option['options'], array( 'POSTID', 'POSTIDS', 'PAGEID', 'PAGEIDS' ) ) ) {
 
-							$pageoptions = $postoptions = array( '' => '' );
 							$posttype = strtolower( substr( $option['options'], 0, 4 ) );
 							if ( ( ( 'page' == $posttype ) && !isset( $pageoptions ) )
 								|| ( ( 'post' == $posttype ) && !isset( $postoptions ) ) ) {
@@ -2556,6 +2555,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 								$query = $wpdb->prepare( $query, $posttype );
 								// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 								$results = $wpdb->get_results( $query, ARRAY_A );
+
+								// 1.2.7: fix by moving page/post options variable here
+								$pageoptions = $postoptions = array( '' => '' );
 								if ( $results && ( count( $results ) > 0 ) ) {
 									foreach ( $results as $result ) {
 										if ( strlen( $result['post_title'] ) > 35 ) {
@@ -3069,9 +3071,10 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 			// --- settings tab styles ---
 			// 1.1.0: added max-width:100% to select input
+			// 1.2.7: add pointer cursor to inactive tabs
 			$styles[] = '.settings-tab-button {display:inline-block; font-size:15px; padding:7px 14px; margin-right:20px; border-radius:7px;}';
 			$styles[] = '.settings-tab-button.active {font-weight:bold; background-color:#0073aa; color:#FFF; border:1px solid #FFF;}';
-			$styles[] = '.settings-tab-button.inactive {font-weight:bold; background-color:#F5F5F5; color:#0073aa; border:1px solid #000;}';
+			$styles[] = '.settings-tab-button.inactive {font-weight:bold; background-color:#F5F5F5; color:#0073aa; border:1px solid #000; cursor:pointer;}';
 			$styles[] = '.settings-tab-button.inactive:hover {background-color:#FFFFFF; color:#00a0d2;}';
 			$styles[] = '.settings-tab.active {display:block;}';
 			$styles[] = '.settings-tab.inactive {display:none;}';
@@ -3084,19 +3087,18 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 			// --- setting input styles ---
 			$styles[] = '.settings-input {vertical-align:top; min-width:100px; max-width:300px;}';
-			$styles[] = '.settings-input input.setting-radio {}';
-			$styles[] = '.settings-input input.setting-checkbox {}';
+			// $styles[] = '.settings-input input.setting-radio {}';
+			// $styles[] = '.settings-input input.setting-checkbox {}';
 			$styles[] = '.settings-input input.setting-text {width:100%;}';
 			$styles[] = '.settings-input input.setting-numeric {display:inline-block; width:50%; text-align:center; vertical-align:middle;}';
 			$styles[] = '.settings-input input.setting-button {display:inline-block; padding:0px 5px;}';
-			$styles[] = '.settings-input input.setting-button.number-down-button {padding:9px 7px;}';
+			$styles[] = '.settings-input input.setting-button.number-down-button {padding:0px 7px; font-weight:bold;}';
 			$styles[] = '.settings-input input.setting-textarea {width:100%;}';
 			$styles[] = '.settings-input select.setting-select {min-width:100px; max-width:100%;}';
 
 			// --- toggle input styles ---
 			// Ref: https://www.w3schools.com/howto/howto_css_switch.asp
-			$styles[] = '
-			.setting-toggle {position:relative; display:inline-block; width:30px; height:17px;}
+			$styles[] = '.setting-toggle {position:relative; display:inline-block; width:30px; height:17px;}
 			.setting-toggle input {opacity:0; width:0; height:0;}
 			.setting-slider {position:absolute; cursor:pointer;
 			  top:0; left:0; right:0; bottom:0; background-color:#ccc;
@@ -3105,14 +3107,19 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			.setting-slider:before {position:absolute; content:""; height:13px; width:13px;
 			  left:2px; bottom:2px; background-color:white; -webkit-transition:.4s; transition:.4s;
 			}
-			input:checked + .setting-slider {background-color: #2196F3;}
-			input:focus + .setting-slider {box-shadow: 0 0 1px #2196F3;}
+			input:checked + .setting-slider {background-color:#2196F3;}
+			input:focus + .setting-slider {box-shadow:0 0 1px #2196F3;}
 			input:checked + .setting-slider:before {
 			  -webkit-transform:translateX(13px); -ms-transform:translateX(13px); transform:translateX(13px);
 			}
 			.setting-slider.round {border-radius: 17px;}
-			.setting-slider.round:before {border-radius: 50%;}
-			';
+			.setting-slider.round:before {border-radius: 50%;}';
+
+			// --- color picker styles ---
+			// 1.2.7: added to overlay active color picker
+			$styles[] = '.wp-picker-active {position:absolute; z-index:999; background-color:#FFF; border:1px solid #999; padding:5px;}';
+			$styles[] = '.wp-picker-active .wp-picker-input-wrap {display:block;}';
+			$styles[] = '.wp-color-picker {max-width:200px;}';
 
 			// --- filter and output styles ---
 			$namespace = $this->namespace;
@@ -3438,6 +3445,10 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // =========
 // CHANGELOG
 // =========
+
+// == 1.2.7 ==
+// - added color picker dropdown overlay styling
+// - added pointer cursor style to inactive tab
 
 // == 1.2.6 ==
 // - expanded wp_kses allowed input attributes

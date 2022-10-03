@@ -402,18 +402,45 @@ function radio_station_get_now_playing( $time = false ) {
 	$show_id = $current_show['show']['id'];
 
 	// TODO: improve handling of playlists for overrides
+	$override = false;
 	if ( isset( $current_show['override'] ) && $current_show['override'] ) {
-		// TODO: check if override is linked to show
-		$playlist = apply_filters( 'radio_station_override_now_playing', false, $current_show['override'] );
-		return $playlist;
+		$override = true;
+		// 2.5.0: check if override is linked to show
+		$override_id = $show_id;
+		$linked_show = get_post_meta( $override_id, 'linked_show_id', true );
+		if ( $linked_show ) {
+			$show_id = $linked_show;
+		} else {
+			$playlist = apply_filters( 'radio_station_override_now_playing', false, $current_show['override'] );
+			return $playlist;
+		}
 	}
 
 	// 2.3.3.9: fix to assign current show shifts to playlist data
-	// TODO: match current playlist to assigned show shift ?
+	// TODO: maybe match current playlist to assigned show shift ?
 	$playlist = array();
 	$shifts = get_post_meta( $show_id, 'show_sched', true );
 	if ( $shifts ) {
 		$playlist['shifts'] = $shifts;
+	}
+	// 2.5.0: merge in override shifts
+	if ( $override ) {
+		$override_shifts = get_post_meta( $override_id, 'show_override_sched', true );
+		if ( $override_shifts && is_array( $override_shifts ) && ( count( $override_shifts ) > 0 ) ) {
+			if ( isset( $$playlist['shifts'] ) ) {
+				$playlist['shifts'] = array_merge( $playlist['shifts'], $override_shifts );
+			} else {
+				$playlist['shifts'] = $override_shifts;
+			}
+		}
+		$recurring_shifts = get_post_meta( $override_id, 'show_recurring_sched', true );
+		if ( $recurring_shifts && is_array( $recurring_shifts ) && ( count( $recurring_shifts ) > 0 ) ) {
+			if ( isset( $$playlist['shifts'] ) ) {
+				$playlist['shifts'] = array_merge( $playlist['shifts'], $recurring_shifts );
+			} else {
+				$playlist['shifts'] = $recurring_shifts;
+			}
+		}
 	}
 
 	// --- grab the most recent playlist for the current show ---
@@ -440,7 +467,6 @@ function radio_station_get_now_playing( $time = false ) {
 	$playlist['posts'] = $playlist_posts;
 
 	// TODO: check for playlist linked to this shift / date?
-
 	if ( $playlist_posts && is_array( $playlist_posts ) && ( count( $playlist_posts ) > 0 ) ) {
 
 		// --- fetch the tracks for the playlist ---
@@ -474,8 +500,10 @@ function radio_station_get_now_playing( $time = false ) {
 
 			// --- add show and playlist data ---
 			// 2.3.0: add IDs and URLs instead of just playlist URL
+			// 2.5.0: add playlist title to playlist array
 			$playlist['show'] = $show_id;
 			$playlist['show_url'] = get_permalink( $show_id );
+			$playlist['title'] = $playlist_post->post_title;
 			$playlist['playlist'] = $playlist_post->ID;
 			$playlist['playlist_url'] = get_permalink( $playlist_post->ID );
 

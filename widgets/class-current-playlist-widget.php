@@ -28,11 +28,13 @@ class Playlist_Widget extends WP_Widget {
 		// 2.3.2: added AJAX load option
 		// 2.3.3.8: added playlist link option
 		// 2.5.0: added no_playlist text option
+		// 2.5.0: added playlist_title option
 		// --- widget display options ---
 		$title = $instance['title'];
 		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : '';
 		$hide_empty = isset( $instance['hide_empty'] ) ? $instance['hide_empty'] : true;
 		// --- playlist display options ---
+		$playlist_title = isset( $instance['playlist_title'] ) ? $instance['playlist_title'] : false;
 		$link_playlist = isset( $instance['link'] ) ? $instance['link'] : true;
 		$no_playlist = isset( $instance['no_playlist'] ) ? $instance['no_playlist'] : '';
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : false;
@@ -42,6 +44,10 @@ class Playlist_Widget extends WP_Widget {
 		$album = isset( $instance['album'] ) ? $instance['album'] : false;
 		$label = isset( $instance['label'] ) ? $instance['label'] : false;
 		$comments = isset( $instance['comments'] ) ? $instance['comments'] : false;
+
+		// --- get upgrade URLs ---
+		$pricing_url = radio_station_get_pricing_url();
+		$upgrade_url = radio_station_get_upgrade_url();
 
 		// 2.3.0: convert template style code to strings
 		// 2.3.2: added AJAX load option field
@@ -69,12 +75,10 @@ class Playlist_Widget extends WP_Widget {
 		</p>';
 
 		// --- [Pro] Dynamic Reloading ---
-		$pricing_url = add_query_arg( 'page', 'radio-station-pricing', admin_url( 'admin.php' ) );
-		$upgrade_url = radio_station_get_upgrade_url();
 		$fields['dynamic'] = '<p>
 			<label for="dynamic">' . esc_html( __( 'Show changeover reloading available in Pro.', 'radio-station' ) ) . '</label><br>
-			<a href="' . esc_url( $pricing_url ) . '">' . esc_html( __( 'Upgrade to Pro', 'radio-station' ) ) . '</a> |
-			<a href="' . esc_url( $upgrade_url ) . '" target="_blank">' . esc_html( __( 'More Details', 'radio-station' ) ) . '</a>
+			<a href="' . esc_url( $upgrade_url ) . '">' . esc_html( __( 'Upgrade to Pro', 'radio-station' ) ) . '</a> |
+			<a href="' . esc_url( $pricing_url ) . '" target="_blank">' . esc_html( __( 'More Details', 'radio-station' ) ) . '</a>
 		</p>';
 
 		// --- Hide if Empty ---
@@ -86,6 +90,14 @@ class Playlist_Widget extends WP_Widget {
 		</p>';
 
 		// === Playlist Display Options ===
+
+		// --- Link to Playlist ---
+		$fields['playlist_title'] = '<p>
+			<label for="' . esc_attr( $this->get_field_id( 'playlist_title' ) ) . '">
+			<input id="' . esc_attr( $this->get_field_id( 'playlist_title' ) ) . '" name="' . esc_attr( $this->get_field_name( 'playlist_title' ) ) . '" type="checkbox" ' . checked( $playlist_title, true, false ) . '>
+				' . esc_html( __( 'Display Playlist Title?', 'radio-station' ) ) . '
+			</label>
+		</p>';
 
 		// --- Link to Playlist ---
 		$fields['link_playlist'] = '<p>
@@ -175,11 +187,13 @@ class Playlist_Widget extends WP_Widget {
 		// 2.3.2: added AJAX load option
 		// 2.3.3.8: added playlist link option
 		// 2.5.0: added no_playlist text option
+		// 2.5.0: added playlist_title option
 		// --- widget display options ---
 		$instance['title'] = $new_instance['title'];
 		$instance['ajax'] = isset( $new_instance['ajax'] ) ? $new_instance['ajax'] : 0;
 		$instance['hide_empty'] = isset( $new_instance['hide_empty'] ) ? 1 : 0;
 		// --- playlist display options ---
+		$instance['playlist_title'] = isset( $new_instance['playlist_title'] ) ? 1 : 0;
 		$instance['link'] = isset( $new_instance['link'] ) ? 1 : 0;
 		$instance['no_playlist'] = isset ( $new_instance['no_playlist'] ) ? $new_instance['no_playlist'] : '';
 		$instance['countdown'] = isset( $new_instance['countdown'] ) ? 1 : 0;
@@ -214,12 +228,15 @@ class Playlist_Widget extends WP_Widget {
 		// 2.3.0: added countdown display option
 		// 2.3.2: set fallback options to numeric for shortcode
 		// 2.3.2: added AJAX load option
+		// 2.5.0: added no_playlist text option
+		// 2.5.0: added playlist_title option
 		// --- widget display options ---
 		$title = empty( $instance['title'] ) ? '' : $instance['title'];
 		$title = apply_filters( 'widget_title', $title );
 		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : 0;
 		$hide_empty = isset( $instance['hide_empty'] ) ? $instance['hide_empty'] : 0;
 		// --- playlist display options ---
+		$playlist_title = isset( $instance['playlist_title'] ) ? $instance['playlist_title'] : 0;
 		$link = isset( $instance['link'] ) ? $instance['link'] : 1;
 		$no_playlist = isset( $instance['no_playlist'] ) ? $instance['no_playlist'] : '';
 		$countdown = isset( $instance['countdown'] ) ? $instance['countdown'] : 0;
@@ -237,21 +254,22 @@ class Playlist_Widget extends WP_Widget {
 		// 2.5.0: removed title attribute (only used for shortcodes)
 		$atts = array(
 			// --- widget display options ---
-			'ajax'        => $ajax,
-			'hide_empty'  => $hide_empty,
+			'ajax'           => $ajax,
+			'hide_empty'     => $hide_empty,
 			// --- playlist display options ---
-			'link'        => $link,
-			'no_playlist' => '',
-			'countdown'   => $countdown,
+			'playlist_title' => $playlist_title,
+			'link'           => $link,
+			'no_playlist'    => '',
+			'countdown'      => $countdown,
 			// --- track display options ---
-			'artist'      => $artist,
-			'song'        => $song,
-			'album'       => $album,
-			'label'       => $label,
-			'comments'    => $comments,
+			'artist'         => $artist,
+			'song'           => $song,
+			'album'          => $album,
+			'label'          => $label,
+			'comments'       => $comments,
 			// --- widget data ---
-			'widget'      => 1,
-			'id'          => $id,
+			'widget'         => 1,
+			'id'             => $id,
 		);
 
 		// 2.3.3.9: add filter for default widget attributes

@@ -42,6 +42,12 @@
 			image_position: { type: 'string', default: 'left' },
 			hide_past_shows: { type: 'boolean', default: false },
 
+			/* --- Header Displays --- */
+			time_header: { type: 'string', default: 'clock' },
+			/* clock: { type: 'boolean', default: true }, */
+			/* timezone: { type: 'boolean', default: true }, */
+			selector: { type: 'boolean', default: true },
+
 			/* --- Times Display --- */
 			display_day: { type: 'string', default: 'short' },
 			display_month: { type: 'string', default: 'short' },
@@ -51,11 +57,6 @@
 			/* start_date:  { type: '', default: false }, */
 			/* active_date: { type: '', default: false }, */
 			/* display_date: { type: 'string', default: 'jS' }, */
-
-			/* --- Extra Displays --- */
-			selector: { type: 'boolean', default: true },
-			clock: { type: 'boolean', default: true },
-			timezone: { type: 'boolean', default: true },
 
 			/* --- Show Display --- */
 			show_times: { type: 'boolean', default: true },
@@ -231,6 +232,35 @@
 								)
 							),
 
+							/* === Header Displays Panel === */
+							el( PanelBody, { title: __( 'Header Display Options', 'radio-station' ), initialOpen: false },
+								/* --- Clock/Timezone Header --- */
+								el( PanelRow, {},
+									el( SelectControl, {
+										label: __( 'Radio Time Header', 'radio-station' ),
+										options: [
+											{ label: __( 'Display Radio Clock', 'radio-station' ), value: 'clock' },
+											{ label: __( 'Display Radio Timezone', 'radio-station' ), value: 'timezone' },
+											{ label: __( 'No Time Header Display', 'radio-station' ), value: 'none' }
+										],
+										onChange: ( value ) => {
+											props.setAttributes( { time_header: value } );
+										},
+										value: atts.time_header
+									})
+								),
+								/* --- Genre Highlighter --- */
+								el( PanelRow, {},
+									el( ToggleControl, {
+										label: __( 'Display Genre Highlighter', 'radio-station' ),
+										onChange: ( value ) => {
+											props.setAttributes( { selector: value } );
+										},
+										checked: atts.selector,
+									})
+								),
+							),
+
 							/* === Time Display Options === */
 							el( PanelBody, { title: __( 'Time Display Options', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
 								/* --- Day Display --- */
@@ -379,40 +409,6 @@
 											props.setAttributes( { show_encore: value } );
 										},
 										checked: atts.show_encore,
-									})
-								),
-							),				
-							
-							/* === Extra Displays Panel === */
-							el( PanelBody, { title: __( 'Extra Display Options', 'radio-station' ), initialOpen: false },
-								/* --- Genre Selector --- */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Display Genre Selector', 'radio-station' ),
-										onChange: ( value ) => {
-											props.setAttributes( { selector: value } );
-										},
-										checked: atts.selector,
-									})
-								),
-								/* --- Clock --- */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Display Radio Clock', 'radio-station' ),
-										onChange: ( value ) => {
-											props.setAttributes( { clock: value } );
-										},
-										checked: atts.clock,
-									})
-								),
-								/* --- Timezone --- */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Display Radio Timezone', 'radio-station' ),
-										onChange: ( value ) => {
-											props.setAttributes( { timezone: value } );
-										},
-										checked: atts.timezone,
 									})
 								),
 							)

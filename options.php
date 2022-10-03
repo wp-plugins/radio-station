@@ -448,17 +448,18 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro/Player] Popup Player Window ---
-	/* 'player_popup' => array(
+	// --- [Pro/Player] Popup Player Button ---
+	// 2.5.0: enabled popup player button
+	'player_popup' => array(
 		'type'    => 'checkbox',
-		'label'   => __( 'Popup Player Window', 'radio-station' ),
+		'label'   => __( 'Popup Player Button', 'radio-station' ),
 		'default' => '',
 		'value'   => 'yes',
-		'helper'  => __( 'Add a popup icon to your Player to open it in a separate window.', 'radio-station' ),
+		'helper'  => __( 'Add button to open Popup Player in separate window.', 'radio-station' ),
 		'tab'     => 'player',
 		'section' => 'advanced',
 		'pro'     => true,
-	), */
+	),
 
 	// === Sitewide Player Bar ===
 

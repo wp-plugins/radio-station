@@ -68,7 +68,10 @@ function radio_date_string(datetime, day, date, month, override) {
 }
 
 /* Update Current Time Clock */
-function radio_clock_date_time(init) {
+function radio_clock_date_time() {
+
+	if (radio_clock_init) {init = false;}
+	else {init = true; radio_clock_init = true;}
 
 	/* user datetime / timezone */
 	userdatetime = new Date();
@@ -85,7 +88,7 @@ function radio_clock_date_time(init) {
 	override = false;
 	if (typeof radio_timezone_override == 'function') {
 		override = radio_timezone_override();
-		if (radio.debug) {console.log('User Timezone Selection Override: '+override);}
+		if (radio.clock_debug) {console.log('User Timezone Selection Override: '+override);}
 		if (override) {
 			userzone = override;
 			offset = radio_offset_override(false);
@@ -179,4 +182,5 @@ function radio_clock_date_time(init) {
 }
 
 /* Start the Clock */
-setTimeout('radio_clock_date_time(true);', 1000);
+var radio_clock_init = false;
+setTimeout(radio_clock_date_time, 1000);

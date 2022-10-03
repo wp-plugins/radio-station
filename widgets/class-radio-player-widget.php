@@ -42,6 +42,10 @@ class Radio_Player_Widget extends WP_Widget {
 		// $hosts = isset( $instance['show_hosts'] ) ? $instance['show_hosts'] : false;
 		// $producers = isset( $instance['show_producers'] ) ? $instance['show_producers'] : false;
 
+		// --- get upgrade URLs ---
+		$upgrade_url = radio_station_get_upgrade_url();
+		$pricing_url = radio_station_get_pricing_url();
+
 		// 2.5.0: set fields array
 		$fields = array();
 
@@ -76,20 +80,21 @@ class Radio_Player_Widget extends WP_Widget {
 
 		// --- Station Image ---
 		// 2.5.0: fix to image field key (script)
+		// TODO: support for custom image?
 		$field = '<p>
 			<label for="' . esc_attr( $this->get_field_id( 'image' ) ) . '">
-				<select id="' . esc_attr( $this->get_field_id( 'image' ) ) . '" name="' . esc_attr( $this->get_field_name( 'image' ) ) . '">';
-				$options = array(
-					'default' => __( 'Plugin Setting', 'radio-station' ),
-					'on'      => __( 'Display Station Image', 'radio-station' ),
-					'off'     => __( 'Do Not Display Image', 'radio-station' ),
-					// 'custom' => __( 'Use Custom Image', 'radio-station' ),
-				);
-				foreach ( $options as $option => $label ) {
-					$field .= '<option value="' . esc_attr( $option ) . '" ' . selected( $image, $option, false ) . '>' . esc_html( $label ) . '</option>';
-				}
-				$field .= '</select>
-				' . esc_html( __( 'Whether to display Station Image in Player.', 'radio-station' ) ) . '
+			' . esc_html( __( 'Display Station Image', 'radio-station' ) ) . '</label><br>
+			<select id="' . esc_attr( $this->get_field_id( 'image' ) ) . '" name="' . esc_attr( $this->get_field_name( 'image' ) ) . '">';
+			$options = array(
+				'default' => __( 'Plugin Setting', 'radio-station' ),
+				'1'       => __( 'Display Station Image', 'radio-station' ),
+				'0'       => __( 'Do Not Display Image', 'radio-station' ),
+				// 'custom' => __( 'Use Custom Image', 'radio-station' ),
+			);
+			foreach ( $options as $option => $label ) {
+				$field .= '<option value="' . esc_attr( $option ) . '" ' . selected( $image, $option, false ) . '>' . esc_html( $label ) . '</option>';
+			}
+			$field .= '</select>
 		</p>';
 		$fields['image'] = $field;
 
@@ -99,27 +104,27 @@ class Radio_Player_Widget extends WP_Widget {
 		// --- Player Script ---
 		$field = '<p>
 			<label for="' . esc_attr( $this->get_field_id( 'script' ) ) . '">
-				<select id="' . esc_attr( $this->get_field_id( 'script' ) ) . '" name="' . esc_attr( $this->get_field_name( 'script' ) ) . '">';
-				$options = array(
-					'default'   => __( 'Plugin Setting', 'radio-station' ),
-					'amplitude' => __( 'Amplitude', 'radio-station' ),
-					'howler'    => __( 'Howler', 'radio-station' ),
-					'jplayer'   => __( 'jPlayer', 'radio-station' ),
-				);
-				foreach ( $options as $option => $label ) {
-					$field .= '<option value="' . esc_attr( $option ) . '" ' . selected( $script, $option, false ) . '>' . esc_html( $label ) . '</option>';
-				}
-				$field .= '</select>
-				' . esc_html( __( 'Player Script to load by default.', 'radio-station' ) ) . '
-			</label>
+			' . esc_html( __( 'Default Player Script', 'radio-station' ) ) . '</label><br>
+			<select id="' . esc_attr( $this->get_field_id( 'script' ) ) . '" name="' . esc_attr( $this->get_field_name( 'script' ) ) . '">';
+			$options = array(
+				'default'   => __( 'Plugin Setting', 'radio-station' ),
+				'amplitude' => __( 'Amplitude', 'radio-station' ),
+				'howler'    => __( 'Howler', 'radio-station' ),
+				'jplayer'   => __( 'jPlayer', 'radio-station' ),
+			);
+			foreach ( $options as $option => $label ) {
+				$field .= '<option value="' . esc_attr( $option ) . '" ' . selected( $script, $option, false ) . '>' . esc_html( $label ) . '</option>';
+			}
+			$field .= '</select>
 		</p>';
 		$fields['script'] = $field;
 		
 		// --- Player Volume ---
+		// TODO: improve this to a number field control?
 		$fields['volume'] = '<p>
 			<label for="' . esc_attr( $this->get_field_id( 'volume' ) ) . '">
 			' . esc_html( __( 'Player Start Volume', 'radio-station' ) ) . ' (0 to 100, empty for default):
-				<input class="widefat" id="' . esc_attr( $this->get_field_id( 'volume' ) ) . '" name="' . esc_attr( $this->get_field_name( 'volume' ) ) . '" type="text" value="' . esc_attr( $volume ) . '" />
+				<input id="' . esc_attr( $this->get_field_id( 'volume' ) ) . '" name="' . esc_attr( $this->get_field_name( 'volume' ) ) . '" type="text" value="' . esc_attr( $volume ) . '" />
 			</label>
 		</p>';
 
@@ -127,8 +132,15 @@ class Radio_Player_Widget extends WP_Widget {
 		$fields['default'] = '<p>
 			<label for="' . esc_attr( $this->get_field_id( 'default' ) ) . '">
 			<input id="' . esc_attr( $this->get_field_id( 'default' ) ) . '" name="' . esc_attr( $this->get_field_name( 'default' ) ) . '" type="checkbox" ' . checked( $default, true, false ) . '>
-				' . esc_html( __( 'Use this as the default Player instance.', 'radio-station' ) ) . '
+				' . esc_html( __( 'Use as the default Player instance.', 'radio-station' ) ) . '
 			</label>
+		</p>';
+
+		// --- [Pro] Popup Player ---
+		$fields['popup'] = '<p>
+			<label for="dynamic">' . esc_html( __( 'Popup Player button available in Pro.', 'radio-station' ) ) . '</label><br>
+			<a href="' . esc_url( $pricing_url ) . '">' . esc_html( __( 'Upgrade to Pro', 'radio-station' ) ) . '</a> |
+			<a href="' . esc_url( $upgrade_url ) . '" target="_blank">' . esc_html( __( 'More Details', 'radio-station' ) ) . '</a>
 		</p>';
 
 		// === Player Styles ===
@@ -137,59 +149,65 @@ class Radio_Player_Widget extends WP_Widget {
 		// --- Player Layout ---
 		$field = '<p>
 			<label for="' . esc_attr( $this->get_field_id( 'layout' ) ) . '">
-				<select id="' . esc_attr( $this->get_field_id( 'layout' ) ) . '" name="' . esc_attr( $this->get_field_name( 'layout' ) ) . '">';
-				$options = array(
-					'vertical' => __( 'Vertical (Stacked)', 'radio-station' ),
-					'horizontal' => __( 'Horizontal (Inline)', 'radio-station' ),
-				);
-				foreach ( $options as $option => $label ) {
-					$field .= '<option value="' . esc_attr( $option ) . '" ' . selected( $layout, $option, false ) . '>' . esc_html( $label ) . '</option>';
-				}
-				$field .= '</select>
-				' . esc_html( __( 'Layout Style (tall or wide)', 'radio-station' ) ) . '
-			</label>
+			' . esc_html( __( 'Player Widget Layout', 'radio-station' ) ) . '</label><br>
+			<select id="' . esc_attr( $this->get_field_id( 'layout' ) ) . '" name="' . esc_attr( $this->get_field_name( 'layout' ) ) . '">';
+			$options = array(
+				'vertical' => __( 'Vertical (Stacked)', 'radio-station' ),
+				'horizontal' => __( 'Horizontal (Inline)', 'radio-station' ),
+			);
+			foreach ( $options as $option => $label ) {
+				$field .= '<option value="' . esc_attr( $option ) . '" ' . selected( $layout, $option, false ) . '>' . esc_html( $label ) . '</option>';
+			}
+			$field .= '</select>
 		</p>';
 		$fields['layout'] = $field;
 
 		// --- Player Theme ---
 		$field = '<p>
 			<label for="' . esc_attr( $this->get_field_id( 'theme' ) ) . '">
-				<select id="' . esc_attr( $this->get_field_id( 'theme' ) ) . '" name="' . esc_attr( $this->get_field_name( 'theme' ) ) . '">';
-				$options = array(
-					'default'	=> __( 'Plugin Setting', 'radio-station' ),
-					'light'		=> __( 'Light', 'radio-station' ),
-					'dark'		=> __( 'Dark', 'radio-station' ),
-				);
-				$options = apply_filters( 'radio_station_player_theme_options', $options );
-				foreach ( $options as $option => $label ) {
-					$field .= '<option value="' . esc_attr( $option ) . '" ' . selected( $theme, $option, false ) . '>' . esc_html( $label ) . '</option>';
-				}
+			' . esc_html( __( 'Player Theme Style', 'radio-station' ) ) . '</label><br>
+			<select id="' . esc_attr( $this->get_field_id( 'theme' ) ) . '" name="' . esc_attr( $this->get_field_name( 'theme' ) ) . '">';
+			$options = array(
+				'default'	=> __( 'Plugin Setting', 'radio-station' ),
+				'light'		=> __( 'Light', 'radio-station' ),
+				'dark'		=> __( 'Dark', 'radio-station' ),
+			);
+			$options = apply_filters( 'radio_station_player_theme_options', $options );
+			foreach ( $options as $option => $label ) {
+				$field .= '<option value="' . esc_attr( $option ) . '" ' . selected( $theme, $option, false ) . '>' . esc_html( $label ) . '</option>';
+			}
 
-				$field .= '</select>
-				' . esc_html( __( 'Player Theme Style', 'radio-station' ) ) . '
-			</label>
+			$field .= '</select>
 		</p>';
 		$fields['theme'] = $field;
 
 		// --- Player Buttons ---
 		$field = '<p>
 			<label for="' . esc_attr( $this->get_field_id( 'buttons' ) ) . '">
-				<select id="' . esc_attr( $this->get_field_id( 'buttons' ) ) . '" name="' . esc_attr( $this->get_field_name( 'buttons' ) ) . '">';
-				$options = array(
-					'default'	=> __( 'Plugin Setting', 'radio-station' ),
-					'circular'	=> __( 'Circular', 'radio-station' ),
-					'rounded'	=> __( 'Rounded', 'radio-station' ),
-					'square'	=> __( 'Square', 'radio-station' ),
-				);
-				$options = apply_filters( 'radio_station_player_button_options', $options );
-				foreach ( $options as $option => $label ) {
-					$field .= '<option value="' . esc_attr( $option ) . '" ' . selected( $buttons, $option, false ) . '>' . esc_html( $label ) . '</option>';
-				}
-				$field .= '</select>
-				' . esc_html( __( 'Player Button Style', 'radio-station' ) ) . '
-			</label>
+			' . esc_html( __( 'Buttons Style', 'radio-station' ) ) . '</label><br>
+			<select id="' . esc_attr( $this->get_field_id( 'buttons' ) ) . '" name="' . esc_attr( $this->get_field_name( 'buttons' ) ) . '">';
+			$options = array(
+				'default'	=> __( 'Plugin Setting', 'radio-station' ),
+				'circular'	=> __( 'Circular', 'radio-station' ),
+				'rounded'	=> __( 'Rounded', 'radio-station' ),
+				'square'	=> __( 'Square', 'radio-station' ),
+			);
+			$options = apply_filters( 'radio_station_player_button_options', $options );
+			foreach ( $options as $option => $label ) {
+				$field .= '<option value="' . esc_attr( $option ) . '" ' . selected( $buttons, $option, false ) . '>' . esc_html( $label ) . '</option>';
+			}
+			$field .= '</select>
 		</p>';
 		$fields['buttons'] = $field;
+		
+		// --- [Pro] Color Options ---
+		// 2.5.0: added Pro color options message
+		$fields['color_options'] = '<h4>' . esc_html( __( '[Pro] Color Options', 'radio-station' ) ) . '</h4>' . "\n";
+		$fields['color_options'] = '<p>
+			<label for="dynamic">' . esc_html( __( 'Color options available in Pro.', 'radio-station' ) ) . '</label><br>
+			<a href="' . esc_url( $pricing_url ) . '">' . esc_html( __( 'Upgrade to Pro', 'radio-station' ) ) . '</a> |
+			<a href="' . esc_url( $upgrade_url ) . '" target="_blank">' . esc_html( __( 'More Details', 'radio-station' ) ) . '</a>
+		</p>';
 
 		// --- filter and output ---
 		// 2.5.0: added filter for array fields for ease of adding fields

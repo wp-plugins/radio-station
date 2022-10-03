@@ -14,6 +14,7 @@
 // - Get Show
 // - Get Shows
 // - Get Schedule Overrides
+// x Get Show Schedule
 // - Generate Unique Shift ID
 // - Get Show Data
 // - Get Show Metadata
@@ -137,16 +138,13 @@ function radio_station_get_shows( $args = false ) {
 // 2.5.0: added function to match radio_station_get_shows
 function radio_station_get_overrides( $args = false ) {
 
-	global $radio_station_data, $rs_se;
-	$channel = 	$rs_se->channel = $radio_station_data['channel'];
-
 	// --- set default args ---
 	$query_args = array(
 		'post_type'   => RADIO_STATION_OVERRIDE_SLUG,
 		'post_status' => 'publish',
 		'numberposts' => -1,
 		'meta_query'  => array(
-			'relation' => 'AND',
+			// 'relation' => 'AND',
 			array(
 				'key'		=> 'show_override_sched',
 				'compare'	=> 'EXISTS',
@@ -182,33 +180,6 @@ function radio_station_get_overrides( $args = false ) {
 // -----------------
 // 2.3.0: added to give each shift a unique ID
 // 2.5.0: rewritten and moved to schedules.php
-/* function radio_station_get_show_schedule( $show_id ) {
-
-	// --- get show shift schedule ---
-	$shifts = get_post_meta( $show_id, 'show_sched', true );
-	if ( $shifts && is_array( $shifts ) && ( count( $shifts ) > 0 ) ) {
-		$changed = false;
-		foreach ( $shifts as $i => $shift ) {
-
-			// --- check for unique ID length ---
-			if ( strlen( $i ) != 8 ) {
-
-				// --- generate unique shift ID ---
-				unset( $shifts[$i] );
-				$unique_id = radio_station_unique_shift_id();
-				$shifts[$unique_id] = $shift;
-				$changed = true;
-			}
-		}
-
-		// --- update shifts to save unique ID indexes ---
-		if ( $changed ) {
-			update_post_meta( $show_id, 'show_sched', $shifts );
-		}
-	}
-
-	return $shifts;
-} */
 
 // ------------------------
 // Generate Unique Shift ID
@@ -427,17 +398,18 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array(), $att
 
 	// --- get posts from post IDs ---
 	$post_id_list = implode( ',', $post_ids );
-	$query = "SELECT " . $columns . " FROM " . $wpdb->prefix . "posts as posts";
+	$query = "SELECT " . $columns . " FROM " . $wpdb->prefix . "posts";
 	$query .= " WHERE ID IN(" . $post_id_list . ") AND post_status = 'publish' ORDER BY post_date DESC";
 	if ( $args['limit'] ) {
 		$query .= $wpdb->prepare( " LIMIT %d", $args['limit'] );
 	}
 	$results = $wpdb->get_results( $query, ARRAY_A );
-	$results = apply_filters( 'radio_station_show_' . $datatype, $post_ids, $show_id, $args, $atts );
+	$results = apply_filters( 'radio_station_show_' . $datatype, $results, $show_id, $args, $atts );
 
 	if ( RADIO_STATION_DEBUG ) {
 		echo '<span style="display:none;">' . esc_html( $datatype ) . ' for Show ' . esc_html( $show_id ) . ': ';
-		echo esc_html( print_r( $results, true ) ) . '</span>';
+		echo esc_html( print_r( $results, true ) );
+		echo 'Query: ' . $query . '</span>';
 	}
 
 	// 2.4.0.6: add processing of post excerpts
@@ -1525,14 +1497,17 @@ function radio_station_get_producer_url( $producer_id ) {
 // ---------------
 // 2.3.0: added to get Upgrade to Pro link
 function radio_station_get_upgrade_url() {
-
-	// TODO: test Freemius upgrade to Pro URL
-	// ...maybe it is -addons instead of -pricing ???
-	// $upgrade_url = add_query_arg( 'page', 'radio-station-pricing', admin_url( 'admin.php' ) );
-
-	$upgrade_url = RADIO_STATION_PRO_URL . 'pricing/';
-
+	$upgrade_url = add_query_arg( 'page', 'radio-station-pricing', admin_url( 'admin.php' ) );
 	return $upgrade_url;
+}
+
+// ---------------
+// Get Pricing URL
+// ---------------
+// 2.5.0: added to get link to Pricing page
+function radio_station_get_pricing_url() {
+	$pricing_url = RADIO_STATION_PRO_URL . 'pricing/';
+	return $pricing_url;
 }
 
 // ------------------------
@@ -1896,9 +1871,6 @@ function radio_station_trim_excerpt( $content, $length = false, $more = false, $
 // ---------------
 function radio_station_sanitize_values( $data, $keys ) {
 	
-	// print_r( $keys );
-	// print_r( $data );
-	
 	$sanitized = array();
 	foreach ( $keys as $key => $type ) {
 		if ( isset( $data[$key] ) ) {
@@ -1920,6 +1892,11 @@ function radio_station_sanitize_values( $data, $keys ) {
 			}
 		}
 	}
+
+	// echo 'Sanitize Keys: '; print_r( $keys );
+	// echo 'Sanitize Data: '; print_r( $data );
+	// echo 'Sanitized: '; print_r( $sanitized );
+
 	return $sanitized;
 }
 
@@ -1933,21 +1910,23 @@ function radio_station_sanitize_input( $prefix, $key ) {
 	$types = radio_station_get_meta_input_types();
 
 	// 2.4.0.3: bug out if post key not set
-	if ( !isset( $_POST[$postkey] ) ) {
-		return '';
+	// 2.5.0: set empty value as default
+	$value = '';
+	if ( isset( $_POST[$postkey] ) ) {
+		$posted_value = $_POST[$postkey];
 	}
 
 	if ( in_array( $key, $types['file'] ) ) {
-		$value = wp_strip_all_tags( trim( $_POST[$postkey] ) );
+		$value = wp_strip_all_tags( trim( $posted_value ) );
 	} elseif ( in_array( $key, $types['email'] ) ) {
-		$value = sanitize_email( trim( $_POST[$postkey] ) );
+		$value = sanitize_email( trim( $posted_value ) );
 	} elseif ( in_array( $key, $types['url'] ) ) {
-		$value = filter_var( trim( $_POST[$postkey] ), FILTER_SANITIZE_URL );
+		$value = filter_var( trim( $posted_value ), FILTER_SANITIZE_URL );
 	} elseif ( in_array( $key, $types['slug'] ) ) {
-		$value = sanitize_title( $_POST[$postkey] );
+		$value = sanitize_title( $posted_value );
 	} elseif ( in_array( $key, $types['phone'] ) ) {
 		// 2.3.3.6: added phone number with character filter validation
-		$value = trim( $_POST[$postkey] );
+		$value = trim( $posted_value );
 		if ( strlen( $value ) > 0 ) {
 			$value = str_split( $value, 1 );
 			$value = preg_filter( '/^[0-9+\(\)#\.\s\-]+$/', '$0', $value );
@@ -1959,7 +1938,7 @@ function radio_station_sanitize_input( $prefix, $key ) {
 		}
 	} elseif ( in_array( $key, $types['numeric'] ) ) {
 
-		$value = absint( $_POST[$postkey] );
+		$value = absint( $posted_value );
 		if ( $value < 0 ) {
 			$value = '';
 		}
@@ -1970,8 +1949,8 @@ function radio_station_sanitize_input( $prefix, $key ) {
 		// 2.2.8: removed strict in_array checking
 		// 2.3.2: fix for unchecked boxes index warning
 		$value = '';
-		if ( isset( $_POST[$postkey] ) ) {
-			$value = $_POST[$postkey];
+		if ( isset( $posted_value ) ) {
+			$value = $posted_value;
 		}
 		if ( !in_array( $value, array( '', 'on', 'yes' ) ) ) {
 			$value = '';
@@ -1980,8 +1959,8 @@ function radio_station_sanitize_input( $prefix, $key ) {
 	} elseif ( in_array( $key, $types['user'] ) ) {
 
 		// --- user selection inputs ---
-		if ( isset( $_POST[$postkey] ) ) {
-			$value = $_POST[$postkey];
+		if ( isset( $posted_value ) ) {
+			$value = $posted_value;
 		}
 		if ( !isset( $value ) || !is_array( $value ) ) {
 			$value = array();
@@ -1999,7 +1978,7 @@ function radio_station_sanitize_input( $prefix, $key ) {
 	} elseif ( in_array( $key, $types['date'] ) ) {
 
 		// --- datepicker date field ---
-		$date = $_POST[$postkey];
+		$date = $posted_value;
 		$parts = explode( '-', $date );
 		if ( 3 == count( $parts ) ) {
 			if ( checkdate( (int) $parts[1], (int) $parts[2], (int) $parts[0] ) ) {
@@ -2010,7 +1989,7 @@ function radio_station_sanitize_input( $prefix, $key ) {
 	} elseif ( in_array( $key, $types['hour'] ) ) {
 
 		// --- hours (24) ---
-		$value = absint( $_POST[$postkey] );
+		$value = absint( $posted_value );
 		if ( ( $value < 0 ) || ( $value > 23 ) ) {
 			$value = '00';
 		} elseif ( $value < 10 ) {
@@ -2022,7 +2001,7 @@ function radio_station_sanitize_input( $prefix, $key ) {
 	} elseif ( in_array( $key, $types['mins'] ) ) {
 
 		// --- minutes (or seconds) ---
-		$value = absint( $_POST[$postkey] );
+		$value = absint( $posted_value );
 		if ( ( $value < 0 ) || ( $value > 60 ) ) {
 			$value = '00';
 		} elseif ( $value < 10 ) {
@@ -2035,7 +2014,7 @@ function radio_station_sanitize_input( $prefix, $key ) {
 
 		// --- meridiems ---
 		$valid = array( '', 'am', 'pm' );
-		$value = $_POST[$postkey];
+		$value = $posted_value;
 		if ( !in_array( $value, $valid ) ) {
 			$value = '';
 		}
@@ -2062,7 +2041,7 @@ function radio_station_get_meta_input_types() {
 		'phone'    => array( 'phone' ),
 		'date'     => array( 'date' ),
 		'hour'     => array( 'hour' ),
-		'mins'     => array( 'mins', 'minutes', 'seconds' ),
+		'mins'     => array( 'mins', 'minutes', 'secs', 'seconds' ),
 		'meridiem' => array( 'meridian', 'meridiem' ),
 	);
 
@@ -2131,6 +2110,7 @@ function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
 		// 2.5.0: default_name to no_shows key, time to time_format key
 		// 2.5.0: added hide_empty, avatar_size and block keys
 		$keys = array(
+
 			// --- general options ---
 			'title'          => 'text',
 			'ajax'           => 'boolean',
@@ -2151,6 +2131,8 @@ function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
 			// --- extra display options ---
 			'display_hosts'  => 'boolean',
 			'link_hosts'     => 'boolean',
+			// 'display_producers' => 'boolean',
+			// 'link_producers' => 'boolean',
 			'show_desc'      => 'boolean',
 			'show_playlist'  => 'boolean',
 			'show_encore'    => 'boolean',
@@ -2158,8 +2140,8 @@ function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
 			'widget'         => 'boolean',
 			'block'          => 'boolean',
 			'id'             => 'integer',
-			'instance'       => 'integer',
 			'for_time'       => 'integer',
+			'instance'       => 'integer',
 		);
 
 	} elseif ( 'upcoming-shows' == $type ) {
@@ -2189,49 +2171,65 @@ function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
 			// --- extra display options ---
 			'display_hosts'  => 'boolean',
 			'link_hosts'     => 'boolean',
+			// 'display_producers' => 'boolean',
+			// 'link_producers' => 'boolean',
 			'show_encore'    => 'boolean',
 			// --- shortcode data ---
 			'widget'         => 'boolean',
+			'block'          => 'boolean',
 			'id'             => 'integer',
-			'instance'       => 'integer',
 			'for_time'       => 'integer',
+			'instance'       => 'integer',
 		);
 
 	} elseif ( 'current-playlist' == $type ) {
 
 		// --- current playlist attribute keys ---
 		// 2.3.3: added for_time value
+		// 2.5.0: added hide_empty, no_playlist, playlist_title, block
 		$keys = array(
 			// --- general options ---
-			'title'     => 'text',
-			'dynamic'   => 'boolean',
-			'ajax'      => 'boolean',
+			'title'          => 'text',
+			'dynamic'        => 'boolean',
+			'ajax'           => 'boolean',
+			'hide_empty'     => 'boolean',
 			// --- playlist display options ---
-			'link'      => 'boolean',
-			'countdown' => 'boolean',
+			'playlist_title' => 'boolean',
+			'link'           => 'boolean',
+			'no_playlist'    => 'text',
+			'countdown'      => 'boolean',
 			// --- track display options ---
-			'artist'    => 'boolean',
-			'song'      => 'boolean',
-			'album'     => 'boolean',
-			'label'     => 'boolean',
-			'comments'  => 'boolean',
+			'artist'         => 'boolean',
+			'song'           => 'boolean',
+			'album'          => 'boolean',
+			'label'          => 'boolean',
+			'comments'       => 'boolean',
 			// --- shortcode data ---
-			'widget'    => 'boolean',
-			'id'        => 'integer',
-			'instance'  => 'integer',
-			'for_time'  => 'integer',
+			'widget'         => 'boolean',
+			'block'          => 'boolean',
+			'id'             => 'integer',
+			'for_time'       => 'integer',
+			'instance'       => 'integer',
 		);
+
 	} elseif ( 'master-schedule' == $type ) {
 
 		// --- master schedule attribute keys ---
 		// 2.3.3.9: added for AJAX schedule loading
+		// 2.5.0: added active_date, 
 		$keys = array(
+
+			// --- control display options ---
+			// 'selector' => 'boolean',
+			// 'clock' => 'boolean',
+			// 'timezone' => 'boolean',
 
 			// --- schedule display options ---
 			'view'              => 'text',
 			'days'              => 'text',
 			'start_day'         => 'text',
 			'start_date'        => 'text',
+			'active_date'       => 'text',
 			'display_day'       => 'text',
 			'display_date'      => 'text',
 			'display_month'	    => 'text',
@@ -2261,6 +2259,10 @@ function radio_station_sanitize_shortcode_values( $type, $extras = false ) {
 			'time_spaced'       => 'boolean',
 			'weeks'             => 'integer',
 			'previous_weeks'    => 'integer',
+			
+			// --- shortcode data ---
+			'block'             => 'boolean',
+			'instance'          => 'boolean',
 		);
 
 	}
@@ -2316,6 +2318,7 @@ function radio_station_link_tag_allowed_html( $allowed, $type, $context ) {
 // ----------------------------
 // Settings Inputs Allowed HTML
 // ----------------------------
+// 2.5.0: added for admin settings inputs
 add_filter( 'radio_station_allowed_html', 'radio_station_settings_allowed_html', 10, 3 );
 function radio_station_settings_allowed_html( $allowed, $type, $context ) {
 
@@ -2370,6 +2373,10 @@ function radio_station_settings_allowed_html( $allowed, $type, $context ) {
 	$allowed['optgroup'] = array(
 		'label' => array(),
 	);
+
+	// --- allow onclick on spans and divs ---
+	$allowed['span']['onclick'] = array();
+	$allowed['div']['onclick'] = array();
 
 	return $allowed;
 }

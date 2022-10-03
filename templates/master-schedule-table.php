@@ -80,17 +80,24 @@ $infokeys = apply_filters( 'radio_station_schedule_table_info_order', $infokeys 
 $table = '<div style="clear:both;"></div>' . "\n";
 
 // --- start master program table ---
-$table .= '<table id="master-program-schedule" cellspacing="0" cellpadding="0">' . "\n";
+// 2.5.0: maybe add instance to element ID
+// 2.5.0: set oddeven variable
+$oddeven = 'even';
+$id = ( 0 == $instance ) ? '' : '-' . $instance;
+$table .= '<table id="master-program-schedule' . esc_attr( $id ) . '" class="master-program-schedule" cellspacing="0" cellpadding="0">' . "\n";
 
 // --- weekday table headings row ---
 // 2.3.2: added hour column heading id
 $table .= '<tr class="master-program-day-row">' . "\n";
-$table .= '<th id="master-program-hour-heading">' . "\n";
-// 2.3.3.9: added filters for week loader controls
-$table .= apply_filters( 'radio_station_schedule_loader_control', '', 'table', 'left' );
-$table .= apply_filters( 'radio_station_schedule_loader_control', '', 'table', 'right' );
+// 2.5.0: change element ID to class for selectors
+$table .= '<th class="master-program-hour-heading">' . "\n";
+	// 2.3.3.9: added filters for week loader controls
+	$table .= apply_filters( 'radio_station_schedule_loader_control', '', 'table', 'left', $instance );
+	$table .= apply_filters( 'radio_station_schedule_loader_control', '', 'table', 'right', $instance );
 $table .= '</th>' . "\n";
 
+// 2.5.0: set odd/even day variable
+$oddeven_day = 'even';
 foreach ( $weekdays as $i => $weekday ) {
 
 	// --- maybe skip all days but those specified ---
@@ -156,7 +163,10 @@ foreach ( $weekdays as $i => $weekday ) {
 
 		// --- set heading classes ---
 		// 2.3.0: add day and check for highlighting
+		// 2.5.0: add odd/even day class
 		$classes = array( 'master-program-day', 'day-' . $i, strtolower( $weekday ), 'date-' . $weekdate );
+		$oddeven_day = ( 'even' == $oddeven_day ) ? 'odd' : 'even';
+		$classes[] = $oddeven_day . '-day';	
 		if ( ( $now > $day_start_time ) && ( $now < $day_end_time ) ) {
 			$classes[] = 'current-day';
 			// $classes[] = 'selected-day';
@@ -169,7 +179,7 @@ foreach ( $weekdays as $i => $weekday ) {
 		// 2.3.2: added check for optional display_date attribute
 		$table .= '<th class="' . esc_attr( $classlist ) . '">' . "\n";
 			$table .= '<div class="shift-left-arrow">' . "\n";
-				$table .= '<a href="javascript:void(0);" onclick="return radio_shift_day(\'left\');" title="' . esc_attr( __( 'Previous Day', 'radio-station' ) ) . '">' . $arrows['left'] . '</a>' . "\n";
+				$table .= '<a href="javascript:void(0);" onclick="return radio_shift_day(\'left\',' . esc_attr( $instance ) . ');" title="' . esc_attr( __( 'Previous Day', 'radio-station' ) ) . '">' . $arrows['left'] . '</a>' . "\n";
 			$table .= '</div>' . "\n";
 			$table .= '<div class="headings">' . "\n";
 				$table .= '<div class="day-heading"';
@@ -182,7 +192,7 @@ foreach ( $weekdays as $i => $weekday ) {
 				}
 			$table .= '</div>' . "\n";
 			$table .= '<div class="shift-right-arrow">' . "\n";
-				$table .= '<a href="javacript:void(0);" onclick="return radio_shift_day(\'right\');" title="' . esc_attr( __( 'Next Day', 'radio-station' ) ) . '">' . $arrows['right'] . '</a>' . "\n";
+				$table .= '<a href="javacript:void(0);" onclick="return radio_shift_day(\'right\',' . esc_attr( $instance ) . ');" title="' . esc_attr( __( 'Next Day', 'radio-station' ) ) . '">' . $arrows['right'] . '</a>' . "\n";
 			$table .= '</div>' . "\n";
 			// 2.3.2: add day start and end time date
 			$table .= '<span class="rs-time rs-start-time" data="' . esc_attr( $day_start_time ) . '"></span>' . "\n";
@@ -194,7 +204,9 @@ foreach ( $weekdays as $i => $weekday ) {
 $table .= '</tr>' . "\n";
 
 // --- loop schedule hours ---
+// 2.5.0: set odd/even hour variable
 $tcount = 0;
+$oddeven_hour = 'odd';
 foreach ( $hours as $hour ) {
 
 	// 2.3.1: fix to set translated hour for display only
@@ -218,7 +230,10 @@ foreach ( $hours as $hour ) {
 	// 2.3.0: check current hour for highlighting
 	// 2.3.1: fix to use untranslated hour (12 hr format bug)
 	// 2.3.2: replace strtotime with to_time function for timezone
+	// 2.5.0: add odd/even hour class
 	$classes = array( 'master-program-hour' );
+	$oddeven_hour = ( 'odd' == $oddeven_hour ) ? 'even' : 'odd';
+	$classes[] = $oddeven_hour . '-hour';
 	$hour_start = radio_station_to_time( $date . ' ' . $hour . ':00' );
 	$hour_end = $hour_start + ( 60 * 60 );
 	if ( ( $now > $hour_start ) && ( $now < $hour_end ) ) {
@@ -417,7 +432,9 @@ foreach ( $hours as $hour ) {
 						}
 						if ( isset( $show['genres'] ) && is_array( $show['genres'] ) && ( count( $show['genres'] ) > 0 ) ) {
 							foreach ( $show['genres'] as $genre ) {
-								$divclasses[] = sanitize_title_with_dashes( $genre );
+								// 2.5.0: add genre- prefix to genre terms
+								// $divclasses[] = sanitize_title_with_dashes( $genre );
+								$divclasses[] = 'genre-' . sanitize_title_with_dashes( $genre );
 							}
 						}
 						if ( $split_id ) {

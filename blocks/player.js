@@ -22,7 +22,7 @@
 		attributes: {
 			/* --- Player Content --- */
 			url: { type: 'string', default: '' },
-			station: { type: 'string', default: '' },
+			title: { type: 'string', default: '' },
 			image: { type: 'string', default: 'default' },
 			/* --- Player Options --- */
 			script: { type: 'string', default: 'default' },
@@ -60,15 +60,15 @@
 										value: atts.url,
 									})
 								),
-								/* --- Station/Player Text --- */
+								/* --- Player Title Text --- */
 								el( PanelRow, {},
 									el( TextControl, {
-										label: __( 'Player Text', 'radio-station' ),
+										label: __( 'Player Title Text', 'radio-station' ),
 										help: __( 'Empty for default, 0 for none.', 'radio-station' ),
 										onChange: ( value ) => {
-											props.setAttributes( { station: value } );
+											props.setAttributes( { title: value } );
 										},
-										value: atts.station
+										value: atts.title
 									})
 								),
 								/* --- Image --- */
@@ -77,8 +77,8 @@
 										label: __( 'Player Image', 'radio-station' ),
 										options : [
 											{ label: __( 'Plugin Setting', 'radio-station' ), value: 'default' },
-											{ label: __( 'Display Station Image', 'radio-station' ), value: 'on' },
-											{ label: __( 'Do Not Display Station Image', 'radio-station' ), value: 'off' },
+											{ label: __( 'Display Station Image', 'radio-station' ), value: '1' },
+											{ label: __( 'Do Not Display Station Image', 'radio-station' ), value: '0' },
 											/* { label: __( 'Display Custom Image', 'radio-station' ), value: 'custom' }, */
 										],
 										onChange: ( value ) => {
@@ -123,13 +123,36 @@
 								el( PanelRow, {},
 									el( ToggleControl, {
 										label: __( 'Use as Default Player', 'radio-station' ),
-										help: __( 'Use this player as the player on this page?', 'radio-station' ),
+										help: __( 'Make this the default player on this page.', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { default: value } );
 										},
 										checked: atts.default,
 									})
 								),
+								/* --- Popup Player Button --- */
+								/* el( PanelRow, {},
+									( ( atts.pro ) && 
+										el( SelectControl, {
+											label: __( 'Popup Player', 'radio-station' ),
+											help: __( 'Enables button to open Player in separate window.', 'radio-station' ),
+											options : [
+												{ label: __( 'Plugin Setting', 'radio-station' ), value: 'default' },
+												{ label: __( 'On', 'radio-station' ), value: 'on' },
+												{ label: __( 'Off', 'radio-station' ), value: 'off' },
+											],
+											onChange: ( value ) => {
+												props.setAttributes( { popup: value } );
+											},
+											value: atts.popup
+										})
+									), ( ( !atts.pro ) &&
+										el( BaseControl, {
+											label: __( 'Popup Player', 'radio-station' ),
+											help: __( 'Popup Player Button available in Pro.', 'radio-station' ),
+										})
+									)
+								), */
 							),
 
 							/* === Player Styles === */

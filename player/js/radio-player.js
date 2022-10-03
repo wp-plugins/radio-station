@@ -461,7 +461,7 @@ function radio_player_volume_slider(instance, volume) {
 		sliderbg.hide(); /* .css('border','inherit'); */
 		slider.val(volume); swidth = slider.width();
 		thumb.show(); twidth = thumb.width(); thumb.hide();
-		bgwidth = (swidth - (twidth / 2)) * (volume / 100);
+		bgwidth = (swidth - (twidth / 2)) * (volume / 100) * 0.98;
 		sliderbg.attr('style', 'width: '+bgwidth+'px !important;').show(); /*  border:inherit; */
 		if (radio_player.debug) {newwidth = parseInt(sliderbg.css('width')); console.log('Volume Slider: '+swidth+' : '+twidth+' : '+bgwidth+' : '+newwidth);}
 		if (volume == 100) {container.addClass('maxed');} else {container.removeClass('maxed');}

@@ -642,7 +642,7 @@ class radio_station_schedule_engine {
 				// 2.3.3.9: loop to allow for multiple overrides
 				foreach ( $override_shifts as $j => $data ) {
 
-					// echo '<span style="display:none;">Shift Data: ' . print_r( $override, true ) . '</span>';
+					echo '<span style="display:none;">Override Data: ' . print_r( $data, true ) . '</span>' . "\n";
 
 					// 2.3.3.9: ignore disabled overrides
 					if ( !isset( $data['disabled'] ) || ( 'yes' != $data['disabled'] ) ) {
@@ -2045,7 +2045,7 @@ class radio_station_schedule_engine {
 	// Shift Checker
 	// -------------
 	// (checks shift being saved against other shows)
-	public function check_shift( $record_id, $shift, $scope = 'all', $all_shifts, $times = false ) {
+	public function check_shift( $record_id, $shift, $scope, $all_shifts, $times = false ) {
 
 		// --- set channel and context ---
 		$channel = $this->channel;
@@ -3242,7 +3242,7 @@ class radio_station_schedule_engine {
 			if ( ( $weekday == $day ) || ( $weekday == $abbr ) ) {
 				if ( ( !$short && !is_null( $short ) ) || ( is_null( $short ) && ( $weekday == $day ) ) ) {
 					$weekday = $wp_locale->get_weekday( $i );
-				} elseif ( $short || ( is_null( $short ) && ( weekday == $abbr ) ) ) {
+				} elseif ( $short || ( is_null( $short ) && ( $weekday == $abbr ) ) ) {
 					$weekday = $wp_locale->get_weekday_abbrev( $wp_locale->get_weekday( $i ) );
 				}
 			}

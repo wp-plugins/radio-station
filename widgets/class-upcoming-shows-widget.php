@@ -50,6 +50,10 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		$link_djs = isset( $instance['link_djs'] ) ? $instance['link_djs'] : '';
 		$show_encore = isset( $instance['show_encore'] ) ? $instance['show_encore'] : true;
 
+		// --- get upgrade URLs ---
+		$pricing_url = add_query_arg( 'page', 'radio-station-pricing', admin_url( 'admin.php' ) );
+		$upgrade_url = radio_station_get_upgrade_url();
+
 		// --- set image size options ---
 		$image_sizes = radio_station_get_image_sizes();
 		$image_size_options = '';
@@ -94,12 +98,10 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		</p>';
 
 		// --- [Pro] Dynamic Reloading ---
-		$pricing_url = add_query_arg( 'page', 'radio-station-pricing', admin_url( 'admin.php' ) );
-		$upgrade_url = radio_station_get_upgrade_url();
 		$fields['dynamic'] = '<p>
 			<label for="dynamic">' . esc_html( __( 'Show changeover reloading available in Pro.', 'radio-station' ) ) . '</label><br>
-			<a href="' . esc_url( $pricing_url ) . '">' . esc_html( __( 'Upgrade to Pro', 'radio-station' ) ) . '</a> |
-			<a href="' . esc_url( $upgrade_url ) . '" target="_blank">' . esc_html( __( 'More Details', 'radio-station' ) ) . '</a>
+			<a href="' . esc_url( $upgrade_url ) . '">' . esc_html( __( 'Upgrade to Pro', 'radio-station' ) ) . '</a> |
+			<a href="' . esc_url( $pricing_url ) . '" target="_blank">' . esc_html( __( 'More Details', 'radio-station' ) ) . '</a>
 		</p>';
 
 		// --- No Shows Text ---
@@ -122,7 +124,7 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		// === Show Display Options ===
 		
 		// --- Link to Show ---
-		$fields['show_link'] - '<p>
+		$fields['show_link'] = '<p>
 			<label for="' . esc_attr( $this->get_field_id( 'link' ) ) . '">
 			<input id="' . esc_attr( $this->get_field_id( 'link' ) ) . '" name="' . esc_attr( $this->get_field_name( 'link' ) ) . '" type="checkbox"' . checked( $link, true, false ) . '/>
 				' . esc_html( __( 'Link Show title to  Show page.', 'radio-station' ) ) . '

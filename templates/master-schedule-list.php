@@ -73,10 +73,13 @@ $infokeys = array( 'avatar', 'title', 'hosts', 'times', 'encore', 'file', 'genre
 $infokeys = apply_filters( 'radio_station_schedule_list_info_order', $infokeys );
 
 // --- start list schedule output ---
-$list = '<ul id="master-list" class="master-list">' . "\n";
+// 2.5.0: append instance to element ID
+$list = '<ul id="master-list-' . esc_attr( $instance ) . '" class="master-list">' . "\n";
 
 $tcount = 0;
 // 2.3.0: loop weekdays instead of legacy master list
+// 2.5.0: set odd/even variable
+$oddeven = 'even';
 foreach ( $weekdays as $weekday ) {
 
 	// --- maybe skip all days but those specified ---
@@ -139,8 +142,11 @@ foreach ( $weekdays as $weekday ) {
 			$date_subheading .= ' ' . radio_station_translate_month( $month, true );
 		}
 
-		// 2.3.2: add classes
+		// 2.3.2: add classes to day
+		// 2.5.0: add odd/even class day
 		$classes = array( 'master-list-day' );
+		$oddeven = ( 'even' == $oddeven ) ? 'odd' : 'even';
+		$classes[] = $oddeven . '-day';
 		$weekdate = $weekdates[$weekday];
 		if ( $weekdate == $date ) {
 			$classes[] = 'current-day';
@@ -237,7 +243,9 @@ foreach ( $weekdays as $weekday ) {
 				$terms = wp_get_post_terms( $show_id, RADIO_STATION_GENRES_SLUG, array() );
 				if ( $terms && ( count( $terms ) > 0 ) ) {
 					foreach ( $terms as $term ) {
-						$classes[] = strtolower( $term->slug );
+						// 2.5.0: add genre- prefix to genre terms
+						// $classes[] = strtolower( $term->slug );
+						$classes[] = 'genre-' . strtolower( $term->slug );
 					}
 				}
 				// 2.3.2: check for now playing shift
