@@ -642,7 +642,9 @@ class radio_station_schedule_engine {
 				// 2.3.3.9: loop to allow for multiple overrides
 				foreach ( $override_shifts as $j => $data ) {
 
-					echo '<span style="display:none;">Override Data: ' . print_r( $data, true ) . '</span>' . "\n";
+					if ( $this->debug ) {
+						echo '<span style="display:none;">Override Data: ' . print_r( $data, true ) . '</span>' . "\n";
+					}
 
 					// 2.3.3.9: ignore disabled overrides
 					if ( !isset( $data['disabled'] ) || ( 'yes' != $data['disabled'] ) ) {

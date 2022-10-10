@@ -2744,12 +2744,19 @@ function radio_station_current_show() {
 	if ( isset( $atts['instance'] ) ) {
 
 		// --- send to parent window ---
-		$js .= "widget = document.getElementById('widget-contents').innerHTML;" . PHP_EOL;
+		$js .= "widget = document.getElementById('widget-contents').innerHTML;" . "\n";
 		$js .= "parent.document.getElementById('rs-current-show-" . esc_js( $atts['instance'] ) . "').innerHTML = widget;" . PHP_EOL;
 
 		// --- maybe restart countdowns ---
 		if ( $atts['countdown'] ) {
-			$js .= "setTimeout(function() {parent.radio_countdown();}, 2000);" . PHP_EOL;
+			// 2.5.0: replace timeout with interval and function check
+			// $js .= "setTimeout(function() {parent.radio_countdown();}, 2000);" . "\n";
+			$js .= "countdown = setInterval(function() {" . "\n";
+				$js .= "if (typeof parent.radio_countdown == 'function') {" . "\n";
+					$js .= "parent.radio_countdown();" . "\n";
+					$js .= "clearInterval(countdown);" . "\n";
+				$js .= "}" . "\n";
+			$js .= "}, 1000);" . "\n";
 		}
 
 	}
@@ -3402,7 +3409,14 @@ function radio_station_upcoming_shows() {
 
 		// --- restart countdowns ---
 		if ( $atts['countdown'] ) {
-			$js .= "setTimeout(function() {parent.radio_countdown();}, 2000);" . "\n";
+			// 2.5.0: replace timeout with interval and function check
+			// $js .= "setTimeout(function() {parent.radio_countdown();}, 2000);" . "\n";
+			$js .= "countdown = setInterval(function() {" . "\n";
+				$js .= "if (typeof parent.radio_countdown == 'function') {" . "\n";
+					$js .= "parent.radio_countdown();" . "\n";
+					$js .= "clearInterval(countdown);" . "\n";
+				$js .= "}" . "\n";
+			$js .= "}, 1000);" . "\n";
 		}
 
 	}
@@ -3902,7 +3916,14 @@ function radio_station_current_playlist() {
 
 		// --- restart countdowns ---
 		if ( $atts['countdown'] ) {
-			$js .= "setTimeout(function() {parent.radio_countdown();}, 2000);" . "\n";
+			// 2.5.0: replace timeout with interval and function check
+			// $js .= "setTimeout(function() {parent.radio_countdown();}, 2000);" . "\n";
+			$js .= "countdown = setInterval(function() {" . "\n";
+				$js .= "if (typeof parent.radio_countdown == 'function') {" . "\n";
+					$js .= "parent.radio_countdown();" . "\n";
+					$js .= "clearInterval(countdown);" . "\n";
+				$js .= "}" . "\n";
+			$js .= "}, 1000);" . "\n";
 		}
 
 	}

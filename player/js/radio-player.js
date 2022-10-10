@@ -153,6 +153,7 @@ function radio_player_load_audio(script, instance, data, start) {
 	radio_player_set_data_state(script, instance, data, start);
 	loaded = radio_player_check_script(script);
 	if (loaded) {
+		if (radio_player.delayed_player) {clearInterval(radio_player.delayed_player);}
 		/* initialize the player if script is already loaded */
 		if (script == 'amplitude') {player =  radio_player_amplitude(instance, url, format, fallback, fformat);}
 		else if (script == 'jplayer') {player = radio_player_jplayer(instance, url, format, fallback, fformat);}
