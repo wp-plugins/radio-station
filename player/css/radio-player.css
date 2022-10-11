@@ -229,7 +229,7 @@
 	opacity: 1;
 }
 
-.rp-volume-controls button, .rp-popup button {
+.radio-container .rp-volume-controls button, .radio-container .rp-popup button {
 	overflow: hidden;
 	text-indent: -9999px;
 	border: none;
@@ -241,7 +241,7 @@
 	margin-top: -12px;
 }
 
-.rp-volume-controls button:hover, .rp-volume-controls button:focus {
+.radio-container .rp-volume-controls button:hover, .radio-container .rp-volume-controls button:focus {
 	opacity: 1;
 }
 
@@ -257,16 +257,18 @@
 	border-radius: 1px;
 }
 
-button.rp-mute, button.rp-volume-max, button.rp-volume-down, button.rp-volume-up, button.rp-popup-button,
-button.rp-mute:hover, button.rp-volume-max:hover, button.rp-volume-down:hover, button.rp-volume-up:hover, button.rp-popup-button:hover,
-button.rp-mute:focus, button.rp-volume-max:focus, button.rp-volume-down:focus, button.rp-volume-up:focus, button.rp-popup-button:focus {
+.rp-volume-controls button.rp-mute, .rp-volume-controls button.rp-mute:hover, .rp-volume-controls button.rp-mute:focus,
+.rp-volume-controls button.rp-volume-down, .rp-volume-controls button.rp-volume-down:hover, .rp-volume-controls button.rp-volume-down:focus,
+.rp-volume-controls button.rp-volume-up, .rp-volume-controls button.rp-volume-up:hover, .rp-volume-controls button.rp-volume-up:focus,
+.rp-volume-controls button.rp-volume-max, .rp-volume-controls button.rp-volume-max:hover, .rp-volume-controls button.rp-volume-max:focus,
+.rp-popup button.rp-popup-button, .rp-popup button.rp-popup-button:hover, .rp-popup button.rp-popup-button:focus {
 	width: 18px; height: 18px; padding: 0; margin: 0; background-size: 36px; background-repeat: no-repeat;
 }
 
-.light .rp-mute, .light .rp-volume-max, .light .rp-volume-up, .light .rp-volume-down, .light .rp-popup-button {
+.light button.rp-mute, .light button.rp-volume-max, .light button.rp-volume-up, .light button.rp-volume-down, button.light button.rp-popup-button {
 	background-image: url("../images/volume-controls-light.png?v=1");
 }
-.dark .rp-mute, .dark .rp-volume-max, .dark .rp-volume-up, .dark .rp-volume-down, .dark .rp-popup-button {
+.dark button.rp-mute, .dark button.rp-volume-max, .dark button.rp-volume-up, .dark button.rp-volume-down, .dark button.rp-popup-button {
 	background-image: url("../images/volume-controls-dark.png?v=1");
 }
 
