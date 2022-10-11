@@ -8,9 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### 2.5.0
-* Added: Wordpress Radio Blocks (converted Widgets)
-* Updated: Plugin Panel (1.2.6)
+* Added: Radio Station Blocks! (converted Widgets)
+* Updated: Freemius SDK (2.4.5)
+* Updated: Plugin Panel (1.2.7)
 * Updated: Moment JS (2.29.4) with WP Loading
+* Changed: Tab Schedule default date display on
 * Improved: Refactored Schedule Engine Class (1.0.0)
 * Improved: Standardized Widget Input Fields
 * Improved: WordPress Coding Standards
