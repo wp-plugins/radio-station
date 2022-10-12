@@ -1162,6 +1162,10 @@ function radio_station_player_core_scripts() {
 		}
 		$radio_player['enqueued_player'] = true;
 	}
+
+	// 2.5.0: added do action for player scripts
+	do_action( 'radio_station_player_enqueued_scripts' );
+
 }
 
 // ---------------------

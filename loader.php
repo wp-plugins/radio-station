@@ -742,21 +742,30 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						if ( !is_null( $posted ) ) {
 							$posted = str_replace( ' ', '', $posted );
 							$values = array();
-							sscanf( $color, 'rgba(%d,%d,%d,%f)', $values['red'], $values['green'], $values['blue'], $alpha );
-							foreach ( $values as $key => $value ) {
-								$value = absint( $value );
-								if ( $value < 0 ) {
-									$values[$key] = 0;
-								} elseif ( $value > 255 ) {
-									$values[$key] = 255;
+							// 1.2.7: fix color variable to posted
+							// 1.2.7: make alpha a value key not separate
+							sscanf( $posted, 'rgba(%d,%d,%d,%f)', $values['red'], $values['green'], $values['blue'], $values['alpha'] );
+							// echo 'rgba sscanf values: ' . print_r( $values, true ) . "\n";
+							// 1.2.7: fix for use of duplicate key variable
+							foreach ( $values as $k => $v ) {
+								if ( 'alpha' != $k ) {
+									// --- sanitize rgb values ---
+									$v = absint( $v );
+									if ( $v < 0 ) {
+										$values[$k] = 0;
+									} elseif ( $v > 255 ) {
+										$values[$k] = 255;
+									}
+								} else {
+									// --- sanitize alpha value ---
+									if ( $v < 0 ) {
+										$values['alpha'] = 0;
+									} elseif ( $v > 1 ) {
+										$values['alpha'] = 1;
+									}
 								}
 							}
-							if ( $alpha < 0 ) {
-								$alpha = 0;
-							} elseif ( $alpha > 1 ) {
-								$alpha = 1;
-							}
-							$posted = 'rgba(' . $values['red'] . ',' . $values['green'] . ',' . $values['blue'] . ',' . $alpha . ')';
+							$posted = 'rgba(' . $values['red'] . ',' . $values['green'] . ',' . $values['blue'] . ',' . $values['alpha'] . ')';
 						}
 						$settings[$key] = $posted;
 
@@ -3447,6 +3456,7 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // =========
 
 // == 1.2.7 ==
+// - fix color picker alpha sanitization / saving
 // - added color picker dropdown overlay styling
 // - added pointer cursor style to inactive tab
 
