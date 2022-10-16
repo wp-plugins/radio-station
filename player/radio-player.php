@@ -263,6 +263,10 @@ function radio_station_player_output( $args = array(), $echo = false ) {
 	$classes[] = $args['layout'];
 	$classes[] = $args['theme'];
 	$classes[] = $args['buttons'];
+
+	// TODO: check volume controls display settings
+	// $classes[] = 'no-volume-controls';
+	
 	// 2.5.0: added filter for radio container class
 	if ( function_exists( 'apply_filters' ) ) {
 		$classes = apply_filters( 'radio_station_player_container_classes', $classes, $args, $instance );
@@ -320,9 +324,10 @@ function radio_station_player_output( $args = array(), $echo = false ) {
 			$frequency_display = apply_filters( 'radio_player_frequency_display', $frequency_display, $args, $instance );
 			$station_text_html .= '<div class="rp-station-frequency"></div>' . "\n";
 
+			// 2.5.0: fix to mismatched location variable and class
 			$location_display = isset( $args['location'] ) ? $args['location'] : '';
-			$frequency_display = apply_filters( 'radio_player_location_display', $location_display, $args, $instance );
-			$station_text_html .= '<div class="rp-station-frequency"></div>' . "\n";
+			$location_display = apply_filters( 'radio_player_location_display', $location_display, $args, $instance );
+			$station_text_html .= '<div class="rp-station-location"></div>' . "\n";
 			
 			$html['station'] .= $station_text_html;
 
@@ -397,25 +402,25 @@ function radio_station_player_output( $args = array(), $echo = false ) {
 		$html['show'] .= $show_text_html;
 	$html['show'] .= '	</div>' . "\n";
 
-	// --- Progress Bar ---
+	// --- Playback Progress Bar ---
 	// (for files - not implemented yet)
-	/* $html['progress'] = '<div class="rp-progress">';
-	$html['progress'] .= '	<div class="rp-seek-bar">';
-	$html['progress'] .= '		<div class="rp-play-bar"></div>';
-	$html['progress'] .= '	</div>';
-	$html['progress'] .= '</div>';
-	$html['progress'] .= '<div class="rp-current-time" role="timer" aria-label="time">&nbsp;</div>' . PHP_EOL;
-	$html['progress'] .= '<div class="rp-duration" role="timer" aria-label="duration">&nbsp;</div>' . PHP_EOL;
-	$html['progress'] .= '<div class="rp-toggles">';
-	$html['progress'] .= '	<button class="rp-repeat" role="button" tabindex="0">Repeat</button>';
-	$html['progress'] .= '	<button class="rp-shuffle" role="button" tabindex="0">Shuffle</button>';
-	$html['progress'] .= '</div>' . PHP_EOL; */
+	/* $html['progress'] = '<div class="rp-progress">' . "\n";
+		$html['progress'] .= '<div class="rp-seek-bar">' . "\n";
+			$html['progress'] .= '<div class="rp-play-bar"></div>' . "\n";
+		$html['progress'] .= '</div>' . "\n";
+	$html['progress'] .= '</div>' . "\n";
+	$html['progress'] .= '<div class="rp-current-time" role="timer" aria-label="time">&nbsp;</div>' . "\n";
+	$html['progress'] .= '<div class="rp-duration" role="timer" aria-label="duration">&nbsp;</div>' . "\n";
+	$html['progress'] .= '<div class="rp-toggles">' . "\n";
+	$html['progress'] .= '	<button class="rp-repeat" role="button" tabindex="0">Repeat</button>' . "\n";
+	$html['progress'] .= '	<button class="rp-shuffle" role="button" tabindex="0">Shuffle</button>' . "\n";
+	$html['progress'] .= '</div>' . "\n"; */
 
 	// --- no solution section ---
-	// $html['no-solution'] = '<div class="rp-no-solution">' . PHP_EOL;
-	// $html['no-solution'] .= '<span>' . esc_html( __( 'Update Required' ) ) . '</span>' . PHP_EOL;
-	// $html['no-solution'] .= 'To play the media you will need to either update your browser to a recent version or update your <a href="https://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.' . PHP_EOL;
-	// $html['no-solution'] .= '</div>' . PHP_EOL;
+	// $html['no-solution'] = '<div class="rp-no-solution">' . "\n";
+	// $html['no-solution'] .= '<span>' . esc_html( __( 'Update Required' ) ) . '</span>' . "\n";
+	// $html['no-solution'] .= 'To play the media you will need to either update your browser to a recent version or update your <a href="https://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.' . "\n";
+	// $html['no-solution'] .= '</div>' . "\n";
 
 	// --- Current Track ---
 	$html['track'] = '<div class="rp-now-playing">' . "\n";

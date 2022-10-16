@@ -886,7 +886,7 @@ function radio_station_master_schedule_genre_selector( $instances ) {
 // Table View Javascript
 // ---------------------
 // 2.3.0: added for table responsiveness
-// TODO: use traversals with instance IDs
+// 2.5,0: use DOM traversals with jQuery and classes
 function radio_station_master_schedule_table_js() {
 
 	// 2.3.2: added current show highlighting cycle
@@ -940,7 +940,7 @@ function radio_station_master_schedule_table_js() {
 				else {jQuery(this).removeClass('current-hour');}
 			});
 			for (i = 0; i < 7; i++) {
-				jQuery(this).find('.master-program-schedule .day-'+i).each(function() {
+				jQuery(this).find('.day-'+i).each(function() {
 					var radio_table_shift = false;
 					jQuery(this).find('.master-show-entry').each(function() {
 						start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
@@ -1183,7 +1183,7 @@ function radio_station_master_schedule_tabs_js() {
 			});
 			radio_tabs_active_tab(false,scheduleid); /* fallback */
 			var radio_tabs_split = false;
-			jQuery(this).find('.master-schedule-tabs-show').each(function() {
+			jQuery(this).parent().find('.master-schedule-tabs-show').each(function() {
 				start = parseInt(jQuery(this).find('.rs-start-time').attr('data'));
 				end = parseInt(jQuery(this).find('.rs-end-time').attr('data'));
 				if (radio.debug) {console.log(start+' - '+end);}
@@ -1204,7 +1204,7 @@ function radio_station_master_schedule_tabs_js() {
 				}
 			});
 			if (radio_tabs_split) {
-				jQuery(this).find('.'+radio_tabs_split).removeClass('before-current').removeClass('after-current').addClass('nowplaying');
+				jQuery(this).parent().find('.'+radio_tabs_split).removeClass('before-current').removeClass('after-current').addClass('nowplaying');
 			}
 		});
 	}

@@ -946,7 +946,9 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 					return $output;
 				}
 				if ( 1 == count( $shifts ) ) {
-					$shift = $shifts[0];
+					// 2.5.0: fix to get first item (not via index key 0)
+					$first_key = array_keys( $shifts )[0];
+					$shift = $shifts[$first_key];
 					$shift_start = $shift['day'] . ' ' . $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
 					// 2.3.3.9: fix to put addition outside bracket
 					// 2.5.0: fix to use to_time not get_time!
@@ -1023,6 +1025,12 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 
 		// --- generate adjacent Show link ---
 		if ( isset( $show ) ) {
+
+			// 2.5.0: fix to maybe get show key data
+			if ( isset( $show['show'] ) ) {
+				$show = $show['show'];
+			}
+			
 			if ( 'next' == $adjacent ) {
 				$rel = 'next';
 			} elseif ( 'previous' == $adjacent ) {
@@ -1030,20 +1038,23 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 			}
 			$adjacent_post = get_post( $show['id'] );
 
-			// --- adjacent post title ---
-			// 2.4.0.3: added fix for missing post title
-			$post_title = $adjacent_post->post_title;
-			// if ( empty( $adjacent_post->post_title ) ) {
-			// 	$post_title = $title;
-			// }
-			$post_title = apply_filters( 'the_title', $post_title, $adjacent_post->ID );
+			// 2.5.0: added check for valid post
+			if ( $adjacent_post ) {
+				// --- adjacent post title ---
+				// 2.4.0.3: added fix for missing post title
+				$post_title = $adjacent_post->post_title;
+				// if ( empty( $adjacent_post->post_title ) ) {
+				// 	$post_title = $title;
+				// }
+				$post_title = apply_filters( 'the_title', $post_title, $adjacent_post->ID );
 
-			$date = mysql2date( get_option( 'date_format' ), $adjacent_post->post_date );
-			$string = '<a href="' . esc_url( get_permalink( $adjacent_post ) ) . '" rel="' . esc_attr( $rel ) . '" title="' . $post_title . '">';
-			$inlink = str_replace( '%title', $post_title, $link );
-			$inlink = str_replace( '%date', $date, $inlink );
-			$inlink = $string . $inlink . '</a>';
-			$output = str_replace( '%link', $inlink, $format );
+				$date = mysql2date( get_option( 'date_format' ), $adjacent_post->post_date );
+				$string = '<a href="' . esc_url( get_permalink( $adjacent_post ) ) . '" rel="' . esc_attr( $rel ) . '" title="' . $post_title . '">';
+				$inlink = str_replace( '%title', $post_title, $link );
+				$inlink = str_replace( '%date', $date, $inlink );
+				$inlink = $string . $inlink . '</a>';
+				$output = str_replace( '%link', $inlink, $format );
+			}
 		}
 
 		return $output;

@@ -1,11 +1,11 @@
 /*
- * Radio Player Skin
- * https://netmix.com/radio-player/
+ * === Radio Stream Player Skin ===
+ * https://radiostation.pro/stream-player/
  *
  * Author: Tony Hayes
- * Skin Version: 1.0.0 (Radio Player 1.0.0)
+ * Skin Version: 1.0.1 (Stream Player 2.5.0)
  *
- * Based on Blue Monday Skin for jPlayer 2.9.2 ~ (c) 2009-2014 Happyworm Ltd ~ MIT License
+ * originally based on Blue Monday Skin for jPlayer 2.9.2 ~ (c) 2009-2014 Happyworm Ltd ~ MIT License
 */
 
 .rp-player {
@@ -38,7 +38,7 @@
 .rp-interface {
 	position: relative;
 	background-color: transparent;
-	width: 36%;
+	width: 35%;
 }
 
 .rp-station-info, .rp-interface, .rp-volume-controls, .rp-controls-holder , .rp-script-switcher, .rp-show-info {
@@ -162,27 +162,27 @@
 	background-image: url("../images/play-dark-square.png?v=2");
 }
 
-.radio-container.paused.light.circular .rp-play-pause-button {
+.radio-container.playing.light.circular .rp-play-pause-button {
 	background-image: url("../images/pause-light-circular.png?v=2");
 }
 
-.radio-container.paused.light.rounded .rp-play-pause-button {
+.radio-container.playing.light.rounded .rp-play-pause-button {
 	background-image: url("../images/pause-light-rounded.png?v=2");
 }
 
-.radio-container.paused.light.square .rp-play-pause-button {
+.radio-container.playing.light.square .rp-play-pause-button {
 	background-image: url("../images/pause-light-square.png?v=2");
 }
 
-.radio-container.paused.dark.circular .rp-play-pause-button {
+.radio-container.playing.dark.circular .rp-play-pause-button {
 	background-image: url("../images/pause-dark-circular.png?v=2");
 }
 
-.radio-container.paused.dark.rounded .rp-play-pause-button {
+.radio-container.playing.dark.rounded .rp-play-pause-button {
 	background-image: url("../images/pause-dark-rounded.png?v=2");
 }
 
-.radio-container.paused.dark.square .rp-play-pause-button {
+.radio-container.playing.dark.square .rp-play-pause-button {
 	background-image: url("../images/pause-dark-square.png?v=2");
 }
 

@@ -1773,7 +1773,7 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 		} else {
 
 			// 2.5.0: fix to maybe get post object
-			if ( !is_a( $post, 'WP_Post' ) ) {
+			if ( is_object( $post ) && !is_a( $post, 'WP_Post' ) ) {
 				$post = get_post( $post, ARRAY_A );
 			}
 

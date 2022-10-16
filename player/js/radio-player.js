@@ -506,6 +506,7 @@ function radio_player_default_instance() {
 	jQuery('.radio-player').each(function() {
 		if (!instance && jQuery(this).hasClass('default-player')) {
 			instance = parseInt(jQuery(this).attr('id').replace('radio_player_', ''));
+			return instance;
 		}
 	});
 	return instance;
@@ -813,7 +814,14 @@ jQuery(document).ready(function() {
 
 	/* --- hide all volume controls if no support (iOS) --- */
 	novolumesupport = radio_player_volume_test();
-	if (novolumesupport) {jQuery('.rp-volume-controls').hide(); jQuery('.rp-play-pause-button-bg').css('margin-right','0');}
+	if (novolumesupport) {
+		jQuery('.rp-volume-controls').each(function() {
+			jQuery(this).hide();
+			container = jQuery(this).closest('.radio-container');
+			container.addClass('no-volume-controls');
+			container.find('.rp-play-pause-button-bg').css('margin-right','0');
+		}
+	}
 
 	/* --- bind pause/play button clicks --- */
 	jQuery('.rp-play-pause-button').on('click', function() {
