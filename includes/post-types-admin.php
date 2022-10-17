@@ -5878,7 +5878,8 @@ function radio_station_playlist_admin_list_styles() {
 	// --- enqueue script inline ---
 	// 2.3.0: enqueue instead of echo
 	// 2.3.3.9: filter playlist list script
-	$js = apply_filters( 'radio_station_playlist_list_script', $css );
+	// 2.5.0: fix incorrect variable to filter (css)
+	$js = apply_filters( 'radio_station_playlist_list_script', $js );
 	wp_add_inline_script( 'radio-station-admin', $js );
 }
 
