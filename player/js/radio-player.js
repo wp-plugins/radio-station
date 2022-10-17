@@ -820,7 +820,7 @@ jQuery(document).ready(function() {
 			container = jQuery(this).closest('.radio-container');
 			container.addClass('no-volume-controls');
 			container.find('.rp-play-pause-button-bg').css('margin-right','0');
-		}
+		});
 	}
 
 	/* --- bind pause/play button clicks --- */
