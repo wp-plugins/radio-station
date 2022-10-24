@@ -69,7 +69,6 @@
 	display: block;
 	width: 100%;
 	vertical-align: top;
-	text-align: left;
 }
 
 .rp-controls, .rp-volume-controls, .rp-popup, .rp-script-switcher {
@@ -265,7 +264,7 @@
 	width: 18px; height: 18px; padding: 0; margin: 0; background-size: 36px; background-repeat: no-repeat;
 }
 
-.light button.rp-mute, .light button.rp-volume-max, .light button.rp-volume-up, .light button.rp-volume-down, button.light button.rp-popup-button {
+.light button.rp-mute, .light button.rp-volume-max, .light button.rp-volume-up, .light button.rp-volume-down, .light button.rp-popup-button {
 	background-image: url("../images/volume-controls-light.png?v=1");
 }
 .dark button.rp-mute, .dark button.rp-volume-max, .dark button.rp-volume-up, .dark button.rp-volume-down, .dark button.rp-popup-button {

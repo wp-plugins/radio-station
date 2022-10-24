@@ -365,20 +365,21 @@
 	display: inline-block;
 	margin: 0;
 	padding: 0 10px;
-	font-size: 2em;
-	line-height: 1em;
+	font-size: 50px;
+	line-height: 35px;
 	vertical-align: top;
 	cursor: pointer;
 }
 
 .master-schedule-tabs-loader .master-schedule-tabs-arrow {
-	width: 1em;
+	width: 50px;
 	text-align: center;
+	padding-bottom: 15px;
 }
 
 .master-schedule-tabs-loader .master-schedule-tabs-arrow:hover {
 	background-color: rgba(128,128,128,0.5);
-	border-radius: 1em;
+	border-radius: 25px;
 }
 
 .master-schedule-tabs .master-schedule-tabs-day {

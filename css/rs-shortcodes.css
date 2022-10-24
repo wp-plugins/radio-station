@@ -190,6 +190,7 @@
 
 ul.current-show-list, ul.current-show-list li, ul.upcoming-shows-list, ul.upcoming-shows-list li {
     list-style: none;
+	padding-left: 0;
 }
 
 .current-show-avatar, .upcoming-show-avatar, .on-air-dj-avatar {

@@ -744,7 +744,13 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 							$values = array();
 							// 1.2.7: fix color variable to posted
 							// 1.2.7: make alpha a value key not separate
-							sscanf( $posted, 'rgba(%d,%d,%d,%f)', $values['red'], $values['green'], $values['blue'], $values['alpha'] );
+							// 1.2.7: check number of commas to see if alpha is set
+							$commas = substr_count( $posted, ',' );
+							if ( 3 == $commas ) {
+								sscanf( $posted, 'rgba(%d,%d,%d,%f)', $values['red'], $values['green'], $values['blue'], $values['alpha'] );
+							} elseif ( 2 == $commas ) {
+								sscanf( $posted, 'rgba(%d,%d,%d)', $values['red'], $values['green'], $values['blue'] );
+							}
 							// echo 'rgba sscanf values: ' . print_r( $values, true ) . "\n";
 							// 1.2.7: fix for use of duplicate key variable
 							foreach ( $values as $k => $v ) {
@@ -765,7 +771,11 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 									}
 								}
 							}
-							$posted = 'rgba(' . $values['red'] . ',' . $values['green'] . ',' . $values['blue'] . ',' . $values['alpha'] . ')';
+							if ( 3 == $commas ) {
+								$posted = 'rgba(' . $values['red'] . ',' . $values['green'] . ',' . $values['blue'] . ',' . $values['alpha'] . ')';
+							} elseif ( 2 == $commas ) {
+								$posted = 'rgba(' . $values['red'] . ',' . $values['green'] . ',' . $values['blue'] . ')';
+							}
 						}
 						$settings[$key] = $posted;
 
@@ -3457,6 +3467,7 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 
 // == 1.2.7 ==
 // - fix color picker alpha sanitization / saving
+// - allow color picker alpha to not include alpha
 // - added color picker dropdown overlay styling
 // - added pointer cursor style to inactive tab
 

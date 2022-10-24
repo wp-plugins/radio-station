@@ -1,8 +1,11 @@
 <?php
 
-// ===============================
-// === Radio Station Schedules ===
-// ===============================
+// =======================
+// === Schedule Engine ===
+// =======================
+// ==== Version 2.5.0 ====
+// =======================
+
 
 // - Set Scheduler Debug Mode
 // - Open Schedule Engine Class

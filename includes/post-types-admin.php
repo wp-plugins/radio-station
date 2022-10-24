@@ -60,6 +60,9 @@
 // - Add Playlist List Columns
 // - Playlist List Column Data
 // - Playlist List Column Styles
+// - Playlist List Column Scripts
+// - Playlist Quick Edit Fields
+// - Playlist Quick Edit Script
 // === Posts ===
 // - Add Related Shows Metabox
 // - Related Shows Metabox
@@ -1052,7 +1055,7 @@ function radio_station_shift_edit_script() {
 
 	// 2.3.3.6: store possible existing onbeforeunload function
 	// (to help prevent conflicts with other plugins using this event)
-	$js .= "var storedonbeforeunload = null; var onbeforeunloadset = false;" . "\n";
+	/* $js .= "var storedonbeforeunload = null; var onbeforeunloadset = false;" . "\n";
 	$js .= "function radio_check_shifts() {
 		if (jQuery('.show-shift.changed').length) {
 			if (!onbeforeunloadset) {
@@ -1066,7 +1069,32 @@ function radio_station_shift_edit_script() {
 				onbeforeunloadset = false;
 			}
 		}
+	}" . "\n"; */
+
+	// 2.5.0: replace window.onbeforeunload merhod with event listener
+	// ref: https://stackoverflow.com/a/58841521/5240159
+	$js .= "function radio_check_shifts() {
+		if (jQuery('.show-shift.changed').length) {
+			window.addEventListener('beforeunload', radio_onbeforeunload);
+		} else {
+			window.removeEventListener('beforeunload', radio_onbeforeunload);
+		}
 	}" . "\n";
+
+	// --- onbeforeunload event function ---
+	// (this display ~"do you want to leave this page?" dialogue)
+	$js .= "function radio_onbeforeunload(e) {
+		e.preventDefault();
+		e.returnValue = '';
+	}" . "\n";
+
+	// --- remove event listener on publish/update ---
+	// 2.5.0: added so publish/update does not trigger event
+	$js .= "jQuery(document).ready(function() {
+		jQuery('#publish').on('click', function() {
+			window.removeEventListener('beforeunload', radio_onbeforeunload);
+		}
+	}";
 
 	// --- add new shift ---
 	// 2.3.2: separate function for onclick
@@ -1662,22 +1690,24 @@ function radio_station_show_helper_box() {
 	echo '<p>' . "\n";
 		echo esc_html( __( 'The text field below is for your Show Description. It will display in the About section of your Show page.', 'radio-station' ) ) . "\n";
 		echo ' ' . esc_html( __( 'It is not recommended to include your past show content or archives in this area, as it will affect the Show page layout your visitors see.', 'radio-station' ) ) . "\n";
-		echo esc_html( __( "It may also impact SEO, as archived content won't have their own pages and thus their own SEO and Social meta rules.", 'radio-station' ) ) . '<br>' . "\n";
+		echo esc_html( __( "It may also impact SEO, as archived content won't have their own pages and thus their own SEO and Social meta rules.", 'radio-station' ) ) . "\n";
+	echo '</p>' . "\n";
+	echo '<p>' . "\n";
 		echo esc_html( __( 'We recommend using WordPress Posts to add new posts and assign them to your Show(s) using the Related Show metabox on the Post Edit screen so they display on the Show page.', 'radio-station' ) ) . "\n";
 		echo ' ' . esc_html( __( 'This way you can then assign them to a relevant Post Category for display on your site also.', 'radio-station' ) ) . "\n";
 	echo '</p>' . "\n";
 
-	// [Pro Blurb]
-	// TODO: upgrade to Pro for upcoming Show Episodes blurb
-	// echo '<br>' . esc_html( 'In future, Radio Station Pro will include an Episodes post type', 'radio-station' ) );
-	// TODO: change this text/link when Pro Episodes become available
-	// $upgrade_url = radio_station_get_upgrade_url();
-	// $pricing_url = radio_station_get_pricing_url();
-	// echo '<br><a href="' . esc_url( $upgrade_url ) . '">';
-	//	echo esc_html( __( 'Upgrade to Radio Station Pro.', 'radio-station' ) );
-	// echo '</a> | <a href="' . esc_url( $pricing_url ) . '" target="_blank">';
-	//	echo esc_html( __( 'Find out more.', 'radio-station' ) );
-	// echo '</a>';
+	// 2.5.0: activate upgrade to Pro blurb
+	$upgrade_url = radio_station_get_upgrade_url();
+	$pricing_url = radio_station_get_pricing_url();
+	$message = '<p>' . esc_html( __( 'Radio Station Pro includes an Episodes post type for adding past episodes.', 'radio-station' ) ) . "\n";
+	$message .= esc_html( __( 'These are then automatically listed on your Show page in an Episodes tab.', 'radio-station' ) ) . "\n";
+	$message .= ' <a href="' . esc_url( $upgrade_url ) . '">' . esc_html( __( 'Go Pro!', 'radio-station' ) ) . '</a>';
+	$message .= ' | <a href="' . esc_url( $pricing_url ) . '" target="_blank">' . esc_html( __( 'Find out more...', 'radio-station' ) ) . '</a>';
+	$message .= '</p>';
+	$message = apply_filters( 'radio_station_show_helper_episode_message', $message );
+	$allowed_html = radio_station_allowed_html( 'content', 'settings' );
+	echo wp_kses( $message, $allowed_html );
 
 }
 
@@ -1903,57 +1933,57 @@ function radio_station_show_images_save() {
 	global $post;
 
 	// --- sanitize posted values ---
-	if ( isset( $_GET['post_id'] ) ) {
-		$post_id = absint( $_GET['post_id'] );
-		if ( $post_id < 1 ) {
-			unset( $post_id );
-		}
-	}
-
 	// 2.3.3.6: get post for checking capability
-	$post = get_post( $post_id );
-	if ( !$post ) {
-		exit;
-	}
+	// 2.5.0: simplified sanitization and auth check logic
+	if ( isset( $_GET['post_id'] ) && ( absint( $_GET['post_id'] ) > 0 ) ) {
+		$post_id = absint( $_GET['post_id'] );
+		$post = get_post( $post_id );
+		if ( $post ) {
 
-	// --- check edit capability ---
-	if ( !current_user_can( 'edit_shows' ) ) {
-		exit;
-	}
+			// --- check edit capability ---
+			if ( !current_user_can( 'edit_shows' ) ) {
+				exit;
+			}
 
-	// --- verify nonce value ---
-	if ( !isset( $_GET['nonce'] ) || !wp_verify_nonce( $_GET['nonce'], 'show-images-autosave' ) ) {
-		exit;
-	}
+			// --- verify nonce value ---
+			if ( !isset( $_GET['nonce'] ) || !wp_verify_nonce( $_GET['nonce'], 'show-images-autosave' ) ) {
+				exit;
+			}
 
-	if ( isset( $_GET['image_id'] ) ) {
-		$image_id = absint( $_GET['image_id'] );
-		if ( $image_id < 1 ) {
-			unset( $image_id );
+			// --- refresh parent frame nonce ---
+			$images_save_nonce = wp_create_nonce( 'show-images-autosave' );
+			echo "<script>parent.document.getElementById('show-images-save-nonce').value = '" . esc_js( $images_save_nonce ) . "';</script>";
+
+			// --- get image ID ---
+			if ( isset( $_GET['image_id'] ) ) {
+				$image_id = absint( $_GET['image_id'] );
+				if ( $image_id < 1 ) {
+					unset( $image_id );
+				}
+			}
+
+			// --- get image type ---
+			if ( isset( $_GET['image_type'] ) ) {
+				if ( in_array( $_GET['image_type'], array( 'header', 'avatar' ) ) ) {
+					$image_type = $_GET['image_type'];
+				}
+			}
+
+			// --- update show avatar image ID ---
+			if ( isset( $image_id ) && isset( $image_type ) ) {
+				update_post_meta( $post_id, 'show_' . $image_type, $image_id );
+
+				// --- maybe add image updated flag ---
+				// (help prevent duplication on new posts)
+				$updated = get_post_meta( $post_id, '_rs_image_updated', true );
+				if ( !$updated ) {
+					add_post_meta( $post_id, '_rs_image_updated', true );
+				}
+
+			}
 		}
 	}
-	if ( isset( $_GET['image_type'] ) ) {
-		if ( in_array( $_GET['image_type'], array( 'header', 'avatar' ) ) ) {
-			$image_type = $_GET['image_type'];
-		}
-	}
 
-	if ( isset( $post_id ) && isset( $image_id ) && isset( $image_type ) ) {
-		update_post_meta( $post_id, 'show_' . $image_type, $image_id );
-	} else {
-		exit;
-	}
-
-	// --- add image updated flag ---
-	// (help prevent duplication on new posts)
-	$updated = get_post_meta( $post_id, '_rs_image_updated', true );
-	if ( !$updated ) {
-		add_post_meta( $post_id, '_rs_image_updated', true );
-	}
-
-	// --- refresh parent frame nonce ---
-	$images_save_nonce = wp_create_nonce( 'show-images-autosave' );
-	echo "<script>parent.document.getElementById('show-images-save-nonce').value = '" . esc_js( $images_save_nonce ) . "';</script>";
 	exit;
 }
 
@@ -5546,24 +5576,18 @@ function radio_station_playlist_show_metabox() {
 		'post_status' => array( 'publish', 'draft' )
 	);
 	$shows = get_posts( $args );
-	if ( count( $shows ) > 0 ) {
-		$have_shows = true;
-	} else {
-		$have_shows = false;
-	}
+	$have_shows = ( count( $shows ) > 0 ) ? true : false;
 
 	// --- maybe restrict show selection to user-assigned shows ---
 	// 2.2.8: remove strict argument from in_array checking
 	// 2.3.0: added check for new Show Editor role
 	// 2.3.0: added check for edit_others_shows capability
-	if ( !in_array( 'administrator', $user->roles )
-			&& !in_array( 'show-editor', $user->roles )
-			&& !current_user_can( 'edit_others_shows' ) ) {
+	if ( !in_array( 'administrator', $user->roles )	&& !in_array( 'show-editor', $user->roles )	&& !current_user_can( 'edit_others_shows' ) ) {
 
 		// --- get the user lists for all shows ---
+		// 2.5.0: shorten query to one line
 		$allowed_shows = array();
-		$query = "SELECT pm.meta_value, pm.post_id FROM " . $wpdb->prefix . "postmeta pm";
-		$query .= " WHERE pm.meta_key = 'show_user_list'";
+		$query = "SELECT meta_value, post_id FROM " . $wpdb->prefix . "postmeta WHERE meta_key = 'show_user_list'";
 		$show_user_lists = $wpdb->get_results( $query );
 
 		// ---- check each list for the current user ---
@@ -5601,26 +5625,163 @@ function radio_station_playlist_show_metabox() {
 
 	// 2.3.3.9: move meta_inner ID to class
 	echo '<div class="meta_inner">' . "\n";
+	
+	$metabox = '';
 	if ( !$have_shows ) {
-		echo esc_html( __( 'No Shows were found.', 'radio-station' ) ) . "\n";
+
+		$metabox .= esc_html( __( 'No Shows were found.', 'radio-station' ) ) . "\n";
+
 	} else {
+
 		if ( count( $shows ) < 1 ) {
-			echo esc_html( __( 'You are not assigned to any Shows.', 'radio-station' ) ) . "\n";
+
+			$metabox .= esc_html( __( 'You are not assigned to any Shows.', 'radio-station' ) ) . "\n";
+
 		} else {
 			// --- add nonce field for verification ---
 			wp_nonce_field( 'radio-station', 'playlist_show_nonce' );
 
 			// --- select show to assign playlist to ---
-			$current = get_post_meta( $post->ID, 'playlist_show_id', true );
-			echo '<select name="playlist_show_id">' . "\n";
-				echo '<option value="" ' . selected( $current, false, false ) . '>' . esc_html__( 'Unassigned', 'radio-station' ) . '</option>' . "\n";
-				foreach ( $shows as $show ) {
-					echo '<option value="' . esc_attr( $show->ID ) . '" ' . selected( $show->ID, $current, false ) . '>' . esc_html( $show->post_title ) . '</option>' . "\n";
-				}
-			echo '</select>' . "\n";
+			$current_show = get_post_meta( $post->ID, 'playlist_show_id', true );
+			$metabox .= '<div>' . "\n";
+				$metabox .= '<b>' . esc_html( __( 'Assign to Show', 'radio-station' ) ) . '</b><br>' . "\n";
+				$metabox .= '<select id="playlist-show-select" name="playlist_show_id" onchange="radio_playlist_show_shifts();">' . "\n";
+					$metabox .= '<option value="" ' . selected( $current_show, false, false ) . '>' . esc_html__( 'Unassigned', 'radio-station' ) . '</option>' . "\n";
+					foreach ( $shows as $show ) {
+						$metabox .= '<option value="' . esc_attr( $show->ID ) . '" ' . selected( $show->ID, $current_show, false ) . '>' . esc_html( $show->post_title ) . '</option>' . "\n";
+					}
+				$metabox .= '</select>' . "\n";
+			$metabox .= '</div><br>' . "\n";
+
+			// 2.5.0: added playlist show shift selector
+			$current_shift = get_post_meta( $post->ID, 'playlist_shift_id', true );
+			$select = radio_station_playlist_show_shift_select( $current_show, $current_shift );
+			$metabox .= $select;
+
+			// 2.5.0: filter playlist metabox output
+			$metabox = apply_filters( 'radio_station_playlist_show_metabox', $metabox, $post );
+			$allowed_html = radio_station_allowed_html( 'content', 'settings' );
+			echo wp_kses( $metabox, $allowed_html );
+
+			// --- selection AJAX loader iframe ----
+			echo '<iframe id="playlist-shift-selection-frame" src="javascript:void(0);" style="display:none;"></iframe>' . "\n";
+
+			// 2.5.0: playlist selection javascript
+			add_action( 'admin_footer', 'radio_station_playlist_selection_script' );
+
 		}
 	}
+
+	// --- close metabox_inner ---
 	echo '</div>' . "\n";
+
+}
+
+// -----------------------------------
+// Playlist Episode Assignment Message
+// -----------------------------------
+add_filter( 'radio_station_playlist_show_metabox', 'radio_station_playlist_episode_message', 10, 2 );
+function radio_station_playlist_episode_message( $metabox, $post ) {
+
+	// --- assign to Episodes upgrade to Pro message ---
+	$upgrade_url = radio_station_get_upgrade_url();
+	$pricing_url = radio_station_get_pricing_url();
+	$message = '<div style="width:200px;">' . esc_html( __( 'You can assign Playlists to Show Episodes in Radio Station Pro.', 'radio-station' ) ) . '</div>' . "\n";
+	$message .= '<a href="' . esc_url( $upgrade_url ) . '">' . esc_html( __( 'Go PRO', 'radio-station' ) ) . '</a> | ' . "\n";
+	$message .= '<a href="' . esc_url( $pricing_url ) . '" target="_blank">' . esc_html( __( 'Find Out More...', 'radio-station' ) ) . '</a><br>' . "\n";
+
+	// --- append message and return ---
+	$metabox .= $message;
+	return $metabox;
+}
+
+// ----------------------------------
+// Playlist Show Selection Javascript
+// ----------------------------------
+function radio_station_playlist_selection_script() {
+
+	$ajax_url = add_query_arg( 'action', 'radio_station_select_show_shifts', admin_url( 'admin-ajax.php' ) );
+	$js = "var playlist_ajax_url = '" . esc_url( $ajax_url ) . "';
+	function radio_playlist_show_shifts() {
+		select = document.getElementById('playlist-show-select');
+		show_id = select.options[select.selectedIndex].value;
+		playlist_id = document.getElementById('post_ID').value;
+		url = playlist_ajax_url+'&playlist_id='+playlist_id+'&show_id='+show_id;
+		frame = document.getElementById('playlist-shift-selection-frame');
+		if (frame.src != url) {
+			select = document.getElementById('playlist-show-shift-select');
+			if (select) {setAttribute('disabled','disabled');}
+			frame.src = url;
+		}
+	}" . "\n";
+	$js = apply_filters( 'radio_station_playlist_selection_script', $js );
+	
+	echo '<script>' . $js . '</script>' . "\n";
+
+}
+
+// ------------------------
+// AJAX Get Shift Selection
+// ------------------------
+// 2.5.0: added AJAX action for show shift selection loading
+add_action( 'wp_ajax_radio_station_select_show_shifts', 'radio_station_select_show_shifts' );
+function radio_station_select_show_shifts() {
+	
+	// --- sanitize posted values ---
+	$playlist_id = absint( $_GET['playlist_id'] );
+	$show_id = absint( $_GET['show_id'] );
+	if ( $show_id > 0 ) {
+		$show = get_post( $show_id );
+	} else {
+		$show_id = false;
+	}
+
+	// --- output show shift selector ---
+	$current_shift = $playlist_id ? get_post_meta( $playlist_id, 'playlist_shift_id', true ) : false;
+	$select = radio_station_playlist_show_shift_select( $show_id, $current_shift );
+	$allowed_html = radio_station_allowed_html( 'content', 'settings' );
+	echo wp_kses( $select, $allowed_html );
+
+	// --- send shift select output to parent frame ---
+	echo "<script>selector = parent.document.getElementById('playlist-shift-select');" . "\n";
+	echo "select = parent.document.getElementById('playlist-show-shift-select');" . "\n";
+	echo "if (select) {select.removeAttribute('disabled');}" . "\n";
+	if ( isset( $show ) && $show ) {
+		echo "newselector = document.getElementById('playlist-shift-select');" . "\n";
+		echo "selector.style.display = '';" . "\n";
+		echo "selector.innerHTML = newselector.innerHTML;" . "\n";
+	} else {
+		echo "selector.style.display = 'none';" . "\n";
+	}
+	echo "</script>" . "\n";
+
+	exit;
+}
+
+// ----------------------------
+// Playlist Show Shift Selector
+// ----------------------------
+function radio_station_playlist_show_shift_select( $show_id, $current_shift ) {
+
+	$select = '<div id="playlist-shift-select">';
+	if ( $show_id ) {
+		$shifts = get_post_meta( $show_id, 'show_sched', true );
+		$select .= '<b>' . esc_html( __( 'Assign to Show Shift', 'radio-station' ) ) . '</b><br>' . "\n";
+		$select .= '<select id="playlist-show-shift-select" name="playlist_shift_id">' . "\n";
+			$select .= '<option value="" ' . selected( $current_shift, false, false ) . '>' . esc_html__( 'Latest Show', 'radio-station' ) . '</option>' . "\n";
+			$select .= '<option value="" ' . selected( $current_shift, 'unassigned', false ) . '>' . esc_html__( 'Unassigned', 'radio-station' ) . '</option>' . "\n";
+			if ( is_array( $shifts ) && ( count( $shifts ) > 0 ) ) {
+				foreach ( $shifts as $shift_id => $shift ) {
+					$shift_time = radio_station_translate_weekday( $shift['day'] ) . ' ' . $shift['start_hour'] . ':' . $shift['start_min'] . $shift['start_meridian'];
+					$select .= '<option value="' . esc_attr( $shift_id ) . '" ' . selected( $shift_id, $current_shift, false ) . '>' . esc_html( $shift_time ) . '</option>' . "\n";
+				}
+			}
+		$select .= '</select>' . "\n";
+	} else {
+		$select = esc_html( __( 'No Show selected.', 'radio-station' ) );
+	}
+	$select .= '</div><br>' . "\n";
+	return $select;
 }
 
 // --------------------
@@ -5640,36 +5801,40 @@ function radio_station_playlist_save_data( $post_id ) {
 	// 2.3.2: added AJAX track saving checks
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 
-		// 2.3.3: added double check for AJAX action match
-		if ( !isset( $_REQUEST['action'] ) || ( 'radio_station_playlist_save_tracks' != $_REQUEST['action'] ) ) {
-			return;
-		}
+		// 2.5.0: added check to exclude quick edit action
+		if ( !isset( $_POST['playlist-quick-edit'] ) || ( '1' != $_POST['playlist-quick-edit'] ) ) {
 
-		$error = false;
-		if ( !current_user_can( 'edit_playlists' ) ) {
-			$error = __( 'Failed. Use manual Publish or Update instead.', 'radio-station' );
-		} elseif ( !isset( $_POST['playlist_tracks_nonce'] ) || !wp_verify_nonce( $_POST['playlist_tracks_nonce'], 'radio-station' ) ) {
-			$error = __( 'Expired. Publish or Update instead.', 'radio-station' );
-		} elseif ( !isset( $_POST['playlist_id'] ) || ( '' == $_POST['playlist_id'] ) ) {
-			$error = __( 'Failed. No Playlist ID provided.', 'radio-station' );
-		} else {
-			$post_id = absint( $_POST['playlist_id'] );
-			$post = get_post( $post_id );
-			if ( !$post ) {
-				$error = __( 'Failed. Invalid Playlist ID.', 'radio-station' );
+			// 2.3.3: added double check for AJAX action match
+			if ( !isset( $_REQUEST['action'] ) || ( 'radio_station_playlist_save_tracks' != $_REQUEST['action'] ) ) {
+				return;
 			}
-		}
 
-		// --- send error message to parent window ---
-		if ( $error ) {
-			echo "<script>parent.document.getElementById('tracks-saving-message').style.display = 'none';" . "\n";
-			echo "parent.document.getElementById('tracks-error-message').style.display = '';" . "\n";
-			echo "parent.document.getElementById('tracks-error-message').innerHTML = '" . esc_js( $error ) . "';" . "\n";
-			echo "form = parent.document.getElementById('track-save-form');" . "\n";
-			echo "if (form) {form.parentNode.removeChild(form);}" . "\n";
-			echo "</script>" . "\n";
+			$error = false;
+			if ( !current_user_can( 'edit_playlists' ) ) {
+				$error = __( 'Failed. Use manual Publish or Update instead.', 'radio-station' );
+			} elseif ( !isset( $_POST['playlist_tracks_nonce'] ) || !wp_verify_nonce( $_POST['playlist_tracks_nonce'], 'radio-station' ) ) {
+				$error = __( 'Expired. Publish or Update instead.', 'radio-station' );
+			} elseif ( !isset( $_POST['playlist_id'] ) || ( '' == $_POST['playlist_id'] ) ) {
+				$error = __( 'Failed. No Playlist ID provided.', 'radio-station' );
+			} else {
+				$post_id = absint( $_POST['playlist_id'] );
+				$post = get_post( $post_id );
+				if ( !$post ) {
+					$error = __( 'Failed. Invalid Playlist ID.', 'radio-station' );
+				}
+			}
 
-			exit;
+			// --- send error message to parent window ---
+			if ( $error ) {
+				echo "<script>parent.document.getElementById('tracks-saving-message').style.display = 'none';" . "\n";
+				echo "parent.document.getElementById('tracks-error-message').style.display = '';" . "\n";
+				echo "parent.document.getElementById('tracks-error-message').innerHTML = '" . esc_js( $error ) . "';" . "\n";
+				echo "form = parent.document.getElementById('track-save-form');" . "\n";
+				echo "if (form) {form.parentNode.removeChild(form);}" . "\n";
+				echo "</script>" . "\n";
+
+				exit;
+			}
 		}
 	}
 
@@ -5718,11 +5883,17 @@ function radio_station_playlist_save_data( $post_id ) {
 		// --- verify playlist related to show nonce ---
 		if ( isset( $_POST['playlist_show_nonce'] ) && wp_verify_nonce( $_POST['playlist_show_nonce'], 'radio-station' ) ) {
 
+			// 2.5.0: also get previous shift (if any)
 			$show_changed = false;
 			$prev_show = get_post_meta( $post_id, 'playlist_show_id', true );
-			$show = $_POST['playlist_show_id'];
+			$prev_shift = get_post_meta( $post_id, 'playlist_shift_id', true );
+
+			// 2.5.0: added sanitize_text_field to post request
+			$show = sanitize_text_field( $_POST['playlist_show_id'] );
 			if ( empty( $show ) ) {
 				delete_post_meta( $post_id, 'playlist_show_id' );
+				// 2.5.0: also delete shift association
+				delete_post_meta( $post_id, 'playlist_shift_id' );
 				if ( $prev_show ) {
 					$show = $prev_show;
 					$show_changed = true;
@@ -5733,7 +5904,20 @@ function radio_station_playlist_save_data( $post_id ) {
 					update_post_meta( $post_id, 'playlist_show_id', $show );
 					$show_changed = true;
 				}
+				// 2.5.0: maybe save selected shift
+				if ( isset( $_POST['playlist_shift_id'] ) ) {
+					$shift_id = sanitize_text_field( $_POST['playlist_shift_id'] );
+					if ( '' != $shift_id ) {
+						update_post_meta( $post_id, 'playlist_shift_id', $shift_id );
+						if ( $shift_id != $prev_shift ) {
+							$show_changed = true;
+						}
+					}
+				}
 			}
+
+			// 2.5.0: added filter to check for other show changes
+			$show_changed = apply_filters( 'radio_station_playlist_show_changed', $show_changed, $post_id );
 
 			// 2.3.0: maybe clear cached data to be safe
 			// 2.3.3: remove current show transient
@@ -5814,14 +5998,66 @@ function radio_station_playlist_columns( $columns ) {
 // 2.2.7: added data columns for show list display
 add_action( 'manage_' . RADIO_STATION_PLAYLIST_SLUG . '_posts_custom_column', 'radio_station_playlist_column_data', 5, 2 );
 function radio_station_playlist_column_data( $column, $post_id ) {
+
 	$tracks = get_post_meta( $post_id, 'playlist', true );
+
 	if ( 'show' == $column ) {
+
+		// 2.5.0: also get show data for quick edit
+		global $post;
+		$stored_post = $post;
+
+		// --- get Shows linked to playlist ---
+		$data = '';
+		$show_ids = $disabled = array();
 		$show_id = get_post_meta( $post_id, 'playlist_show_id', true );
-		$post = get_post( $show_id );
-		echo '<a href="' . esc_url( get_edit_post_link( $post->ID ) ) . '">' . esc_html( $post->post_title ) . '</a>' . "\n";
+		if ( $show_id ) {
+			if ( is_array( $show_id ) ) {
+				$show_ids = $show_id;
+				foreach ( $show_ids as $i => $show_id ) {
+					if ( 0 == $show_id ) {
+						unset( $show_ids[$i] );
+					}
+				}
+				$data = implode( ',', $show_ids );
+			} elseif ( $show_id > 0 ) {
+				$show_ids = array( $show_id );
+				$data = $show_id;
+			}
+		}
+
+		// --- display Shows linked to post ---
+		if ( count( $show_ids ) > 0 ) {
+			foreach ( $show_ids as $show_id ) {
+				$show = get_post( trim( $show_id ) );
+				if ( $show ) {
+					$post = $show;
+					if ( current_user_can( 'edit_shows' ) ) {
+						echo '<a href="' . esc_url( get_edit_post_link( $show_id ) ) . '" title="' . esc_attr( __( 'Edit Show', 'radio-station' ) ) . ' ' . $show_id . '">' . PHP_EOL;
+					} else {
+						$disabled[] = $show_id;
+					}
+					echo esc_html( $show->post_title ) . '<br>' . "\n";
+					if ( current_user_can( 'edit_shows' ) ) {
+						echo '</a>' . "\n";
+					}
+				}
+			}
+		}
+
+		// --- hidden show and disabled show IDs ---
+		echo '<span class="show-ids" style="display:none;">' . esc_html( $data ) . '</span>' . "\n";
+		echo '<span class="disabled-ids" style="display:none;">' . esc_html( implode( ',', $disabled ) ) . '</span>' . "\n";
+
+		// --- restore global post object ---
+		$post = $stored_post;
+
 	} elseif ( 'trackcount' == $column ) {
+
 		echo count( $tracks ) . "\n";
+
 	} elseif ( 'tracklist' == $column ) {
+
 		echo '<a href="javascript:void(0);" onclick="showhidetracklist(\'' . esc_js( $post_id ) . '\')">';
 		echo esc_html( __( 'Show/Hide Tracklist', 'radio-station' ) ) . '</a><br>' . "\n";
 		echo '<div id="tracklist-' . esc_attr( $post_id ) . '" style="display:none;">' . "\n";
@@ -5841,6 +6077,7 @@ function radio_station_playlist_column_data( $column, $post_id ) {
 				}
 			echo '</table>' . "\n";
 		echo '</div>' . "\n";
+
 	}
 }
 
@@ -5868,6 +6105,15 @@ function radio_station_playlist_admin_list_styles() {
 	$css = apply_filters( 'radio_station_playlist_list_styles', $css );
 	echo '<style>' . wp_kses_post( $css ) . '</style>';
 
+}
+
+// ----------------------------
+// Playlist List Column Scripts
+// ----------------------------
+// 2.5.0: separated function from playlist list column styles
+add_action( 'admin_footer', 'radio_station_playlist_admin_list_scripts' );
+function radio_station_playlist_admin_list_scripts() {
+
 	// --- expand/collapse tracklist data ---
 	$js = "function showhidetracklist(postid) {" . "\n";
 	$js .= " if (document.getElementById('tracklist-'+postid).style.display == 'none') {" . "\n";
@@ -5881,6 +6127,130 @@ function radio_station_playlist_admin_list_styles() {
 	// 2.5.0: fix incorrect variable to filter (css)
 	$js = apply_filters( 'radio_station_playlist_list_script', $js );
 	wp_add_inline_script( 'radio-station-admin', $js );
+}
+
+
+// --------------------------------
+// Playlist Quick Edit Input Fields
+// --------------------------------
+// 2.5.0: added for quick selection of playlist show
+add_action( 'quick_edit_custom_box', 'radio_station_quick_edit_playlist', 10, 2 );
+function radio_station_quick_edit_playlist( $column_name, $post_type ) {
+
+	global $post, $radio_station_data;
+	$stored_post = $post;
+
+	if ( 'playlist' != $post_type ) {
+		return;
+	}
+
+	if ( isset( $radio_station_data['playlist-quick-edit'] ) ) {
+		return;
+	}
+
+	// --- get all shows ---
+	$args = array(
+		'numberposts' => -1,
+		'offset'      => 0,
+		'orderby'     => 'post_title',
+		'order'       => 'ASC',
+		'post_type'   => RADIO_STATION_SHOW_SLUG,
+		'post_status' => array( 'publish', 'draft' ),
+	);
+	$shows = get_posts( $args );
+
+	// --- show select input field ---
+	echo '<fieldset class="inline-edit-col-right playlist-show-field">' . "\n";
+		echo '<div class="inline-edit-col column-' . esc_attr( $column_name ) . '">' . "\n";
+			echo '<label class="inline-edit-group">' . "\n";
+				echo '<span class="title">' . esc_html( __( 'Assign to Show', 'radio-station' ) ) . '</span>' . "\n";
+				if ( count( $shows ) > 0 ) {
+					echo '<select name="playlist_show_id" class="select-show">' . "\n";
+					echo '<option value="">' . esc_html( __( 'Unassigned' ) ) . '</option>' . "\n";
+					foreach ( $shows as $show ) {
+						$post = $show;
+						echo '<option value="' . esc_attr( $show->ID ) . '"';
+						if ( !current_user_can( 'edit_shows' ) ) {
+							echo ' disabled="disabled"';
+						}
+						echo '>' . esc_html( $show->post_title ) . '</option>' . "\n";
+					}
+					echo '</select>' . "\n";
+				} else {
+					// --- no shows message ---
+					echo esc_html( __( 'No Shows available to Select.', 'radio-station' ) ) . "\n";
+				}
+			echo '</label>' . "\n";
+		echo '</div>' . "\n";
+	echo '</fieldset>' . "\n";
+
+	// --- hidden fields for quick edit saving ---
+	wp_nonce_field( 'radio-station', 'playlist_show_nonce' );
+	echo '<input type="hidden" name="playlist-quick-edit" value="1">' . "\n";
+
+	// --- related shows post box styles ---
+	$css = '.pre-selected {background-color:#BBB;}';
+	$css = apply_filters( 'radio_station_quick_edit_playlist_styles', $css );
+	echo '<style>' . wp_kses_post( $css ) . '</style>' . "\n";
+
+	// 2.3.3.6: restore stored post object
+	$post = $stored_post;
+	
+	// --- set flag to prevent duplication ---
+	$radio_station_data['playlist-quick-edit'] = true;
+}
+
+// --------------------------
+// Playlist Quick Edit Script
+// --------------------------
+// ref: https://codex.wordpress.org/Plugin_API/Action_Reference/quick_edit_custom_box
+// 2.5.0: added for quick selection of playlist show
+add_action( 'admin_enqueue_scripts', 'radio_station_playlists_quick_edit_script' );
+function radio_station_playlists_quick_edit_script( $hook ) {
+
+	if ( 'edit.php' != $hook ) {
+		return;
+	}
+
+	if ( RADIO_STATION_PLAYLIST_SLUG == sanitize_text_field( $_GET['post_type'] ) ) {
+		$js = "(function($) {
+			var \$wp_inline_edit = inlineEditPost.edit;
+			inlineEditPost.edit = function( id ) {
+				\$wp_inline_edit.apply(this, arguments);
+				var post_id = 0; var disabled_ids;
+				if (typeof(id) == 'object') {post_id = parseInt(this.getId(id));}
+				if (post_id > 0) {
+					var show_ids = jQuery('#post-'+post_id+' .column-show .show-ids').text();
+					if (show_ids != '') {
+						if (show_ids.indexOf(',') > -1) {ids = show_ids.split(',');}
+						else {ids = new Array(); ids[0] = show_ids;}
+						for (i = 0; i < ids.length; i++) {
+							var thisshowid = ids[i];
+							jQuery('#edit-'+post_id+' .select-show option').each(function() {
+								if (jQuery(this).val() == thisshowid) {jQuery(this).attr('selected','selected');}
+							});
+						}
+						/* disable uneditable options */
+						disabled = jQuery('#post-'+post_id+' .column-show .disabled-ids').text();
+						if (disabled != '') {
+							if (disabled.indexOf(',') > -1) {disabled_ids = disabled.split(',');}
+							else {disabled_ids = new Array(); disabled_ids[0] = disabled;}
+							jQuery('#edit-'+post_id+' .select-show option').each(function() {
+								for (j = 0; j < disabled_ids.length; j++) {
+									if (jQuery(this).val() == disabled_ids[j]) {
+										jQuery(this).attr('disabled','disabled');
+										if (jQuery(this).attr('selected') == 'selected') {jQuery(this).addClass('pre-selected');}
+									}
+								}
+							});
+						}
+					}
+				}
+			};
+		})(jQuery);";
+
+		wp_add_inline_script( 'radio-station-admin', $js );
+	}
 }
 
 
@@ -6117,7 +6487,7 @@ function radio_station_quick_edit_post( $column_name, $post_type ) {
 	$stored_post = $post;
 
 	// 2.3.3.5: added fix for post type context
-	if ( $post_type != 'post' ) {
+	if ( 'post' != $post_type ) {
 		return;
 	}
 
@@ -6227,12 +6597,13 @@ function radio_station_post_column_data( $column, $post_id ) {
 					// 2.3.3.6: only link to Shows user can edit
 					$post = $show;
 					if ( current_user_can( 'edit_shows' ) ) {
-						echo '<a href="' . get_edit_post_link( $show_id ) . '" title="' . esc_attr( __( 'Edit Show', 'radio-station' ) ) . ' ' . $show_id . '">' . PHP_EOL;
+						// 2.5.0: added missing esc_url wrapper
+						echo '<a href="' . esc_url( get_edit_post_link( $show_id ) ) . '" title="' . esc_attr( __( 'Edit Show', 'radio-station' ) ) . ' ' . $show_id . '">' . PHP_EOL;
 					} else {
 						// 2.3.3.6: set disabled (uneditable) data
 						$disabled[] = $show_id;
 					}
-					echo esc_html( $show->post_title ) . '<br>';
+					echo esc_html( $show->post_title ) . '<br>' . "\n";
 					if ( current_user_can( 'edit_shows' ) ) {
 						echo '</a>' . "\n";
 					}
@@ -6240,11 +6611,9 @@ function radio_station_post_column_data( $column, $post_id ) {
 			}
 		}
 
-		// 2.5.0: added missing debug check wrapper
-		if ( RADIO_STATION_DEBUG ) {
-			echo '<span class="show-ids" style="display:none;">' . esc_html( $data ) . '</span>' . "\n";
-			echo '<span class="disabled-ids" style="display:none;">' . esc_html( implode( ',', $disabled ) ) . '</span>' . "\n";
-		}
+		// --- hidden show and disabled show IDs ---
+		echo '<span class="show-ids" style="display:none;">' . esc_html( $data ) . '</span>' . "\n";
+		echo '<span class="disabled-ids" style="display:none;">' . esc_html( implode( ',', $disabled ) ) . '</span>' . "\n";
 
 		// --- restore global post object ---
 		$post = $stored_post;
@@ -6254,8 +6623,8 @@ function radio_station_post_column_data( $column, $post_id ) {
 // -------------------------------
 // Related Shows Quick Edit Script
 // -------------------------------
-// 2.3.3.4: added Related Show Quick Edit value population script
 // ref: https://codex.wordpress.org/Plugin_API/Action_Reference/quick_edit_custom_box
+// 2.3.3.4: added Related Show Quick Edit value population script
 // 2.3.3.6: disable uneditable Show select options
 add_action( 'admin_enqueue_scripts', 'radio_station_posts_quick_edit_script' );
 function radio_station_posts_quick_edit_script( $hook ) {
@@ -6615,12 +6984,13 @@ function radio_station_columns_query_filter( $query ) {
 				$yearmonth = $_GET['month'];
 				$start_date = date( $yearmonth . '-01' );
 				$end_date = date( $yearmonth . '-t' );
-				$meta_query = array(
+				// 2.5.0: fix to use double array for meta_query
+				$meta_query = array( array(
 					'key'     => 'show_override_date',
 					'value'   => array( $start_date, $end_date ),
 					'compare' => 'BETWEEN',
 					'type'    => 'DATE',
-				);
+				) );
 				$query->set( 'meta_query', $meta_query );
 			}
 
@@ -6659,7 +7029,8 @@ function radio_station_columns_query_filter( $query ) {
 					);
 					$meta_query = $combined_query;
 				} else {
-					$meta_query = $pastfuture_query;
+					// 2.5.0: fix to use double array for single meta_query
+					$meta_query = array( $pastfuture_query );
 				}
 				$query->set( 'meta_query', $meta_query );
 			}

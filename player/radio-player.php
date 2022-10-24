@@ -221,7 +221,7 @@ function radio_station_player_output( $args = array(), $echo = false ) {
 	$instance = 0;
 	if ( isset( $args['id'] ) && ( '' != $args['id'] ) ) {
 		$id = abs( intval( $args['id'] ) ) ;
-		if ( $instance > -1 ) {
+		if ( $id > -1 ) {
 			$instance = $id; 
 		}
 	}		
@@ -752,6 +752,31 @@ function radio_station_player_shortcode( $atts ) {
 	return $player;
 }
 
+// -----------------------------------
+// Set Player Default Color Attributes
+// -----------------------------------
+add_filter( 'radio_station_player_shortcode_attributes', 'radio_station_player_default_colors' );
+function radio_station_player_default_colors( $atts ) {
+
+	// --- map bar color settings to shortcode attributes ---
+	// 2.5.0: added for mapping colors to attributes and instance
+	if ( isset( $atts['sitewide'] ) ) {
+		$keys = array(
+			'playing_color'    => 'player_playing_color',
+			'buttons_color'    => 'player_buttons_color',
+			'track_color'      => 'player_range_color',
+			'thumb_color'      => 'player_thumb_color',
+		);
+		foreach ( $keys as $att => $key ) {
+			if ( !isset( $atts[$att] ) ) {
+				$atts[$att] = radio_station_get_setting( $key );
+			}
+		}
+	}
+
+	return $atts;
+}
+
 // -------------------
 // Player AJAX Display
 // -------------------
@@ -761,22 +786,25 @@ function radio_station_player_ajax() {
 
 	// --- sanitize shortcode attributes ---
 	$atts = radio_station_player_sanitize_shortcode_values();
-	// 2.5.0: check for popup attribute
-	$popup = ( isset( $atts['popup'] ) && $atts['popup'] ) ? true : false;
-	// 2.5.0: clear widget/block/popup attributes
-	$atts['widget'] = $atts['block'] = $atts['popup'] = 0;
 
-	// --- debug shortcode attributes ---
-	// if ( defined( 'RADIO_PLAYER_DEBUG' ) && RADIO_PLAYER_DEBUG ) {
-		echo '<span style="display:none;">Radio Player Shortcode Attributes: ' . esc_html( print_r( $atts, true ) ) . '</span>';
-	// }
+	// 2.5.0: anti-conflict with WP theme querystring overrides
+	if ( isset( $_GET['theme'] ) ) {
+		unset( $_GET['theme'] );
+	}
+	if ( isset( $_POST['theme'] ) ) {
+		unset( $_POST['theme'] );
+	}
+	if ( isset( $_REQUEST['theme'] ) ) {
+		unset( $_REQUEST['theme'] );
+	}
 
-	// --- output head ---
+	// --- open HTML and head ---
 	// 2.5.0: buffer head content to maybe replace window title tag
-	echo '<head>' . "\n";
+	echo '<html><head>' . "\n";
 	ob_start();
 	wp_head();
 	$head = ob_get_contents();
+	ob_end_clean();
 	if ( isset( $atts['title'] ) && $atts['title'] && ( '' != $atts['title'] ) ) {
 		if ( stristr( $head, '<title' ) ) {
 			$posa = stripos( $head, '<title' );
@@ -803,6 +831,47 @@ function radio_station_player_ajax() {
 	// --- open body ---
 	echo '<body>' . "\n";
 
+	// 2.5.0: check for popup attribute
+	$popup = ( isset( $atts['popup'] ) && $atts['popup'] ) ? true : false;
+	// 2.5.0: clear widget/block/popup attributes
+	$atts['widget'] = $atts['block'] = $atts['popup'] = 0;
+
+	// 2.5.0: strip text color attribute (applied to div container)
+	$text_color = '';
+	if ( isset( $atts['text_color'] ) ) {
+		$text_color = $atts['text_color'];
+		unset( $atts['text_color'] );
+		if ( isset( $atts['text'] ) ) {
+			unset( $atts['text'] );
+		}
+	} elseif ( isset( $atts['text'] ) ) {
+		$text_color = $atts['text'];
+		unset( $atts['text_color'] );
+	} elseif ( function_exists( 'apply_filters' ) ) {
+		$text_color = apply_filters( 'radio_player_text_color', $text_color );
+	}
+		
+	// 2.5.0: strip background color attribute (applied to window body)
+	$background_color = '';
+	if ( isset( $atts['background_color'] ) ) {
+		$background_color = $atts['background_color'];
+		unset( $atts['background_color'] );
+		if ( isset( $atts['background'] ) ) {
+			unset( $atts['background'] );
+		}
+	} elseif ( isset( $atts['background'] ) ) {
+		$background_color = $atts['background'];
+		unset( $atts['background'] );
+	} elseif ( function_exists( 'apply_filters' ) ) {
+		// 2.5.0: fallaback to apply_filters
+		$background_color = apply_filters( 'radio_player_background_color', $background_color );
+	}
+
+	// --- debug shortcode attributes ---
+	// if ( defined( 'RADIO_PLAYER_DEBUG' ) && RADIO_PLAYER_DEBUG ) {
+		echo '<span style="display:none;">Radio Player Shortcode Attributes: ' . esc_html( print_r( $atts, true ) ) . '</span>';
+	// }
+
 	// --- output widget contents ---
 	// 2.5.0: maybe add popup player class
 	echo '<div id="player-contents"';
@@ -815,21 +884,37 @@ function radio_station_player_ajax() {
 
 	// --- output (hidden) footer for scripts ---
 	echo '<div style="display:none;">' . "\n";
+
+		// --- call wp_footer actions ---
 		wp_footer();
+
+		// --- maybe add text color ---
+		// 2.5.0: added for matching with background color
+		if ( '' != $text_color ) {
+			if ( ( 'rgb' != substr( $text_color, 0, 3 ) ) && ( '#' != substr( $text_color, 0, 1 ) ) ) {
+				$text_color = '#' . $text_color;
+			}
+			$css .= '#player-contents {color: ' . esc_attr( $text_color ) . ';}' . "\n";
+		}
+
+		// --- maybe add background color ---
+		if ( '' != $background_color ) {
+			if ( ( 'rgb' != substr( $background_color, 0, 3 ) ) && ( '#' != substr( $background_color, 0, 1 ) ) ) {
+				$background_color = '#' . $background_color;
+			}
+			$css .= 'body {background: ' . esc_attr( $background_color ) . ';}' . "\n";
+		}
+
+		// --- output extra player styles ---
+		$css = apply_filters( 'radio_station_player_ajax_styles', $css, $atts );
+		echo '<style>' . wp_strip_all_tags( $css ) . '</style>';
+
+	// --- close footer ---
 	echo '</div>' . "\n";
 
-	// --- maybe add background color ---
-	if ( isset( $atts['background'] ) ) {
-		$background = $atts['background'];
-	} else {
-		// 2.5.0: fallaback to apply_filters
-		$background = apply_filters( 'radio_player_background_color', '' );
-	}
-	if ( '' != $background ) {
-		echo '<style>#player-contents {background: #' . esc_attr( $background ) . ';}</style>' . "\n";
-	}
+	// --- close body and HTML ---
+	echo '</body></html>' . "\n";
 
-	echo '</body>' . "\n";
 	exit;
 }
 
@@ -839,6 +924,8 @@ function radio_station_player_ajax() {
 function radio_station_player_sanitize_shortcode_values() {
 
 	// --- current show attribute keys ---
+	// 2.5.0: added alternative text attribute
+	// 2.5.0: added block attribute
 	$keys = array(
 		'url'        => 'url',
 		'title'	     => 'text',
@@ -851,7 +938,7 @@ function radio_station_player_sanitize_shortcode_values() {
 		'default'    => 'boolean',
 		'widget'     => 'boolean',
 		'background' => 'text',
-		// 2.5.0: added block attribute
+		'text'       => 'text',
 		'block'      => 'boolean',
 	);
 
@@ -2578,6 +2665,7 @@ function radio_station_player_control_styles( $instance ) {
 	}
 
 	// --- check for player instance ---
+	// 2.5.0: improved instance and ID matching
 	if ( false !== $instance ) {
 		
 		// -- set instance container selector ---
@@ -2588,8 +2676,16 @@ function radio_station_player_control_styles( $instance ) {
 			$instance_props = $radio_player['instance-props'][$instance];
 			foreach ( $instance_props as $key => $value ) {
 				if ( substr( $key, -6, 6 ) == '_color' ) {
+
+					// 2.5.0: ignore text and background for bar instance
+					if ( isset( $radio_player['bar-instance'] ) && ( $instance == $radio_player['bar-instance'] ) ) {
+						if ( in_array( $key, array( 'text_color', 'background_color' ) ) ) {
+							$value = '';
+						}
+					}
+					
 					if ( $value && ( '' != $value ) ) {
-						if ( substr( $value, 0, 3 ) !== 'rgb' ) {
+						if ( 'rgb' != ( substr( $value, 0, 3 ) ) && ( '#' != substr( $value, 0, 1 ) ) ) {
 							$value = '#' . $value;
 						}
 						$key = str_replace( '_color', '', $key );
@@ -2598,6 +2694,7 @@ function radio_station_player_control_styles( $instance ) {
 				}
 			}
 		}
+
 	} else {
 		// 2.5.0: added check to do once only
 		if ( isset( $radio_player['control-styles'] ) ) {

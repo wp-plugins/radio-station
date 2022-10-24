@@ -224,12 +224,14 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Updated: Plugin Panel (1.2.7)
 * Updated: Moment JS (2.29.4) with WP Loading
 * Changed: Tab Schedule default date display on
-* Improved: Refactored Schedule Engine Class (1.0.0)
+* Improved: Refactored Schedule Engine Class (2.5.0)
 * Improved: Standardized Widget Input Fields
 * Improved: WordPress Coding Standards
 * Improved: Sanitization using KSES
 * Improved: Translation Implementation
 * Improved: use WP JSON functions for data endpoints
+* Added: assign Playlist to a specific Show Shift
+* Added: Quick Edit of Playlist to assign to Show
 * Fixed: Countdowns with multiple widget instances
 * Fixed: Radio Player iOS no volume control detection
 
