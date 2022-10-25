@@ -236,10 +236,6 @@
 	opacity: 0.9;
 }
 
-.rp-popup {
-	margin-top: -12px;
-}
-
 .radio-container .rp-volume-controls button:hover, .radio-container .rp-volume-controls button:focus {
 	opacity: 1;
 }

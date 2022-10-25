@@ -729,7 +729,10 @@ function radio_station_localization_script() {
 
 	// --- detect touchscreens ---
 	// ref: https://stackoverflow.com/a/52855084/5240159
-	$js .= "if (window.matchMedia('(pointer: coarse)').matches) {radio.touchscreen = true;} else {radio.touchscreen = false;}" . PHP_EOL;
+	// 2.5.0: use !any-pointer:fine instead of pointer:coarse
+	// ref: https://stackoverflow.com/a/51774045/5240159
+	$js .= "matchmedia = window.matchMedia || window.msMatchMedia;" . "\n";
+	$js .= "radio.touchscreen = !matchmedia('(any-pointer: fine)').matches;" . "\n";
 
 	// --- set debug flag ---
 	if ( RADIO_STATION_DEBUG ) {

@@ -800,10 +800,15 @@ function radio_station_player_ajax() {
 
 	// --- open HTML and head ---
 	// 2.5.0: buffer head content to maybe replace window title tag
+	// note: do not remove these span tags, they magically "fix" broken output buffering!?
 	echo '<html><head>' . "\n";
+	echo '<span></span>';
 	ob_start();
+	echo '<span></span>';
 	wp_head();
+	echo '<span></span>';
 	$head = ob_get_contents();
+	echo '<span></span>';
 	ob_end_clean();
 	if ( isset( $atts['title'] ) && $atts['title'] && ( '' != $atts['title'] ) ) {
 		if ( stristr( $head, '<title' ) ) {
@@ -850,7 +855,7 @@ function radio_station_player_ajax() {
 	} elseif ( function_exists( 'apply_filters' ) ) {
 		$text_color = apply_filters( 'radio_player_text_color', $text_color );
 	}
-		
+
 	// 2.5.0: strip background color attribute (applied to window body)
 	$background_color = '';
 	if ( isset( $atts['background_color'] ) ) {
