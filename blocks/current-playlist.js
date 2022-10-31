@@ -17,7 +17,7 @@
 		title: '[Radio Station] Current Playlist',
 		description: __( 'Radio Station current playlist block.', 'radio-station' ),
 		icon: 'playlist-audio',
-		category: 'widgets',
+		category: 'radio-station',
 		example: {},
 		attributes: {
 			/* --- Loading Options --- */

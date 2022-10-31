@@ -24,7 +24,7 @@
 		title: '[Radio Station] Current Show',
 		description: __( 'Radio Station current show block.', 'radio-station' ),
 		icon: 'controls-play',
-		category: 'widgets',
+		category: 'radio-station',
 		example: {},
 		attributes: {
 			/* --- Loading Options --- */

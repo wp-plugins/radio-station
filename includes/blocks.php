@@ -7,6 +7,7 @@
 // @since 2.5.0
 
 // === Block Editor Support ===
+// - Register Block Category
 // - Get Block Callbacks
 // - Get Block Attributes
 // - Register Blocks
@@ -17,6 +18,32 @@
 // ----------------------------
 // === Block Editor Support ===
 // ----------------------------
+
+// -----------------------
+// Register Block Category
+// -----------------------
+add_action( 'plugins_loaded', 'radio_station_register_block_categories' );
+function radio_station_register_block_categories() {
+	global $wp_version;
+	if ( version_compare( $wp_version, '5.8', '>=' ) ) {
+		add_filter( 'block_categories_all', 'radio_station_register_block_category' );
+	} else {
+		add_filter( 'block_categories', 'radio_station_register_block_category' );
+	}
+}
+function radio_station_register_block_category( $categories ) {
+	$new_categories = array();
+	foreach ( $categories as $category ) {
+		if ( 'embed' == $category['slug'] ) {
+			$new_categories[] = array(
+				'slug'  => 'radio-station',
+				'title' => __( 'Radio Station', 'radio-station' ),
+			);
+		}
+		$new_categories[] = $category;
+	}
+	return $new_categories;
+}
 
 // -------------------
 // Get Block Callbacks
@@ -242,7 +269,11 @@ function radio_station_register_blocks() {
 	// --- loop block names to register blocks ---
 	foreach ( $callbacks as $block_slug => $callback ) {
 		$block_key = 'radio-station/' . $block_slug;
-		$args = array( 'render_callback' => $callback, 'attributes' => $attributes[$block_slug] );
+		$args = array(
+			'render_callback' => $callback,
+			'attributes'      => $attributes[$block_slug],
+			'category'        => 'radio-station',
+		);	
 		$args = apply_filters( 'radio_station_block_args', $args, $block_slug, $callback );
 		register_block_type( $block_key, $args );
 	}
@@ -253,8 +284,8 @@ function radio_station_register_blocks() {
 // ---------------------------
 // 2.5.0: added for editor block scripts/styles
 // reF: https://jasonyingling.me/enqueueing-scripts-and-styles-for-gutenberg-blocks/
-add_action( 'enqueue_block_editor_assets', 'raddio_station_block_editor_assets' );
-function raddio_station_block_editor_assets() {
+add_action( 'enqueue_block_editor_assets', 'radio_station_block_editor_assets' );
+function radio_station_block_editor_assets() {
 	
 	// --- get block callabacks ---
 	$callbacks = radio_station_get_block_callbacks();

@@ -17,7 +17,7 @@
 		title: '[Radio Station] Radio Clock',
 		description: __( 'Radio Station Clock time display.', 'radio-station' ),
 		icon: 'clock',
-		category: 'widgets',
+		category: 'radio-station',
 		example: {},
 		attributes: {
 			/* --- Clock Display Options --- */

@@ -30,7 +30,7 @@
 		title: '[Radio Station] Archive List',
 		description: __( 'Archive list for Radio Station record types.', 'radio-station' ),
 		icon: 'media-audio',
-		category: 'widgets',
+		category: 'radio-station',
 		example: {},
 		attributes: {
 			/* --- Archive List Details --- */

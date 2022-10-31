@@ -221,7 +221,8 @@ function radio_station_show_language_metabox() {
 				$slug = $term->slug;
 				$term_slugs[] = $slug;
 				$label = $term->name;
-				if ( !empty( $term->description ) ) {
+				// 2.5.0: only append description to label if different to name
+				if ( !empty( $term->description ) && ( $term->description != $label ) ) {
 					$label .= ' (' . $term->description . ')';
 				}
 
@@ -349,13 +350,15 @@ function radio_station_language_term_filter( $post_id ) {
 	}
 
 	// --- loop and set posted terms ---
-	// 2.5.0: use sanitize_text_field on posted value
-	$terms = sanitize_text_field( $_POST[RADIO_STATION_LANGUAGES_SLUG] );
+	$terms = $_POST[RADIO_STATION_LANGUAGES_SLUG];
 
 	$term_ids = array();
 	if ( is_array( $terms ) && ( count( $terms ) > 0 ) ) {
 		$languages = radio_station_get_languages();
 		foreach ( $terms as $i => $term_slug ) {
+
+			// 2.5.0: use sanitize_text_field on posted value
+			$term_slug = sanitize_text_field( $term_slug );
 
 			foreach ( $languages as $j => $language ) {
 
@@ -1093,8 +1096,8 @@ function radio_station_shift_edit_script() {
 	$js .= "jQuery(document).ready(function() {
 		jQuery('#publish').on('click', function() {
 			window.removeEventListener('beforeunload', radio_onbeforeunload);
-		}
-	}";
+		});
+	});" . "\n";
 
 	// --- add new shift ---
 	// 2.3.2: separate function for onclick

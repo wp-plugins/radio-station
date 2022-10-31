@@ -24,7 +24,7 @@
 		title: '[Radio Station] Upcoming Shows',
 		description: __( 'Radio Station upcoming shows block.', 'radio-station' ),
 		icon: 'controls-forward',
-		category: 'widgets',
+		category: 'radio-station',
 		example: {},
 		attributes: {
 			/* --- Loading Options --- */

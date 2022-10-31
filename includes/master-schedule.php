@@ -18,6 +18,8 @@
 // -------------------------
 // Master Schedule Shortcode
 // -------------------------
+// 2.5.0: added optional radio-schedule shortcode alias
+add_shortcode( 'radio-schedule', 'radio_station_master_schedule' );
 add_shortcode( 'master-schedule', 'radio_station_master_schedule' );
 function radio_station_master_schedule( $atts ) {
 	

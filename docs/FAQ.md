@@ -111,12 +111,29 @@ We haven't built an interface between Google Calendar and Radio Station just yet
 
 ### How do I install the latest Development version for testing?
 
-If you are having issues with the plugin, we may recommend you install the development version for further bugix testing, as it may contain fixes that are not yet released into the next stable WordPress version. It is recommended you do this on a staging site. Instructions:
+If you are having issues with the plugin, we may recommend you install the development version for further bugfix testing, as it may contain fixes that are not yet released into the next stable WordPress version. It is recommended you do this on a staging site. Instructions:
 
-1. Download the `develop` branch zip from the Github repository at: 
+1. Visit the `develop` branch of the Radio Station Github repository at:
 `https://github.com/netmix/radio-station/tree/develop/`
-2. Unzip the downloaded file on your computer and upload it via FTP to the subdirectory of your WordPress install on your web server: `/wp-content/plugins/radio-station-dev/`
-3. Rename the subdirectory `/wp-content/plugins/radio-station/` to `/wp-content/plugins/radio-station-old`
-4. Rename the subdirectory `/wp-content/plugins/radio-station-dev/` to `/wp-content/plugins/radio-station/`
+2. Click on the green "Code" button and select Download a ZIP.
+3. Unzip the downloaded file on your computer and upload it via FTP to the subdirectory of your WordPress install on your web server: `/wp-content/plugins/radio-station-develop/`
+4. Rename the subdirectory `/wp-content/plugins/radio-station/` to `/wp-content/plugins/radio-station-old/`
+5. Rename the subdirectory `/wp-content/plugins/radio-station-develop/` to `/wp-content/plugins/radio-station/`
+
+Then upload to WordPress via the plugin installer as normal.
+Note that it will install to /wp-content/plugins/radio-station-develop/, and because of this won't overwrite your existing installation, so you'll need to deactivate that before activating the development version.
 
 You can now visit your site to make sure nothing is broken. If you experience issues you can reverse the folder renaming process to activate the old copy of the plugin. If the new development version works fine, at your convenience you can delete the `/wp-content/plugins/radio-station-old/` directory.
+
+Alternatively, if you want to do this from your WordPress Plugin area, you can upload the development Zip file from your Plugins -> Upload page. This will install it to `/wp-content/plugins/radio-station-develop/`. You can then deactivate the existing Radio Station plugin from you Plugins page and then activate the development version. (You can tell them apart on the plugins page via their version numbers. Official releases are 2.x.x, only development releases have the extra digit 2.x.x.x) Again, if you experience issues, you can deactivate the development version and reactivate the old version.
+
+
+### What about Pro Beta Version Testing?
+
+We are constantly improving and adding new features to [Radio Station Pro](https://radiostation.pro/pricing/). Periodically we will release a Beta version to test out a new feature (or fix) out before it is officially released. If you have a Pro license, you can access these cutting edge Pro Beta version releases in two ways:
+
+1. Download the Beta versions by logging in to your [Freemius User Dashboard](https://dashboard.freemius.com). and navigating to the "Downloads" section. You will see a dropdown list of all the Radio Station Pro releases, including beta ones.
+2. Enable the Beta program option from your Radio Station Account page in your WordPress site's Admin area, and the latest Beta version will then be available as an update.
+
+We recommend you test these on a Staging site (or a development copy of your live site.) This way you can make sure there are no significant bugs before using it on a production site. Of course, please be willing to [report any bugs](https://github.com/netmix/radio-station/issues) that you do find so we can ensure they are not present in the next official release.
+

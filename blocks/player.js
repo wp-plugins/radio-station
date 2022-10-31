@@ -17,7 +17,7 @@
 		title: __( '[Radio Station] Stream Player', 'radio-station' ),
 		description: __( 'Audio stream player block.', 'radio-station' ),
 		icon: 'controls-volumeon',
-		category: 'media',
+		category: 'radio-station',
 		example: {},
 		attributes: {
 			/* --- Player Content --- */

@@ -33,7 +33,7 @@
 		title: '[Radio Station] Program Schedule',
 		description: __( 'Radio Station Schedule block.', 'radio-station' ),
 		icon: 'calendar-alt',
-		category: 'widgets',
+		category: 'radio-station',
 		example: {},
 		attributes: {
 			

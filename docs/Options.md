@@ -124,6 +124,10 @@ Default Player Controls theme style. Light or dark to match your theme.
 Default: rounded. Key: player_buttons
 Default Player Buttons shape style. Circular, rounded or square.
 
+#### Player Volume Controls
+Default: all. Key: player_volumes
+Which volume controls to display in the Player by default.
+
 #### Player Debug Mode
 Default: off. Key: player_debug
 Output player debug information in browser javascript console.
@@ -150,11 +154,15 @@ Initial volume for when the Player starts playback. 0-100
 
 #### Single Player
 Default: on. Key: player_single
-Stop any existing Players on the page or in other windows or tabs when a Player is started.
+Stop any existing Player instances on the page or in other windows or tabs when a Player is started.
 
 #### [Pro] Player Autoresume
 Default: on. Key: player_autoresume
 Attempt to resume playback if visitor was playing. Only triggered when the user first interacts with the page.
+
+#### [Pro] Player Popup
+Default: off. Key: player_popup
+Add button to open Popup Player in separate window.
 
 #### [Pro] Sitewide Player Bar
 Default: off. Key: player_bar
@@ -179,6 +187,18 @@ Text color for the fixed position Sitewide Bar Player.
 #### [Pro] Bar Player Background Color
 Default: black. Key: player_bar_background
 Background color for the fixed position Sitewide Bar Player.
+
+#### [Pro] Bar Player Current Show
+Default: on. Key: player_bar_currentshow
+Display the Current Show in the Player Bar.
+
+#### [Pro] Bar Player Now Player
+Default: on. Key: player_bar_nowplaying
+Display the Now Playing Track metadata in the Player Bar.
+
+#### [Pro] Bar Player Metadata Source
+Default: none (use Stream URL.) Key: player_bar_metadata
+Alternative metadata source URL for Now Playing Track metadata.
 
 
 ## Pages
@@ -271,6 +291,11 @@ Replaces selected page content with default Playlist Archive.
 Alternatively customize display using the shortcode: `[playlists-archive]`
 See [Playlist Archives Shortcode](./Shortcodes.md#playlist-archives-shortcode) for more info.  
 
+#### [Pro] Team Archives Page
+Default: None. Key: team_archive_page
+Replaces selected page content with default Team Archive (Hosts and Producers.)
+Alternatively customize display using the shortcode: `[team-archive]`
+
 #### Genre Archives Page
 Default: None. Key: genre_archive_page
 Select the Page for displaying the Genre archive list.
@@ -315,11 +340,18 @@ Whether to load Widget contents via AJAX by default. This prevents stale cached 
 Default: On. Key: dynamic_reload
 Whether to reload Widgets automatically on change of Current Show. Can also be set on a per widget basis.
 
+#### [Pro] Convert Show Times
+Default: On. Key: convert_show_times
+Automatically display Show times converted into the visitor timezone, based on their browser setting.
+
+#### [Pro] User Timezone Switching
+Default: On. Key: timezone_switching
+Allow visitors to select their Timezone manually for Show time conversions.
+
 
 ## Roles
 
-Since 2.3.0, a new Show Editor role has been added with Publish and Edit capabilities for all Radio Station Post Types.
-You can assign this Role to any user to give them full Station Schedule updating permissions without giving them a WordPress administrator role.
+Since 2.3.0, a new Show Editor role has been added with Publish and Edit capabilities for all Radio Station Post Types. You can assign this Role to any user to give them complete Station Schedule and Radio Station Post Type updating permissions without giving them a full WordPress administrator role.
 See [Roles](./Roles.md#show-editor-role] for more info.
 
 ### Permissions
