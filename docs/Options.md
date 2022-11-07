@@ -192,9 +192,13 @@ Background color for the fixed position Sitewide Bar Player.
 Default: on. Key: player_bar_currentshow
 Display the Current Show in the Player Bar.
 
-#### [Pro] Bar Player Now Player
+#### [Pro] Bar Player Now Playing
 Default: on. Key: player_bar_nowplaying
 Display the Now Playing Track metadata in the Player Bar.
+
+#### [Pro] Bar Player Track Animation
+Default: backandforth. Key: player_bar_track_animation
+How to animate the currently playing track display.
 
 #### [Pro] Bar Player Metadata Source
 Default: none (use Stream URL.) Key: player_bar_metadata

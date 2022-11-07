@@ -5,7 +5,7 @@
 // =================================
 //
 // --------------
-// Version: 1.2.7
+// Version: 1.2.8
 // --------------
 // Note: Changelog and structure at end of file.
 //
@@ -749,7 +749,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 							if ( 3 == $commas ) {
 								sscanf( $posted, 'rgba(%d,%d,%d,%f)', $values['red'], $values['green'], $values['blue'], $values['alpha'] );
 							} elseif ( 2 == $commas ) {
-								sscanf( $posted, 'rgba(%d,%d,%d)', $values['red'], $values['green'], $values['blue'] );
+								// 1.2.8: remove a from rgba (failing for non-alpha selections)
+								sscanf( $posted, 'rgb(%d,%d,%d)', $values['red'], $values['green'], $values['blue'] );
 							}
 							// echo 'rgba sscanf values: ' . print_r( $values, true ) . "\n";
 							// 1.2.7: fix for use of duplicate key variable
@@ -774,7 +775,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 							if ( 3 == $commas ) {
 								$posted = 'rgba(' . $values['red'] . ',' . $values['green'] . ',' . $values['blue'] . ',' . $values['alpha'] . ')';
 							} elseif ( 2 == $commas ) {
-								$posted = 'rgba(' . $values['red'] . ',' . $values['green'] . ',' . $values['blue'] . ')';
+								// 1.2.8: remove a from rgba (for non-alpha selections)
+								$posted = 'rgb(' . $values['red'] . ',' . $values['green'] . ',' . $values['blue'] . ')';
 							}
 						}
 						$settings[$key] = $posted;
@@ -3464,6 +3466,9 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // =========
 // CHANGELOG
 // =========
+
+// == 1.2.8 ==
+// - fix saving non-alpha colours in coloralpha fields
 
 // == 1.2.7 ==
 // - fix color picker alpha sanitization / saving

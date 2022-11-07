@@ -25,6 +25,7 @@ class Radio_Player_Widget extends WP_Widget {
 		$instance = wp_parse_args( (array) $instance, array( 'title' => '' ) );
 
 		// 2.5.0: fix player image default value to 'default'
+		// $media = isset( $instance['media'] ? $instance['media'] : '';
 		$url = isset( $instance['url'] ) ? $instance['url'] : '';
 		// $format = isset( $instance['format'] ) ? $instance['format'] : '';
 		$title = isset( $instance['title'] ) ? $instance['title'] : '';
@@ -36,6 +37,14 @@ class Radio_Player_Widget extends WP_Widget {
 		$buttons = isset( $instance['buttons'] ) ? $instance['buttons'] : 'default';
 		$volume = isset( $instance['volume'] ) ? $instance['volume'] : '';
 		$default = isset( $instance['default'] ) ? $instance['default'] : 0;
+
+		// 2.5.0: set volume control selection default
+		$volumes = isset( $instance['volumes'] ) ? $instance['volumes'] : 'slider,updown,mute,max';
+		$volumes = explode( ',', $volumes );
+		$volume_slider = in_array( 'slider', $volumes ) ? true : false;
+		$volume_updown = in_array( 'updown', $volumes ) ? true : false;
+		$volume_mute = in_array( 'mute', $volumes ) ? true : false;
+		$volume_max = in_array( 'max', $volumes ) ? true : false;
 
 		// --- additional displays ---
 		// $shows = isset( $instance['show_display'] ) ? $instance['show_display'] : false;
@@ -128,6 +137,18 @@ class Radio_Player_Widget extends WP_Widget {
 			</label>
 		</p>';
 
+		// --- Player Volume Controls ---
+		// 2.5.0: added for consistency with main plugin settings
+		$fields['volumes'] = '<p>
+			<label>
+			' . esc_html( __( 'Volume Controls', 'radio-station' ) ) . '
+				<input name="' . esc_attr( $this->get_field_name( 'volume_slider' ) ) . '" type="checkbox" ' . checked( $volume_slider, true, false ) . '>
+				<input name="' . esc_attr( $this->get_field_name( 'volume_updown' ) ) . '" type="checkbox" ' . checked( $volume_updown, true, false ) . '>
+				<input name="' . esc_attr( $this->get_field_name( 'volume_mute' ) ) . '" type="checkbox" ' . checked( $volume_mute, true, false ) . '>
+				<input name="' . esc_attr( $this->get_field_name( 'volume_max' ) ) . '" type="checkbox" ' . checked( $volume_max, true, false ) . '>
+			</label>
+		</p>';
+
 		// --- Default Player ---
 		$fields['default'] = '<p>
 			<label for="' . esc_attr( $this->get_field_id( 'default' ) ) . '">
@@ -202,9 +223,19 @@ class Radio_Player_Widget extends WP_Widget {
 		
 		// --- [Pro] Color Options ---
 		// 2.5.0: added Pro color options message
-		$fields['color_options'] = '<h4>' . esc_html( __( '[Pro] Color Options', 'radio-station' ) ) . '</h4>' . "\n";
+		$fields['color_options'] .= '<h4>' . esc_html( __( '[Pro] Color Options', 'radio-station' ) ) . '</h4>' . "\n";
 		$fields['color_options'] = '<p>
 			<label for="dynamic">' . esc_html( __( 'Color options available in Pro.', 'radio-station' ) ) . '</label><br>
+			<a href="' . esc_url( $pricing_url ) . '">' . esc_html( __( 'Upgrade to Pro', 'radio-station' ) ) . '</a> |
+			<a href="' . esc_url( $upgrade_url ) . '" target="_blank">' . esc_html( __( 'More Details', 'radio-station' ) ) . '</a>
+		</p>';
+
+		// --- [Pro] Track Animation ---
+		// 2.5.0: added Pro track animation message
+		$fields['advanced_options'] = '<h4>' . esc_html( __( '[Pro] Advanced Options', 'radio-station' ) ) . '</h4>' . "\n";
+		$fields['advanced_options'] .= '<p>
+			<label for="dynamic">' . esc_html( __( 'Advanced options available in Pro.', 'radio-station' ) ) . '</label><br>
+			<ul>
 			<a href="' . esc_url( $pricing_url ) . '">' . esc_html( __( 'Upgrade to Pro', 'radio-station' ) ) . '</a> |
 			<a href="' . esc_url( $upgrade_url ) . '" target="_blank">' . esc_html( __( 'More Details', 'radio-station' ) ) . '</a>
 		</p>';
@@ -224,6 +255,7 @@ class Radio_Player_Widget extends WP_Widget {
 
 		// --- get new widget options ---
 		$instance = $old_instance;
+		// $instance['media'] = isset( $new_instance['media'] ) : 'stream';
 		$instance['url'] = isset( $new_instance['url'] ) ? $new_instance['url'] : '';
 		$instance['title'] = isset( $new_instance['title'] ) ? $new_instance['title'] : '';
 		$instance['station'] = isset( $new_instance['station'] ) ? $new_instance['station'] : '';
@@ -242,6 +274,22 @@ class Radio_Player_Widget extends WP_Widget {
 			}
 		}
 		$instance['default'] = isset( $new_instance['default'] ) ? 1 : 0;
+
+		// 2.5.0: save volume control selections
+		$volumes = array();
+		if ( isset( $new_instance['volume_slider'] ) ) {
+			$volumes[] = 'slider';
+		}
+		if ( isset( $new_instance['volume_updown'] ) ) {
+			$volumes[] = 'updown';
+		}
+		if ( isset( $new_instance['volume_mute'] ) ) {
+			$volumes[] = 'mute';
+		}
+		if ( isset( $new_instance['volume_max'] ) ) {
+			$volumes[] = 'max';
+		}
+		$instance['volumes'] = implode( ',', $volumes );
 
 		// --- additional displays ---
 		// $instance['show_display'] = isset( $new_instance['show_display'] ) ? 1 : 0;
@@ -267,7 +315,9 @@ class Radio_Player_Widget extends WP_Widget {
 		$id = $radio_station_data['widgets']['player'];
 
 		// --- get widget options ---
+		$media = isset( $instance['media'] ) ? $instance['media'] : 'stream';
 		$url = $instance['url'];
+		// $fallback = $instance['fallback'];
 		$title = empty( $instance['title'] ) ? '' : $instance['title'];
 		$title = apply_filters( 'widget_title', $title );
 		$station = $instance['station'];
@@ -286,6 +336,8 @@ class Radio_Player_Widget extends WP_Widget {
 			$volume = 'default';
 		}
 		$default = $instance['default'];
+		// 2.5.0: added volume controls
+		$volumes = isset( $instance['volumes'] ) ? explode( ',', $instance['volumes'] ) : array( 'slider', 'updown', 'mute', 'max' );
 
 		// --- additional displays ---
 		// $instance['show_display'] = $instance['show_display'] ) ? 1 : 0;
@@ -294,9 +346,12 @@ class Radio_Player_Widget extends WP_Widget {
 
 		// --- set shortcode attributes ---
 		// note: station text mapped to shortcode title attribute
+		// 2.5.0: added media and volumes attributes
 		$atts = array(
 			// --- main player settings ---
+			'media'          => $media,
 			'url'            => $url,
+			// 'fallback'    => $fallback
 			'title'          => $station,
 			'image'          => $image,
 			'script'         => $script,
@@ -304,6 +359,7 @@ class Radio_Player_Widget extends WP_Widget {
 			'theme'          => $theme,
 			'buttons'        => $buttons,
 			'volume'         => $volume,
+			'volumes'        => $volumes,
 			'default'        => $default,
 			// --- additional displays ---
 			// 'shows'          => $shows,

@@ -188,6 +188,7 @@ The following attributes are available for this shortcode:
 * *link_genres* : Link Genre titles to term pages. 0 or 1. Default 1.
 * *genre_desc' :  Display Genre term description. 0 or 1. Default 1.
 * *genre_images' : [Pro] Display Genre images. 0 or 1. Default 1.
+* *view* : Layout display view. 'list' or 'grid'. Default 'grid'.
 * *image_width' : [Pro] Set a width style in pixels for Genre images. Default is 100.
 * *hide_empty' : No output if no records to display for Genre. 0 or 1. Default 1.
 * *status* : Query for Show status. Default 'publish'.
@@ -212,6 +213,7 @@ The following attributes are available for this shortcode:
 * *languages* : Genres to display (ID or slug). Separate multiple values with commas. Default empty (all)
 * *link_languages* : Link Genre titles to term pages. 0 or 1. Default 1.
 * *language_desc' :  Display Genre term description. 0 or 1. Default 1.
+* *view* : Layout display view. 'list' or 'grid'. Default 'grid'.
 * *hide_empty' : No output if no records to display for Genre. 0 or 1. Default 1.
 * *status* : Query for Show status. Default 'publish'.
 * *perpage* : Query for number of Shows. Default -1 (all)
@@ -264,11 +266,11 @@ The following attributes are available for this shortcode:
 
 `[team-archive]`
 
-The Team Archive Shortcode
+The following attributes are available for this shortcode:
 
 * *view* : Layout display view. 'list' or 'grid'. Default list.
 
-
+...
 
 [Demo Site Example Output](https://demo.radiostation.pro/archive-shortcodes/team-archive/)
 
@@ -303,7 +305,7 @@ The following attributes are available for this shortcode:
 
 `[show-episodes-archive]` (or `[show-episode-archive]`)
 
-This shortcode will be available in [Radio Station Pro](https://radiostation.pro)
+This shortcode is available in [Radio Station Pro](https://radiostation.pro)
 
 
 ## Widget Shortcodes

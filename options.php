@@ -607,6 +607,23 @@ $options = array(
 		'pro'     => true,
 	),
 
+	// --- [Pro/Player] Track Animation ---
+	'player_bar_track_animation' => array(
+		'type'    => 'select',
+		'label'   => __( 'Track Animation', 'radio-station' ),
+		'default' => 'backandforth',
+		'options' => array(
+			'none'         => __( 'No Animation', 'radio-station' ),
+			'lefttoright'  => __( 'Left to Right Ticker', 'radio-station' ),
+			'righttoleft'  => __( 'Right to Left Ticker', 'radio-station' ),
+			'backandforth' => __( 'Back and Forth', 'radio-station' ),
+		),
+		'tab'     => 'player',
+		'section' => 'bar',
+		'helper'  => __( 'How to animate the currently playing track display.', 'radio-station' ),
+		'pro'     => true,	
+	),
+
 	// --- [Pro/Player] Metadata URL ---
 	// 2.4.0.3: added for alternative stream metadata URL
 	'player_bar_metadata' => array(

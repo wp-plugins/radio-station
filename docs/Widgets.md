@@ -2,21 +2,6 @@
 
 ***
 
-[Radio Player Widget](./Widgets.md#radio-player-widget)
-[Radio Player Shortcode](./Widgets.md#radio-player-shortcode)
-[[Pro] Sitewide Bar Player](./Widgets.md#pro-sitewide-bar-player)
-[Current Show Widget](./Widgets.md#current-show-widget)
-[Current Show Shortcode](./Widgets.md#current-show-shortcode)
-[Upcoming Shows Widget](./Widgets.md#upcoming-shows-widget)
-[Upcoming Shows Shortcode](./Widgets.md#upcoming-shows-shortcode)
-[Current Playlist Widget](./Widgets.md#current-playlist-widget)
-[Current Playlist Shortcode](./Widgets.md#current-playlist-shortcode)
-[Radio Clock Widget](./Widgets.md#radio-clock-widget)
-[Radio Station Blocks](./Widgets.md#radio-station-blocks)
-[[Pro] Extra Block Options](./Widgets.md#pro-extra-block-options)
-[[Pro] Beaver Builder Modules](./Widgets.md#pro-beaver-builder-modules)
-[[Pro] Elementor Widgets](./Widgets.md#pro-elementor-widgets)
-
 You can add any of the Radio Station Plugin Widgets to your site's sidebar widget areas via the WordPress Appearance -> Widgets screen. 
 
 Note Widgets are displayed via their corresponding Shortcodes to prevent code duplication and maintain display consistency. (The selected Widget options are converted into Shortcode attributes.) This also means if you want to display a Widget within a custom Template, you can use the corresponding shortcode in your template file. eg. `do_shortcode('[current-show]');`

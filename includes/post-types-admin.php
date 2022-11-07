@@ -1480,165 +1480,165 @@ function radio_station_show_shifts_table( $post_id ) {
 
 				$list .= '<ul id="shift-' . esc_attr( $unique_id ) . '" class="' . esc_attr( $classlist ) . '">' . "\n";
 
-				// --- shift day selection ---
-				$list .= '<li class="shift-item first-item">' . "\n";
-					$list .= '<label>' . esc_html( __( 'Day', 'radio-station' ) ) . '</label>: ' . "\n";
-					$class = ( '' == $shift['day'] ) ? 'incomplete' : '';
-					$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-day" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][day]" onchange="radio_check_select(this);">' . "\n";
-						// 2.3.0: simplify by looping days
-						foreach ( $days as $day ) {
-							// 2.3.0: add weekday translation to display
-							$list .= '<option value="' . esc_attr( $day ) . '" ' . selected( $day, $shift['day'], false ) . '>' . "\n";
-							$list .= esc_html( radio_station_translate_weekday( $day ) ) . '</option>' . "\n";
+					// --- shift day selection ---
+					$list .= '<li class="shift-item first-item">' . "\n";
+						$list .= '<label>' . esc_html( __( 'Day', 'radio-station' ) ) . '</label>: ' . "\n";
+						$class = ( '' == $shift['day'] ) ? 'incomplete' : '';
+						$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-day" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][day]" onchange="radio_check_select(this);">' . "\n";
+							// 2.3.0: simplify by looping days
+							foreach ( $days as $day ) {
+								// 2.3.0: add weekday translation to display
+								$list .= '<option value="' . esc_attr( $day ) . '" ' . selected( $day, $shift['day'], false ) . '>' . "\n";
+								$list .= esc_html( radio_station_translate_weekday( $day ) ) . '</option>' . "\n";
+							}
+						$list .= '</select>' . "\n";
+						$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-day" value="' . esc_attr( $shift['day'] ) . '">' . "\n";
+					$list .= '</li>' . "\n";
+
+					// --- shift start time ---
+					$list .= '<li class="shift-item">' . "\n";
+						$list .= '<label>' . esc_html( __( 'Start Time', 'radio-station' ) ) . '</label>: ' . "\n";
+
+						// --- start hour selection ---
+						$class = ( '' == $shift['start_hour'] ) ? 'incomplete' : '';
+						$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-start-hour" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][start_hour]" onchange="radio_check_select(this);" style="min-width:35px;">' . "\n";
+						// 2.5.0: use (possibly translated) hours
+						foreach ( $hours as $hour => $label ) {
+							$class = ( $hour == $shift['start_hour'] ) ? 'original' : '';
+							// 2.5.0: added number format internationalization
+							$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $hour ) . '" ' . selected( $hour, $shift['start_hour'], false ) . '>' . esc_html( $label ) . '</option>' . "\n";
 						}
-					$list .= '</select>' . "\n";
-					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-day" value="' . esc_attr( $shift['day'] ) . '">' . "\n";
-				$list .= '</li>' . "\n";
+						$list .= '</select>' . "\n";
+						$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-start-hour" value="' . esc_attr( $shift['start_hour'] ) . '">' . "\n";
 
-				// --- shift start time ---
-				$list .= '<li class="shift-item">' . "\n";
-					$list .= '<label>' . esc_html( __( 'Start Time', 'radio-station' ) ) . '</label>: ' . "\n";
+						// --- start minute selection ---
+						$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-start-min" name="show_sched[' . esc_attr( $unique_id ) . '][start_min]" onchange="radio_check_select(this);" style="min-width:35px;">' . "\n";
+							// $list .= '<option value=""></option>' . "\n";
+							$list .= '<option value="00">' . esc_html( number_format_i18n( 0 ) . number_format_i18n( 0 ) ) . '</option>' . "\n";
+							$list .= '<option value="15">' . esc_html( number_format_i18n( 15 ) ) . '</option>' . "\n";
+							$list .= '<option value="30">' . esc_html( number_format_i18n( 30 ) ) . '</option>' . "\n";
+							$list .= '<option value="45">' . esc_html( number_format_i18n( 45 ) ) . '</option>' . "\n";
+							// 2.5.0: use (possibly translated) minutes
+							foreach ( $mins as $min => $label ) {
+								$class = ( $min == $shift['start_min'] ) ? 'original' : '';
+								// 2.5.0: added number format internationalization
+								$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $min ) . '" ' . selected( $min, $shift['start_min'], false ) . '>' . esc_html( $label ) . '</option>' . "\n";
+							}
+						$list .= '</select>' . "\n";
+						$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-start-min" value="' . esc_attr( $shift['start_min'] ) . '">' . "\n";
 
-					// --- start hour selection ---
-					$class = ( '' == $shift['start_hour'] ) ? 'incomplete' : '';
-					$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-start-hour" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][start_hour]" onchange="radio_check_select(this);" style="min-width:35px;">' . "\n";
-					// 2.5.0: use (possibly translated) hours
-					foreach ( $hours as $hour => $label ) {
-						$class = ( $hour == $shift['start_hour'] ) ? 'original' : '';
-						// 2.5.0: added number format internationalization
-						$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $hour ) . '" ' . selected( $hour, $shift['start_hour'], false ) . '>' . esc_html( $label ) . '</option>' . "\n";
-					}
-					$list .= '</select>' . "\n";
-					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-start-hour" value="' . esc_attr( $shift['start_hour'] ) . '">' . "\n";
+						// --- start meridiem selection ---
+						$class = ( '' == $shift['start_meridian'] ) ? 'incomplete' :  '';
+						$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-start-meridian" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][start_meridian]" onchange="radio_check_select(this);" style="min-width:35px;">' . "\n";
+							$class = ( 'am' == $shift['start_meridian'] ) ? 'original' : '';
+							$list .= '<option class="' . esc_attr( $class ) . '" value="am" ' . selected( $shift['start_meridian'], 'am', false ) . '>' . esc_html( $am ) . '</option>' . "\n";
+							$class = ( 'pm' == $shift['start_meridian'] ) ? 'original' : '';
+							$list .= '<option class="' . esc_attr( $class ) . '" value="pm" ' . selected( $shift['start_meridian'], 'pm', false ) . '>' . esc_html( $pm ) . '</option>' . "\n";
+						$list .= '</select>' . "\n";
+						$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-start-meridian" value="' . esc_attr( $shift['start_meridian'] ) . '">' . "\n";
 
-					// --- start minute selection ---
-					$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-start-min" name="show_sched[' . esc_attr( $unique_id ) . '][start_min]" onchange="radio_check_select(this);" style="min-width:35px;">' . "\n";
-						// $list .= '<option value=""></option>' . "\n";
+					$list .= '</li>' . "\n";
+
+					// --- shift end time ---
+					$list .= '<li class="shift-item">' . "\n";
+						$list .= '<label>' . esc_html( __( 'End Time', 'radio-station' ) ) . '</label>: ' . "\n";
+
+						// --- end hour selection ---
+						$class = ( '' == $shift['end_hour'] ) ? 'incomplete' : '';
+						$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-end-hour" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][end_hour]" onchange="radio_check_select(this);" style="min-width:35px;">' . "\n";
+							// 2.5.0: use (possibly translated) minutes
+							foreach ( $hours as $hour => $label ) {
+								$class = ( $hour == $shift['end_hour'] ) ? 'original' : '';
+								$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $hour ) . '" ' . selected( $shift['end_hour'], $hour, false ) . '>' . esc_html( $label ) . '</option>' . "\n";
+							}
+						$list .= '</select>' . "\n";
+						$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-end-hour" value="' . esc_attr( $shift['end_hour'] ) . '">' . "\n";
+
+					// --- end minute selection ---
+					$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-end-min" name="show_sched[' . esc_attr( $unique_id ) . '][end_min]" onchange="radio_check_select(this);" style="min-width:35px;">' . "\n";
+						$list .= '<option value=""></option>' . "\n";
 						$list .= '<option value="00">' . esc_html( number_format_i18n( 0 ) . number_format_i18n( 0 ) ) . '</option>' . "\n";
 						$list .= '<option value="15">' . esc_html( number_format_i18n( 15 ) ) . '</option>' . "\n";
 						$list .= '<option value="30">' . esc_html( number_format_i18n( 30 ) ) . '</option>' . "\n";
 						$list .= '<option value="45">' . esc_html( number_format_i18n( 45 ) ) . '</option>' . "\n";
 						// 2.5.0: use (possibly translated) minutes
 						foreach ( $mins as $min => $label ) {
-							$class = ( $min == $shift['start_min'] ) ? 'original' : '';
-							// 2.5.0: added number format internationalization
-							$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $min ) . '" ' . selected( $min, $shift['start_min'], false ) . '>' . esc_html( $label ) . '</option>' . "\n";
+							$class = ( $min == $shift['end_min'] ) ? 'original' : '';
+							$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $min ) . '" ' . selected( $shift['end_min'], $min, false ) . '>' . esc_html( $label ) . '</option>' . "\n";
 						}
 					$list .= '</select>' . "\n";
-					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-start-min" value="' . esc_attr( $shift['start_min'] ) . '">' . "\n";
+					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-end-min" value="' . esc_attr( $shift['end_min'] ) . '">' . "\n";
 
-					// --- start meridiem selection ---
-					$class = ( '' == $shift['start_meridian'] ) ? 'incomplete' :  '';
-					$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-start-meridian" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][start_meridian]" onchange="radio_check_select(this);" style="min-width:35px;">' . "\n";
-						$class = ( 'am' == $shift['start_meridian'] ) ? 'original' : '';
-						$list .= '<option class="' . esc_attr( $class ) . '" value="am" ' . selected( $shift['start_meridian'], 'am', false ) . '>' . esc_html( $am ) . '</option>' . "\n";
-						$class = ( 'pm' == $shift['start_meridian'] ) ? 'original' : '';
-						$list .= '<option class="' . esc_attr( $class ) . '" value="pm" ' . selected( $shift['start_meridian'], 'pm', false ) . '>' . esc_html( $pm ) . '</option>' . "\n";
-					$list .= '</select>' . "\n";
-					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-start-meridian" value="' . esc_attr( $shift['start_meridian'] ) . '">' . "\n";
+					// --- end meridiem selection ---
+					$class = ( '' == $shift['end_meridian'] ) ? 'incomplete' : '';
+						$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-end-meridian" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][end_meridian]" onchange="radio_check_select(this);" style="min-width:35px;">' . "\n";
+							$class = ( 'am' == $shift['end_meridian'] ) ? 'original' : '';
+							$list .= '<option class="' . esc_attr( $class ) . '" value="am" ' . selected( $shift['end_meridian'], 'am', false ) . '>' . esc_html( $am ) . '</option>' . "\n";
+							$class = ( 'pm' == $shift['end_meridian'] ) ? 'original' : '';
+							$list .= '<option class="' . esc_attr( $class ) . '" value="pm" ' . selected( $shift['end_meridian'], 'pm', false ) . '>' . esc_html( $pm ) . '</option>' . "\n";
+						$list .= '</select>' . "\n";
+						$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-end-meridian" value="' . esc_attr( $shift['end_meridian'] ) . '">' . "\n";
+					$list .= '</li>' . "\n";
 
-				$list .= '</li>' . "\n";
+					// --- encore presentation ---
+					if ( !isset( $shift['encore'] ) ) {
+						$shift['encore'] = '';
+					}
+					$list .= '<li class="shift-item shift-encore">' . "\n";
+						$list .= '<input id="' . esc_attr( $unique_id ) . '-encore" type="checkbox" value="on" name="show_sched[' . esc_attr( $unique_id ) . '][encore]" id="shift-' . esc_attr( $unique_id ) . '-encore"' . checked( $shift['encore'], 'on', false ) . ' onchange="radio_check_checkbox(this);">' . "\n";
+						$list .= ' <label>' . esc_html( __( 'Encore', 'radio-station' ) ) . '</label>' . "\n";
+						$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-encore" value="' . esc_attr( $shift['encore'] ) . '">' . "\n";
+					$list .= '</li>' . "\n";
 
-				// --- shift end time ---
-				$list .= '<li class="shift-item">' . "\n";
-					$list .= '<label>' . esc_html( __( 'End Time', 'radio-station' ) ) . '</label>: ' . "\n";
+					// --- shift disabled ---
+					// 2.3.0: added disabled checkbox to shift row
+					if ( !isset( $shift['disabled'] ) ) {
+						$shift['disabled'] = '';
+					}
+					$list .= '<li class="shift-item shift-disable">' . "\n";
+						$list .= '<input id="' . esc_attr( $unique_id ) . '-disabled" type="checkbox" value="yes" name="show_sched[' . esc_attr( $unique_id ) . '][disabled]" id="shift-' . esc_attr( $unique_id ) . '-disabled"' . checked( $shift['disabled'], 'yes', false ) . ' onchange="radio_check_checkbox(this);">' . "\n";
+						$list .= ' <label>' . esc_html( __( 'Disabled', 'radio-station' ) ) . '</label>' . "\n";
+						$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-disabled" value="' . esc_attr( $shift['disabled'] ) . '">' . "\n";
+					$list .= '</li>' . "\n";
 
-					// --- end hour selection ---
-					$class = ( '' == $shift['end_hour'] ) ? 'incomplete' : '';
-					$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-end-hour" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][end_hour]" onchange="radio_check_select(this);" style="min-width:35px;">' . "\n";
-						// 2.5.0: use (possibly translated) minutes
-						foreach ( $hours as $hour => $label ) {
-							$class = ( $hour == $shift['end_hour'] ) ? 'original' : '';
-							$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $hour ) . '" ' . selected( $shift['end_hour'], $hour, false ) . '>' . esc_html( $label ) . '</option>' . "\n";
+					// --- duplicate shift icon ---
+					// 2.3.0: added duplicate shift icon
+					$list .= '<li class="shift-item">' . "\n";
+						$title = __( 'Duplicate Shift', 'radio-station' ) . "\n";
+						$list .= '<span id="shift-' . esc_attr( $unique_id ) . '-duplicate" class="shift-duplicate dashicons dashicons-admin-page" title="' . esc_attr( $title ) . '" onclick="radio_shift_duplicate(this);"></span>' . "\n";
+					$list .= '</li>' . "\n";
+
+					// --- remove shift icon ---
+					// 2.3.0: change remove button to icon
+					$list .= '<li class="shift-item last-item">' . "\n";
+						$title = __( 'Remove Shift', 'radio-station' ) . "\n";
+						$list .= '<span id="shift-' . esc_attr( $unique_id ) . '-remove" class="shift-remove dashicons dashicons-no" title="' . esc_attr( $title ) . '" onclick="radio_shift_remove(this);"></span>' . "\n";
+					$list .= '</li>' . "\n";
+
+				$list .= '</ul>' . "\n";
+
+				// --- output any shift conflicts found ---
+				if ( $conflicts && is_array( $conflicts ) && ( count( $conflicts ) > 0 ) ) {
+
+					$list .= '<div class="shift-conflicts">' . "\n";
+					$list .= '<b>' . esc_html( __( 'Shift Conflicts', 'radio-station' ) ) . '</b>: ' . "\n";
+					foreach ( $conflicts as $j => $conflict ) {
+						if ( $j > 0 ) {
+							$list .= ', ';
 						}
-					$list .= '</select>' . "\n";
-					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-end-hour" value="' . esc_attr( $shift['end_hour'] ) . '">' . "\n";
-
-				// --- end minute selection ---
-				$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-end-min" name="show_sched[' . esc_attr( $unique_id ) . '][end_min]" onchange="radio_check_select(this);" style="min-width:35px;">' . "\n";
-					$list .= '<option value=""></option>' . "\n";
-					$list .= '<option value="00">' . esc_html( number_format_i18n( 0 ) . number_format_i18n( 0 ) ) . '</option>' . "\n";
-					$list .= '<option value="15">' . esc_html( number_format_i18n( 15 ) ) . '</option>' . "\n";
-					$list .= '<option value="30">' . esc_html( number_format_i18n( 30 ) ) . '</option>' . "\n";
-					$list .= '<option value="45">' . esc_html( number_format_i18n( 45 ) ) . '</option>' . "\n";
-					// 2.5.0: use (possibly translated) minutes
-					foreach ( $mins as $min => $label ) {
-						$class = ( $min == $shift['end_min'] ) ? 'original' : '';
-						$list .= '<option class="' . esc_attr( $class ) . '" value="' . esc_attr( $min ) . '" ' . selected( $shift['end_min'], $min, false ) . '>' . esc_html( $label ) . '</option>' . "\n";
+						if ( $conflict['show'] == $post_id ) {
+							$list .= '<i>' . esc_html( __('This Show', 'radio-station' ) ) . '</i>' . "\n";
+						} else {
+							$show_edit_link = add_query_arg( 'post', $conflict['show'], $edit_link );
+							$show_title = get_the_title( $conflict['show'] );
+							$list .= '<a href="' . esc_url( $show_edit_link ) . '">' . esc_html( $show_title ) . '</a>' . "\n";
+						}
+						$conflict_start = esc_html( $conflict['shift']['start_hour'] ) . ':' . esc_html( $conflict['shift']['start_min'] ) . ' ' . esc_html( $conflict['shift']['start_meridian'] );
+						$conflict_end = esc_html( $conflict['shift']['end_hour'] ) . ':' . esc_html( $conflict['shift']['end_min'] ). ' ' . esc_html( $conflict['shift']['end_meridian'] );
+						$list .= ' - ' . esc_html( $conflict['shift']['day'] ) . ' ' . $conflict_start . ' - ' . $conflict_end;
 					}
-				$list .= '</select>' . "\n";
-				$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-end-min" value="' . esc_attr( $shift['end_min'] ) . '">' . "\n";
-
-				// --- end meridiem selection ---
-				$class = ( '' == $shift['end_meridian'] ) ? 'incomplete' : '';
-					$list .= '<select id="shift-' . esc_attr( $unique_id ) . '-end-meridian" class="' . esc_attr( $class ) . '" name="show_sched[' . esc_attr( $unique_id ) . '][end_meridian]" onchange="radio_check_select(this);" style="min-width:35px;">' . "\n";
-						$class = ( 'am' == $shift['end_meridian'] ) ? 'original' : '';
-						$list .= '<option class="' . esc_attr( $class ) . '" value="am" ' . selected( $shift['end_meridian'], 'am', false ) . '>' . esc_html( $am ) . '</option>' . "\n";
-						$class = ( 'pm' == $shift['end_meridian'] ) ? 'original' : '';
-						$list .= '<option class="' . esc_attr( $class ) . '" value="pm" ' . selected( $shift['end_meridian'], 'pm', false ) . '>' . esc_html( $pm ) . '</option>' . "\n";
-					$list .= '</select>' . "\n";
-					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-end-meridian" value="' . esc_attr( $shift['end_meridian'] ) . '">' . "\n";
-				$list .= '</li>' . "\n";
-
-				// --- encore presentation ---
-				if ( !isset( $shift['encore'] ) ) {
-					$shift['encore'] = '';
+					$list .= '</div><br>' . "\n";
 				}
-				$list .= '<li class="shift-item shift-encore">' . "\n";
-					$list .= '<input id="' . esc_attr( $unique_id ) . '-encore" type="checkbox" value="on" name="show_sched[' . esc_attr( $unique_id ) . '][encore]" id="shift-' . esc_attr( $unique_id ) . '-encore"' . checked( $shift['encore'], 'on', false ) . ' onchange="radio_check_checkbox(this);">' . "\n";
-					$list .= ' <label>' . esc_html( __( 'Encore', 'radio-station' ) ) . '</label>' . "\n";
-					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-encore" value="' . esc_attr( $shift['encore'] ) . '">' . "\n";
-				$list .= '</li>' . "\n";
-
-				// --- shift disabled ---
-				// 2.3.0: added disabled checkbox to shift row
-				if ( !isset( $shift['disabled'] ) ) {
-					$shift['disabled'] = '';
-				}
-				$list .= '<li class="shift-item shift-disable">' . "\n";
-					$list .= '<input id="' . esc_attr( $unique_id ) . '-disabled" type="checkbox" value="yes" name="show_sched[' . esc_attr( $unique_id ) . '][disabled]" id="shift-' . esc_attr( $unique_id ) . '-disabled"' . checked( $shift['disabled'], 'yes', false ) . ' onchange="radio_check_checkbox(this);">' . "\n";
-					$list .= ' <label>' . esc_html( __( 'Disabled', 'radio-station' ) ) . '</label>' . "\n";
-					$list .= '<input type="hidden" id="' . esc_attr( $unique_id ) . '-disabled" value="' . esc_attr( $shift['disabled'] ) . '">' . "\n";
-				$list .= '</li>' . "\n";
-
-				// --- duplicate shift icon ---
-				// 2.3.0: added duplicate shift icon
-				$list .= '<li class="shift-item">' . "\n";
-					$title = __( 'Duplicate Shift', 'radio-station' ) . "\n";
-					$list .= '<span id="shift-' . esc_attr( $unique_id ) . '-duplicate" class="shift-duplicate dashicons dashicons-admin-page" title="' . esc_attr( $title ) . '" onclick="radio_shift_duplicate(this);"></span>' . "\n";
-				$list .= '</li>' . "\n";
-
-				// --- remove shift icon ---
-				// 2.3.0: change remove button to icon
-				$list .= '<li class="shift-item last-item">' . "\n";
-					$title = __( 'Remove Shift', 'radio-station' ) . "\n";
-					$list .= '<span id="shift-' . esc_attr( $unique_id ) . '-remove" class="shift-remove dashicons dashicons-no" title="' . esc_attr( $title ) . '" onclick="radio_shift_remove(this);"></span>' . "\n";
-				$list .= '</li>' . "\n";
-
-			$list .= '</ul>' . "\n";
-
-			// --- output any shift conflicts found ---
-			if ( $conflicts && is_array( $conflicts ) && ( count( $conflicts ) > 0 ) ) {
-
-				$list .= '<div class="shift-conflicts">' . "\n";
-				$list .= '<b>' . esc_html( __( 'Shift Conflicts', 'radio-station' ) ) . '</b>: ' . "\n";
-				foreach ( $conflicts as $j => $conflict ) {
-					if ( $j > 0 ) {
-						$list .= ', ';
-					}
-					if ( $conflict['show'] == $post_id ) {
-						$list .= '<i>' . esc_html( __('This Show', 'radio-station' ) ) . '</i>' . "\n";
-					} else {
-						$show_edit_link = add_query_arg( 'post', $conflict['show'], $edit_link );
-						$show_title = get_the_title( $conflict['show'] );
-						$list .= '<a href="' . esc_url( $show_edit_link ) . '">' . esc_html( $show_title ) . '</a>' . "\n";
-					}
-					$conflict_start = esc_html( $conflict['shift']['start_hour'] ) . ':' . esc_html( $conflict['shift']['start_min'] ) . ' ' . esc_html( $conflict['shift']['start_meridian'] );
-					$conflict_end = esc_html( $conflict['shift']['end_hour'] ) . ':' . esc_html( $conflict['shift']['end_min'] ). ' ' . esc_html( $conflict['shift']['end_meridian'] );
-					$list .= ' - ' . esc_html( $conflict['shift']['day'] ) . ' ' . $conflict_start . ' - ' . $conflict_end;
-				}
-				$list .= '</div><br>' . "\n";
-			}
 
 			// --- close shift wrapper ---
 			$list .= '</div>' . "\n";
@@ -3511,7 +3511,7 @@ function radio_station_schedule_override_metabox() {
 		// --- override list table ---
 		echo '<div id="overrides-list">' . "\n";
 			$table = radio_station_overrides_table( $post->ID );
-			if ( '' != $table['list'] ) {
+			if ( '' != $table['html'] ) {
 				// 2.5.0: use wp_kses on table output
 				$allowed = radio_station_allowed_html( 'content', 'settings' );
 				echo wp_kses( $table['list'], $allowed );
@@ -3904,7 +3904,7 @@ function radio_station_overrides_table( $post_id ) {
 
 	// --- set table output to return ---
 	$table = array(
-		'list' => $list,
+		'html' => $list,
 		// 'conflicts' => $conflicts,
 	);
 
@@ -4630,18 +4630,18 @@ function radio_station_override_save_data( $post_id ) {
 		if ( $sched_changed ) {
 
 			// --- output new show shifts list ---
-			echo '<div id="overrides-list">';
-			$table = radio_station_overrides_table( $post_id );
-			// if ( $table['conflicts'] ) {
-			// 	radio_station_overrides_conflict_message();
-			// }
+			echo '<div id="overrides-list">' . "\n";
 
-			// 2.5.0: use wp_kses on table output
-			$allowed = radio_station_allowed_html( 'content', 'settings' );
-			echo wp_kses( $table['list'], $allowed );
+				$table = radio_station_overrides_table( $post_id );
+				// if ( $table['conflicts'] ) {
+				// 	radio_station_overrides_conflict_message();
+				// }
+				// 2.5.0: use wp_kses on table output
+				$allowed = radio_station_allowed_html( 'content', 'settings' );
+				echo wp_kses( $table['html'], $allowed );
+				// echo '<div id="updated-div"></div>';
 
-			// echo '<div id="updated-div"></div>';
-			echo '</div>';
+			echo '</div>' . "\n";
 
 			// --- refresh show shifts list ---
 			$js = "if (!parent.document.getElementById('overrides-list')) {console.log('Error. Could not find override list!');}" . "\n";

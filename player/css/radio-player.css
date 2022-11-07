@@ -135,6 +135,7 @@
 
 .rp-play-pause-button:hover, .rp-play-pause-button:focus {
 	opacity: 1;
+	scale: 1.1;
 }
 
 .radio-container.light.circular .rp-play-pause-button {
@@ -236,8 +237,10 @@
 	opacity: 0.9;
 }
 
-.radio-container .rp-volume-controls button:hover, .radio-container .rp-volume-controls button:focus {
+.radio-container .rp-volume-controls button:hover, .radio-container .rp-volume-controls button:focus,
+.radio-container .rp-popup button:hover, .radio-container .rp-popup button:focus {
 	opacity: 1;
+	scale: 1.1;
 }
 
 .radio-container.circular .rp-volume-controls button, .radio-container.circular .rp-popup button {
@@ -261,28 +264,22 @@
 }
 
 .light button.rp-mute, .light button.rp-volume-max, .light button.rp-volume-up, .light button.rp-volume-down, .light button.rp-popup-button {
-	background-image: url("../images/volume-controls-light.png?v=1");
+	background-image: url("../images/volume-controls-light.png?v=3");
 }
 .dark button.rp-mute, .dark button.rp-volume-max, .dark button.rp-volume-up, .dark button.rp-volume-down, .dark button.rp-popup-button {
-	background-image: url("../images/volume-controls-dark.png?v=1");
+	background-image: url("../images/volume-controls-dark.png?v=3");
 }
 
-.light .rp-mute {background-position: 0px 0px;}
-.dark .rp-mute {background-position: 0px 0px;}
-.light.muted .rp-mute, .light .rp-mute:hover,
-.dark.muted .rp-mute, .dark .rp-mute:hover {background-position: -18px -18px;}
-.light .rp-volume-max, .dark .rp-volume-max {background-position: 0 -36px;}
-.light.maxed .rp-volume-max, .light .rp-volume-max:focus, .light .rp-volume-max:hover,
-.dark.maxed .rp-volume-max, .dark .rp-volume-max:focus, .dark .rp-volume-max:hover {background-position: -18px -36px;}
-.light .rp-volume-up, .dark .rp-volume-up {background-position: 0 -54px;}
-.light .rp-volume-up:focus, .light .rp-volume-up:hover,
-.dark .rp-volume-up:focus, .dark .rp-volume-up:hover {background-position: -18px -54px;}
-.light .rp-volume-down, .dark .rp-volume-down {background-position: 0 -72px;}
-.light .rp-volume-down:focus, .light .rp-volume-down:hover,
-.dark .rp-volume-down:focus, .dark .rp-volume-down:hover {background-position: -18px -72px;}
-.light .rp-popup-button, .dark .rp-popup-button {background-position: 0 -90px;}
-.light .rp-popup-button:focus, .light .rp-popup-button:hover,
-.dark .rp-popup-button:focus, .dark .rp-popup-button:hover {background-position: -18px -90px;}
+.rp-mute {background-position: 0px 0px;}
+.muted .rp-mute, .rp-mute:hover {background-position: -18px -18px;}
+.rp-volume-max {background-position: 0 -36px;}
+.maxed .rp-volume-max, .rp-volume-max:focus, .rp-volume-max:hover {background-position: -18px -36px;}
+.rp-volume-up {background-position: 0 -54px;}
+.rp-volume-up:focus, .rp-volume-up:hover {background-position: -18px -54px;}
+.rp-volume-down {background-position: 0 -72px;}
+.rp-volume-down:focus, .rp-volume-down:hover {background-position: -18px -72px;}
+.rp-popup-button {background-position: 0 -90px;}
+.rp-popup-button:focus, .rp-popup-button:hover {background-position: -18px -90px;}
 /* @end */
 
 /* @roup Now Playing Info */

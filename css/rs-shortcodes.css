@@ -129,6 +129,21 @@
 	font-size: 0.8em;
 }
 
+.show-archives.grid .show-archive-item, .override-archives.grid .override-archive-item,
+.genres-archive.grid .show-archive-item, .languages-archive.grid .show-archive-item,
+.playlist-archives.grid .playlist-archive-item {
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    width: 220px;
+}
+
+.show-archives.grid .show-archive-item-thumbnail, .override-archives.grid .override-archive-item-thumbnail,
+.genres-archive.grid .show-archive-item-thumbnail, .languages-archive.grid .show-archive-item-thumbnail,
+.playlist-archives.grid .playlist-archive-item-thumbnail {
+	float: none;
+}
+
 /* Show Subarchive Shortcodes */
 /* -------------------------- */
 .show-post, .show-playlist, .show-host, .show-producer, .show-episode {

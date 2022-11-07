@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed: Countdowns with multiple widget instances
 * Fixed: Radio Player iOS no volume control detection
 * Fixed: Mobile detection (via any pointer type)
+* Fixed: Genre/Language Archive Pagination
 * Fixed: Adjacent Post Links (where show has one shift)
 
 ### 2.4.0.9

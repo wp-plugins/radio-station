@@ -663,10 +663,9 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
 	// 2.4.0.4: remove rs- prefix from element classes
 	// 2.4.0.4: maybe add view class
 	// 2.5.0: add generic radio-archives class
+	// 2.5.0: always add view class
 	$classes = array( 'radio-archive', $type . '-archives' );
-	if ( $atts['view'] ) {
-		$classes[] = $atts['view'];
-	}
+	$classes[] = $atts['view'];
 	$class_list = implode( ' ', $classes );
 	// 2.5.0: add element ID for archive shortcode instance
 	$list = '<div id="' . esc_attr( $type ) . '-archives-' . esc_attr( $instance ) . '" class="' . esc_attr( $class_list ) . '">';
@@ -976,12 +975,14 @@ function radio_station_genre_archive_list( $atts ) {
 	$instance = $radio_station_data['instances']['genre-archive-list'];
 
 	// 2.3.3.9: default show description display to on
+	// 2.5.0: added view attribute for grid view
 	$defaults = array(
 		// --- genre display options ---
 		'genres'       => '',
 		'link_genres'  => 1,
 		'genre_desc'   => 1,
 		'genre_images' => 1,
+		'view'         => 'list',
 		'image_width'  => 150,
 		'hide_empty'   => 1,
 		'pagination'   => 1,
@@ -998,6 +999,11 @@ function radio_station_genre_archive_list( $atts ) {
 		'avatar_width' => 75,
 		'show_desc'    => 1,
 	);
+
+	// 2.5.0: change show description default for grid view
+	if ( isset( $atts['view'] ) && ( 'grid' == $atts['view'] ) ) {
+		$defaults['show_desc'] = 0;
+	}
 
 	// --- handle possible pagination offset ---
 	// 2.5.0: fix to work by offset
@@ -1160,7 +1166,8 @@ function radio_station_genre_archive_list( $atts ) {
 	}
 
 	// 2.5.0: added id attribute with instance
-	$list = '<div id="genres-archive-' . esc_attr( $instance ) . '" class="genres-archive">' . "\n";
+	// 2.5.0: add view attribute to class list
+	$list = '<div id="genres-archive-' . esc_attr( $instance ) . '" class="genres-archive ' . esc_attr( $atts['view'] ) . '">' . "\n";
 
 	// --- loop genres ---
 	// 2.5.0: track post display count
@@ -1380,6 +1387,7 @@ function radio_station_language_archive_list( $atts ) {
 		'languages'       => '',
 		'link_languages'  => 1,
 		'language_desc'   => 1,
+		'view'            => 'list',
 		'hide_empty'      => 1,
 		'pagination'      => 1,
 		// --- query args ---
@@ -1395,6 +1403,11 @@ function radio_station_language_archive_list( $atts ) {
 		'avatar_width'    => 75,
 		'show_desc'       => 1,
 	);
+
+	// 2.5.0: change show description default for grid view
+	if ( isset( $atts['view'] ) && ( 'grid' == $atts['view'] ) ) {
+		$defaults['show_desc'] = 0;
+	}
 
 	// --- handle possible pagination offset ---
 	// 2.5.0: fix to work by offset
@@ -1621,7 +1634,8 @@ function radio_station_language_archive_list( $atts ) {
 	}
 
 	// 2.5.0: added id attribute with instance
-	$list = '<div id="languages-archive-' . esc_attr( $instance ) . '" class="languages-archive">' . "\n";
+	// 2.5.0: add view attribute to class list
+	$list = '<div id="languages-archive-' . esc_attr( $instance ) . '" class="languages-archive ' . esc_attr( $atts['view'] ) . '">' . "\n";
 
 	// --- loop languages ---
 	// 2.5.0: track post display count
