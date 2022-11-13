@@ -3,7 +3,7 @@ Contributors: tonyzeoli, majick
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
-Tested up to: 6.0.2
+Tested up to: 6.1
 Stable tag: 2.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -225,7 +225,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Updated: AmplitudeJS (5.3.2)
 * Updated: Howler (2.2.3)
 * Updated: Moment JS (2.29.4) with WP Loading
-* Improved: Refactored Schedule Engine Class (2.5.0)
+* Improved: Refactored Schedule Engine Class
 * Improved: Redesigned higher resolution player buttons
 * Improved: Standardized Widget Input Fields
 * Improved: WordPress Coding Standards
