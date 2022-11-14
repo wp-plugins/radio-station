@@ -582,9 +582,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 					if ( $this->debug ) {
 						// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-						echo 'Saving Setting Key ' . esc_html( $key ) . ' (' . esc_html( $postkey ) . ')<br>' . PHP_EOL;
+						echo 'Saving Setting Key ' . esc_html( $key ) . ' (' . esc_html( $postkey ) . ')<br>' . "\n";
 						// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-						echo 'Type: ' . esc_html( $type ) . ' - Valid Options ' . esc_html( $key ) . ': ' . esc_html( print_r( $valid, true ) ) . '<br>' . PHP_EOL;
+						echo 'Type: ' . esc_html( $type ) . ' - Valid Options ' . esc_html( $key ) . ': ' . esc_html( print_r( $valid, true ) ) . '<br>' . "\n";
 					}
 
 					// --- sanitize value according to type ---
@@ -676,7 +676,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						if ( strstr( $posted, ',' ) ) {
 							$posted = explode( ',', $posted );
 						} else {
-							$posted[0] = $posted;
+							// 1.2.8: fix to convert string to array
+							$posted = array( $posted );
 						}
 						foreach ( $posted as $i => $value ) {
 							$posted[$i] = trim( $value );
@@ -788,14 +789,14 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						// 1.2.0: added isset check for newsetting
 						if ( !is_null( $newsettings ) ) {
 							// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-							echo '(To-validate) ' . esc_html( print_r( $newsettings, true ) ) . '<br>' . PHP_EOL;
+							echo '(To-validate) ' . esc_html( print_r( $newsettings, true ) ) . '<br>' . "\n";
 						} else {
 							// 1.1.7 handle if (new) key not set yet
 							if ( isset( $settings[$key] ) ) {
 								// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 								echo '(Validated) ' . esc_html( print_r( $settings[$key], true ) ) . '<br>' . PHP_EOL;
 							} else {
-								echo 'No setting yet for key ' . esc_html( $key ) . '<br>' . PHP_EOL;
+								echo 'No setting yet for key ' . esc_html( $key ) . '<br>' . "\n";
 							}
 						}
 					}
@@ -839,7 +840,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 									$newvalue = $this->validate_setting( $value, $valid, $validate_args );
 									$newvalues[] = $newvalue;
 									if ( $this->debug ) {
-										echo 'Validated Setting value ' . esc_html( $value ) . ' to ' . esc_html( $newvalue ) . '<br>' . PHP_EOL;
+										echo 'Validated Setting value ' . esc_html( $value ) . ' to ' . esc_html( $newvalue ) . '<br>' . "\n";
 									}
 								}
 								$newsettings = implode( ',', $newvalues );
@@ -849,7 +850,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 								// 1.1.9: fix to allow saving of zero value
 								// 1.2.1: fix to allow saving of empty value
 								if ( $this->debug ) {
-									echo 'Validated Setting single value ' . esc_html( $newsettings ) . ' to ' . esc_html( $newsetting ) . '<br>' . PHP_EOL;
+									echo 'Validated Setting single value ' . esc_html( $newsettings ) . ' to ' . esc_html( $newsetting ) . '<br>' . "\n";
 								}
 								if ( $newsetting || ( '' == $newsetting ) || ( 0 == $newsetting ) || ( '0' == $newsetting ) ) {
 									$settings[$key] = $newsetting;
@@ -859,9 +860,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 						if ( $this->debug ) {
 							// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-							echo 'Valid Options for Key ' . esc_html( $key ) . ': ' . esc_html( print_r( $valid, true ) ) . '<br>' . PHP_EOL;
+							echo 'Valid Options for Key ' . esc_html( $key ) . ': ' . esc_html( print_r( $valid, true ) ) . '<br>' . "\n";
 							// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-							echo 'Validated Settings for Key ' . esc_html( $key ) . ': ' . esc_html( print_r( $settings[$key], true ) ) . '<br>' . PHP_EOL;
+							echo 'Validated Settings for Key ' . esc_html( $key ) . ': ' . esc_html( print_r( $settings[$key], true ) ) . '<br>' . "\n";
 						}
 					}
 
@@ -3469,6 +3470,7 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 
 // == 1.2.8 ==
 // - fix saving non-alpha colours in coloralpha fields
+// - fix saving of single value in CSV field
 
 // == 1.2.7 ==
 // - fix color picker alpha sanitization / saving
@@ -3617,8 +3619,3 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // == 0.9.0 ==
 // - Development Version
 
-
-// -----------------
-// Development TODOs
-// -----------------
-// - use sanitize text field on textarea ?

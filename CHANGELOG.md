@@ -10,9 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 2.5.0
 * Added: Radio Station Blocks! (converted Widgets)
 * Updated: Freemius SDK (2.4.5)
-* Updated: Plugin Panel (1.2.7)
+* Updated: Plugin Panel (1.2.8)
+* Updated: AmplitudeJS (5.3.2)
+* Updated: Howler (2.2.3)
 * Updated: Moment JS (2.29.4) with WP Loading
-* Improved: Refactored Schedule Engine Class (2.5.0)
+* Improved: Refactored Schedule Engine Class
 * Improved: Redesigned higher resolution player buttons
 * Improved: Standardized Widget Input Fields
 * Improved: WordPress Coding Standards
@@ -23,11 +25,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Improved: Tab Schedule default date display on
 * Added: assign Playlist to a specific Show Shift
 * Added: Quick Edit of Playlist to assign to Show
+* Added: Volume Control options to Player widget
 * Fixed: Countdowns with multiple widget instances
 * Fixed: Radio Player iOS no volume control detection
 * Fixed: Mobile detection (via any pointer type)
 * Fixed: Genre/Language Archive Pagination
 * Fixed: Adjacent Post Links (where show has one shift)
+* Fixed: Workaround Amplitude pause event not firing
+
 
 ### 2.4.0.9
 * Update: Sysend (1.11.1) for Radio Player
