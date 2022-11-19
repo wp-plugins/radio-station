@@ -2858,10 +2858,10 @@ function radio_station_player_control_styles( $instance ) {
 
 	// --- Range Track (synced Background Div) ---
 	// 2.4.0.3: add position absolute/top on slider background (cross-browser display fix)
+	// 2.6.0: set top bottom and height to 10px for consistent display
 	$css .= "/* Range Track */
 " . $container . " .rp-volume-controls .rp-volume-slider-bg {
-	position: absolute; top: 9px; overflow: hidden; height: 9px; margin-left: 9px; z-index: -1;
-	border: 1px solid rgba(128, 128, 128, 0.5); border-radius: 3px; background: rgba(128, 128, 128, 0.5);
+	position: absolute; top: 10px; bottom: 10px; overflow: hidden; height: 10px; margin-left: 9px; z-index: -1; border: 1px solid rgba(128, 128, 128, 0.5); border-radius: 3px; background: rgba(128, 128, 128, 0.5);
 }
 " . $container . ".playing .rp-volume-controls .rp-volume-slider-bg {background: " . $colors['track'] . ";}
 " . $container . ".playing.muted .rp-volume-controls .rp-volume-slider-bg {background: rgba(128, 128, 128, 0.5);}" . "\n";

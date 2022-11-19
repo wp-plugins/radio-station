@@ -336,10 +336,11 @@ $options = array(
 
 	// --- [Player] Volume Controls  ---
 	// 2.4.0.3: added enable/disable volume controls option
+	// 2.5.0: default to volume slider only
 	'player_volumes' => array(
 		'type'    => 'multicheck',
 		'label'   => __( 'Volume Controls', 'radio-station' ),
-		'default' => array( 'slider', 'updown', 'mute', 'max' ),
+		'default' => array( 'slider' ),
 		'options' => array(
 			'slider'   => __( 'Volume Slider', 'radio-station' ),
 			'updown'   => __( 'Volume Plus / Minus', 'radio-station' ),

@@ -71,7 +71,7 @@
 	vertical-align: top;
 }
 
-.rp-controls, .rp-volume-controls, .rp-popup, .rp-script-switcher {
+.rp-controls, .rp-volume-controls, .rp-script-switcher {
 	display: inline-block;
 	vertical-align: middle;
 	margin-top: -10px;
@@ -80,6 +80,10 @@
 .rp-volume-controls button, .rp-volume-slider-container, .rp-volume-bar {
 	display: inline-block;
 	vertical-align: middle;
+}
+
+.rp-popup {
+	display: inline-block;
 }
 
 .rp-audio .rp-interface, .rp-audio-stream .rp-interface {

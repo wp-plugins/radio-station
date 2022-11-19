@@ -22,6 +22,8 @@ Default settings for the Player can be set on the Plugin Settings page on the Pl
 * Start Volume: Initial volume for when the Player starts playback.
 * Single Player: Stop other Player instances when a Player is started.
 
+Please note you will not see volume controls when using an iOS device as they are not supported.
+
 ### Radio Player Widget
 
 A Player widget instance can be added to any widget area via the WordPress Admin Appearance -> Widgets page. The widget options correspond to the shortcode attributes below, allowing you control over the widget display output.
@@ -45,6 +47,23 @@ A Player block can be added via the Block Editor by clicking the blue + icon. Th
 * Current Show Display: whether to display the Current Show in the Player Bar.
 * Now Playing Display: whether to display current track information via stream metadata.
 * Metadata URL: alternative URL for metadata retrieval (normally via stream URL.)
+
+#### [Pro] Continous Player Integration
+
+Developers should note that the continous player page transitions are implemented by adding click event listeners to `a` link tags. This means that dynamic links - those that do not exist on page load but are added in content later - will need special treatment to preserve continuous playback. Some examples of these include some mobile menus or breadcrumbs that are created by javascript dynamically on hover, and AJAX loaded "more" or filtered content. 
+
+The solution to integrated these dynamic links is to use a filter to target the classes of the dynamic links. Knowing these claseses to target, Teleporter will then handle them via click event bubbling. Here's an example of how that can be done. (Note the format is just a comma separated list of classes without a `.` prefix:)
+
+```
+add_filter( 'teleporter_dynamic_link_classes', 'my_custom_dynamic_link_classes' );
+function my_custom_dynamic_link_classes( $classes ) {
+    $classes = 'mobile-menu,elementor-item';
+    return $classes;
+}
+```
+
+Similarly, if there are links that you wish to force to not transition for some reason, you can use the `teleporter_ignore_link_classes` filter in the same way.
+
 
 #### [Pro] Extra Color Options
 
