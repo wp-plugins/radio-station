@@ -1,0 +1,9 @@
+/* Radio Station - Freemius Pricing Page v2 Styles */
+
+.fs-packages .fs-plan-features ul li:first-child {display: none;}
+.fs-packages li:first-child .fs-plan-features ul li:first-child {display: block; font-weight: bold;}
+.fs-packages li:nth-child(3) .fs-plan-features ul li:nth-child(3) {font-weight: bold;}
+.fs-packages .fs-plan-features ul li:nth-child(2) {font-weight: bold;}
+.fs-packages li:first-child .fs-plan-features ul li:nth-child(2) {font-weight: normal;}
+
+#fs_pricing_app .fs-packages .fs-button {background: #2da1d0;}

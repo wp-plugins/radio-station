@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2.5.0
 * Added: Radio Station Blocks! (converted Widgets)
-* Updated: Freemius SDK (2.4.5)
-* Updated: Plugin Panel (1.2.8)
+* Updated: Freemius SDK (2.5.3)
+* Updated: Plugin Panel (1.2.9)
 * Updated: AmplitudeJS (5.3.2)
 * Updated: Howler (2.2.3)
 * Updated: Moment JS (2.29.4) with WP Loading

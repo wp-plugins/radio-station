@@ -11,16 +11,16 @@ The Radio Player is available as a Shortcode, Widget or Block. In Pro it is also
 
 Default settings for the Player can be set on the Plugin Settings page on the Player tab. These will be used in widgets wherever the widget options are set to "Default". This saves you from setting them twice, but also means that you can override these defaults in individual widgets as needed. (see [Options](./Options.md#player) for a list of these options.)
 
-* Player Title: Display your Radio Station Title in Player by default.
-* Player Image: Display your Radio Station Image in Player by default.
-* Script: Default audio script to use for Radio Streaming Player. Ampliture, Howler or Jplayer.
-* Fallback Scripts: Fallback audio scripts to try if/when the default Player script fails.
-* Theme: Default Player Controls theme style. Light or dark to match your theme.
-* Buttons: Default Player Buttons shape style. Circular, rounded or square.
-* Volume Controls: Which volume controls to display in the Player by default.
-* Player Debug Mode: Output player debug information in browser javascript console.
-* Start Volume: Initial volume for when the Player starts playback.
-* Single Player: Stop other Player instances when a Player is started.
+* *Player Title*: Display your Radio Station Title in Player by default.
+* *Player Image*: Display your Radio Station Image in Player by default.
+* *Script*: Default audio script to use for Radio Streaming Player. Ampliture, Howler or Jplayer.
+* *Fallback Scripts*: Fallback audio scripts to try if/when the default Player script fails.
+* *Theme*: Default Player Controls theme style. Light or dark to match your theme.
+* *Buttons*: Default Player Buttons shape style. Circular, rounded or square.
+* *Volume Controls*: Which volume controls to display in the Player by default.
+* *Player Debug Mode*: Output player debug information in browser javascript console.
+* *Start Volume*: Initial volume for when the Player starts playback.
+* *Single Player*: Stop other Player instances when a Player is started.
 
 Please note you will not see volume controls when using an iOS device as they are not supported.
 
@@ -36,23 +36,23 @@ A Player block can be added via the Block Editor by clicking the blue + icon. Th
 
 [Radio Station Pro](https://radiostation.pro) includes a Sitewide Bar Streaming Player, including continuous uninterruptable playback via the integrated Teleporter page transition plugin. The Player Bar isn't added via the Widgets page, but is instead configured via the Plugin Settings page under the Player tab. It has the following main options:
 
-* Bar Position: Fixed in the header or footer area (top or bottom of page, unaffected by scrolling.)
-* Bar Height: Set the absolute height of the Player Bar in pixels.
-* Fade In Player Bar: How long to take to fade in Player Bar after page load.
-* Continous Playback: Enables uninterrupt playback while navigating between pages.
-* Player Page Fade: How long to take to fade between pages when continous playback is enabled.
-* Text Color and Background Color: Bar Player Default text and background colors.
-* Autoresume Playback: attempts to autoresume playback for returning visitors.
-* Popup Player Button: adds a button to open the player in a separate window.
-* Current Show Display: whether to display the Current Show in the Player Bar.
-* Now Playing Display: whether to display current track information via stream metadata.
-* Metadata URL: alternative URL for metadata retrieval (normally via stream URL.)
+* *Bar Position*: Fixed in the header or footer area (top or bottom of page, unaffected by scrolling.)
+* *Bar Height*: Set the absolute height of the Player Bar in pixels.
+* *Fade In Player Bar*: How long to take to fade in Player Bar after page load.
+* *Continous Playback*: Enables uninterrupt playback while navigating between pages.
+* *Player Page Fade*: How long to take to fade between pages when continous playback is enabled.
+* *Text Color and Background Color*: Bar Player Default text and background colors.
+* *Autoresume Playback*: attempts to autoresume playback for returning visitors.
+* *Popup Player Button*: adds a button to open the player in a separate window.
+* *Current Show Display*: whether to display the Current Show in the Player Bar.
+* *Now Playing Display*: whether to display current track information via stream metadata.
+* *Metadata URL*: alternative URL for metadata retrieval (normally via stream URL.)
 
 #### [Pro] Continous Player Integration
 
 Developers should note that the continous player page transitions are implemented by adding click event listeners to `a` link tags. This means that dynamic links - those that do not exist on page load but are added in content later - will need special treatment to preserve continuous playback. Some examples of these include some mobile menus or breadcrumbs that are created by javascript dynamically on hover, and AJAX loaded "more" or filtered content. 
 
-The solution to integrated these dynamic links is to use a filter to target the classes of the dynamic links. Knowing these claseses to target, Teleporter will then handle them via click event bubbling. Here's an example of how that can be done. (Note the format is just a comma separated list of classes without a `.` prefix:)
+The solution to integrated these dynamic links is to use a filter to allow Teleporter (the page transition plugin) target the classes of the dynamic links. Knowing these claseses to target, Teleporter will then handle them via click event bubbling. Here's an example of how that can be done. (Note the format is just a comma separated list of classes without a `.` prefix:)
 
 ```
 add_filter( 'teleporter_dynamic_link_classes', 'my_custom_dynamic_link_classes' );
@@ -62,22 +62,21 @@ function my_custom_dynamic_link_classes( $classes ) {
 }
 ```
 
-Similarly, if there are links that you wish to force to not transition for some reason, you can use the `teleporter_ignore_link_classes` filter in the same way.
-
+Similarly, if there are links that you wish to force to not transition for some reason, you can use the `teleporter_ignore_link_classes` filter in the same way. If you need to use selectors other than classes, you can use the filters `teleporter_dynamic_selectors` and `teleporter_ignore_selectors` to add those respectively also.
 
 #### [Pro] Extra Color Options
 
 The Player Bar also includes some extra color options to match the look and feel of your site (these are also used as defaults for other Player instances.) 
 
-* Playing Icon Highlight Color: Play button highlight color when playing stream.
-* Control Icons Highlight Color: Volume Button Hover highlight and player loading highlight.
-* Volume Track and Knob Colors: To style the volume slider track and it's thumb knob.
+* *Playing Icon Highlight Color*: Play button highlight color when playing stream.
+* *Control Icons Highlight Color*: Volume Button Hover highlight and player loading highlight.
+* *Volume Track and Knob Colors*: To style the volume slider track and it's thumb knob.
 		
 And in addition to the existing Light and Dark button themes, you can also choose from colored button themes of: Red, Orange, Yellow, Light Green, Green, Cyan, Light Blue, Blue, Purple or Magenta. Matching Play/Pause and Volume/Track control images will be used when you activate these theme options.
 
 ### Radio Player Shortcode
 
-`[radio-player]`
+`[radio-player]` or `[stream-player]`
 
 The following attributes are available for this shortcode:
 
@@ -91,6 +90,8 @@ The following attributes are available for this shortcode:
 * *volume* : Initial Player Volume. 0-100. Default: 77
 * *volumes* : Volume Control Buttons, comma separated. (slider,updown,mute,max) Default: all.
 * *default* : Use this as the default Player on the page. 0 or 1. Default 0.
+
+Example Shortcode: `[radio-player url="http://example.com/my-stream-url/"]`
 
 [Demo Site Example Output](https://demo.radiostation.pro/player-shortcode/)
 

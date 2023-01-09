@@ -412,6 +412,7 @@ class radio_station_schedule_engine {
 							// --- shift is valid so continue checking ---
 							// 2.3.2: replace strtotime with to_time for timezones
 							// 2.3.2: fix to conver to 24 hour format first
+							// # midnight calculation
 							$day = $shift['day'];
 							$thisdate = $weekdates[$day];
 							$midnight = $this->to_time( $thisdate . ' 23:59:59', $timezone ) + 1;
@@ -1749,6 +1750,7 @@ class radio_station_schedule_engine {
 
 						// --- account for split midnight times ---
 						// 2.3.2: replace strtotime with to_time for timezones
+						// # midnight
 						if ( ( '00:00 am' == $shift['start'] ) || ( '12:00 am' == $shift['start'] ) ) {
 							$start_time = $this->to_time( $thisdate . ' 00:00', $timezone );
 						} else {
@@ -2169,7 +2171,7 @@ class radio_station_schedule_engine {
 						if ( $this->debug ) {
 							echo "...with Shift for Show " . esc_html( $day_shift['show'] ) . ": ";
 							echo esc_html( $day_shift['day'] ) . " - " . esc_html( $day_shift['date'] ) . " - " . esc_html( $day_shift['start'] ) . " (" . esc_html( $day_shift_start_time ) . ")";
-							echo " to " . esc_html( $day_shift['end'] ) . " (" . esc-html( $day_shift_end_time ) . ")" . "\n";
+							echo " to " . esc_html( $day_shift['end'] ) . " (" . esc_html( $day_shift_end_time ) . ")" . "\n";
 						}
 
 						// 2.3.2: improved shift checking logic
@@ -2195,7 +2197,7 @@ class radio_station_schedule_engine {
 							// --- if there is a shift overlap conflict ---
 							$conflicts[] = $day_shift;
 							if ( $this->debug ) {
-								echo '^^^ CONFLICT ( ' . esc-html( $conflict ) . ' ) ^^^' . "\n";
+								echo '^^^ CONFLICT ( ' . esc_html( $conflict ) . ' ) ^^^' . "\n";
 							}
 						}
 					}

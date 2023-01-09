@@ -2984,7 +2984,8 @@ function radio_station_override_show_metabox() {
 			$sync_genres = get_post_meta( $post_id, 'sync_genres', true );
 			echo '<li id="override-genres">' . "\n";
 				echo '<div class="input-label">' . "\n";
-					echo '<label><b>' . esc_html( 'Sync Genres?', 'radio-station' ) . '</b></label>' . "\n";
+					// 2.5.0: add missing translation wrapper
+					echo '<label><b>' . esc_html( __( 'Sync Genres?', 'radio-station' ) ) . '</b></label>' . "\n";
 				echo '</div>' . "\n";
 				echo '<div class="input-field">' . "\n";
 					echo '<input id="override-genres-input" type="checkbox" name="sync_genres" value="yes" onclick="radio_sync_genres();"';
@@ -3003,7 +3004,8 @@ function radio_station_override_show_metabox() {
 			$sync_languages = get_post_meta( $post_id, 'sync_languages', true );
 			echo '<li id="override-languages">' . "\n";
 				echo '<div class="input-label">' . "\n";
-					echo '<label><b>' . esc_html( 'Sync Languages?', 'radio-station' ) . '</b></label>' . "\n";
+					// 2.5.0: add missing translation wrapper
+					echo '<label><b>' . esc_html( __( 'Sync Languages?', 'radio-station' ) ) . '</b></label>' . "\n";
 				echo '</div>' . "\n";
 				echo '<div class="input-field">' . "\n";
 					echo '<input id="override-languages-input" type="checkbox" name="sync_languages" value="yes" onclick="radio_sync_languages();"';

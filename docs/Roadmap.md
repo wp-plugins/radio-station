@@ -17,6 +17,7 @@ Normal = Feature Completed
 
 **bold** = Next Major Feature(s)
 
+
 | Free | Version | Pro | Version |
 | --- | --- | --- | --- |
 | SCHEDULE |
@@ -41,8 +42,10 @@ Normal = Feature Completed
 | EXTRAS |
 | Host / Producer / Show Editor Roles | 2.3.0 | with Role Assignment Interface | 2.3.0 |
 | REST/Feed API Endpoints | 2.3.0 | with Episodes, Hosts and Producers | 2.4.1 |
-| Standard HTML Markup Output | 2.3.0 | *with Schema.Org SEO Markup* | |
+| Standard HTML Markup Output | 2.3.0 | *with SEO Schema Markup* | |
 | Show Genre Assignments | 2.2.8 | Episode Guests and Topics | 2.4.1 |
+
+
 [comment]: # (Show and Override Feeds)
 
 Interested in going Pro? For a full feature list comparison, [click here to find out more about Radio Station Pro](https://radiostation.pro/pricing/).

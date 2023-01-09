@@ -75,7 +75,7 @@ class Radio_Player_Widget extends WP_Widget {
 			' . esc_html( __( 'Stream or File URL', 'radio-station' ) ) . ':
 				<input class="widefat" id="' . esc_attr( $this->get_field_id( 'url' ) ) . '" name="' . esc_attr( $this->get_field_name( 'url' ) ) . '" type="text" value="' . esc_attr( $url ) . '" />
 			</label><br>
-			' . esc_html( 'Leave blank to use default stream URL.', 'radio-station' ) . '
+			' . esc_html( __( 'Leave blank to use default stream URL.', 'radio-station' ) ) . '
 		</p>';
 
 		// --- Station Text ---
@@ -84,7 +84,7 @@ class Radio_Player_Widget extends WP_Widget {
 			' . esc_html( __( 'Player Station Text', 'radio-station' ) ) . ':
 				<input class="widefat" id="' . esc_attr( $this->get_field_id( 'station' ) ) . '" name="' . esc_attr( $this->get_field_name( 'station' ) ) . '" type="text" value="' . esc_attr( $station ) . '" />
 			</label><br>
-			(' . esc_html( 'Empty for default, 0 for none.', 'radio-station' ) . ')
+			(' . esc_html( __( 'Empty for default, 0 for none.', 'radio-station' ) ) . ')
 		</p>';
 
 		// --- Station Image ---
@@ -194,6 +194,7 @@ class Radio_Player_Widget extends WP_Widget {
 				'dark'		=> __( 'Dark', 'radio-station' ),
 			);
 			$options = apply_filters( 'radio_station_player_theme_options', $options );
+			$options = apply_filters( 'radio_player_theme_options', $options );
 			foreach ( $options as $option => $label ) {
 				$field .= '<option value="' . esc_attr( $option ) . '" ' . selected( $theme, $option, false ) . '>' . esc_html( $label ) . '</option>';
 			}
@@ -214,6 +215,7 @@ class Radio_Player_Widget extends WP_Widget {
 				'square'	=> __( 'Square', 'radio-station' ),
 			);
 			$options = apply_filters( 'radio_station_player_button_options', $options );
+			$options = apply_filters( 'radio_player_button_options', $options );
 			foreach ( $options as $option => $label ) {
 				$field .= '<option value="' . esc_attr( $option ) . '" ' . selected( $buttons, $option, false ) . '>' . esc_html( $label ) . '</option>';
 			}
@@ -402,7 +404,7 @@ class Radio_Player_Widget extends WP_Widget {
 			echo wp_kses( $args['after_title'], $allowed );
 
 			// --- get default display output ---
-			$output = radio_station_player_shortcode( $atts );
+			$output = radio_player_shortcode( $atts );
 
 			// --- check for widget output override ---
 			$output = apply_filters( 'radio_station_player_widget_override', $output, $args, $atts );

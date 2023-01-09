@@ -50,7 +50,7 @@
 			const atts = props.attributes;
 			return (
 				el( Fragment, {},
-					el( ServerSideRender, { block: 'radio-station/current-playlist', className: 'radio-block-schedule', attributes: atts } ),
+					el( ServerSideRender, { block: 'radio-station/current-playlist', className: 'radio-playlist-block', attributes: atts } ),
 					el( InspectorControls, {},
 						el( Panel, {},
 							

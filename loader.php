@@ -2973,8 +2973,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						echo "	if (!agree) {return false;}" . PHP_EOL;
 						echo "	document.getElementById('settings-action').value = 'reset';" . PHP_EOL;
 						echo "	document.getElementById('settings-form').submit();" . PHP_EOL;
-						echo "});" . PHP_EOL;
-						// echo "}" . PHP_EOL;
+						echo "});" . "\n";
+						// echo "}" . "\n";
 
 					} elseif ( 'number_step' == $script ) {
 
@@ -2987,20 +2987,22 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 							if ((min !== false) && (newvalue < parseInt(min))) {newvalue = min;}
 							if ((max !== false) && (newvalue > parseInt(max))) {newvalue = max;}
 							document.getElementById(id).value = newvalue;
-						}" . PHP_EOL; */
+						}" . "\n"; */
 						// 1.2.5: replace with jQuery click function to remove onclick attributes
+						// 1.2.9: fix for possible empty value converting to NaN
 						echo "jQuery('.number-button').on('click', function() {
 							if (jQuery(this).hasClass('number-up-button')) {multiplier = 1;}
 							else if (jQuery(this).hasClass('number-down-button')) {multiplier = -1;}
 							idref = 'number-input-'+jQuery(this).attr('data');
 							data = jQuery('#'+idref).attr('data').split(',');
 							min = data[0]; max = data[1]; step = data[2];
-							value = parseInt(jQuery('#'+idref).val());
+							value = jQuery('#'+idref).val();
+							if (value == '') {value = 0;} else {value = parseInt(value);}				
 							newvalue = value + (multiplier * parseInt(step));
 							if ((min !== false) && (newvalue < parseInt(min))) {newvalue = min;}
 							if ((max !== false) && (newvalue > parseInt(max))) {newvalue = max;}
 							jQuery('#'+idref).val(newvalue);
-						});" . PHP_EOL;
+						});" . "\n";
 
 					} elseif ( 'media_functions' == $script ) {
 
@@ -3051,14 +3053,14 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 								parentdiv.find('.delete-custom-image').addClass('hidden');
 							});
 
-						});" . PHP_EOL;
+						});" . "\n";
 
 					} elseif ( 'colorpicker_init' == $script ) {
 
 						// --- initialize color pickers ---
-						echo "jQuery(document).ready(function(){" . PHP_EOL;
-						echo "	if (jQuery('.color-picker').length) {jQuery('.color-picker').wpColorPicker();}" . PHP_EOL;
-						echo "});" . PHP_EOL;
+						echo "jQuery(document).ready(function(){" . "\n";
+						echo "	if (jQuery('.color-picker').length) {jQuery('.color-picker').wpColorPicker();}" . "\n";
+						echo "});" . "\n";
 
 					}
 					// else {
@@ -3082,7 +3084,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			$styles = array();
 
 			// --- page styles ---
-			$styles[] = '#wrapbox {margin-right: 20px;}';
+			// 1.2.9: add padding to bottom of settings form
+			$styles[] = '#wrapbox {margin-right: 20px; padding-bottom: 20px;}';
 
 			// --- plugin header styles ---
 			// 1.2.0: moved from plugin header section
@@ -3117,7 +3120,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			$styles[] = '.settings-input input.setting-button.number-down-button {padding:0px 7px; font-weight:bold;}';
 			$styles[] = '.settings-input input.setting-textarea {width:100%;}';
 			$styles[] = '.settings-input select.setting-select {min-width:100px; max-width:100%;}';
-
+			
 			// --- toggle input styles ---
 			// Ref: https://www.w3schools.com/howto/howto_css_switch.asp
 			$styles[] = '.setting-toggle {position:relative; display:inline-block; width:30px; height:17px;}
@@ -3467,6 +3470,10 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // =========
 // CHANGELOG
 // =========
+
+// == 1.2.9 ==
+// - fix empty number field converting to NaN value
+// - add bottom padding to settings form wrap box
 
 // == 1.2.8 ==
 // - fix saving non-alpha colours in coloralpha fields

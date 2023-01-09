@@ -74,7 +74,7 @@
 .rp-controls, .rp-volume-controls, .rp-script-switcher {
 	display: inline-block;
 	vertical-align: middle;
-	margin-top: -10px;
+	/* margin-top: -10px; */
 }
 
 .rp-volume-controls button, .rp-volume-slider-container, .rp-volume-bar {

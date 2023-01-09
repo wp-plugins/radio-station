@@ -233,7 +233,7 @@ function radio_player_play_on_load(player, script, instance) {
 // --- check/load a player script ---
 function radio_player_check_script(script) {
 	loading = false; head = document.getElementsByTagName('head')[0];
-	/* funcs = radio_player.settings.ajaxurl+'?action=radio_station_player_script&script='+script; */
+	/* funcs = radio_player.settings.ajaxurl+'?action=radio_player_script&script='+script; */
 	if (script == 'amplitude') {
 		if (typeof window.Amplitude == 'undefined') {
 			if (radio_player.debug) {console.log('Dynamically Loading Amplitude Player Script...');}
@@ -679,7 +679,7 @@ function radio_player_save_user_state() {
 			if (state.volume) {volume = state.volume;} else {volume = '';}
 			if (state.mute) {mute = '1';} else {mute = '0';}
 			timestamp = Math.floor( (new Date()).getTime() / 1000 );
-			url = radio_player.settings.ajaxurl+'?action=radio_station_player_state';
+			url = radio_player.settings.ajaxurl+'?action=radio_player_state';
 			/* ? TODO: instance ? */
 			url += '&playing='+playing+'&station='+station+'&volume='+volume+'&mute='+mute+'&timestamp='+timestamp;
 			document.getElementById('radio-player-state-iframe').src = url;

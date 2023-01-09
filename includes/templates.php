@@ -947,7 +947,8 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 				}
 				if ( 1 == count( $shifts ) ) {
 					// 2.5.0: fix to get first item (not via index key 0)
-					$first_key = array_keys( $shifts )[0];
+					$shift_keys = array_keys( $shifts );
+					$first_key = $shift_keys[0];
 					$shift = $shifts[$first_key];
 					$shift_start = $shift['day'] . ' ' . $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
 					// 2.3.3.9: fix to put addition outside bracket

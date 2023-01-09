@@ -40,7 +40,7 @@
 			const atts = props.attributes;
 			return (
 				el( Fragment, {},
-					el( ServerSideRender, { block: 'radio-station/clock', className: 'radio-block-clock', attributes: atts } ),
+					el( ServerSideRender, { block: 'radio-station/clock', className: 'radio-clock-block', attributes: atts } ),
 					el( InspectorControls, {},
 						el ( Panel, {},
 							el( PanelBody, { title: __( 'Clock Display Options', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },

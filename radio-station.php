@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://radiostation.pro/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.4.9.7
+Version: 2.4.9.9
 Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
@@ -163,6 +163,7 @@ require RADIO_STATION_DIR . '/includes/master-schedule.php';
 require RADIO_STATION_DIR . '/includes/shortcodes.php';
 
 // --- Widgets ---
+// 2.3.1: added radio player widget file
 // 2.4.0.4: move player widget here
 // 2.5.0: move widget classes to widgets directory
 require RADIO_STATION_DIR . '/widgets/class-current-show-widget.php';
@@ -179,7 +180,6 @@ if ( function_exists( 'register_block_type' ) ) {
 
 // --- Feature Development ---
 // 2.3.0: add feature branch development includes
-// 2.3.1: added radio player widget file
 $features = array( 'import-export' );
 foreach ( $features as $feature ) {
 	$filepath = RADIO_STATION_DIR . '/includes/' . $feature . '.php';
@@ -210,7 +210,7 @@ require RADIO_STATION_DIR . '/options.php';
 $settings = array(
 	// --- Plugin Info ---
 	'slug'         => RADIO_STATION_SLUG,
-	'file'         => __FILE__,
+	'file'         => RADIO_STATION_FILE,
 	'version'      => '0.0.1',
 
 	// --- Menus and Links ---
@@ -283,6 +283,7 @@ if ( RADIO_STATION_DEBUG ) {
 require RADIO_STATION_DIR . '/loader.php';
 $instance = new radio_station_loader( $settings );
 
+
 // --------------------------
 // Include Plugin Admin Files
 // --------------------------
@@ -308,6 +309,26 @@ add_action( 'plugins_loaded', 'radio_station_init' );
 function radio_station_init() {
 	// 2.3.0: use RADIO_STATION_DIR constant
 	load_plugin_textdomain( 'radio-station', false, RADIO_STATION_DIR . '/languages' );
+}
+
+// ----------------------------
+// Add Pricing Page Path Filter
+// ----------------------------
+// 2.5.0: added for Freemius Pricing Page v2
+add_action( 'radio_station_loaded', 'radio_station_add_pricing_path_filter' );
+function radio_station_add_pricing_path_filter() {
+	global $radio_station_freemius;
+	if ( method_exists( $radio_station_freemius, 'add_filter' ) ) {
+		$radio_station_freemius->add_filter( 'freemius_pricing_js_path', 'radio_station_pricing_page_path' );
+	}
+}
+
+// ------------------------
+// Pricing Page Path Filter
+// ------------------------
+// 2.6.0: added for Freemius Pricing Page v2
+function radio_station_pricing_page_path( $default_pricing_js_path ) {
+	return RADIO_STATION_DIR . '/freemius-pricing/freemius-pricing.js';
 }
 
 
@@ -361,7 +382,7 @@ function radio_station_check_plan_options() {
 
 	// 2.5.0: set as array for returning
 	$plan_options = array(
-		'has_plans' => $has_plans,
+		'has_plans'  => $has_plans,
 		'has_addons' => $has_addons,
 		'plan_type'  => $plan,
 	);
@@ -885,7 +906,7 @@ function radio_station_localization_script() {
 // Filter for Streaming Data
 // -------------------------
 // 2.3.3.7: added streaming data filter for player integration
-add_filter( 'radio_station_player_data', 'radio_station_streaming_data' );
+add_filter( 'radio_player_data', 'radio_station_streaming_data' );
 function radio_station_streaming_data( $data, $station = false ) {
 	$data = array(
 		'script'	=> radio_station_get_setting( 'player_script' ),

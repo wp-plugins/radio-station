@@ -3,7 +3,7 @@ Contributors: tonyzeoli, majick
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
-Tested up to: 6.1
+Tested up to: 6.1.1
 Stable tag: 2.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -220,8 +220,8 @@ You can now visit your site to make sure nothing is broken. If you experience is
 
 = 2.5.0 =
 * Added: Radio Station Blocks! (converted Widgets)
-* Updated: Freemius SDK (2.4.5)
-* Updated: Plugin Panel (1.2.8)
+* Updated: Freemius SDK (2.5.3)
+* Updated: Plugin Panel (1.2.9)
 * Updated: AmplitudeJS (5.3.2)
 * Updated: Howler (2.2.3)
 * Updated: Moment JS (2.29.4) with WP Loading
@@ -234,6 +234,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Improved: use WP JSON functions for data endpoints
 * Improved: Schedule Templates to use Classes and Instances
 * Improved: Tab Schedule default date display on
+* Added: Freemius Pricing Page v2
 * Added: assign Playlist to a specific Show Shift
 * Added: Quick Edit of Playlist to assign to Show
 * Added: Volume Control options to Player widget

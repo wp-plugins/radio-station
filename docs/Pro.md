@@ -11,6 +11,16 @@ Note that additional Pro Documentation will be added in the relevant section as 
 If you are interested in testing cutting edge features in development for this next release, read about [Installing the Development Version](./FAQ.md#how-do-i-install-the-latest-development-version-for-testing) and [Pro Beta Version Testing](./#pro-beta-version-testing).
 
 
+### Radio Station Plus
+
+Note that the following features are *not* available in Radio Station Plus:
+
+- Persistent Stream Player Bar
+- Visual Schedule Editor Interface
+- Episodes and Segments (and related data/features)
+- Page Builder Modules (for Elementor and Beaver Builder)
+
+
 #### API
 
 [Episodes Data Endpoint](./API.md#pro-episodes-endpoint)

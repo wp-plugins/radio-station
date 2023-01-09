@@ -56,7 +56,7 @@ function radio_station_get_block_callbacks() {
 		// 'timezone'         => 'radio_station_timezone_shortcode',
 		'clock'            => 'radio_station_clock_shortcode',
 		// --- Stream Player ---
-		'player'           => 'radio_station_player_shortcode',
+		'player'           => 'radio_player_shortcode',
 		// --- Master Schedule ---
 		'schedule'         => 'radio_station_master_schedule',
 		// --- Archive Lists ---
@@ -125,6 +125,7 @@ function radio_station_get_block_attributes() {
 			// ---- Player Options ---
 			'script' => array( 'type' => 'string', 'default' => 'default' ),
 			'volume' => array( 'type' => 'number', 'default' => 77 ),
+			'volumes' => array( 'type' => 'array', 'default' => array( 'slider' ) ),
 			'default' => array( 'type' => 'boolean', 'default' => false ),
 			// --- Player Styles ---
 			'layout' => array( 'type' => 'string', 'default' => 'horizontal' ),
@@ -345,13 +346,21 @@ function radio_station_block_editor_assets() {
 		wp_enqueue_style( 'rs-' . $stylekey, $style_url, array(), $version, 'all' );
 	}
 
-	// --- add block control style fix inline ---
+	// --- block control style fixes ---
+	$css = array();
 	// - fix cutoff label widths -
-	$css = '.components-panel .components-panel__body.radio-block-controls .components-panel__row label {
+	$css[] = '.components-panel .components-panel__body.radio-block-controls .components-panel__row label {
 	width: 100%; max-width: 100%; min-width: 150px; overflow: visible;}' . "\n";
+	$css[] = '.components-panel .components-panel__body.radio-block-controls .components-panel__row label.components-toggle-control__label {width: auto;}';
 	// - multiple select minimum height fix -
 	// ref: https://github.com/WordPress/gutenberg/issues/27166
-	$css .= '.components-panel .components-panel__body.radio-block-controls .components-select-control__input[multiple] {min-height: 100px;}';
+	$css[] = '.components-panel .components-panel__body.radio-block-controls .components-select-control__input[multiple] {min-height: 100px;}';
+	// - color dropdown label with fix -
+	$css[] = '.components-panel .color-dropdown-control .components-base-control__label {min-width: 130px; vertical-align: middle;}';
+	$css[] = '.components-panel .color-dropdown-control .color-dropdown-buttons, .components-panel .color-dropdown-control .color-dropdown-buttons button {vertical-align: middle;}';
+
+	// --- add style fixes inline ---
+	$css = implode( "\n", $css );
 	$css = apply_filters( 'radio_station_block_control_styles', $css );
 	wp_add_inline_style( 'wp-edit-blocks', $css );
 
@@ -364,7 +373,7 @@ function radio_station_block_editor_assets() {
 		wp_enqueue_style( 'radio-player', $style_url, array(), $version, 'all' );
 
 		// --- enqueue player control styles inline ---
-		$control_styles = radio_station_player_control_styles( false );
+		$control_styles = radio_player_control_styles( false );
 		wp_add_inline_style( 'radio-player', $control_styles );
 	}
 }

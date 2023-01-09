@@ -135,5 +135,7 @@ We are constantly improving and adding new features to [Radio Station Pro](https
 1. Download the Beta versions by logging in to your [Freemius User Dashboard](https://dashboard.freemius.com). and navigating to the "Downloads" section. You will see a dropdown list of all the Radio Station Pro releases, including beta ones.
 2. Enable the Beta program option from your Radio Station Account page in your WordPress site's Admin area, and the latest Beta version will then be available as an update.
 
+**Important Note**: As we are developing the Free and Pro versions in tandem, the latest Pro Beta may require you to install a development version of the Free plugin for it to work. Please see the previous section for how you can install the development version from Github if that version is not yet available via the WordPress repository.
+
 We recommend you test these on a Staging site (or a development copy of your live site.) This way you can make sure there are no significant bugs before using it on a production site. Of course, please be willing to [report any bugs](https://github.com/netmix/radio-station/issues) that you do find so we can ensure they are not present in the next official release.
 

@@ -2,7 +2,7 @@
 
 ***
 
-For live display examples see [Radio Station Demo Site](http://demo.radiostation.pro).
+For live display examples see [Radio Station Demo Site](https://demo.radiostation.pro).
 
 ## Styling
 
@@ -12,18 +12,18 @@ You can find the base styles in the `/css` directory of the plugin, prefixed wit
 
 #### Custom Styling
 
-You may wish to add your own styles to suit your site's look and feel. One easy way to do this is to add your own `rs-custom.css` to your Child Theme's directory, and add more specific style rules that modify or override the existing styles. Radio Station will automatically detect the presence of this file and enqueue it. This is preferable to modifying the base style files, as your changes will be overwritten in a plugin update.
+You may wish to add your own styles to suit your site's look and feel. One easy way to do this is to add your own `rs-custom.css` to your Child Theme's directory, and add more specific style rules that modify or override the existing styles. Radio Station will automatically detect the presence of this file and enqueue it. This is preferable to modifying the base style files directly, as your changes will be overwritten in a plugin update.
 
 
 ## Timezone Conversions
 
 #### Automatic Display
 
-Radio Station will now display a shift time converted to the users timezone under every shift time displayed. This conversion is based on the selected Timezone in your plugin settings and the default timezone detected in the users browser. This feature is on by default but can be disabled in the Plugin Settings.
+Radio Station will now display a shift time converted to the users timezone under every shift time displayed. This conversion is based on the selected Timezone in your plugin settings and the default timezone detected in the users browser. This feature is on by default, but can also be disabled in the Plugin Settings.
 
 #### [Pro] User Timezone Switching
 
-In [Radio Station Pro](https://radiostation.pro), there is an additional interface displayed in the Clock/Timezone shortcode (automatically displayed above schedules and also in the Radio Clock widget.) This allows your visitors/listeners to select a specific timezone other than what is in their browser. This can be useful for travellers especially, for keeping up with their home Shows, or tuning into a new local station without needing to update their computer clock.
+In [Radio Station Pro](https://radiostation.pro), there is an additional interface displayed in the Clock/Timezone shortcode (automatically displayed above Schedules and also in the Radio Clock widget.) This allows your visitors/listeners to select a specific timezone other than what is detected in their browser. This can be useful for travellers especially, for keeping up with their home Shows, or tuning into a new local station without needing to update their computer clock.
 
 
 ## Automatic Pages
@@ -34,7 +34,7 @@ Since one of the main purposes of this plugin is to provide your listeners with 
 
 The following Views are available for the Master Schedule:
 
-* Table - [default] responsive program grid in table form
+* Table - [default] responsive program in table form
 * Tabbed - responsive styled list view with day selection tabs
 * List - unstyled plain list view for custom development use
 * Divs - [display issues] legacy unstyled div based view 
@@ -42,6 +42,14 @@ The following Views are available for the Master Schedule:
 
 Table or Tabbed are recommended for the best ready display result. By enabling the "Automatic Display" option for this page, the selected Master Schedule View  will automatically replace the content of that page, using with default attributes. If you want to use other display options to customize what displays in the Schedule - or wish to combine it with other content on that page - then disable the Automatic Display option and instead manually place the [Master Schedule Shortcode](./Shortcodes.md#master-schedule-shortcode) `[master-schedule]` in the page content instead.
 
+#### [Pro] Extra Master Schedule Views
+
+In [Radio Station Pro](https://radiostation.pro), two additional schedule views are available for displaying your station schedule:
+
+* Grid - vertically stacked responsive show grid based on days
+* Calendar - responsive weekly schedule view with horizontal day show slider
+
+You can set these are the default view in the settings, or display them via the master schedule shortcode. If using the Grid view there is also an extra option to line up the grid according to the show time slots.
 
 ### Archive Pages
 
@@ -69,7 +77,6 @@ What this means is also that *if you have previously copied a legacy template in
 If you have *not* customized templates to match your Theme, and yet they are present, then it is recommended that you *remove the old templates from your Child Theme entirely*. This will allow the plugin to work via the new content filter method with the standard template within your theme. The Legacy templates names that you should look for and remove are: `single-show.php`, `single-playlist.php`, `archive-playlist.php`, `playlist-archive-template.php`, `show-blog-archive-template.php`
 
 We recognize this is may be a rather confusing and complex situation for existing users transitioning to 2.3.0, and if this is the case suggest rereading these section until it becomes clear. We are however confident that our solution going forward here is the best one, as it maintains backwards compatibility, honours the WordPress Template Hierarchy and enables implementing the revamped content displays. Fortunately, the majority of users will not be affected by these changes at all, but if you are the above options should easily resolve this.
-
 
 ### Show Page Content
 
@@ -108,7 +115,11 @@ Since 2.3.0, image support has been added to Schedule Overrides so that they beh
 
 ### [Pro] Profile Images
 
-In [Radio Station Pro](https://radiostation.pro), Host and Producer Profiles also support having images added, which then display on thee public profile pages for the host or producer.
+In [Radio Station Pro](https://radiostation.pro), Show Host and Producer Profiles also support having images added, which then display on the public profile pages for the Host or Producer.
+
+### [Pro] Episode Images
+
+In [Radio Station Pro](https://radiostation.pro), Episodes also support having images added, which then display on the public page for that Show Episode.
 
 ### [Pro] Genre Images and Colors
 
@@ -127,13 +138,11 @@ This is because some strings have never been translated into certain languages, 
 
 #### Time Related Translations
 
-Unlike other word strings, those involving dates and times are automatically translated by the plugin into your WordPress language using the `WP_Locale` class.
-
-This means you do not have to retranslate common strings for days of the week, month names, or am/pm meridian strings.
+Unlike other word strings, those involving dates and times are automatically translated by the plugin into your WordPress language using the `WP_Locale` class. This means you do not have to retranslate common strings for days of the week, month names, or am/pm meridian strings.
 
 #### Using a Translation Plugin
 
-If you wish to use a translation plugin instead, you can find the relevant language filed in the /languages/ directory of the plugin. Follow the translation plugin documentation on how to use these files. We welcome submissions of updated language files. Please contact us via email or submit a pull request via the [Github repository](https://github.com/netmix/radio-station/).
+If you wish to use a translation plugin instead, you can find the relevant language filed in the `/languages/` directory of the plugin. Follow the translation plugin documentation on how to use these files. We welcome submissions of updated language files. Please contact us via email or submit a pull request via the [Github repository](https://github.com/netmix/radio-station/).
 
 
 

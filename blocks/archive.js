@@ -74,7 +74,7 @@
 
 			return (
 				el( Fragment, {},
-					el( ServerSideRender, { block: 'radio-station/archive', className: 'radio-block-archive', attributes: atts } ),
+					el( ServerSideRender, { block: 'radio-station/archive', className: 'radio-archive-block', attributes: atts } ),
 					el( InspectorControls, {},
 						el( Panel, {},
 							/* === Archive List Details === */
