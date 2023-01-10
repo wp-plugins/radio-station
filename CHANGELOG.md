@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Improved: use WP JSON functions for data endpoints
 * Improved: Schedule Templates to use Classes and Instances
 * Improved: Tab Schedule default date display on
+* Added: Freemius Pricing Page v2
 * Added: assign Playlist to a specific Show Shift
 * Added: Quick Edit of Playlist to assign to Show
 * Added: Volume Control options to Player widget
@@ -32,7 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed: Genre/Language Archive Pagination
 * Fixed: Adjacent Post Links (where show has one shift)
 * Fixed: Workaround Amplitude pause event not firing
-
 
 ### 2.4.0.9
 * Update: Sysend (1.11.1) for Radio Player
