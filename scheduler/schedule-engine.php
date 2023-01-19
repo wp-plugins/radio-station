@@ -10,6 +10,11 @@
 // - Set Scheduler Debug Mode
 // - Open Schedule Engine Class
 // - Class Constructor
+// === Caching ===
+// - Set Current Schedule
+// - Set Previous Shift
+// - Set Current Shift
+// - Set Next Shift
 // === Schedule ===
 // - Get Record Shifts
 // - Generate Unique Shift ID
