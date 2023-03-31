@@ -24,17 +24,21 @@ Note that the following features are *not* available in Radio Station Plus:
 #### API
 
 [Episodes Data Endpoint](./API.md#pro-episodes-endpoint)
+
 [Hosts Data Endpoint](./API.md#pro-hosts-endpoint)
+
 [Producers Data Endpoint](./API.md#pro-producers-endpoint)
 
 #### Data
 
 [Show Episodes](./Data.md#pro-show-episodes)
+
 [Host and Producer Profiles](./Data.md#pro-host-and-producer-profiles)
 
 #### Display
 
 [Profile Images](./Display.md#pro-profile-images)
+
 [Genre Images and Colors](./Display.md#genre-images-and-colors)
 
 #### Filters
@@ -56,19 +60,30 @@ Note that the following features are *not* available in Radio Station Plus:
 #### Shortcodes
 
 [Schedule Grid View](./Shortcodes.md#master-schedule-shortcode)
+
 [Schedule Calendar View](./Shortcodes.md#master-schedule-shortcode)
+
 [Multiple View Switching](./Shortcodes.md#pro-multiple-view-switching)
+
 [Timezone Switching](./Shortcodes.md#pro-user-timezone-switching)
+
 [Hosts Archive Shortcode](./Shortcodes.md#pro-hosts-archive-shortcode)
+
 [Producers Archive Shortcode](./Shortcodes.md#pro-producers-archive-shortcode)
+
 [Team Archive Shortcode](./Shortcodes.md#pro-team-archive-shortcode)
+
 [Show Episodes Archive Shortcode](./Shortcodes.md#pro-show-episodes-archive-shortcode)
 
 #### Widgets
 
-[Sitewide Bar Player(./Player.md#pro-sitewide-bar-player)
+[Sitewide Bar Player](./Player.md#pro-sitewide-bar-player)
+
 [Timezone Switcher](./Widgets.md#pro-timezone-switcher)
+
 [Extra Block Options](./Widgets.md#pro-extra-block-options)
+
 [Elementor Widgets](./Widgets.md#pro-elementor-widgets)
+
 [Beaver Builder Modules]('./Widgets.md#pro-beaver-builder-modules)
 
