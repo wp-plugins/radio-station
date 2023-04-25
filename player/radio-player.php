@@ -1241,8 +1241,10 @@ function radio_player_core_scripts() {
 	// --- set minified script suffix ---
 	$suffix = '.min';
 	if ( ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG )
-	  || ( defined( 'RADIO_STATION_DEBUG') && RADIO_STATION_DEBUG ) ) {$suffix = '';}
-	$suffix = ''; // DEV TEST
+	  || ( defined( 'RADIO_STATION_DEBUG') && RADIO_STATION_DEBUG ) ) {
+		  $suffix = '';
+	}
+	// $suffix = ''; // DEV TEST
 
 	// --- set amplitude script ---
 	$path = dirname( __FILE__ ) . '/js/amplitude' . $suffix . '.js';

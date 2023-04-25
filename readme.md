@@ -12,7 +12,7 @@ Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 
 Requires at least: 3.3.1
 
-Tested up to: 6.1.1
+Tested up to: 6.2
 
 Stable tag: 2.5.0
 
@@ -232,6 +232,8 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * https://radiostation.pro/radio-station-2-5-0-release-with-blocks/
 * Refactored Schedule Engine Class
 * Improved translations and sanitization
+* Numerous bugfixes and improvements
+* Escape debug output security fix
 
 #### 2.4.0
 * Radio Station Stream Player Widget!

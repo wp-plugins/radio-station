@@ -2,37 +2,66 @@
 
 ***
 
-### How do I get started with Radio Station?
+### How do I get started with Radio Station (Free or PRO)?
 
 Read the [Quickstart Guide](./index.md#quickstart-guide) for an introduction to the plugin, what features are available and how to set them up.
 
-### Where can I find the full plugin documentation?
+### Where can I find the full Radio Station documentation (Free or PRO)?
 
-The latest documentation can be found online at [NetMix.com](https://netmix.com/radio-station/docs/). Documentation is also included with for the currently installed version via the Radio Station Help menu. You can find the Markdown-formatted files in the `/docs` folder of the [GitHub Repository](https://github.com/netmix/radio-station/docs/) and in the `/docs` folder of the plugin directory. 
+The latest documentation [can be found online here](https://radiostation.pro/docs/). Documentation is also included with the currently installed version via the Radio Station Help menu item located under the Radio Station admin menu. You can find the Markdown-formatted files in the `/docs` folder of the [GitHub Repository](https://github.com/netmix/radio-station/docs/) and in the `/docs` folder of the plugin directory. 
+
+### How do I get support for Radio Station (Free or PRO)?
+
+For Radio Station customers using the free, open-source version of our plugin, you can contact us in our support channel in the [WordPress support forums here](https://wordpress.org/support/plugin/radio-station/. For Radio Station PRO subscribers, you can email us at [support@radiostation.pro](mailto:support@radiostation.pro) and someone will respond to your inquiry within 12 to 24 hours. All support inquiries will be handled in the order they are received. Before contacting support, make sure you check for conflicts by disabling all of your plugins and re-enabling them one at a time to ascertain which plugin is conflicting with Radio Station (Free and PRO).
+
+### How do I access my Radio Station PRO account?
+
+We have partnered with Freemius who provide an integrated subscription and upgrade system for WordPress plugin developers. When you purchase Radio Station PRO, you will receive email instructions to create your account, which contain a link to the [Freemius User Dashboard here](https://users.freemius.com/login). While you can see your account details by navigating to WordPress Dashboard > Radio Station > Account, logging into the Freemius Dashboard will give you full control over your account.
+
+### Can I try Radio Station PRO before I purchase the plugin?
+
+Yes, you can trial Radio Station PRO for up to 14 days. You are required to set a credit or debit card number when you sign up for the free trial and can cancel any time before the trial is up. The credit or debit card on file will be charged automatically once the trial expires 14 days from the date of your registration.
+
+### Can I request a refund for Radio Station PRO?
+
+We offer a 30 day, moneyback guarantee. If you are not satisfied with Radio Station PRO within the 30 day period, we will issue a full refund, no questions asked. Once the 30-day period is exhausted refunds are not available.
+
+### How do I cancel my Radio Station PRO subscription?
+
+Login to your [Freemius User Dashboard](https://users.freemius.com/login) and navigate to Renewals & Billing to cancel your Radio Station PRO subscription. When you cancel your subscription, your account will stay active for the remainder of the billing period. Once your subscription is cancelled, you will lose access to PRO customer support and any future upgrades, bugfixes and feature additions.
 
 ### How do I schedule a Show? 
 
 Simply create a new show via Add Show in the Radio Station plugin menu in the Admin area. You will be able to assign Shift timeslots to it on the Show edit page, as well as add the Show description and other meta fields, including Show images.
+In order to schedule a Show, a Show must be added and available to accept schedule entries. If this is your first time using Radio Station, create a new show via the Add Show item in the Radio Stationn menu in your WordPress Admin screen. You can assign Shift timeslots to your new Show or pre-existing Show on the Show edit page, as well as add a Show description and other meta fields, including Show images.
 
 ### How do I display a full schedule of my Station's shows? 
 
-In the Plugin Settings, you can select a Page on which to automatically display the schedule as well as which View to display (a Table grid by default.) Alternatively, you can use the shortcode `[master-schedule]` on any page (or post.) This option allows you to use further shortcode attributes to control the what is displayed in the Schedule (see [Master Schedule Shortcode Docs](./Shortcodes.md#master-schedule-shortcode) )
+Navigate to the plugin Settings page via the Radio Station menu in your WordPress Admin screen and then click the Pages tab. There you can select the Page on which to automatically display the schedule, as well as which View to display (a Table grid by default.) Alternatively, you can use the shortcode `[master-schedule]` on any page (or post.) This option allows you to use additional shortcode attributes to control what is displayed in your Schedule (see [Master Schedule Shortcode Docs](./Shortcodes.md#master-schedule-shortcode) )
 
-### I've scheduled all my Shows, but some are not showing up on the program schedule?
+### Why aren't all my Shows displaying in the program schedule?
 
 Did you remember to check the "Active" checkbox for each Show? If a Show is not marked active, the plugin assumes that it's not currently in production and it is not shown on the Schedule. A Show will also not be shown if it has a Draft status or has no active Shifts assigned to it.
 
 ### What if I want to schedule a special event or one-off schedule change?
 
-If you have a one-off event that you need to show up in the Schedule and Widgets, you can create a Schedule Override by clicking Schedule Override in the Radio Station admin menu. This will allow you to set aside a block of time on a specific date, and when the Schedule or Widget is displaying that date, the override will be used instead of the normally scheduled Show. (Note that Schedule Overrides will not display in the old Legacy Table/Div Views of the Master Schedule.)
+If you have a one-off event that you need to show up in the Schedule and Widgets, you can create a Schedule Override by navigating to WordPress Dashboard > Radio Station > Schedule Overrides > Add New. This will allow you to set aside a block of time on a specific date, and when the Schedule or Widget is displaying that date, the override will be used instead of the normally scheduled Show. You can also link an Override to an existing Show, and partially update any Show information to be overridden. (Note that Schedule Overrides will not display in the old Legacy Table/Div Views of the Master Schedule.) In the Free version, if an Override needs to apply to multiple dates, you must schedule each time slot individually. In the PRO version, you can repeat the Override via day periods or monthly recurrences.
 
-### I'm seeing 404 Not Found errors when I click on the link for a Show! 
+### Where is my data stored? Can I export my data?
 
-Try re-saving your site's permalink settings via Settings -> Permalinks.  Wordpress sometimes gets confused with a new custom post type is added. Permalink rewrites are automatically flushed on plugin activation, so you can also just deactivate and reactivate the plugin.
+Radio Station PRO is a WordPress plugin, which functions similarly to other WordPress themes and plugins by storing your site's settings and all post-type data in your WordPress MySQL database, which is connected to your website and accessed through your WordPress hosting account with the provider you chose. Similarly to all WordPress themes and plugins, when changing settings or adding content to a WordPress website, Radio Station (free and PRO) stores data in the MySQL database as it is added, edited, and published, updated, or saved. You can export your data using WordPress Dashboard > Tools > Export feature or Radio Station PRO’s Export feature located at WordPress Dashboard > Import/Export. Our import/export feature works with YML and not XML, which is the standard WordPress format.
 
-### What if I want to change or style the plugin's displays? 
+### Can I import Show datae from Pro.Radio or the JOAN (Jock on Air Now) plugin?
 
-The default styles for Radio Station have intionally kept fairly minimal so as to be compatible with most themes, so you may wish to add your own styles to suit your site's look and feel. The best way to do this is to add your own `rs-custom.css` to your Child Theme's directory, and add more specific style rules that modify or override the existing styles. Radio Station will automatically detect the presence of this file and enqueue it. You can find the base styles in the `/css/` directory of the plugin.
+We do not have a method of importing data directly from JOAN or Pro.Radio
+
+### I'm seeing a 404 Not Found error when I click on the link for a Show! 
+
+Try re-saving your site's permalink settings via Settings -> Permalinks. WordPress sometimes gets confused with a new custom post type is added. Permalink rewrites are automatically flushed on plugin activation, so you can also just deactivate and reactivate the plugin to regenerate your site's permalinks.
+
+### What if I want to style how Radio Station's schedule displays on the frond end?
+
+The default styles for Radio Station have intentionally kept fairly minimal so as to be compatible with most themes, so you may wish to add your own CSS styles to suit your site's look and feel. You can add these styles via Theme Customizer's Additional CSS setting. You can also add your own `rs-custom.css` file to your Child Theme's directory, and Radio Station will automatically detect the presence of this file and enqueue it. Either way you can add more specific selectors with rules that modify or override the existing styles. You can find the base styles in the `/css/` directory of the plugin. 
 
 ### What Widgets are available with this plugin?
 
@@ -41,9 +70,9 @@ Current Show, Upcoming Shows, Current Playlist, Radio Clock and Streaming Player
 
 ### Do the Widgets reload automatically?
 
-Current Show, Upcoming Shows and Current Playlist widgets do not refresh automatically in this free version. This capability has been added as a new feature to the [Pro version](https://radiostation.pro) however - so that the widgets refresh exactly at Show changeover times.
+Current Show, Upcoming Shows and Current Playlist widgets do not refresh automatically in the Free version of Radio Station. This functionality is only available in our Pro version so widgets refresh exactly at a Show's changeover time. To enable s refresh exactly at Show changeover times. To enable auto-refresh widgets [upgrade to Radio Station PRO](https://radiostation.pro)
 
-### What Shortcodes are available with this plugin?
+### What Shortcodes are available in Radio Station?
 
 See the [Shortcode Documentation](./Shortcodes.md) for more details and a full list of possible Attributes for these Shortcodes:
 
@@ -57,25 +86,28 @@ See the [Shortcode Documentation](./Shortcodes.md) for more details and a full l
 * `[overrides-archive]` - Archive List of Schedule overrides
 * `[playlists-archive]` - Archive List of Show Playlists
 
-Note old shortcode aliases will still work in current and future versions to prevent breakage.
+(Note old shortcode aliases will still work in current and future versions to prevent breakage.)
 
-### I need users other than just the Administrator and DJ roles to have access to the Shows and Playlists post types. How do I do that? 
+### How do I grant users other than Administrator and DJ roles permission to edit Shows and Playlists?
 
-There are a number of different options depending on what you are wanting to to do. To address this situation, we have added a Show Editor role that can edit Shows without being an Administrator. You can find more information on roles in the [Roles Documentation](./Roles.md)
+There are a number of different options depending on what your goals are.To address this situation, we have added a Show Editor role that can edit Shows without being an Administrator. This may help keep clear lines of separation for editorial responsibility over your content, as you may not want users with Autors or Conftirubyute roles to edit Shows, but to give a specific user the ability to do so. You can find more information on roles in the [Roles Documentation](./Roles.md)
 
-### How do I change the Show Avatar displayed in the sidebar widget? 
+### How do I change the Show Image displayed in the widgets and schedule? 
 
-The avatar is whatever image is assigned as the Show's Avatar.  All you have to do is set a new Show Avatar on the Edit page for that Show.
+The widgets and schedule will display whichever avatar is assigned to the show on the Show Edit screen. Navigate in the WordPress Dashboard to Radio Station > Shows and locate the Show you want to add/edit the Avatar for in the Shows list. Simply set a new image for the Show.
 
-### Why don't any users show up in the Hosts or Producers list on the Show edit page? =
+### Why don’t all WordPress Users appear in the Hosts or Producers lists on a Show Edit screen?
 
-You need to assign the Host or Producer role to the users you want, so that you can select these users on the Show edit page. You can assign roles by editing the User via the WordPress admin. The [Pro version](https://radiostation.pro) has an additional Role Editor interface where you can assign the plugin roles to any number of users at once.
+You need to assign the Host or Producer role to the users you want, so that you can select these users on the Show edit screen. You can assign roles by editing the User via the WordPress admin. The [Pro version](https://radiostation.pro) has an additional Role Editor interface where you can assign the plugin roles to any number of users at once.
 
-### My Show Hosts and Producers can't edit a Show page.  What do I do? 
+### Why can't Show Hosts or Producers can't edit a Show page?
 
-The only Hosts and Producers that can edit a show are the ones listed as being Hosts or Producers for that Show in the respective user selection menus. This is to prevent Hosts/Producers from editing other Host/Producer's Shows without permission.
+The only Hosts and Producers that may Edit a Show are the ones assigned as Host(s) or Producer(s) to that specific Show in the respective user selection menus. This is to prevent Hosts/Producers from editing other Shows managed by different Hosts/Producers without permission. 
 
-### I don't want to use Gravatar for my Host/Producer's image on their profile page. 
+### How do I use a different image from the Gravatar for a Host/Producer?
+
+If you prefer not to use WordPress-owned, Gravatar.com for your User profile images, you'll need to install a plugin that allows lets you the ability to add a different image to your Host/Producer's Uuser account. You can search for a free plugin in the WordPress plugin repository at WordPress.org. As there are a number of plugins that do just this, it's a little out mostly out of the scope of this plugin’s features. However, in our the Pro version,  you can create separate profile pages to showcase each of your Hosts and Producers, to which, you can and assign profile images that appear on those to these profile pages. If you would like to enable this feature, pelase upgrade here.
+
 
 Then you'll need to install a plugin that lets you add a different image to your Host/Producer's user account. As there are a number of plugins that do just this, it's a little out of the scope of this plugin. However, in the [Pro version](https://radiostation.pro) you can create separate profile pages to showcase each of your Hosts and Producers, and assign profile images to these profile pages.
 

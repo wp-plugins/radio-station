@@ -7,9 +7,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### 2.5.0
+= 2.5.0 =
 * Added: Radio Station Blocks! (converted Widgets)
-* Updated: Freemius SDK (2.5.3)
+* Updated: Freemius SDK (2.5.5)
 * Updated: Plugin Panel (1.2.9)
 * Updated: AmplitudeJS (5.3.2)
 * Updated: Howler (2.2.3)
@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Improved: use WP JSON functions for data endpoints
 * Improved: Schedule Templates to use Classes and Instances
 * Improved: Tab Schedule default date display on
+* Improved: use wp_send_json for feed endpoints
 * Added: Freemius Pricing Page v2
 * Added: assign Playlist to a specific Show Shift
 * Added: Quick Edit of Playlist to assign to Show
@@ -33,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed: Genre/Language Archive Pagination
 * Fixed: Adjacent Post Links (where show has one shift)
 * Fixed: Workaround Amplitude pause event not firing
+* Security Fix: Escape all debug output content
 
 ### 2.4.0.9
 * Update: Sysend (1.11.1) for Radio Player

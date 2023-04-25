@@ -495,9 +495,9 @@ function radio_station_schedule_endpoint() {
 	$weekday = $singular = $multiple = false;
 	if ( isset( $_GET['weekday'] ) ) {
 
-		$weekday = $_GET['weekday'];
-
-		if ( strstr( $_GET['weekday'], ',' ) ) {
+		// 2.5.0: added sanitize_text_field
+		$weekday = sanitize_text_field( $_GET['weekday'] );
+		if ( strstr( $weekday, ',' ) ) {
 			$multiple = true;
 			$weekdays = explode( ',', $weekday );
 		} else {
@@ -577,7 +577,8 @@ function radio_station_shows_endpoint() {
 	// --- get show query parameter ---
 	$show = $singular = $multiple = false;
 	if ( isset( $_GET['show'] ) ) {
-		$show = $_GET['show'];
+		// 2.5.0: added sanitize_text_field
+		$show = sanitize_text_field( $_GET['show'] );
 		if ( strstr( $show, ',' ) ) {
 			$multiple = true;
 		} else {
@@ -624,7 +625,8 @@ function radio_station_genres_endpoint() {
 	// --- get genre query parameter ---
 	$genre = $singular = $multiple = false;
 	if ( isset( $_GET['genre'] ) ) {
-		$genre = $_GET['genre'];
+		// 2.5.0: added sanitize_text_field
+		$genre = sanitize_text_field( $_GET['genre'] );
 		if ( strstr( $genre, ',' ) ) {
 			$multiple = true;
 		} else {
@@ -671,7 +673,8 @@ function radio_station_languages_endpoint() {
 	// --- get language query parameter ---
 	$language = $singular = $multiple = false;
 	if ( isset( $_GET['language'] ) ) {
-		$language = $_GET['language'];
+		// 2.5.0: added sanitize_text_field
+		$language = sanitize_text_field( $_GET['language'] );
 		if ( strstr( $language, ',' ) ) {
 			$multiple = true;
 		} else {

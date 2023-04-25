@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://radiostation.pro/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.4.9.9
+Version: 2.4.9.10
 Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
@@ -944,7 +944,7 @@ function radio_station_delete_transients_with_prefix( $prefix ) {
 	$results = $wpdb->get_results( $query, ARRAY_A );
 	// if ( RADIO_STATION_DEBUG ) {
 	//	echo $query . PHP_EOL . '<br>';
-	//	echo 'Transients: ' . print_r( $results, true );
+	//	echo 'Transients: ' . esc_html( print_r( $results, true ) ) . "\n";
 	// }
 	if ( !$results || !is_array( $results ) || ( count( $results ) < 1 ) ) {
 		return;
@@ -958,7 +958,7 @@ function radio_station_delete_transients_with_prefix( $prefix ) {
 		// 2.3.3.9: also delete transient cache object by key
 		wp_cache_delete( $key, 'transient' );
 		// if ( RADIO_STATION_DEBUG ) {
-		// 	echo "Deleting transient and cache object for '" . $key . "'" . PHP_EOL;
+		// 	echo "Deleting transient and cache object for '" . esc_html( $key ) . "'" . "\n";
 		// }
 	}
 }

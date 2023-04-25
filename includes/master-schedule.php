@@ -661,7 +661,7 @@ function radio_station_ajax_schedule_loader() {
 	$debug = true;
 	$atts = radio_station_sanitize_shortcode_values( 'master-schedule' );
 	if ( RADIO_STATION_DEBUG || $debug ) {
-		echo esc_html( print_r( $_REQUEST, true ) );
+		echo "Full Request Inputs: " . esc_html( print_r( $_REQUEST, true ) );
 		echo "Sanitized Master Schedule Shortcode Attributes: " . esc_html( print_r( $atts, true ) );
 	}
 

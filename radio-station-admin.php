@@ -695,7 +695,7 @@ function radio_station_get_upgrade_notice() {
 	$pluginslug = RADIO_STATION_SLUG;
 	$pluginupdates = get_site_transient( 'update_plugins' );
 	if ( RADIO_STATION_DEBUG ) {
-		echo '<span style="display:none;">Update Transient: ' . print_r( $pluginupdates, true ) . '</span>';
+		echo '<span style="display:none;">Update Transient: ' . esc_html( print_r( $pluginupdates, true ) ) . '</span>';
 	}
 
 	// 2.4.0.9: check for object for PHP8
@@ -726,7 +726,7 @@ function radio_station_get_upgrade_notice() {
 		}
 	}
 	if ( RADIO_STATION_DEBUG && $notice ) {
-		echo '<span style="display:none;">Update Notice: ' . print_r( $notice, true ) . '</span>';
+		echo '<span style="display:none;">Update Notice: ' . esc_html( print_r( $notice, true ) ) . '</span>';
 	}
 	return $notice;
 }

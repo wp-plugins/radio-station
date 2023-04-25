@@ -318,7 +318,7 @@ function radio_station_automatic_pages_content_set( $content ) {
 
 	// --- languages archive page ---
 	// 2.3.3.9: added automatic display of language archive page
-	$language_archive_page = radio_station_get_setting( '' );
+	$language_archive_page = radio_station_get_setting( 'language_archive_page' );
 	if ( !is_null( $language_archive_page ) && !empty( $language_archive_page ) ) {
 		if ( is_page( $language_archive_page ) ) {
 			$automatic = radio_station_get_setting( 'language_archive_auto' );

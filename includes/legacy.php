@@ -400,9 +400,9 @@ function radio_station_get_now_playing( $time = false ) {
 		return false;
 	}
 	$show_id = $current_show['show']['id'];
-	// if ( RADIO_STATION_DEBUG ) {
-		echo '<span style="display:none;">Playlist Current Show Data: ' . print_r( $current_show, true ) . '</span>' . "\n";
-	// }
+	if ( RADIO_STATION_DEBUG ) {
+		echo '<span style="display:none;">Playlist Current Show Data: ' . esc_html( print_r( $current_show, true ) ) . '</span>' . "\n";
+	}
 
 	// TODO: improve handling of playlists for overrides
 	$override = false;

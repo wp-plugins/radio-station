@@ -1,9 +1,10 @@
-=== Radio Station ===
+=== Radio Station  by netmix® - Manage and play your show schedule in WordPress!
+===
 Contributors: tonyzeoli, majick
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
-Tested up to: 6.1.1
+Tested up to: 6.2
 Stable tag: 2.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -11,6 +12,8 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Radio Station lets you build and manage a Show Schedule for a radio station or Internet broadcaster's WordPress website. 
 
 == Description ==
+
+[__Live Demo__](https://demo.radiostation.pro/) | [__Documentation__](https://radiostation.pro/docs/) | [__Support__](https://wordpress.org/support/plugin/radio-station/) | [__Upgrade to Pro!__](https://radiostation.pro/pricing/)
 
 Radio Station by NetMix is a plugin to build and manage a Show Schedule for a radio station or internet broadcaster's WordPress website. If you're a podcaster with scheduled releases or a Clubhouse app moderator who schedule rooms, you could use this plugin to announce your schedule on your website. It's functionality was originally based on Drupal 6's Station plugin, reworked for use in Wordpress and then extended.
 
@@ -220,7 +223,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 
 = 2.5.0 =
 * Added: Radio Station Blocks! (converted Widgets)
-* Updated: Freemius SDK (2.5.3)
+* Updated: Freemius SDK (2.5.5)
 * Updated: Plugin Panel (1.2.9)
 * Updated: AmplitudeJS (5.3.2)
 * Updated: Howler (2.2.3)
@@ -234,6 +237,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Improved: use WP JSON functions for data endpoints
 * Improved: Schedule Templates to use Classes and Instances
 * Improved: Tab Schedule default date display on
+* Improved: use wp_send_json for feed endpoints
 * Added: Freemius Pricing Page v2
 * Added: assign Playlist to a specific Show Shift
 * Added: Quick Edit of Playlist to assign to Show
@@ -244,6 +248,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Fixed: Genre/Language Archive Pagination
 * Fixed: Adjacent Post Links (where show has one shift)
 * Fixed: Workaround Amplitude pause event not firing
+* Security Fix: Escape all debug output content
 
 = 2.4.0.9 =
 * Update: Sysend (1.11.1) for Radio Player
@@ -803,6 +808,7 @@ You can now visit your site to make sure nothing is broken. If you experience is
 * Refactored Schedule Engine Class
 * Improved translations and sanitization
 * Numerous bugfixes and improvements
+* Escape debug output security fix
 
 = 2.4.0 =
 * Radio Station Stream Player Widget!
