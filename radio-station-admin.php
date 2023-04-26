@@ -62,7 +62,8 @@ function radio_station_enqueue_admin_scripts() {
 
 	if ( RADIO_STATION_DEBUG ) {
 		$js = "radio_admin.debug = true;";
-		wp_add_inline_script( 'radio-station-admin', $js );
+		// 2.5.0: use radio_station_add_inline_script
+		radio_station_add_inline_script( 'radio-station-admin', $js );
 	}
 
 	// --- enqueue admin styles ---
@@ -337,7 +338,8 @@ function radio_station_taxonomy_submenu_fix() {
 		// --- enqueue script inline ---
 		// 2.3.0: enqueue instead of echoing
 		if ( '' != $js ) {
-			wp_add_inline_script( 'radio-station-admin', $js );
+			// 2.5.0: use radio_station_add_inline_script
+			radio_station_add_inline_script( 'radio-station-admin', $js );
 		}
 	}
 }

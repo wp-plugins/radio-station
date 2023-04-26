@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://radiostation.pro/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.4.9.10
+Version: 2.4.9.11
 Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
@@ -57,7 +57,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // - Enqueue Plugin Scripts
 // - Register Moment JS
 // - Enqueue Plugin Script
+// - Add Inline Script
+// - Print Footer Scripts
+// - Print Admin Footer Scripts
 // - Enqueue Plugin Stylesheet
+// - Add Inline Style
+// - Print Footer Styles
+// - Print Admin Footer Styles
 // - Enqueue Datepicker
 // - Enqueue Localized Script Values
 // - Localization Script
@@ -625,6 +631,63 @@ function radio_station_enqueue_script( $scriptkey, $deps = array(), $infooter = 
 	}
 }
 
+// -----------------
+// Add Inline Script
+// -----------------
+// 2.5.0: added for missed inline scripts (via shortcodes)
+function radio_station_add_inline_script( $handle, $js, $position = 'after' ) {
+	
+	// --- add check if script is already done ---
+	if ( !wp_script_is( 'done', $handle ) ) {
+		// --- handle javascript normally ---
+		wp_add_inline_script( $handle, $js, $position );
+	} else {
+		// --- store extra javascript for later output ---
+		if ( !strstr( $handle, '-admin' ) ) {
+			global $radio_station_scripts;
+			add_action( 'wp_print_footer_scripts', 'radio_station_print_footer_scripts', 20 );
+			if ( !isset( $radio_station_scripts[$handle] ) ) {
+				$radio_station_scripts[$handle] = '';
+			}
+			$radio_station_scripts[$handle] .= $js;
+		} else {
+			global $radio_station_admin_scripts;
+			add_action( 'admin_print_footer_scripts', 'radio_station_admin_print_footer_scripts', 20 );
+			if ( !isset( $radio_station_admin_scripts[$handle] ) ) {
+				$radio_station_admin_scripts[$handle] = '';
+			}
+			$radio_station_admin_scripts[$handle] .= $js;
+		}
+	}
+}
+
+// --------------------
+// Print Footer Scripts
+// --------------------
+// 2.5.0: added for missed inline scripts
+function radio_station_print_footer_scripts() {
+	global $radio_station_scripts;
+	if ( is_array( $radio_station_scripts ) && ( count( $radio_station_scripts ) > 0 ) ) {
+		foreach ( $radio_station_scripts as $handle => $js ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<script id="' . esc_attr( $handle ) . '-js-after">' . $js . '</script>';
+		}
+	}
+}
+
+// --------------------------
+// Print Admin Footer Scripts
+// --------------------------
+function radio_station_admin_print_footer_scripts() {
+	global $radio_station_admin_scripts;
+	if ( is_array( $radio_station_admin_scripts ) && ( count( $radio_station_admin_scripts ) > 0 ) ) {
+		foreach ( $radio_station_admin_scripts as $handle => $js ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<script id="' . esc_attr( $handle ) . '-js-after">' . $js . '</script>';
+		}
+	}
+}
+
 // -------------------------
 // Enqueue Plugin Stylesheet
 // -------------------------
@@ -669,6 +732,62 @@ function radio_station_enqueue_style( $stylekey, $deps = array() ) {
 	}
 }
 
+// -----------------
+// Add Inline Styles
+// -----------------
+// 2.5.0: added for missed inline styles (via shortcodes)
+function radio_station_add_inline_style( $handle, $css ) {
+
+	// --- add check if style is already done ---
+	if ( !wp_style_is( 'done', $handle ) ) {
+		// --- handle javascript normally ---
+		wp_add_inline_style( $handle, $css );
+	} else {
+		// --- store extra javascript for later output ---
+		if ( !strstr( $handle, '-admin' ) ) {
+			global $radio_station_styles;
+			add_action( 'wp_print_footer_scripts', 'radio_station_print_footer_styles', 20 );
+			if ( !isset( $radio_station_styles[$handle] ) ) {
+				$radio_station_styles[$handle] = '';
+			}
+			$radio_station_styles[$handle] .= $css;
+		} else {
+			global $radio_station_admin_styles;
+			add_action( 'admin_print_footer_scripts', 'radio_station_admin_print_footer_styles', 20 );
+			if ( !isset( $radio_station_admin_styles[$handle] ) ) {
+				$radio_station_admin_styles[$handle] = '';
+			}
+			$radio_station_admin_styles[$handle] .= $css;
+		}
+	}
+}
+
+// -------------------
+// Print Footer Styles
+// -------------------
+// 2.5.0: added for missed inline styles
+function radio_station_print_footer_styles() {
+	global $radio_station_styles;
+	if ( is_array( $radio_station_styles ) && ( count( $radio_station_styles ) > 0 ) ) {
+		foreach ( $radio_station_styles as $handle => $css ) {
+			echo '<style>' . wp_kses_post( $css ) . '</style>';
+		}
+	}
+}
+
+// -------------------------
+// Print Admin Footer Styles
+// -------------------------
+// 2.5.0: added for missed inline styles
+function radio_station_admin_print_footer_styles() {
+	global $radio_station_admin_styles;
+	if ( is_array( $radio_station_admin_styles ) && ( count( $radio_station_admin_styles ) > 0 ) ) {
+		foreach ( $radio_station_admin_styles as $handle => $css ) {
+			echo '<style>' . wp_kses_post( $css ) . '</style>';
+		}
+	}
+}
+
 // ------------------
 // Enqueue Datepicker
 // ------------------
@@ -705,7 +824,8 @@ function radio_station_enqueue_color_picker() {
 	$js = "jQuery(document).ready(function() {";
 	$js .= "if (jQuery('.color-picker').length) {jQuery('.color-picker').wpColorPicker();}";
 	$js .= "});" . "\n";
-	wp_add_inline_script( 'wp-color-picker-a', $js );
+	// 2.5.0: use radio_station_add_inline_script
+	radio_station_add_inline_script( 'wp-color-picker-a', $js );
 }
 
 // -------------------------------
@@ -721,7 +841,8 @@ function radio_station_localize_script() {
 	}
 
 	$js = radio_station_localization_script();
-	wp_add_inline_script( 'radio-station', $js );
+	// 2.5.0: use radio_station_add_inline_script
+	radio_station_add_inline_script( 'radio-station', $js );
 	$radio_station['script-localized'] = true;
 }
 

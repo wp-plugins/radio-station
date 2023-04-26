@@ -312,7 +312,8 @@ function radio_station_master_schedule( $atts ) {
 
 	// --- enqueue schedule loader script ---
 	$js = radio_station_master_schedule_loader_js( $atts );
-	wp_add_inline_script( 'radio-station', $js );
+	// 2.5.0: use radio_station_add_inline_script
+	radio_station_add_inline_script( 'radio-station', $js );
 
 	// --- schedule display override ---
 	// 2.3.1: add full schedule override filter
@@ -354,7 +355,8 @@ function radio_station_master_schedule( $atts ) {
 
 		// --- enqueue table view script ---
 		$js = radio_station_master_schedule_table_js();
-		wp_add_inline_script( 'radio-station', $js );
+		// 2.5.0: use radio_station_add_inline_script
+		radio_station_add_inline_script( 'radio-station', $js );
 
 		// --- filter and return ---
 		// 2.5.0: added prefixed filter for consistency
@@ -383,7 +385,8 @@ function radio_station_master_schedule( $atts ) {
 
 		// --- enqueue tabs view script ---
 		$js = radio_station_master_schedule_tabs_js();
-		wp_add_inline_script( 'radio-station', $js );
+		// 2.5.0: use radio_station_add_inline_script
+		radio_station_add_inline_script( 'radio-station', $js );
 
 		// --- filter and return ---
 		// 2.5.0: added prefixed filter for consistency
@@ -412,7 +415,8 @@ function radio_station_master_schedule( $atts ) {
 
 		// --- enqueue list view script ---
 		$js = radio_station_master_schedule_list_js();
-		wp_add_inline_script( 'radio-station', $js );
+		// 2.5.0: use radio_station_add_inline_script
+		radio_station_add_inline_script( 'radio-station', $js );
 
 		// --- filter and return ---
 		// 2.5.0: added prefixed filter for consistency
@@ -879,7 +883,8 @@ function radio_station_master_schedule_genre_selector( $instances ) {
 
 	// --- enqueue script ---
 	// 2.3.0: add script code to existing handle
-	wp_add_inline_script( 'radio-station', $js );
+	// 2.5.0: use radio_station_add_inline_script
+	radio_station_add_inline_script( 'radio-station', $js );
 
 	return $html;
 }

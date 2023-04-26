@@ -326,7 +326,8 @@ function radio_station_show_language_metabox() {
 	// --- add script inline ---
 	// 2.3.3.9: added language edit script filter
 	$js = apply_filters( 'radio_station_language_edit_script', $js );
-	wp_add_inline_script( 'radio-station-admin', $js );
+	// 2.5.0: use radio_station_add_inline_script
+	radio_station_add_inline_script( 'radio-station-admin', $js );
 }
 
 // ----------------------------
@@ -895,7 +896,8 @@ function radio_station_show_shifts_metabox() {
 
 		// --- enqueue inline script ---
 		// 2.3.0: enqueue instead of echoing
-		wp_add_inline_script( 'radio-station-admin', $js );
+		// 2.5.0: use radio_station_add_inline_script
+		radio_station_add_inline_script( 'radio-station-admin', $js );
 
 		// --- shift display styles ---
 		// 2.3.2: added dashed border to new shift
@@ -1921,7 +1923,8 @@ function radio_station_show_images_metabox() {
 
 	// --- enqueue script inline ---
 	// 2.3.0: enqueue instead of echoing
-	wp_add_inline_script( 'radio-station-admin', $js );
+	// 2.5.0: use radio_station_add_inline_script
+	radio_station_add_inline_script( 'radio-station-admin', $js );
 
 	// 2.3.3.9: add media modal close button style fix
 	echo '<style>.media-modal-close {z-index: 1001 !important;</style>';
@@ -3409,7 +3412,8 @@ function radio_station_override_show_metabox() {
 	$js = radio_station_override_show_script();
 
 	// --- enqueue inline script ---
-	wp_add_inline_script( 'radio-station-admin', $js );
+	// 2.5.0: use radio_station_add_inline_script
+	radio_station_add_inline_script( 'radio-station-admin', $js );
 }
 
 // -------------------------
@@ -3572,7 +3576,8 @@ function radio_station_schedule_override_metabox() {
 
 		// --- enqueue inline script ---
 		// 2.3.0: enqeue instead of echoing
-		wp_add_inline_script( 'radio-station-admin', $js );
+		// 2.5.0: use radio_station_add_inline_script
+		radio_station_add_inline_script( 'radio-station-admin', $js );
 
 		// --- override metabox bottom action ---
 		// 2.5.0: added override metabox action
@@ -4679,8 +4684,9 @@ function radio_station_override_save_data( $post_id ) {
 			$js .= "});" . "\n";
 
 			// --- output the scripts ---
-			// TODO: use wp_add_inline_script ?
-			echo '<script>' . $js . '</script>';
+			// 2.5.0: use radio_station_add_inline_script
+			// echo '<script>' . $js . '</script>';		
+			radio_station_add_inline_script( 'radio-station-admin', $js );
 
 			// 2.3.3.9: trigger action for save or add override time
 			if ( 'radio_station_override_save' == $action ) {
@@ -5363,7 +5369,8 @@ function radio_station_playlist_metabox() {
 
 		// --- enqueue inline script ---
 		// 2.3.0: enqueue instead of echoing
-		wp_add_inline_script( 'radio-station-admin', $js );
+		// 2.5.0: use radio_station_add_inline_script
+		radio_station_add_inline_script( 'radio-station-admin', $js );
 
 		// --- track list styles ---
 		// 2.3.0: added track meta style fix
@@ -6134,8 +6141,9 @@ function radio_station_playlist_admin_list_scripts() {
 	// 2.3.0: enqueue instead of echo
 	// 2.3.3.9: filter playlist list script
 	// 2.5.0: fix incorrect variable to filter (css)
+	// 2.5.0: use radio_station_add_inline_script
 	$js = apply_filters( 'radio_station_playlist_list_script', $js );
-	wp_add_inline_script( 'radio-station-admin', $js );
+	radio_station_add_inline_script( 'radio-station-admin', $js );
 }
 
 
@@ -6258,7 +6266,8 @@ function radio_station_playlists_quick_edit_script( $hook ) {
 			};
 		})(jQuery);";
 
-		wp_add_inline_script( 'radio-station-admin', $js );
+		// 2.5.0: use radio_station_add_inline_script
+		radio_station_add_inline_script( 'radio-station-admin', $js );
 	}
 }
 
@@ -6681,7 +6690,8 @@ function radio_station_posts_quick_edit_script( $hook ) {
 			};
 		})(jQuery);";
 
-		wp_add_inline_script( 'radio-station-admin', $js );
+		// 2.5.0: use radio_station_add_inline_script
+		radio_station_add_inline_script( 'radio-station-admin', $js );
 	}
 }
 
@@ -6725,7 +6735,8 @@ function radio_station_show_posts_bulk_edit_script( $hook ) {
 			});
 		});";
 
-		wp_add_inline_script( 'radio-station-admin', $js );
+		// 2.5.0: use radio_station_add_inline_script
+		radio_station_add_inline_script( 'radio-station-admin', $js );
 	}
 }
 

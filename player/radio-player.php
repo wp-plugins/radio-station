@@ -1334,8 +1334,14 @@ function radio_player_core_scripts() {
 		$js = radio_player_get_settings();
 		if ( '' != $js ) {
 			if ( function_exists( 'wp_add_inline_script' ) ) {
-				// --- add inline script ---
-				wp_add_inline_script( 'radio-player', $js, 'before' );
+				// 2.5.0: added check if script already done
+				if ( !wp_script_is( 'done', 'radio-player' ) ) {
+					// --- add inline script ---
+					wp_add_inline_script( 'radio-player', $js, 'before' );
+				} else {
+					// --- print settings directly ---
+					echo "<script>" . $js . "</script>";
+				}
 			} else {
 				// --- print settings directly ---
 				echo "<script>" . $js . "</script>";
@@ -1414,8 +1420,14 @@ function radio_player_enqueue_script( $script ) {
 	// --- output script tag ---
 	if ( '' != $js ) {
 		if ( function_exists( 'wp_add_inline_script' ) ) {
-			// --- add inline script ---
-			wp_add_inline_script( 'radio-player', $js, 'after' );
+			// 2.5.0: added check if script already done
+			if ( !wp_script_is( 'done', 'radio-player' ) ) {
+				// --- add inline script ---
+				wp_add_inline_script( 'radio-player', $js, 'after' );
+			} else {
+				// --- print script directly ---
+				echo "<script>" . $js . "</script>";
+			}
 		} else {
 			// --- print script directly ---
 			echo "<script>" . $js . "</script>";
@@ -2611,7 +2623,8 @@ function radio_player_enqueue_styles( $script = false, $skin = false ) {
 			// --- enqueue player control styles inline ---
 			$control_styles = radio_player_control_styles( false );
 			if ( '' != $control_styles ) {
-				wp_add_inline_style( 'radio-player', $control_styles );
+				// 2.5.0: use radio_station_add_inline_style
+				radio_station_add_inline_style( 'radio-player', $control_styles );
 			}
 
 		} else {

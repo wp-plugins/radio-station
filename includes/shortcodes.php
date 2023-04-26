@@ -1881,7 +1881,8 @@ function radio_station_archive_pagination_javascript() {
 	}";
 
 	// --- enqueue script inline ---
-	wp_add_inline_script( 'radio-station', $js );
+	// 2.5.0: use radio_station_add_inline_script
+	radio_station_add_inline_script( 'radio-station', $js );
 }
 
 
@@ -1984,7 +1985,7 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 			$type = 'episode';
 		}
 		if ( RADIO_STATION_DEBUG ) {
-			echo '<span style="display:none;">Show Posts (' . $type . '):' . print_r( $posts, true ) . '</span>';
+			echo '<span style="display:none;">Show Posts (' . esc_html( $type ) . '):' . esc_html( print_r( $posts, true ) ) . '</span>';
 		}
 	}
 	if ( !isset( $posts ) || !$posts || !is_array( $posts ) || ( count( $posts ) == 0 ) )  {
@@ -2273,7 +2274,8 @@ function radio_station_list_pagination_javascript() {
 
 	// --- enqueue script inline ---
 	// 2.3.0: enqueue instead of echoing
-	wp_add_inline_script( 'radio-station', $js );
+	// 2.5.0: use radio_station_add_inline_script
+	radio_station_add_inline_script( 'radio-station', $js );
 }
 
 
@@ -3036,7 +3038,7 @@ function radio_station_current_show() {
 	// --- sanitize shortcode attributes ---
 	$atts = radio_station_sanitize_shortcode_values( 'current-show' );
 	if ( RADIO_STATION_DEBUG ) {
-		echo '<span style="display:none;">Current Show Shortcode Attributes: ' . print_r( $atts, true ) . '</span>' . "\n";
+		echo '<span style="display:none;">Current Show Shortcode Attributes: ' . esc_html( print_r( $atts, true ) ) . '</span>' . "\n";
 	}
 
 	// --- output widget contents ---
@@ -3653,10 +3655,10 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 			$output .= '<input type="hidden" class="upcoming-show-times" value="' . esc_attr( $next_start_time ) . '-' . esc_attr( $next_end_time ) . '">' . "\n";
 			if ( RADIO_STATION_DEBUG ) {
 				$output .= '<span style="display:none;">';
-					$output .= 'Now: ' . date( 'Y-m-d H:i:s', $now ) . ' (' . $now . ')' . PHP_EOL;
-					$output .= 'Next Start Time: ' . date('y-m-d H:i:s', $next_start_time ) . ' (' . $next_start_time . ')' . PHP_EOL;
-					$output .= 'Next End Time: ' . date( 'y-m-d H:i:s', $next_end_time ) . ' (' . $next_end_time . ')' . PHP_EOL;
-					$output .= 'Starting in: ' . ( $next_start_time - $now ) . PHP_EOL;
+					$output .= 'Now: ' . esc_html( date( 'Y-m-d H:i:s', $now ) ) . ' (' . esc_html( $now ) . ')' . PHP_EOL;
+					$output .= 'Next Start Time: ' . esc_html( date('y-m-d H:i:s', $next_start_time ) ) . ' (' . esc_html( $next_start_time ) . ')' . PHP_EOL;
+					$output .= 'Next End Time: ' . esc_html( date( 'y-m-d H:i:s', $next_end_time  ) ) . ' (' . esc_html( $next_end_time ) . ')' . PHP_EOL;
+					$output .= 'Starting in: ' . esc_html( $next_start_time - $now ) . PHP_EOL;
 				$output .= '</span>';
 			}
 

@@ -1040,7 +1040,8 @@ if ( 'tabbed' == $section_layout ) {
 	$js .= "  }";
 	$js .= " }";
 	$js .= "}, 500);";
-	wp_add_inline_script( 'radio-station-page', $js );
+	// 2.5.0: use radio_station_add_inline_script
+	radio_station_add_inline_script( 'radio-station-page', $js );
 }
 
 // 2.3.3.9: turn off doing template flag
