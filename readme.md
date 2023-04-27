@@ -23,41 +23,42 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 ## Description
 
-Radio Station by NetMix is a plugin to build and manage a Show Schedule for a radio station or internet broadcaster's WordPress website, including podcasters. Its functionality was originally based on Drupal 6's Station plugin, reworked for use in Wordpress and then extended.
+[__Live Demo__](https://demo.radiostation.pro/) | [__Documentation__](https://radiostation.pro/docs/) | [__Support__](https://wordpress.org/support/plugin/radio-station/) | [__Upgrade to Pro!__](https://radiostation.pro/pricing/)
 
-The plugin adds a new "Show" post type, schedulable blocks of time that contain a Show description, a Show shifts repeater field, assignable images and other meta information. You can also create Playlists associated with those shows, or assign standard blog posts to relate to a Show. It also supports adding Schedule Overrides for specific dates and times, and adds the ability to associate users (given a role of "Host" or "Producer") to Shows, so they can be displayed for that Show and to give them edit access.
+= RADIO STATION by netmix®† - THE BEST WORDPRESS PLUGIN FOR BROADCASTERS! =
 
-A schedule of all Shows can be generated and added to a page with a shortcode (or simple page selection in the Plugin Settings) which has a number of Layout and display options. Shows can be categorized into Genres and a Genre highlighting filter appears on the embedded Schedule view. Each Show has its own dedicated page to display all the Show details in a responsive layout.
+**Radio Station** *by netmix®* is the most comprehensive WordPress plugin for broadcasters to create, manage and play a Show schedule on a WordPress website. Used by thousands of stations worldwide, **Radio Station** *by netmix®* is the most popular Radio Station plugin for WordPress and is used by broadcasters of all types.
 
-The plugin contains a widget to display the on-air Current Show linked to the Show page, with various widget display options, and further widgets for displaying Upcoming Shows and current Playlist tracks. Shortcodes are available for these widgets, as well as for displaying archive lists of any of the plugin's custom post types.
+*Radio channels* and *television networks* can use it to showcase their existing program schedule online, *podcasters* to announce upcoming episode drops, *streamers* to let their fans know of their next live webcast, *social audio moderators* to let their group know of the next meetup - for just about any kind of *media curators* to schedule content for their audience base.
 
-As there is a lot you can do with Radio Station, we've made an effort to provide complete [Radio Station Plugin Documentation](https://radiostation.pro/docs/). You can also find a Quickstart Guide there, as well as in the section below. You can see some example displays from the plugin via the Screenshots section, and full live examples are available on the [Radio Station Plugin Demo Site](https://radiostation.pro).
 
-We are actively seeking Radio Station partners and supporters to fund further development of the free, open source version of this plugin via [Patreon](https://www.patreon.com/radiostation) and are also continuing to develop more exciting features and functionality for [Radio Station Pro](https://radiostation.pro/).
+= SO WHAT DOES RADIO STATION BY netmix® DO? =
 
-### Updating from Prior to 2.3.0
+At its core the plugin adds a **Show** custom post type, schedulable blocks of time that contain a description, a weekly shift repeater field, uploadable images and other meta information. This lets you easily and instantly display a full show **Schedule** on the front end of your site in one of three built-in schedule views. (It also supports adding **Overrides** for handling specific dates and times that can be fully or partially linked to existing shows.)
 
-Since 2.3.0, the first major feature update since plugin takeover in July 2019, Radio Station has incorporated a whole bunch of enhancements (see the changelog for a full list)... but here is a shortlist of the main new features:
 
-* an Updated Show Page Layout (based on Content Filters not Templates)
-* Responsive Schedule Views (with integrated Override support)
-* Revamped Schedule calculations (with Show Shift Conflict Checking)
-* Producer and Show Editor Roles (for improved Show management)
-* Language Taxonomy Assignments (for Shows and Overrides)
-* Admin Plugin Settings Page (with a plethora of new options)
-* ...and a Radio Station Data API via the WordPress REST API! 
+You can also create detailed track **Playlists** and associate them with a Show, or assign blog posts as **Related Posts** to a Show. Users can be given a plugin role of **Host** or **Producer** with edit privelages when assigned to a Show. **Genre** and **Language** taxonomies are available to group and filter your Shows. **Automatic Pages** are available for your Schedule and all plugin record lists.
 
-If you have been using Radio Station prior to version 2.3.0 and want to update, it is recommended that you read [the blog post for the 2.3.0 release](https://netmix.com/2-3-0-release-announcement/). As there is quite a lot of refactoring and changes in this version, you will want to check the details of the new changes with your current usage - especially if you have been using any custom page templates in your theme or other plugin-related custom code on your site. As these are probably the most significant changes that will ever be made to the plugin in a release, we have worked hard to maintain backwards compatibility and test the new features thoroughly, but it's important you know what is going and test things out yourself in the update process.
+**PLUS** we’ve built in a *NEW* **Stream Player** so that your audience can listen to your broadcast while navigating your site. You can also quickly display the **Current Show**, **Upcoming Shows**, **Current Playlist**, **Radio Time** and **Show Lists**. All are available for easily customizable display as *Blocks*, *Widgets* and/or *Shortcodes*!
 
-### Support and Contribution
+= WANT MORE? UPGRADE TO RADIO STATION PRO! =
+
+In the course of improving the free version, we’ve tracked a plethora of great features and developed them for inclusion in **Radio Station PRO**. The Pro version amps up your broadcast website with numerous additional **Schedule Improvements** such as *extra schedule views*, *recurring timeslots*, *auto-refreshing widgets*, and a *visual schedule editor!* It also gives you **New Content Features** like *show Episodes and Ssegments*, *Topic and Guest taxonomies*, and *page builder modules!*
+
+**PLUS**, building on our jamming free **Stream Player**, we’ve created our own *innovative page transition technology* and then combined it with a purpose-built sticky **Sitewide Player Bar**, allowing your listeners to navigate while continuing to play your audio ***uninterrupted***! This is a real game-changer for your listener's online experience of your site. The Player Bar includes *animated live track metadata*, *responsive display sections* and *extended color and button themes*.
+
+[Click here to find out more about Radio Station PRO](https://radiostation.pro/pricing/).
+
+= Support and Contribution =
 
 We are grateful to Nikki Blight for her contribution to creating and developing this plugin for as long as she could maintain the codebase. As of June 22, 2019, Radio Station is managed by [Tony Zeoli](https://profiles.wordpress.org/tonyzeoli/) with [Tony Hayes](https://profiles.wordpress.org/majick/) as lead developer and other contributing committers to the project.
 
 For free version plugin support, you can ask in the [Wordpress Plugin Support Forum](https://wordpress.org/support/plugin/radio-station/). Please give 24-48 hours to answer support questions. Alternatively (and preferably) you can submit bugs, enhancement and feature requests directly to [Github Repository Issues](https://github.com/netmix/radio-station/issues/).
+We work hard to maintain backwards compatibility and test any new features thoroughly.
 
 If you are a WordPress developer wanting to contribute to Radio Station, please join the team and follow plugin development on [Github](https://github.com/netmix/radio-station) and submit Issues and Pull Requests there. You can see the current progress via the Projects tab. Or if you would prefer to get involved even more substantially, please [Contact Us via Email](mailto:info@netmix.com) and let us know what you would like to do.
 
-### Quickstart Guide
+= Quickstart Guide =
 
 Once you have installed and activated the Radio Station Plugin on your WordPress site, your WordPress Admin area will now have a new menu item titled Radio Station with submenu page items. If you are trying to do something specific, you can check out the [FAQ](https://radiostation.pro/docs/FAQ.md) for Frequently Asked Questions as you may find the answer there.
 
@@ -75,10 +76,9 @@ Radio Station has several in-built [Data](https://radiostation.pro/docs/Data.md)
 
 This plugin is under active development and we are continuously working to enhance the Free version available on [WordPress.Org](https://wordpress.org/plugins/radio-station/), as well as creating new feature additions for **Radio Station Pro**. Check out the [Roadmap](https://radiostation.pro/docs/Roadmap.md) if you are interested in seeing what is coming up next!
 
-### Upgrading to Radio Station Pro
+= Upgrading to Radio Station Pro =
 
 Love Radio Station and ready for more? As the free version develops, we have also been working hard to introduce new features to create a Professional version that will "level up" the plugin to make your Station's site even more useable and accessible for your listeners! [Click here to learn more about Radio Station Pro](https://radiostation.pro/). 
-
 
 ## Installation
 

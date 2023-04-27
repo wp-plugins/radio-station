@@ -19,25 +19,25 @@ Radio Station lets you build and manage a Show Schedule for a radio station or I
 
 **Radio Station** *by netmix®* is the most comprehensive WordPress plugin for broadcasters to create, manage and play a Show schedule on a WordPress website. Used by thousands of stations worldwide, **Radio Station** *by netmix®* is the most popular Radio Station plugin for WordPress and is used by broadcasters of all types.
 
-*Radio stations* and *TV channels* can use it to showcase their existing programme schedule online, *podcasters* to announce upcoming episode drops, *streamers* to let their fans know of their next live webcast, *social audio moderators* to let their group know of the next meetup - for just about any kind of *media curators* to schedule content for their audience base.
+*Radio channels* and *television networks* can use it to showcase their existing program schedule online, *podcasters* to announce upcoming episode drops, *streamers* to let their fans know of their next live webcast, *social audio moderators* to let their group know of the next meetup - for just about any kind of *media curators* to schedule content for their audience base.
 
 
 = SO WHAT DOES RADIO STATION BY netmix® DO? =
 
-At core the plugin adds a **Show** custom post type, schedulable blocks of time that contain a description, a weekly shift repeater field, uploadable images and other meta information. This lets you easily and instantly display a full show **Schedule** on the frontend of your site in one of three in-built schedule views. (It also supports adding **Overrides** for handling specific dates and times that can be fully or partially linked to existing shows.)
+At its core the plugin adds a **Show** custom post type, schedulable blocks of time that contain a description, a weekly shift repeater field, uploadable images and other meta information. This lets you easily and instantly display a full show **Schedule** on the front end of your site in one of three built-in schedule views. (It also supports adding **Overrides** for handling specific dates and times that can be fully or partially linked to existing shows.)
 
 
-You can also create detailed track **Playlists** and associate them with a Show, or assign blog posts as **Related Posts** to a Show. Users can be given a plugin role of **Host** or **Producer** and assigned to Shows to give them edit access. **Genre** and **Language** taxonomies are available to group your Shows. **Automatic Pages** are available for your Schedule and all plugin record lists.
+You can also create detailed track **Playlists** and associate them with a Show, or assign blog posts as **Related Posts** to a Show. Users can be given a plugin role of **Host** or **Producer** with edit privelages when assigned to a Show. **Genre** and **Language** taxonomies are available to group and filter your Shows. **Automatic Pages** are available for your Schedule and all plugin record lists.
 
-**PLUS** we’ve built in a *NEW* **Stream Player** so that your audience can listen to your broadcast while navigating your site. And you can also quickly display the **Current Show**, **Upcoming Shows**, **Current Playlist**, **Radio Time** and **Show Lists**. All available for easily customizable display as *Blocks*, *Widgets* and/or *Shortcodes*!
+**PLUS** we’ve built in a *NEW* **Stream Player** so that your audience can listen to your broadcast while navigating your site. You can also quickly display the **Current Show**, **Upcoming Shows**, **Current Playlist**, **Radio Time** and **Show Lists**. All are available for easily customizable display as *Blocks*, *Widgets* and/or *Shortcodes*!
 
+= WANT MORE? UPGRADE TO RADIO STATION PRO! =
 
+In the course of improving the free version, we’ve tracked a plethora of great features and developed them for inclusion in **Radio Station PRO**. The Pro version amps up your broadcast website with numerous additional **Schedule Improvements** such as *extra schedule views*, *recurring timeslots*, *auto-refreshing widgets*, and a *visual schedule editor!* It also gives you **New Content Features** like *show Episodes and Ssegments*, *Topic and Guest taxonomies*, and *page builder modules!*
 
+**PLUS**, building on our jamming free **Stream Player**, we’ve created our own *innovative page transition technology* and then combined it with a purpose-built sticky **Sitewide Player Bar**, allowing your listeners to navigate while continuing to play your audio ***uninterrupted***! This is a real game-changer for your listener's online experience of your site. The Player Bar includes *animated live track metadata*, *responsive display sections* and *extended color and button themes*.
 
-
-
-
-We worked hard to maintain backwards compatibility and test the new features thoroughly.
+[Click here to find out more about Radio Station PRO](https://radiostation.pro/pricing/).
 
 
 
@@ -46,6 +46,7 @@ We worked hard to maintain backwards compatibility and test the new features tho
 We are grateful to Nikki Blight for her contribution to creating and developing this plugin for as long as she could maintain the codebase. As of June 22, 2019, Radio Station is managed by [Tony Zeoli](https://profiles.wordpress.org/tonyzeoli/) with [Tony Hayes](https://profiles.wordpress.org/majick/) as lead developer and other contributing committers to the project.
 
 For free version plugin support, you can ask in the [Wordpress Plugin Support Forum](https://wordpress.org/support/plugin/radio-station/). Please give 24-48 hours to answer support questions. Alternatively (and preferably) you can submit bugs, enhancement and feature requests directly to [Github Repository Issues](https://github.com/netmix/radio-station/issues/).
+We work hard to maintain backwards compatibility and test any new features thoroughly.
 
 If you are a WordPress developer wanting to contribute to Radio Station, please join the team and follow plugin development on [Github](https://github.com/netmix/radio-station) and submit Issues and Pull Requests there. You can see the current progress via the Projects tab. Or if you would prefer to get involved even more substantially, please [Contact Us via Email](mailto:info@netmix.com) and let us know what you would like to do.
 

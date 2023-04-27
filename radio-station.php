@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://radiostation.pro/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.4.9.11
+Version: 2.4.9.12
 Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
@@ -627,7 +627,9 @@ function radio_station_enqueue_script( $scriptkey, $deps = array(), $infooter = 
 		$url = $template['url'];
 
 		// --- enqueue script ---
-		wp_enqueue_script( $scriptkey, $url, $deps, $version, $infooter );
+		// 2.5.0: register script before enqueueing
+		wp_register_script( $scriptkey, $url, $deps, $version, $infooter );
+		wp_enqueue_script( $scriptkey );
 	}
 }
 
@@ -638,7 +640,7 @@ function radio_station_enqueue_script( $scriptkey, $deps = array(), $infooter = 
 function radio_station_add_inline_script( $handle, $js, $position = 'after' ) {
 	
 	// --- add check if script is already done ---
-	if ( !wp_script_is( 'done', $handle ) ) {
+	if ( !wp_script_is( $handle, 'done' ) ) {
 		// --- handle javascript normally ---
 		wp_add_inline_script( $handle, $js, $position );
 	} else {
@@ -739,7 +741,7 @@ function radio_station_enqueue_style( $stylekey, $deps = array() ) {
 function radio_station_add_inline_style( $handle, $css ) {
 
 	// --- add check if style is already done ---
-	if ( !wp_style_is( 'done', $handle ) ) {
+	if ( !wp_style_is( $handle, 'done' ) ) {
 		// --- handle javascript normally ---
 		wp_add_inline_style( $handle, $css );
 	} else {
