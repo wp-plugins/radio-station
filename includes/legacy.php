@@ -400,24 +400,56 @@ function radio_station_get_now_playing( $time = false ) {
 		return false;
 	}
 	$show_id = $current_show['show']['id'];
+	if ( RADIO_STATION_DEBUG ) {
+		echo '<span style="display:none;">Playlist Current Show Data: ' . esc_html( print_r( $current_show, true ) ) . '</span>' . "\n";
+	}
 
 	// TODO: improve handling of playlists for overrides
+	$override = false;
 	if ( isset( $current_show['override'] ) && $current_show['override'] ) {
-		$playlist = apply_filters( 'radio_station_override_now_playing', false, $current_show['override'] );
-		return $playlist;
+		$override = true;
+		// 2.5.0: check if override is linked to show
+		$override_id = $show_id;
+		$linked_show = get_post_meta( $override_id, 'linked_show_id', true );
+		if ( $linked_show ) {
+			$show_id = $linked_show;
+		} else {
+			$playlist = apply_filters( 'radio_station_override_now_playing', false, $current_show['override'] );
+			return $playlist;
+		}
 	}
-	
+
 	// 2.3.3.9: fix to assign current show shifts to playlist data
-	// TODO: match current playlist to assigned show shift ?
+	// TODO: maybe match current playlist to assigned show shift ?
 	$playlist = array();
 	$shifts = get_post_meta( $show_id, 'show_sched', true );
 	if ( $shifts ) {
 		$playlist['shifts'] = $shifts;
 	}
 
+	// 2.5.0: merge in override shifts
+	if ( $override ) {
+		$override_shifts = get_post_meta( $override_id, 'show_override_sched', true );
+		if ( $override_shifts && is_array( $override_shifts ) && ( count( $override_shifts ) > 0 ) ) {
+			if ( isset( $playlist['shifts'] ) ) {
+				$playlist['shifts'] = array_merge( $playlist['shifts'], $override_shifts );
+			} else {
+				$playlist['shifts'] = $override_shifts;
+			}
+		}
+		$recurring_shifts = get_post_meta( $override_id, 'show_recurring_sched', true );
+		if ( $recurring_shifts && is_array( $recurring_shifts ) && ( count( $recurring_shifts ) > 0 ) ) {
+			if ( isset( $playlist['shifts'] ) ) {
+				$playlist['shifts'] = array_merge( $playlist['shifts'], $recurring_shifts );
+			} else {
+				$playlist['shifts'] = $recurring_shifts;
+			}
+		}
+	}
+
 	// --- grab the most recent playlist for the current show ---
 	$args = array(
-		'numberposts' => 1,
+		'numberposts' => -1,
 		'offset'      => 0,
 		'orderby'     => 'post_date',
 		'order'       => 'DESC',
@@ -432,17 +464,32 @@ function radio_station_get_now_playing( $time = false ) {
 		),
 	);
 	$playlist_posts = get_posts( $args );
+	// 2.5.0: added filter for playlist posts
+	$playlist_posts = apply_filters( 'radio_station_playlist_posts', $playlist_posts, $show_id, $time );
+
 	$playlist['query'] = $args;
 	$playlist['posts'] = $playlist_posts;
 
 	// TODO: check for playlist linked to this shift / date?
-
 	if ( $playlist_posts && is_array( $playlist_posts ) && ( count( $playlist_posts ) > 0 ) ) {
+
+		$found = false;
+		foreach ( $playlist_posts as $playlist_post ) {
+			$shift_id = get_post_meta( $playlist_post->ID, 'playlist_shift_id', true );
+			if ( $shift_id == $current_show['id'] ) {
+				$playlist_id = $playlist_post->ID;
+				$found = true;
+			}
+		}
+
+		if ( !$found ) {
+			// --- if not found use most recently published show playlist ---
+			$playlist_id = $playlist_posts[0]->ID;
+		}
 
 		// --- fetch the tracks for the playlist ---
 		// 2.3.0: added singular argument to true
-		$playlist_post = $playlist_posts[0];
-		$tracks = get_post_meta( $playlist_post->ID, 'playlist', true );
+		$tracks = get_post_meta( $playlist_id, 'playlist', true );
 
 		if ( $tracks && is_array( $tracks ) && ( count( $tracks ) > 0 ) ) {
 
@@ -470,8 +517,10 @@ function radio_station_get_now_playing( $time = false ) {
 
 			// --- add show and playlist data ---
 			// 2.3.0: add IDs and URLs instead of just playlist URL
+			// 2.5.0: add playlist title to playlist array
 			$playlist['show'] = $show_id;
 			$playlist['show_url'] = get_permalink( $show_id );
+			$playlist['title'] = $playlist_post->post_title;
 			$playlist['playlist'] = $playlist_post->ID;
 			$playlist['playlist_url'] = get_permalink( $playlist_post->ID );
 
@@ -481,7 +530,6 @@ function radio_station_get_now_playing( $time = false ) {
 	// --- filter and return tracks ---
 	// 2.3.2: added time argument to filter
 	$playlist = apply_filters( 'radio_station_show_now_playing', $playlist, $show_id, $time );
-
 	return $playlist;
 }
 
@@ -663,7 +711,7 @@ function radio_station_legacy_functions() {
 			}
 		}
     }
-    
+
 	if ( !function_exists( 'station_current_schedule' ) ) {
 		function station_current_schedule( $scheds = array() ) {
 			radio_station_deprecated_function( __FUNCTION__, 'radio_station_current_schedule', '2.2.0' );
@@ -677,7 +725,7 @@ function radio_station_legacy_functions() {
 			return radio_station_convert_time( $time );
 		}
 	}
-	
+
 	if ( !function_exists( 'station_convert_schedule_to_24hour' ) ) {
 		function station_convert_schedule_to_24hour( $sched = array() ) {
 			radio_station_deprecated_function( __FUNCTION__, 'radio_station_convert_schedule_to_24hour', '2.2.0' );
@@ -705,7 +753,7 @@ function radio_station_legacy_functions() {
 			return radio_station_get_now_playing();
 		}
 	}
-	
+
 	if ( !function_exists( 'master_get_overrides' ) ) {
 		function master_get_overrides( $currenthour = false, $date = false ) {
 			radio_station_deprecated_function( __FUNCTION__, 'radio_station_master_get_overrides', '2.2.0' );

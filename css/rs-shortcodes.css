@@ -72,6 +72,7 @@
 .radio-station-clock-widget .radio-station-server-clock, .radio-station-clock-widget .radio-station-user-clock {
 	font-size: 0.9em;
 	margin-top: 10px;
+	display: inline-block;
 }
 
 .radio-station-clock-widget .radio-server-zone, .radio-station-clock-widget .radio-user-zone {
@@ -128,6 +129,21 @@
 	font-size: 0.8em;
 }
 
+.show-archives.grid .show-archive-item, .override-archives.grid .override-archive-item,
+.genres-archive.grid .show-archive-item, .languages-archive.grid .show-archive-item,
+.playlist-archives.grid .playlist-archive-item {
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    width: 220px;
+}
+
+.show-archives.grid .show-archive-item-thumbnail, .override-archives.grid .override-archive-item-thumbnail,
+.genres-archive.grid .show-archive-item-thumbnail, .languages-archive.grid .show-archive-item-thumbnail,
+.playlist-archives.grid .playlist-archive-item-thumbnail {
+	float: none;
+}
+
 /* Show Subarchive Shortcodes */
 /* -------------------------- */
 .show-post, .show-playlist, .show-host, .show-producer, .show-episode {
@@ -135,11 +151,8 @@
 	padding-bottom: 5px;
 }
 
-.show-post-thumbnail, .show-post-info,
-.show-playlist-thumbnail, .show-playlist-info,
-.show-host-thumbnail, .show-host-info,
-.show-producer-thumbnail, .show-producer-info,
-.show-episode-thumbnail, .show-episode-info {
+.show-post-thumbnail, .show-playlist-thumbnail, .show-host-thumbnail, .show-producer-thumbnail, .show-episode-thumbnail,
+.show-post-info, .show-playlist-info, .show-host-info, .show-producer-info, .show-episode-info {
 	display: table-cell;
 	vertical-align: top;
 }
@@ -147,10 +160,10 @@
 .show-post-thumbnail, .show-playlist-thumbnail, .show-host-thumbnail, .show-producer-thumbnail, .show-episode-thumbnail {
 	padding-right: 30px;
 	margin-top: 10px;
-	min-width:! 150px;
+	min-width: 150px;
 }
 
-.show-post-info, .show-playlist-info, .show-host-thumbnail, .show-producer-thumbnail .show-episode-info {
+.show-post-info, .show-playlist-info, .show-host-info, .show-producer-info, .show-episode-info {
 	max-width: 600px;
 }
 
@@ -158,7 +171,15 @@
 	margin-bottom: 10px;
 }
 
-.show-pagination-button {
+/* Archive Pagination */
+/* ------------------ */
+.show-pagination-buttons, .show-pagination-buttons::after, .archive-pagination-buttons, .archive-pagination-buttons::after {
+	clear: both;
+	content: "";
+	display: block;
+}
+
+.show-pagination-button, .archive-pagination-button {
 	float: left; 
 	display: inline-block; 
 	width: 30px; 
@@ -173,17 +194,22 @@
 	padding: 5px;
 }
 
-.show-pagination-button.arrow-button {
+.show-pagination-button a, .show-pagination-button a:hover,
+.archive-pagination-button a, .archive-pagination a:hover {
+	text-decoration: none;
+}
+
+.show-pagination-button.arrow-button, .archive-pagination-button.arrow-button {
 	padding-top: 4px;
 	padding-bottom: 6px;
 }
 
-.show-pagination-button.active {
+.show-pagination-button.active, .archive-pagination-button.active {
 	background-color: transparent;
 	font-weight: bold;
 }
 
-.show-pagination-button:hover {
+.show-pagination-button:hover, .archive-pagination-button:hover {
 	background-color: #f5f5f5;
 }
 
@@ -192,6 +218,7 @@
 
 ul.current-show-list, ul.current-show-list li, ul.upcoming-shows-list, ul.upcoming-shows-list li {
     list-style: none;
+	padding-left: 0;
 }
 
 .current-show-avatar, .upcoming-show-avatar, .on-air-dj-avatar {

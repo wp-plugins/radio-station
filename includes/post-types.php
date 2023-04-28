@@ -20,8 +20,6 @@
 // - Register Show Taxonomies
 // -- Genre Taxonomy
 // -- Language Taxonomy
-// === Schedule Override Filters ===
-// - Add Override Template Filters
 
 
 // ------------------
@@ -301,6 +299,7 @@ function radio_station_create_post_types() {
 add_filter( 'gutenberg_can_edit_post_type', 'radio_station_post_type_editor', 20, 2 );
 add_filter( 'use_block_editor_for_post_type', 'radio_station_post_type_editor', 20, 2 );
 function radio_station_post_type_editor( $can_edit, $post_type ) {
+
 	// 2.3.2: added host and producer slugs
 	$post_types = array(
 		RADIO_STATION_SHOW_SLUG,
@@ -328,6 +327,7 @@ function radio_station_add_featured_image_support() {
 	// 2.3.0: add override thumbnail to theme support declaration
 	$supported_types = get_theme_support( 'post-thumbnails' );
 	if ( false === $supported_types ) {
+
 		$post_types = array(
 			RADIO_STATION_SHOW_SLUG,
 			RADIO_STATION_OVERRIDE_SLUG,
@@ -335,12 +335,15 @@ function radio_station_add_featured_image_support() {
 			RADIO_STATION_PRODUCER_SLUG,
 		);
 		add_theme_support( 'post-thumbnails', $post_types );
+
 	} elseif ( is_array( $supported_types ) ) {
+
 		$supported_types[0][] = RADIO_STATION_SHOW_SLUG;
 		$supported_types[0][] = RADIO_STATION_OVERRIDE_SLUG;
 		$supported_types[0][] = RADIO_STATION_HOST_SLUG;
 		$supported_types[0][] = RADIO_STATION_PRODUCER_SLUG;
 		add_theme_support( 'post-thumbnails', $supported_types[0] );
+
 	}
 }
 
@@ -541,183 +544,5 @@ function radio_station_register_show_taxonomies() {
 	$args = apply_filters( 'radio_station_language_taxonomy_args', $args );
 	register_taxonomy( RADIO_STATION_LANGUAGES_SLUG, $post_types, $args );
 
-}
-
-
-// ---------------------------------
-// === Schedule Override Filters ===
-// ---------------------------------
-// (to apply linked show overrides in template single-show-content.php)
-// note: post object overrides (content, excerpt) are in radio_station_override_linked_show_data
-
-// --------------------------------------
-// Add Schedule Override Template Filters
-// --------------------------------------
-add_action( 'wp', 'radio_station_override_filters' );
-function radio_station_override_filters() {
-	if ( is_admin() || !is_singular() ) {
-		return;
-	}
-	global $post;
-	if ( is_object( $post ) && ( RADIO_STATION_OVERRIDE_SLUG == $post->post_type ) ) {
-		add_filter( 'the_title', 'radio_station_override_show_title', 10, 2 );
-		add_filter( 'radio_station_show_title', 'radio_station_override_show_title', 10, 2 );
-		add_filter( 'radio_station_show_avatar', 'radio_station_override_show_avatar', 10, 2 );
-		add_filter( 'radio_station_show_avatar_id', 'radio_station_override_show_avatar_id', 10, 2 );
-		add_filter( 'radio_station_show_thumbnail', 'radio_station_override_show_thumbnail', 10, 2 );
-		add_filter( 'get_post_metadata', 'radio_station_override_thumbnail_id', 11, 4 );
-		// add_filter( 'radio_station_show_header', $header_id, $post_id );
-		add_filter( 'radio_station_show_hosts', 'radio_station_override_show_hosts', 10, 2 );
-		add_filter( 'radio_station_show_producers', 'radio_station_override_show_producers', 10, 2 );
-		add_filter( 'radio_station_show_link', 'radio_station_override_show_link', 10, 2 );
-		add_filter( 'radio_station_show_email', 'radio_station_override_show_email', 10, 2 );
-		add_filter( 'radio_station_show_phone', 'radio_station_override_show_phone', 10, 2 );
-		add_filter( 'radio_station_show_download', 'radio_station_override_show_download', 10, 2 );
-		add_filter( 'radio_station_show_file', 'radio_station_override_show_file', 10, 2 );
-		add_filter( 'radio_station_show_patreon', 'radio_station_override_show_patreon', 10, 2 );
-		add_filter( 'radio_station_show_shifts', 'radio_station_override_show_shifts', 10, 2 );
-		// add_filter( 'radio_station_show_rss', 'radio_station_override_show_rss', 10, 2 );
-		// add_filter( 'radio_station_show_social_icons', 'radio_station_override_show_social_icons', 10, 2 );
-	}
-}
-
-// --- Show Title ---
-function radio_station_override_show_title( $show_title, $post_id ) {
-	global $post;
-	if ( !is_object( $post ) || ( $post->ID != $post_id ) ) {
-		return $show_title;
-	}
-	$override = radio_station_get_show_override( $post_id, 'show_title' );
-	if ( false !== $override ) {
-		return $override;
-	}
-	return $show_title;
-}
-
-// --- Show Avatar ---
-function radio_station_override_show_avatar( $show_avatar, $post_id ) {
-	if ( radio_station_doing_template() ) {
-		$override = radio_station_get_show_override( $post_id, 'show_avatar' );
-		if ( false !== $override ) {
-			return $override;
-		}
-	}
-	return $show_avatar;
-}
-
-// --- Show Avatar ID ---
-function radio_station_override_show_avatar_id( $avatar_id, $post_id ) {
-	if ( radio_station_doing_template() ) {
-		$override = radio_station_get_show_override( $post_id, 'show_avatar' );
-		if ( false !== $override ) {
-			return $override;
-		}
-	}
-	return $avatar_id;
-}
-
-// --- Show Thumbnail (Featured Image) ---
-function radio_station_override_show_thumbnail( $show_thumbnail, $post_id ) {
-	$override = radio_station_get_show_override( $post_id, 'show_image' );
-	if ( false !== $override ) {
-		return $override;
-	}
-	return $show_thumbnail;
-}
-
-// --- Show Thumbnail ID ---
-function radio_station_override_thumbnail_id( $id, $object_id, $meta_key, $single ) {
-	global $post;
-	if ( ( '_thumbnail_id' != $meta_key ) || !is_object( $post ) || ( $post->ID != $object_id ) ) {
-		return $id;
-	}
-	if ( RADIO_STATION_OVERRIDE_SLUG == $post->post_type ) {
-		$override = radio_station_get_show_override( $object_id, 'show_image' );
-		if ( false !== $override ) {
-			return $override;
-		}
-	}
-	return $id;
-}
-
-// --- Show Hosts ---
-function radio_station_override_show_hosts( $hosts, $post_id ) {
-	$override = radio_station_get_show_override( $post_id, 'show_user_list' );
-	if ( false !== $override ) {
-		return $override;
-	}
-	return $hosts;
-}
-
-// --- Show Producers ---
-function radio_station_override_show_producers( $producers, $post_id ) {
-	$override = radio_station_get_show_override( $post_id, 'show_producer_list' );
-	if ( false !== $override ) {
-		return $override;
-	}
-	return $producers;
-}
-
-// --- Show Website Link ---
-function radio_station_override_show_link( $show_link, $post_id ) {
-	$override = radio_station_get_show_override( $post_id, 'show_link' );
-	if ( false !== $override ) {
-		return $override;
-	}
-	return $show_link;
-}
-
-// --- Show Email ---
-function radio_station_override_show_email( $show_email, $post_id ) {
-	$override = radio_station_get_show_override( $post_id, 'show_email' );
-	if ( false !== $override ) {
-		return $override;
-	}
-	return $show_email;
-}
-
-// --- Show Phone ---
-function radio_station_override_show_phone( $show_phone, $post_id ) {
-	$override = radio_station_get_show_override( $post_id, 'show_phone' );
-	if ( false !== $override ) {
-		return $override;
-	}
-	return $show_phone;
-}
-
-// --- Show File ---
-function radio_station_override_show_file( $show_file, $post_id ) {
-	$override = radio_station_get_show_override( $post_id, 'show_file' );
-	if ( false !== $override ) {
-		return $override;
-	}
-	return $show_file;
-}
-
-// --- Disable Download ---
-function radio_station_override_show_download( $show_download, $post_id ) {
-	$override = radio_station_get_show_override( $post_id, 'show_download' );
-	if ( false !== $override ) {
-		return $override;
-	}
-	return $show_download;
-}
-
-// --- Show Patreon ---
-function radio_station_override_show_patreon( $show_patreon, $post_id ) {
-	$override = radio_station_get_show_override( $post_id, 'show_patreon' );
-	if ( false !== $override ) {
-		return $override;
-	}
-	return $show_patreon;
-}
-
-// --- Show Shifts ---
-function radio_station_override_show_shifts( $show_shifts, $post_id ) {
-	$linked_id = get_post_meta( $post_id, 'linked_show_id', true );
-	if ( $linked_id ) {
-		$show_shifts = radio_station_get_show_schedule( $linked_id );
-	}
-	return $show_shifts;
 }
 

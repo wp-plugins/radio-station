@@ -68,7 +68,10 @@ function radio_date_string(datetime, day, date, month, override) {
 }
 
 /* Update Current Time Clock */
-function radio_clock_date_time(init) {
+function radio_clock_date_time() {
+
+	if (radio_clock_init) {init = false;}
+	else {init = true; radio_clock_init = true;}
 
 	/* user datetime / timezone */
 	userdatetime = new Date();
@@ -85,7 +88,7 @@ function radio_clock_date_time(init) {
 	override = false;
 	if (typeof radio_timezone_override == 'function') {
 		override = radio_timezone_override();
-		if (radio.debug) {console.log('User Timezone Selection Override: '+override);}
+		if (radio.clock_debug) {console.log('User Timezone Selection Override: '+override);}
 		if (override) {
 			userzone = override;
 			offset = radio_offset_override(false);
@@ -153,9 +156,9 @@ function radio_clock_date_time(init) {
 					if (classes.indexOf('radio-station-server-clock') > -1) {
 						divs = clocks[j].children;
 						for (k = 0; k < divs.length; k++) {
-							if (divs[k].className == 'radio-server-time') {divs[k].innerHTML = servertime;}
-							if (divs[k].className == 'radio-server-date') {divs[k].innerHTML = serverdate;}
-							if (init && zone && (divs[k].className == 'radio-server-zone') ) {divs[k].innerHTML = serverzone;}
+							if ((divs[k].className == 'radio-server-time') && (divs[k].innerHTML != servertime)) {divs[k].innerHTML = servertime;}
+							else if ((divs[k].className == 'radio-server-date') && (divs[k].innerHTML != serverdate)) {divs[k].innerHTML = serverdate;}
+							else if (init && zone && (divs[k].className == 'radio-server-zone') && (divs[k].innerHTML != serverzone)) {divs[k].innerHTML = serverzone;}
 						}
 					}
 
@@ -163,9 +166,9 @@ function radio_clock_date_time(init) {
 					if (classes.indexOf('radio-station-user-clock') > -1) {
 						divs = clocks[j].children;
 						for (k = 0; k < divs.length; k++) {
-							if (divs[k].className == 'radio-user-time') {divs[k].innerHTML = usertime;}
-							if (divs[k].className == 'radio-user-date') {divs[k].innerHTML = userdate;}
-							if (init && zone && (divs[k].className == 'radio-user-zone') ) {divs[k].innerHTML = userzone;}
+							if ((divs[k].className == 'radio-user-time') && (divs[k].innerHTML != usertime)) {divs[k].innerHTML = usertime;}
+							else if ((divs[k].className == 'radio-user-date') && (divs[k].innerHTML != userdate)) {divs[k].innerHTML = userdate;}
+							else if (init && zone && (divs[k].className == 'radio-user-zone') && (divs[k].innerHTML != userzone)) {divs[k].innerHTML = userzone;}
 						}
 					}
 				}
@@ -179,4 +182,5 @@ function radio_clock_date_time(init) {
 }
 
 /* Start the Clock */
-setTimeout('radio_clock_date_time(true);', 1000);
+var radio_clock_init = false;
+setTimeout(radio_clock_date_time, 1000);

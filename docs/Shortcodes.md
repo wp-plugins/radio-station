@@ -11,7 +11,7 @@ Shortcode Output Examples can be seen on the [Radio Station Demo Site](http://de
 
 ### Master Schedule Shortcode
 
-Use the shortcode `[master-schedule]` on any page. This will generate a full-page schedule in one of five Views: 
+Use the shortcode `[radio-schedule]` or `[master-schedule]` on any page. This will generate a full-page schedule in one of five Views: 
 
 * [Table](https://demo.radiostation.pro/master-schedule/table-view/) (default) - responsive program in table form
 * [Tabbed](https://demo.radiostation.pro/master-schedule/tabbed-view/) - responsive styled list view with day selection tabs
@@ -23,32 +23,36 @@ Use the shortcode `[master-schedule]` on any page. This will generate a full-pag
 
 The above View names are linked to examples on the Demo Site.
 
-Note that Divs and Legacy Views are considered deprecated as they do not honour Schedule Overrides, but have been kept for backwards compatibility. The legacy Divs view also has display issues.
+Note that Divs and Legacy Views are considered deprecated as they do not honour Schedule Overrides, but have been kept for backwards compatibility only. The legacy Divs view also has display issues.
 
 The following attributes are available for the shortcode:
 
+* ** Layout Display Options **
 * *view* : Which View to use for display output. 'table', 'tabs', 'list', 'divs', 'legacy', 'grid', 'calendar'. Default 'table'.
-* *time* : Display time format you with to use. 12 and 24. Default is the Plugin Setting.
-* *clock* : Display Radio Clock above schedule. 0 or 1. Default is the Plugin Setting.
-* *show_link* : Display the title of the show as a link to its profile page. 0 or 1.  Default 1.
+* *time* : Display time format you with to use. 12 and 24. Default is Plugin Setting.
+* *clock* : Display Radio Clock above schedule. (See clock shortcode.) 0 or 1. Default is Plugin Setting.
+* ** Show Display Attributes **
 * *show_times* : Whether to display the show shift's start and end times. 0 or 1. Default 1.
+* *show_link* : Display the title of the show as a link to its profile page. 0 or 1.  Default 1.
 * *show_image* : Whether the display the show's avatar. 0 or 1. Default 0 (1 for Tabbed View.)
-* *show_genres* : Whether to display a list of show genres. 0 or 1. Default 0 (1 for Tabbed View.)
 * *show_desc* : Whether to display Show Description excerpt. 0 or 1. 
 * *show_hosts* : Whether to display a list of show hosts. 0 or 1. Default 0.
 * *link_hosts* : Whether to link each show host to their profile page. 0 or 1. Default 0.
+* *show_genres* : Whether to display a list of show genres. 0 or 1. Default 0 (1 for Tabbed View.)
 * *show_encore* : Whether to display 'encore airing' for a show shift. 0 or 1. Default 1.
 * *show_file* : Whether to add a link to the latest audio file. 0 or 1. Default 0.
+* ** Time Display Attributes **
 * *days* : Display for single day or multiple days (string or 0-6, comma separated.) Default all.
-* *start_day* : day of the week to start schedule (string or 0-6, or 'today') Default WordPress setting.
+* *start_day* : day of the week to start schedule (string or 0-6, or 'today') Defaults to WordPress setting.
 * *display_day* : Full or short day heading ('full' or 'short') Default short for Table, full for Tabs/List.
 * *display_date* : Date format for date subheading. 0 for none. Default 'jS' for Table/List, 0 for Tabs.
 * *display_month* : Full or short month subheading ('full', 'short') Default 'short'.
-* *image_position* : Show image position for Tabs view. 'right', 'left' or 'alternate'. Default 'left'.
-* *hide_past_shows* : Hide shows that are finished in the Schedule for Tabs view. 0 or 1. Default 0.
-* *divheight* : Set the height, in pixels, of the individual divs. For legacy 'divs' view only. Default 45.
-* *gridheight* : Set the width, in pixels, of the grid columns. For Pro 'grid' view only. Default 150.
-* 'time_spaced* : Enabled time spacing with background images. For Pro 'grid' view only. 0 or 1. Default 0.
+* ** View-specific Attributes **
+* *image_position* : Tabs View: Show image position placement. 'right', 'left' or 'alternate'. Default 'left'.
+* *hide_past_shows* : Tabs View: Hide shows that are finished in the Schedule. 0 or 1. Default 0.
+* *gridwidth* : [Pro] Grid View: Set the width, in pixels of the grid columns. Default 150.
+* *divheight* : [Legacy] Divs View: Set the height, in pixels, of the individual divs. Default 45.
+* 'time_spaced* : [Pro] Grid View: Enabled time spacing with background images. 0 or 1. Default 0.
 * *weeks* : Number of weeks to display in calendar. For Pro 'calendar' view only. Default 4.
 * *previous_weeks* : Number of past weeks to display in calendar. For Pro 'calendar' view only. Default 1.
 
@@ -85,18 +89,24 @@ Displays the Radio Station Timezone selected via Plugin Settings. There are no a
 
 `[radio-clock]`
 
-Added in 2.3.2. Displays the current server time and user time. Also available as a Widget.
+Displays the current server time and user time. Also available as a Widget.
 
 The following attributes are available for this shortcode:
 
-* *time* : Display time format you with to use. 12 and 24. Default is the Plugin Setting.
-* *seconds* : Display seconds with current times. 0 or 1. Default 0.
+* *time_format* : Display time format you with to use. 12 and 24. Default is Plugin Setting.
 * *day* : Display day after current times. 'full', 'short' or 'none'. Default 'full'.
 * *date* : Display date after current times. 0 or 1. Default 1.
 * *month* : Display months after current times. 'full', 'short' or 'none'. Default 'full'.
 * *zone* : Display timezone after current times. 0 or 1. Default 1.
+* *seconds* : Display seconds with current times. 0 or 1. Default 0.
 
-The Radio Clock can also be displayed by default above the Master Schedule by enabling this in the Plugin Settings. (It's display attributes there can changed via the `radio_station_schedule_clock` filter.)
+The Radio Clock can also be displayed by default above the Master Schedule by enabling this in the Plugin Settings, or by adding `clock="1"` to the Master Schedule shortcode. (It's display attributes as part of the schedule can changed using the `radio_station_schedule_clock` filter.)
+
+
+##### [Pro] User Timezone Switching
+
+In [Radio Station Pro](https://radiostation.pro), where the Radio Clock is displayed (whether as a widget or part of the schedule) the user is given an extra link "Change Timezone" through which they can select their local timezone. The Radio Clock (and/or Schedule) will then provide an additional converted display for displayed times into the user's selected timezone.
+
 
 ## Archive Shortcodes
 
@@ -178,6 +188,7 @@ The following attributes are available for this shortcode:
 * *link_genres* : Link Genre titles to term pages. 0 or 1. Default 1.
 * *genre_desc' :  Display Genre term description. 0 or 1. Default 1.
 * *genre_images' : [Pro] Display Genre images. 0 or 1. Default 1.
+* *view* : Layout display view. 'list' or 'grid'. Default 'grid'.
 * *image_width' : [Pro] Set a width style in pixels for Genre images. Default is 100.
 * *hide_empty' : No output if no records to display for Genre. 0 or 1. Default 1.
 * *status* : Query for Show status. Default 'publish'.
@@ -202,6 +213,7 @@ The following attributes are available for this shortcode:
 * *languages* : Genres to display (ID or slug). Separate multiple values with commas. Default empty (all)
 * *link_languages* : Link Genre titles to term pages. 0 or 1. Default 1.
 * *language_desc' :  Display Genre term description. 0 or 1. Default 1.
+* *view* : Layout display view. 'list' or 'grid'. Default 'grid'.
 * *hide_empty' : No output if no records to display for Genre. 0 or 1. Default 1.
 * *status* : Query for Show status. Default 'publish'.
 * *perpage* : Query for number of Shows. Default -1 (all)
@@ -250,6 +262,18 @@ The following attributes are available for this shortcode:
 
 [Demo Site Example Output](https://demo.radiostation.pro/archive-shortcodes/producers-archive/)
 
+### [Pro] Team Archive Shortcode
+
+`[team-archive]`
+
+The following attributes are available for this shortcode:
+
+* *view* : Layout display view. 'list' or 'grid'. Default list.
+
+...
+
+[Demo Site Example Output](https://demo.radiostation.pro/archive-shortcodes/team-archive/)
+
 ### Show Posts Archive Shortcode
 
 `[show-posts-archive]` (or `[show-post-archive]`)
@@ -281,7 +305,7 @@ The following attributes are available for this shortcode:
 
 `[show-episodes-archive]` (or `[show-episode-archive]`)
 
-This shortcode will be available in [Radio Station Pro](https://radiostation.pro)
+This shortcode is available in [Radio Station Pro](https://radiostation.pro)
 
 
 ## Widget Shortcodes
@@ -305,7 +329,7 @@ This shortcode will be available in [Radio Station Pro](https://radiostation.pro
 
 `[show-list]`
 
-This shortcode is considered Deprecated. Use the [Shows Archive Shortcode](#shows-archive-shortcode) instead: `[shows-archive]`
+This shortcode is considered *Deprecated*. Use the [Shows Archive Shortcode](#shows-archive-shortcode) instead: `[shows-archive]`
 
 The following attributes are available for this shortcode:
 
@@ -317,7 +341,7 @@ Examples: `[list-shows genre="pop"]`, `[list-shows genre="pop,rock,metal"]`
 
 `[show-playlists]` (or `[get-playlists]`
 
-This shortcode is considered Deprecated. Use the [Show Playlists Archive Shortcode](#show-playlists-archive-shortcode) instead: `[show-playlists-archive]`
+This shortcode is considered *Deprecated*. Use the [Show Playlists Archive Shortcode](#show-playlists-archive-shortcode) instead: `[show-playlists-archive]`
 
 The following attributes are available for this shortcode:
 

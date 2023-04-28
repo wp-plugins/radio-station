@@ -1,6 +1,6 @@
 /* =============================== */
 /* === Radio Player Javascript === */
-/* --------- Version 1.0.0 ------- */
+/* --------- Version 1.0.1 ------- */
 /* =============================== */
 
 /* === Cookie Value Function === */
@@ -20,7 +20,10 @@ radio_player_cookie = {
 			while (c.charAt(0) == ' ') {
 				c = c.substring(1, c.length);
 				if (c.indexOf(nameeq) == 0) {
-					return JSON.parse(c.substring(nameeq.length, c.length));
+					/* 1.0.1: fix for possible empty value */
+					value = c.substring(nameeq.length, c.length).trim();
+					if (value == '') {return null;}
+					return JSON.parse(value);
 				}
 			}
 		}
@@ -150,6 +153,7 @@ function radio_player_load_audio(script, instance, data, start) {
 	radio_player_set_data_state(script, instance, data, start);
 	loaded = radio_player_check_script(script);
 	if (loaded) {
+		if (radio_player.delayed_player) {clearInterval(radio_player.delayed_player);}
 		/* initialize the player if script is already loaded */
 		if (script == 'amplitude') {player =  radio_player_amplitude(instance, url, format, fallback, fformat);}
 		else if (script == 'jplayer') {player = radio_player_jplayer(instance, url, format, fallback, fformat);}
@@ -229,7 +233,7 @@ function radio_player_play_on_load(player, script, instance) {
 // --- check/load a player script ---
 function radio_player_check_script(script) {
 	loading = false; head = document.getElementsByTagName('head')[0];
-	/* funcs = radio_player.settings.ajaxurl+'?action=radio_station_player_script&script='+script; */
+	/* funcs = radio_player.settings.ajaxurl+'?action=radio_player_script&script='+script; */
 	if (script == 'amplitude') {
 		if (typeof window.Amplitude == 'undefined') {
 			if (radio_player.debug) {console.log('Dynamically Loading Amplitude Player Script...');}
@@ -458,7 +462,7 @@ function radio_player_volume_slider(instance, volume) {
 		sliderbg.hide(); /* .css('border','inherit'); */
 		slider.val(volume); swidth = slider.width();
 		thumb.show(); twidth = thumb.width(); thumb.hide();
-		bgwidth = (swidth - (twidth / 2)) * (volume / 100);
+		bgwidth = (swidth - (twidth / 2)) * (volume / 100) * 0.98;
 		sliderbg.attr('style', 'width: '+bgwidth+'px !important;').show(); /*  border:inherit; */
 		if (radio_player.debug) {newwidth = parseInt(sliderbg.css('width')); console.log('Volume Slider: '+swidth+' : '+twidth+' : '+bgwidth+' : '+newwidth);}
 		if (volume == 100) {container.addClass('maxed');} else {container.removeClass('maxed');}
@@ -502,6 +506,7 @@ function radio_player_default_instance() {
 	jQuery('.radio-player').each(function() {
 		if (!instance && jQuery(this).hasClass('default-player')) {
 			instance = parseInt(jQuery(this).attr('id').replace('radio_player_', ''));
+			return instance;
 		}
 	});
 	return instance;
@@ -674,7 +679,7 @@ function radio_player_save_user_state() {
 			if (state.volume) {volume = state.volume;} else {volume = '';}
 			if (state.mute) {mute = '1';} else {mute = '0';}
 			timestamp = Math.floor( (new Date()).getTime() / 1000 );
-			url = radio_player.settings.ajaxurl+'?action=radio_station_player_state';
+			url = radio_player.settings.ajaxurl+'?action=radio_player_state';
 			/* ? TODO: instance ? */
 			url += '&playing='+playing+'&station='+station+'&volume='+volume+'&mute='+mute+'&timestamp='+timestamp;
 			document.getElementById('radio-player-state-iframe').src = url;
@@ -686,12 +691,17 @@ function radio_player_save_user_state() {
 
 /* --- volume change audio test --- */
 /* ref: https://stackoverflow.com/a/62094756/5240159 */
-function radio_player_audio_test() {
-        testaudio = new Audio();
-        try {testaudio.volume = 0.5;} catch(e) {return false;}
-        /* note: volume cannot be changed from 1 on iOS 12 and below */
-        if (testaudio.volume === 1) {return false;}
-        return true;
+function radio_player_volume_test() {
+	isIOS = ['iPad Simulator','iPhone Simulator','iPod Simulator','iPad','iPhone','iPod'].includes(navigator.platform);
+	if (radio.debug && isIOS) {console.log('iOS Mobile Device Detected. ');}
+    isAppleDevice = navigator.userAgent.includes('Macintosh');
+	if (radio.debug && isAppleDevice) {console.log('Apple Device Detected.');}
+    isTouchScreen = navigator.maxTouchPoints >= 1;
+	if (radio.debug && isTouchScreen) {console.log('Touch Screen Detected. ');}
+	iosAudioFailure = false; testaudio = new Audio();
+	try {testaudio.volume = 0.5;} catch(e) {if (radio.debug) {console.log('Caught Volume Change Error.');} iosAudioFailure = true;}
+	if (testaudio.volume === 1) {if (radio.debug) {console.log('Volume could not be changed.');} iosAudioFailure = true;}
+    return isIOS || (isAppleDevice && (isTouchScreen || iosAudioFailure));
 }
 
 /* === Multi-Window/Tab Support === */
@@ -803,14 +813,21 @@ jQuery(document).ready(function() {
 jQuery(document).ready(function() {
 
 	/* --- hide all volume controls if no support (iOS) --- */
-	volumesupport = radio_player_audio_test();
-	if (!volumesupport) {jQuery('.rp-volume-controls').hide();}
+	novolumesupport = radio_player_volume_test();
+	if (novolumesupport) {
+		jQuery('.rp-volume-controls').each(function() {
+			jQuery(this).hide();
+			container = jQuery(this).closest('.radio-container');
+			container.addClass('no-volume-controls');
+			container.find('.rp-play-pause-button-bg').css('margin-right','0');
+		});
+	}
 
 	/* --- bind pause/play button clicks --- */
 	jQuery('.rp-play-pause-button').on('click', function() {
 		container = jQuery(this).parents('.radio-container');
 		instance = container.attr('id').replace('radio_container_','');
-		radio_player.debug = true; // DEV TEMP
+		/* radio_player.debug = true; */
 		if (radio_player.debug) {console.log('Play/Pause Button Click:'); console.log(jQuery(this));}
 		if (radio_player_is_playing(instance)) {
 			if (radio_player.debug) {console.log('Trigger Pause of Player Instance '+instance);}

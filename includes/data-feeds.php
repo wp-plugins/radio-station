@@ -45,6 +45,10 @@
 // - Not Found Feed Error
 // - Format Data to XML
 // - Convert Array to XML
+// === Shift Conversions ===
+// - Convert Show Shift
+// - Convert Show Shifts
+// - Convert Schedule Shifts
 
 
 // ---------------------
@@ -76,8 +80,9 @@ function radio_station_api_discovery_link() {
 	$link = "<link rel='" . RADIO_STATION_DOCS_URL . "api/' href='" . esc_url( $api_url ) . "' />";
 	$link = apply_filters( 'radio_station_api_discovery_link', $link );
 	if ( $link ) {
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo $link;
+		// 2.5.0: sanitize with wp_kses and allowed HTML
+		$allowed_html = radio_station_allowed_html( 'link' );
+		echo wp_kses( $link, $allowed_html );
 	}
 }
 
@@ -90,7 +95,7 @@ function radio_station_api_discovery_rsd() {
 	$link = '<api name="RadioStation" blogID="1" preferred="false" apiLink="' . esc_url( $api_url ) . '" />';
 	$link = apply_filters( 'radio_station_api_discovery_rsd', $link );
 	if ( $link ) {
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo $link;
 	}
 }
@@ -112,11 +117,11 @@ function radio_station_add_feed_query_vars( $query_vars ) {
 	// --- add query vars ---
 	foreach ( $vars as $var ) {
 		if ( !in_array( $var, $query_vars ) ) {
-	    	$query_vars[] = $var;
-	    }
-    }
+			$query_vars[] = $var;
+		}
+	}
 
-    return $query_vars;
+	return $query_vars;
 }
 
 // ----------------
@@ -176,8 +181,9 @@ function radio_station_get_station_data() {
 		'updated'         => $updated,
 		'success'         => true,
 	);
-	$station_data = apply_filters( 'radio_station_station_data', $station_data );
 
+	// --- filter and return ---
+	$station_data = apply_filters( 'radio_station_station_data', $station_data );
 	return $station_data;
 }
 
@@ -205,7 +211,8 @@ function radio_station_get_broadcast_data() {
 
 	// 2.3.3.5: just in case transients are the same
 	if ( $current_show == $next_show ) {
-		$now = radio_station_get_time();
+		// 2.5.0: change from radio_station_get_time
+		$now = radio_station_get_now();
 		$next_show = radio_station_get_next_show( $now );
 		$next_show = radio_station_convert_show_shift( $next_show );
 	}
@@ -213,14 +220,15 @@ function radio_station_get_broadcast_data() {
 	// 2.3.3.5: added current playlist to broadcast data
 	$current_playlist = radio_station_get_current_playlist();
 
-	// --- return broadcast info ---
+	// --- set broadcast info ---
 	$broadcast = array(
 		'current_show'     => $current_show,
 		'next_show'        => $next_show,
 		'current_playlist' => $current_playlist,
 	);
-	$broadcast = apply_filters( 'radio_station_broadcast_data', $broadcast );
 
+	// --- filter and return ---
+	$broadcast = apply_filters( 'radio_station_broadcast_data', $broadcast );
 	return $broadcast;
 }
 
@@ -237,11 +245,8 @@ function radio_station_get_shows_data( $show = false ) {
 			$show_ids = explode( ',', $show );
 			foreach ( $show_ids as $show ) {
 				$id = absint( $show );
-				if ( $id < 1 ) {
-					$show = sanitize_title( $show );
-				} else {
-					$show = $id;
-				}
+				// 2.5.0: shortened conditional to single line
+				$show = ( $id < 1 ) ? sanitize_title( $show ) : $id;
 				$show = radio_station_get_show( $show );
 				$show = radio_station_get_show_data_meta( $show, true );
 				$show = radio_station_convert_show_shifts( $show );
@@ -251,11 +256,8 @@ function radio_station_get_shows_data( $show = false ) {
 			}
 		} else {
 			$id = absint( $show );
-			if ( $id < 1 ) {
-				$show = sanitize_title( $show );
-			} else {
-				$show = $id;
-			}
+			// 2.5.0: shortened conditional to single line
+			$show = ( $id < 1 ) ? sanitize_title( $show ) : $id;
 			$show = radio_station_get_show( $show );
 			$show = radio_station_get_show_data_meta( $show, true );
 			$show = radio_station_convert_show_shifts( $show );
@@ -274,9 +276,10 @@ function radio_station_get_shows_data( $show = false ) {
 			}
 		}
 	}
+
+	// --- filter and return ---
 	// 2.3.3.8: add show querystring parameter as second filter argument
 	$shows = apply_filters( 'radio_station_shows_data', $shows, $show );
-
 	return $shows;
 }
 
@@ -311,7 +314,7 @@ function radio_station_get_genres_data( $genre = false ) {
 			$genres[$name]['shows'] = array();
 			$genres[$name]['show_count'] = 0;
 			if ( is_object( $shows ) && property_exists( $shows, 'posts' )
-			     && is_array( $shows->posts ) && ( count( $shows->posts ) > 0 ) ) {
+					&& is_array( $shows->posts ) && ( count( $shows->posts ) > 0 ) ) {
 				$genres[$name]['show_count'] = count( $shows->posts );
 				foreach ( $shows->posts as $show ) {
 					$show = radio_station_get_show_data_meta( $show );
@@ -321,9 +324,10 @@ function radio_station_get_genres_data( $genre = false ) {
 			}
 		}
 	}
+
+	// --- filter and return ---
 	// 2.3.3.8: add genre querystring parameter as second filter argument
 	$genres = apply_filters( 'radio_station_genres_data', $genres, $genre );
-
 	return $genres;
 }
 
@@ -383,7 +387,7 @@ function radio_station_get_languages_data( $language = false ) {
 			$languages_data[$slug]['shows'] = array();
 			$languages_data[$slug]['show_count'] = 0;
 			if ( is_object( $shows ) && property_exists( $shows, 'posts' )
-			     && is_array( $shows->posts ) && ( count( $shows->posts ) > 0 ) ) {
+					&& is_array( $shows->posts ) && ( count( $shows->posts ) > 0 ) ) {
 				$languages_data[$slug]['show_count'] = count( $shows->posts );
 				foreach ( $shows->posts as $show ) {
 					$show = radio_station_get_show_data_meta( $show );
@@ -409,8 +413,8 @@ function radio_station_get_languages_data( $language = false ) {
 		}
 	}
 
+	// --- filter and return ---
 	$languages_data = apply_filters( 'radio_station_languages_data', $languages_data, $language );
-
 	return $languages_data;
 }
 
@@ -428,43 +432,31 @@ function radio_station_station_endpoint() {
 	}
 
 	$station = array();
-	
+
 	// --- broadcast ---
 	$broadcast = radio_station_get_broadcast_data();
 	$station['broadcast'] = $broadcast;
-	
+
 	// --- schedule ---
 	$schedule = radio_station_get_current_schedule();
 	$schedule = radio_station_convert_schedule_shifts( $schedule );
-	if ( count( $schedule ) > 0 ) {
-		$station['schedule'] = $schedule;
-	} else {
-		$station['schedule'] = array();
-	}
-	
+	// 2.5.0: shortened conditional to single line
+	$station['schedule'] = ( count( $schedule ) > 0 ) ? $schedule : array();
+
 	// --- shows ---
 	$shows = radio_station_get_shows_data();
-	if ( count( $shows ) > 0 ) {
-		$station['shows'] = $shows;
-	} else {
-		$station['shows'] = array();
-	}
-	
+	// 2.5.0: shortened conditional to single line
+	$station['shows'] = ( count( $shows ) > 0 ) ? $shows : array();
+
 	// --- genres ---
 	$genres = radio_station_get_genres_data();
-	if ( count( $genres ) > 0 ) {
-		$station['genres'] = $genres;
-	} else {
-		$station['genres'] = array();
-	}
+	// 2.5.0: shortened conditional to single line
+	$station['genres'] = ( count( $genres ) > 0 ) ? $genres : array();
 
 	// --- languages ---
 	$languages = radio_station_get_languages_data();
-	if ( count( $languages ) > 0 ) {
-		$station['languages'] = $languages;
-	} else {
-		$station['languages'] = array();
-	}
+	// 2.5.0: shortened conditional to single line
+	$station['languages'] = ( count( $languages ) > 0 ) ? $languages : array();
 
 	return $station;
 }
@@ -480,7 +472,7 @@ function radio_station_broadcast_endpoint() {
 
 	$broadcast = radio_station_get_broadcast_data();
 	if ( RADIO_STATION_DEBUG ) {
-		echo "Broadcast: " . print_r( $broadcast, true );
+		echo "Broadcast: " . esc_html( print_r( $broadcast, true ) );
 	}
 	return $broadcast;
 }
@@ -503,9 +495,9 @@ function radio_station_schedule_endpoint() {
 	$weekday = $singular = $multiple = false;
 	if ( isset( $_GET['weekday'] ) ) {
 
-		$weekday = $_GET['weekday'];
-
-		if ( strstr( $_GET['weekday'], ',' ) ) {
+		// 2.5.0: added sanitize_text_field
+		$weekday = sanitize_text_field( $_GET['weekday'] );
+		if ( strstr( $weekday, ',' ) ) {
 			$multiple = true;
 			$weekdays = explode( ',', $weekday );
 		} else {
@@ -527,7 +519,7 @@ function radio_station_schedule_endpoint() {
 				}
 			}
 		}
-		
+
 		// --- set no shifts error ---
 		if ( ( 0 == count( $schedule ) ) || ( 0 == $shiftcount ) ) {
 			$code = 'no_scheduled_shifts';
@@ -540,7 +532,7 @@ function radio_station_schedule_endpoint() {
 		// TODO: get schedule for specific date ?
 
 	} else {
-	
+
 		// --- check there are any shifts ---
 		$shiftcount = 0;
 		if ( count( $schedule ) > 0 ) {
@@ -548,16 +540,16 @@ function radio_station_schedule_endpoint() {
 				$shiftcount = $shiftcount + count( $shifts );
 			}
 		}
-		
+
 		// --- set no shifts error ---
 		if ( ( 0 == count( $schedule ) ) || ( 0 == $shiftcount ) ) {
 			$code = 'no_schedule';
 			$message = 'No Show shifts were found in the Schedule.';
 			$error = new WP_Error( $code, $message, array( 'status' => 400 ) );
 		}
-	
+
 	}
-	
+
 	// --- maybe set request error ---
 	if ( isset( $error ) ) {
 		$schedule = $error;
@@ -565,9 +557,9 @@ function radio_station_schedule_endpoint() {
 
 	// --- maybe output debug info ---
 	if ( RADIO_STATION_DEBUG ) {
-		echo "Weekday: " . $weekday . PHP_EOL;
-		echo "Weekdays: " . print_r( $weekdays, true ) . PHP_EOL;
-		echo "Schedule: " . print_r( $schedule, true );
+		echo "Weekday: " . esc_html( $weekday ) . PHP_EOL;
+		echo "Weekdays: " . esc_html( print_r( $weekdays, true ) ) . PHP_EOL;
+		echo "Schedule: " . esc_html( print_r( $schedule, true ) );
 	}
 
 	return $schedule;
@@ -585,7 +577,8 @@ function radio_station_shows_endpoint() {
 	// --- get show query parameter ---
 	$show = $singular = $multiple = false;
 	if ( isset( $_GET['show'] ) ) {
-		$show = $_GET['show'];
+		// 2.5.0: added sanitize_text_field
+		$show = sanitize_text_field( $_GET['show'] );
 		if ( strstr( $show, ',' ) ) {
 			$multiple = true;
 		} else {
@@ -613,10 +606,10 @@ function radio_station_shows_endpoint() {
 
 	// --- maybe output debug info ---
 	if ( RADIO_STATION_DEBUG ) {
-		echo "Show: " . $show . PHP_EOL;
-		echo "Shows: " . print_r( $shows, true );
+		echo "Show: " . esc_html( $show ) . PHP_EOL;
+		echo "Shows: " . esc_html( print_r( $shows, true ) );
 	}
-	
+
 	return $shows;
 }
 
@@ -632,7 +625,8 @@ function radio_station_genres_endpoint() {
 	// --- get genre query parameter ---
 	$genre = $singular = $multiple = false;
 	if ( isset( $_GET['genre'] ) ) {
-		$genre = $_GET['genre'];
+		// 2.5.0: added sanitize_text_field
+		$genre = sanitize_text_field( $_GET['genre'] );
 		if ( strstr( $genre, ',' ) ) {
 			$multiple = true;
 		} else {
@@ -660,10 +654,10 @@ function radio_station_genres_endpoint() {
 
 	// --- maybe output debug info ---
 	if ( RADIO_STATION_DEBUG ) {
-		echo "Genre: " . $genre . PHP_EOL;
-		echo "Genres: " . print_r( $genres, true );
+		echo "Genre: " . esc_html( $genre ) . PHP_EOL;
+		echo "Genres: " . esc_html( print_r( $genres, true ) );
 	}
-	
+
 	return $genres;
 }
 
@@ -679,7 +673,8 @@ function radio_station_languages_endpoint() {
 	// --- get language query parameter ---
 	$language = $singular = $multiple = false;
 	if ( isset( $_GET['language'] ) ) {
-		$language = $_GET['language'];
+		// 2.5.0: added sanitize_text_field
+		$language = sanitize_text_field( $_GET['language'] );
 		if ( strstr( $language, ',' ) ) {
 			$multiple = true;
 		} else {
@@ -690,8 +685,8 @@ function radio_station_languages_endpoint() {
 	// --- get language list data ---
 	$languages = radio_station_get_languages_data( $language );
 	if ( RADIO_STATION_DEBUG ) {
-		echo "Language: " . $language . PHP_EOL;
-		echo "Languages: " . print_r( $languages, true );
+		echo "Language: " . esc_html( $language ) . PHP_EOL;
+		echo "Languages: " . esc_html( print_r( $languages, true ) );
 	}
 
 	// --- maybe return route error ---
@@ -708,7 +703,7 @@ function radio_station_languages_endpoint() {
 		}
 		$languages = new WP_Error( $code, $message, array( 'status' => 400 ) );
 	}
-	
+
 	return $languages;
 }
 
@@ -725,7 +720,7 @@ function radio_station_register_rest_routes() {
 
 	// --- check rest routes are enabled ---
 	$enabled = radio_station_get_setting( 'enable_data_routes' );
-	if ( 'yes' != $enabled ) {
+	if ( 'yes' !== (string) $enabled ) {
 		return;
 	}
 
@@ -871,8 +866,7 @@ function radio_station_route_station( $request ) {
 
 	// --- maybe output debug display ---
 	if ( RADIO_STATION_DEBUG ) {
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo "Output: " . print_r( $station, true ) . PHP_EOL;
+		echo "Output: " . esc_html( print_r( $station, true ) ) . PHP_EOL;
 		exit;
 	}
 
@@ -893,8 +887,7 @@ function radio_station_route_broadcast( $request ) {
 
 	// --- maybe output debug display ---
 	if ( RADIO_STATION_DEBUG ) {
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo "Output: " . print_r( $broadcast, true ) . PHP_EOL;
+		echo "Output: " . esc_html( print_r( $broadcast, true ) ) . PHP_EOL;
 		exit;
 	}
 
@@ -915,11 +908,10 @@ function radio_station_route_schedule( $request ) {
 
 	// --- maybe output debug display ---
 	if ( RADIO_STATION_DEBUG ) {
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo "Output: " . print_r( $schedule, true ) . PHP_EOL;
+		echo "Output: " . esc_html( print_r( $schedule, true ) ) . PHP_EOL;
 		exit;
 	}
-	
+
 	return $schedule;
 }
 
@@ -939,8 +931,7 @@ function radio_station_route_shows( $request ) {
 
 	// --- maybe output debug display ---
 	if ( RADIO_STATION_DEBUG ) {
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo "Output: " . print_r( $show_list, true ) . PHP_EOL;
+		echo "Output: " . esc_html( print_r( $show_list, true ) ) . PHP_EOL;
 		exit;
 	}
 
@@ -963,11 +954,10 @@ function radio_station_route_genres( $request ) {
 
 	// --- maybe output debug display ---
 	if ( RADIO_STATION_DEBUG ) {
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo "Output: " . print_r( $genre_list, true ) . PHP_EOL;
+		echo "Output: " . esc_html( print_r( $genre_list, true ) ) . PHP_EOL;
 		exit;
 	}
-	
+
 	return $genre_list;
 }
 
@@ -987,11 +977,10 @@ function radio_station_route_languages( $request ) {
 
 	// --- maybe output debug display ---
 	if ( RADIO_STATION_DEBUG ) {
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo "Output: " . print_r( $language_list, true ) . PHP_EOL;
+		echo "Output: " . esc_html( print_r( $language_list, true ) ) . PHP_EOL;
 		exit;
 	}
-	
+
 	return $language_list;
 }
 
@@ -1028,7 +1017,7 @@ function radio_station_add_feeds() {
 
 	// --- check feeds are enabled ---
 	$enabled = radio_station_get_setting( 'enable_data_feeds' );
-	if ( 'yes' != $enabled ) {
+	if ( 'yes' !== (string) $enabled ) {
 		return;
 	}
 
@@ -1085,8 +1074,8 @@ function radio_station_add_feeds() {
 	$rewrite_rules = get_option( 'rewrite_rules' );
 	// note this should provide an array not a string
 	if ( !$rewrite_rules || !is_array( $rewrite_rules )
-	  || !array_key_exists( $baserule, $rewrite_rules )
-	  || !array_key_exists( $feedrule, $rewrite_rules ) ) {
+		|| !array_key_exists( $baserule, $rewrite_rules )
+		|| !array_key_exists( $feedrule, $rewrite_rules ) ) {
 		flush_rewrite_rules( false );
 	}
 
@@ -1126,7 +1115,6 @@ function radio_station_get_feed_urls() {
 
 	// --- filter and return ---
 	$feeds = apply_filters( 'radio_station_feed_urls', $feeds );
-
 	return $feeds;
 }
 
@@ -1146,7 +1134,7 @@ function radio_station_feed_radio( $comment_feed, $feed_name ) {
 		$key = '/' . $base . '/' . $endpoint;
 		$routes[$key] = array(
 			'namespace'	=> $base,
-			'methods'	=> array ( 'GET' ),
+			'methods'	=> array( 'GET' ),
 			// 'endpoints'	=> array(),
 			// 'url'	=> $url,
 			'_links' => array(
@@ -1160,11 +1148,11 @@ function radio_station_feed_radio( $comment_feed, $feed_name ) {
 	// --- output debug display or feed data ---
 	if ( RADIO_STATION_DEBUG ) {
 		header( 'Content-Type: text/plain' );
-		echo "Output: " . print_r( $radio, true ) . PHP_EOL;
+		echo "Output: " . esc_html( print_r( $radio, true ) ) . PHP_EOL;
 	} else {
-		header( 'Content-Type: application/json' );
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo json_encode( $radio );
+		// 2.5.0: use wp_send_json instead of echo json_encode
+		// header( 'Content-Type: application/json' );
+		wp_send_json( $radio, 200 );
 	}
 }
 
@@ -1179,15 +1167,15 @@ function radio_station_feed_station( $comment_feed, $feed_name ) {
 	$station = radio_station_add_station_data( $station );
 	$station['endpoints'] = radio_station_get_feed_urls();
 	$station = apply_filters( 'radio_station_feed_station', $station );
+	$status_code = 200;
 
 	// --- output debug display or feed data ---
 	if ( RADIO_STATION_DEBUG ) {
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo "Output: " . print_r( $station, true ) . PHP_EOL;
+		echo "Output: " . esc_html( print_r( $station, true ) ) . PHP_EOL;
 	} else {
-		header( 'Content-Type: application/json' );
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo json_encode( $station );
+		// 2.5.0: use wp_json_encode and wp_send_json instead of echo json_encode
+		// header( 'Content-Type: application/json' );
+		wp_send_json( $station, $status_code );
 	}
 }
 
@@ -1203,14 +1191,15 @@ function radio_station_feed_broadcast( $comment_feed, $feed_name ) {
 	$broadcast = radio_station_add_station_data( $broadcast );
 	$broadcast['endpoints'] = radio_station_get_feed_urls();
 	$broadcast = apply_filters( 'radio_station_feed_broadcast', $broadcast );
+	$broadcast = 200;
 
 	// --- output debug display or feed data ---
 	if ( RADIO_STATION_DEBUG ) {
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo "Output: " . print_r( $broadcast, true ) . PHP_EOL;
+		echo "Output: " . esc_html( print_r( $broadcast, true ) ) . PHP_EOL;
 	} else {
-		header( 'Content-Type: application/json' );
-		echo json_encode( $broadcast );
+		// 2.5.0: use wp_send_json instead of echo json_encode
+		// header( 'Content-Type: application/json' );
+		wp_send_json( $broadcast, $status_code );
 	}
 }
 
@@ -1225,15 +1214,15 @@ function radio_station_feed_schedule( $comment_feed, $feed_name ) {
 	$schedule = radio_station_add_station_data( $schedule );
 	$schedule['endpoints'] = radio_station_get_feed_urls();
 	$schedule = apply_filters( 'radio_station_feed_schedule', $schedule );
+	$status_code = 200;
 
 	// --- output debug display or feed data ---
 	if ( RADIO_STATION_DEBUG ) {
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo "Output: " . print_r( $schedule, true ) . PHP_EOL;
+		echo "Output: " . esc_html( print_r( $schedule, true ) ) . PHP_EOL;
 	} else {
-		header( 'Content-Type: application/json' );
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo json_encode( $schedule );
+		// 2.5.0: use wp_send_json instead of echo json_encode
+		// header( 'Content-Type: application/json' );
+		wp_send_json( $schedule, $status_code );
 	}
 }
 
@@ -1246,21 +1235,22 @@ function radio_station_feed_shows( $comment_feed, $feed_name ) {
 	$show_list = radio_station_shows_endpoint();
 	if ( is_wp_error( $show_list ) ) {
 		$show_list = radio_station_feed_not_found( $show_list );
+		$status_code = 200;
 	} else {
 		$show_list = array( 'shows' => $show_list );
 		$show_list = radio_station_add_station_data( $show_list );
 		$show_list['endpoints'] = radio_station_get_feed_urls();
+		$status_code = 200;
 	}
 	$show_list = apply_filters( 'radio_station_feed_shows', $show_list );
 
 	// --- output debug display or feed data ---
 	if ( RADIO_STATION_DEBUG ) {
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo "Output: " . print_r( $show_list, true ) . PHP_EOL;
+		echo "Output: " . esc_html( print_r( $show_list, true ) ) . PHP_EOL;
 	} else {
-		header( 'Content-Type: application/json' );
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo json_encode( $show_list );
+		// 2.5.0: use wp_send_json instead of echo json_encode
+		// header( 'Content-Type: application/json' );
+		wp_send_json( $show_list, $status_code );
 	}
 }
 
@@ -1273,23 +1263,23 @@ function radio_station_feed_genres( $comment_feed, $feed_name ) {
 	$genre_list = radio_station_genres_endpoint();
 	if ( is_wp_error( $genre_list ) ) {
 		$genre_list = radio_station_feed_not_found( $genre_list );
+		$status_code = 400;
 	} else {
 		$genre_list = array( 'genres' => $genre_list );
 		$genre_list = radio_station_add_station_data( $genre_list );
 		$genre_list['endpoints'] = radio_station_get_feed_urls();
+		$status_code = 200;
 	}
 	$genre_list = apply_filters( 'radio_station_feed_genres', $genre_list );
 
 	// --- output debug display or feed data ---
 	if ( RADIO_STATION_DEBUG ) {
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo "Output: " . print_r( $genre_list, true ) . PHP_EOL;
+		echo "Output: " . esc_html( print_r( $genre_list, true ) ) . PHP_EOL;
 	} else {
-		header( 'Content-Type: application/json' );
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo json_encode( $genre_list );
+		// 2.5.0: use wp_send_json instead of echo json_encode
+		// header( 'Content-Type: application/json' );
+		wp_send_json( $genre_list, $status_code );
 	}
-	
 }
 
 // -------------------
@@ -1300,21 +1290,22 @@ function radio_station_feed_languages( $comment_feed, $feed_name ) {
 	$language_list = radio_station_languages_endpoint();
 	if ( is_wp_error( $language_list ) ) {
 		$language_list = radio_station_feed_not_found( $language_list );
+		$status_code = 400;
 	} else {
 		$language_list = array( 'languages' => $language_list );
 		$language_list = radio_station_add_station_data( $language_list );
 		$language_list['endpoints'] = radio_station_get_feed_urls();
+		$status_code = 200;
 	}
-	$language_list = apply_filters( 'radio_station_feed_languages', $language_list );
+	$language_list = apply_filters( 'radio_station_feed_languages', $language_list, $status_code );
 
 	// --- output debug display or feed data ---
 	if ( RADIO_STATION_DEBUG ) {
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo "Output: " . print_r( $language_list, true ) . PHP_EOL;
+		echo "Output: " . esc_html( print_r( $language_list, true ) ) . PHP_EOL;
 	} else {
-		header( 'Content-Type: application/json' );
-		// phpcs:ignore WordPress.Security.OutputNotEscaped
-		echo json_encode( $language_list );
+		// 2.5.0: use wp_send_json instead of echo json_encode
+		// header( 'Content-Type: application/json' );
+		wp_send_json( $language_list, $status_code );
 	}
 }
 
@@ -1336,7 +1327,8 @@ function radio_station_feed_not_found( $error ) {
 	// 2.3.3.8: change status code to 400 bad request from 404 not found
 	$error = array(
 		'success' => false,
-		'errors'  => array(
+		// 2.5.0: change errors key to standarad data key
+		'data'  => array(
 			'status'  => 400,
 			'code'    => $code,
 			'title'   => __( 'Error 400 No Requested Data', 'radio-station' ),
@@ -1344,8 +1336,78 @@ function radio_station_feed_not_found( $error ) {
 			'detail'  => $message,
 		),
 	);
-
 	return $error;
 }
 
+
+// -------------------------
+// === Shift Conversions ===
+// -------------------------
+// 2.5.0: moved from support-functions.php
+
+// ------------------
+// Convert Show Shift
+// ------------------
+// 2.3.0: 24 format shift for broadcast data endpoint
+function radio_station_convert_show_shift( $shift ) {
+
+	// note: timezone can be ignored here as just getting hours and minutes
+	if ( isset( $shift['start'] ) ) {
+		$shift['start'] = date( 'H:i', strtotime( $shift['start'] ) );
+	}
+	if ( isset( $shift['end'] ) ) {
+		$shift['end'] = date( 'H:i', strtotime( $shift['end'] ) );
+	}
+	return $shift;
+}
+
+// -------------------
+// Convert Show Shifts
+// -------------------
+// 2.3.0: 24 format shifts for show data endpoints
+function radio_station_convert_show_shifts( $show ) {
+
+	if ( isset( $show['schedule'] ) ) {
+		$schedule = $show['schedule'];
+		foreach ( $schedule as $i => $shift ) {
+			// 2.3.3.9: fixed to not use radio_station_convert_hour
+			$start_hour = substr( radio_station_convert_shift_time( $shift['start_hour'] . $shift['start_meridian'], 24 ), 0, 2 );
+			$end_hour = substr( radio_station_convert_shift_time( $shift['end_hour'] . $shift['end_meridian'], 24 ), 0, 2 );
+			// 2.3.3.9: added missing shift encore designation
+			// 2.4.0.6: fix to undefined index warning for encore
+			$encore = ( isset( $shift['encore'] ) && ( 'on' == $shift['encore'] ) ) ? true : false;
+			$schedule[$i] = array(
+				'day'	 => $shift['day'],
+				'start'	 => $start_hour . ':' . $shift['start_min'],
+				'end'	 => $end_hour . ':' . $shift['end_min'],
+				'encore' => $encore,
+			);
+		}
+		$show['schedule'] = $schedule;
+	}
+	return $show;
+}
+
+// -----------------------
+// Convert Schedule Shifts
+// -----------------------
+// 2.3.0: 24 format shifts for schedule data endpoint
+function radio_station_convert_schedule_shifts( $schedule ) {
+
+	if ( is_array( $schedule ) && ( count( $schedule ) > 0 ) ) {
+		foreach ( $schedule as $day => $shows ) {
+			$new_shows = array();
+			if ( is_array( $shows ) && ( count( $shows ) > 0 ) ) {
+				foreach ( $shows as $time => $show ) {
+					$new_show = $show;
+					$new_show['start'] = radio_station_convert_shift_time( $show['start'], 24 );
+					$new_show['end'] = radio_station_convert_shift_time( $show['end'], 24 );
+					$new_shows[] = $new_show;
+				}
+			}
+			$schedule[$day] = $new_shows;
+		}
+	}
+	return $schedule;
+}
 

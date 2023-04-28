@@ -1,11 +1,11 @@
 /*
- * Radio Player Skin
- * https://netmix.com/radio-player/
+ * === Radio Stream Player Skin ===
+ * https://radiostation.pro/stream-player/
  *
  * Author: Tony Hayes
- * Skin Version: 1.0.0 (Radio Player 1.0.0)
+ * Skin Version: 1.0.1 (Stream Player 2.5.0)
  *
- * Based on Blue Monday Skin for jPlayer 2.9.2 ~ (c) 2009-2014 Happyworm Ltd ~ MIT License
+ * originally based on Blue Monday Skin for jPlayer 2.9.2 ~ (c) 2009-2014 Happyworm Ltd ~ MIT License
 */
 
 .rp-player {
@@ -38,6 +38,7 @@
 .rp-interface {
 	position: relative;
 	background-color: transparent;
+	width: 35%;
 }
 
 .rp-station-info, .rp-interface, .rp-volume-controls, .rp-controls-holder , .rp-script-switcher, .rp-show-info {
@@ -47,32 +48,42 @@
 .rp-station-info, .rp-interface, .rp-show-info {
 	text-align: center;
 	vertical-align: top;
-	width: 33%;
 	margin-top: 7px;
+}
+
+.rp-station-info, .rp-show-info {
+	width: 32%;
 }
 
 .rp-station-text-alt, .rp-show-text-alt {
 	display: none;
 }
 
-.radio-container.vertical .rp-station-info,
+.player-contents.popup {
+	padding: 10px;
+}
+
+.radio-container.vertical .rp-station-info, 
 .radio-container.vertical .rp-interface,
 .radio-container.vertical .rp-show-info {
 	display: block;
 	width: 100%;
 	vertical-align: top;
-	text-align: left;
 }
 
 .rp-controls, .rp-volume-controls, .rp-script-switcher {
 	display: inline-block;
 	vertical-align: middle;
-	margin-top: -10px;
+	/* margin-top: -10px; */
 }
 
 .rp-volume-controls button, .rp-volume-slider-container, .rp-volume-bar {
 	display: inline-block;
 	vertical-align: middle;
+}
+
+.rp-popup {
+	display: inline-block;
 }
 
 .rp-audio .rp-interface, .rp-audio-stream .rp-interface {
@@ -110,6 +121,7 @@
 .rp-play-pause-button-bg, .rp-play-pause-button {
 	width: 40px;
 	height: 40px;
+	background-size: 40px 40px;
 }
 
 .radio-container.circular .rp-play-pause-button-bg {
@@ -127,54 +139,55 @@
 
 .rp-play-pause-button:hover, .rp-play-pause-button:focus {
 	opacity: 1;
+	scale: 1.1;
 }
 
 .radio-container.light.circular .rp-play-pause-button {
-	background:url("../images/play-light-circular.png");
+	background-image: url("../images/play-light-circular.png?v=2");
 }
 
 .radio-container.light.rounded .rp-play-pause-button {
-	background:url("../images/play-light-rounded.png");
+	background-image: url("../images/play-light-rounded.png?v=2");
 }
 
 .radio-container.light.square .rp-play-pause-button {
-	background:url("../images/play-light-square.png");
+	background-image: url("../images/play-light-square.png?v=2");
 }
 
 .radio-container.dark.circular .rp-play-pause-button {
-	background:url("../images/play-dark-circular.png");
+	background-image: url("../images/play-dark-circular.png?v=2");
 }
 
 .radio-container.dark.rounded .rp-play-pause-button {
-	background:url("../images/play-dark-rounded.png");
+	background-image: url("../images/play-dark-rounded.png?v=2");
 }
 
 .radio-container.dark.square .rp-play-pause-button {
-	background:url("../images/play-dark-square.png");
+	background-image: url("../images/play-dark-square.png?v=2");
 }
 
-.radio-container.paused.light.circular .rp-play-pause-button {
-	background:url("../images/pause-light-circular.png");
+.radio-container.playing.light.circular .rp-play-pause-button {
+	background-image: url("../images/pause-light-circular.png?v=2");
 }
 
-.radio-container.paused.light.rounded .rp-play-pause-button {
-	background:url("../images/pause-light-rounded.png");
+.radio-container.playing.light.rounded .rp-play-pause-button {
+	background-image: url("../images/pause-light-rounded.png?v=2");
 }
 
-.radio-container.paused.light.square .rp-play-pause-button {
-	background:url("../images/pause-light-square.png");
+.radio-container.playing.light.square .rp-play-pause-button {
+	background-image: url("../images/pause-light-square.png?v=2");
 }
 
-.radio-container.paused.dark.circular .rp-play-pause-button {
-	background:url("../images/pause-dark-circular.png");
+.radio-container.playing.dark.circular .rp-play-pause-button {
+	background-image: url("../images/pause-dark-circular.png?v=2");
 }
 
-.radio-container.paused.dark.rounded .rp-play-pause-button {
-	background:url("../images/pause-dark-rounded.png");
+.radio-container.playing.dark.rounded .rp-play-pause-button {
+	background-image: url("../images/pause-dark-rounded.png?v=2");
 }
 
-.radio-container.paused.dark.square .rp-play-pause-button {
-	background:url("../images/pause-dark-square.png");
+.radio-container.playing.dark.square .rp-play-pause-button {
+	background-image: url("../images/pause-dark-square.png?v=2");
 }
 
 /* .rp-stop, .rp-previous, .rp-next {
@@ -213,13 +226,14 @@
 .rp-volume-slider-container {
 	position: relative;
 	opacity: 0.9;
+	height: 30px;
 }
 
 .rp-volume-slider-container:hover, .rp-volume-slider-container:focus {
 	opacity: 1;
 }
 
-.rp-volume-controls button {
+.radio-container .rp-volume-controls button, .radio-container .rp-popup button {
 	overflow: hidden;
 	text-indent: -9999px;
 	border: none;
@@ -227,81 +241,49 @@
 	opacity: 0.9;
 }
 
-.rp-volume-controls button:hover, .rp-volume-controls button:focus {
+.radio-container .rp-volume-controls button:hover, .radio-container .rp-volume-controls button:focus,
+.radio-container .rp-popup button:hover, .radio-container .rp-popup button:focus {
 	opacity: 1;
+	scale: 1.1;
 }
 
-.radio-container.circular .rp-volume-controls button {
+.radio-container.circular .rp-volume-controls button, .radio-container.circular .rp-popup button {
 	border-radius: 9px;
 }
 
-.radio-container.rounded .rp-volume-controls button {
+.radio-container.rounded .rp-volume-controls button, .radio-container.rounded .rp-popup button {
 	border-radius: 6px;
 }
 
-.radio-container.square .rp-volume-controls button {
+.radio-container.square .rp-volume-controls button, .radio-container.square .rp-popup button {
 	border-radius: 1px;
 }
 
-.rp-mute, .rp-volume-max, .rp-volume-down, .rp-volume-up {
-	width: 18px; height: 18px; padding: 0;
+.rp-volume-controls button.rp-mute, .rp-volume-controls button.rp-mute:hover, .rp-volume-controls button.rp-mute:focus,
+.rp-volume-controls button.rp-volume-down, .rp-volume-controls button.rp-volume-down:hover, .rp-volume-controls button.rp-volume-down:focus,
+.rp-volume-controls button.rp-volume-up, .rp-volume-controls button.rp-volume-up:hover, .rp-volume-controls button.rp-volume-up:focus,
+.rp-volume-controls button.rp-volume-max, .rp-volume-controls button.rp-volume-max:hover, .rp-volume-controls button.rp-volume-max:focus,
+.rp-popup button.rp-popup-button, .rp-popup button.rp-popup-button:hover, .rp-popup button.rp-popup-button:focus {
+	width: 18px; height: 18px; padding: 0; margin: 0; background-size: 36px; background-repeat: no-repeat;
 }
 
-.light .rp-mute {
-	background: url("../images/controls-light.png?v=2") 0px 0px no-repeat;
+.light button.rp-mute, .light button.rp-volume-max, .light button.rp-volume-up, .light button.rp-volume-down, .light button.rp-popup-button {
+	background-image: url("../images/volume-controls-light.png?v=3");
 }
-.dark .rp-mute {
-	background: url("../images/controls-dark.png?v=2") 0px 0px no-repeat;
-}
-
-.light.muted .rp-mute, .light .rp-mute:hover {
-	background: url("../images/controls-light.png?v=2") -18px -18px no-repeat;
-}
-.dark.muted .rp-mute, .dark .rp-mute:hover {
-	background: url("../images/controls-dark.png?v=2") -18px -18px no-repeat;
+.dark button.rp-mute, .dark button.rp-volume-max, .dark button.rp-volume-up, .dark button.rp-volume-down, .dark button.rp-popup-button {
+	background-image: url("../images/volume-controls-dark.png?v=3");
 }
 
-.light .rp-volume-max {
-	background: url("../images/controls-light.png?v=2") 0 -36px no-repeat;
-}
-.dark .rp-volume-max {
-	background: url("../images/controls-dark.png?v=2") 0 -36px no-repeat;
-}
-
-.light.maxed .rp-volume-max, .light .rp-volume-max:focus, .light .rp-volume-max:hover {
-	background: url("../images/controls-light.png?v=2") -18px -36px no-repeat;
-}
-.dark.maxed .rp-volume-max, .dark .rp-volume-max:focus, .dark .rp-volume-max:hover {
-	background: url("../images/controls-dark.png?v=2") -18px -36px no-repeat;
-}
-
-.light .rp-volume-up {
-	background: url("../images/controls-light.png?v=2") 0 -54px no-repeat;
-}
-.dark .rp-volume-up {
-	background: url("../images/controls-dark.png?v=2") 0 -54px no-repeat;
-}
-
-.light .rp-volume-up:focus, .light .rp-volume-up:hover {
-	background: url("../images/controls-light.png?v=2") -18px -54px no-repeat;
-}
-.dark .rp-volume-up:focus, .dark .rp-volume-up:hover {
-	background: url("../images/controls-dark.png?v=2") -18px -54px no-repeat;
-}
-
-.light .rp-volume-down {
-	background: url("../images/controls-light.png?v=2") 0 -72px no-repeat;
-}
-.dark .rp-volume-down {
-	background: url("../images/controls-dark.png?v=2") 0 -72px no-repeat;
-}
-
-.light .rp-volume-down:focus, .light .rp-volume-down:hover {
-	background: url("../images/controls-light.png?v=2") -18px -72px no-repeat;
-}
-.dark .rp-volume-down:focus, .dark .rp-volume-down:hover {
-	background: url("../images/controls-dark.png?v=2") -18px -72px no-repeat;
-}
+.rp-mute {background-position: 0px 0px;}
+.muted .rp-mute, .rp-mute:hover {background-position: -18px -18px;}
+.rp-volume-max {background-position: 0 -36px;}
+.maxed .rp-volume-max, .rp-volume-max:focus, .rp-volume-max:hover {background-position: -18px -36px;}
+.rp-volume-up {background-position: 0 -54px;}
+.rp-volume-up:focus, .rp-volume-up:hover {background-position: -18px -54px;}
+.rp-volume-down {background-position: 0 -72px;}
+.rp-volume-down:focus, .rp-volume-down:hover {background-position: -18px -72px;}
+.rp-popup-button {background-position: 0 -90px;}
+.rp-popup-button:focus, .rp-popup-button:hover {background-position: -18px -90px;}
 /* @end */
 
 /* @roup Now Playing Info */
