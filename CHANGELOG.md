@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed: Genre/Language Archive Pagination
 * Fixed: Adjacent Post Links (where show has one shift)
 * Fixed: Workaround Amplitude pause event not firing
+* Fixed: inline scripts when main script in head tag
 * Security Fix: Escape all debug output content
 
 ### 2.4.0.9
