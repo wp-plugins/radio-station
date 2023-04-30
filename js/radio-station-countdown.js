@@ -29,7 +29,7 @@ function radio_countdown() {
         }
         if (diff < 1) {countdown = radio.labels.showended; jQuery(this).removeClass('current-show-end');}
         else {countdown = radio_countdown_display(diff, radio.labels.timeremaining);}
-        jQuery(this).parent().find('.rs-countdown').html(countdown);
+        jQuery(this).closest('.current-show-list').find('.rs-countdown').html(countdown);
     });
 
     /* Upcoming Show Countdown */
@@ -47,22 +47,22 @@ function radio_countdown() {
             if (diffb < 1) {countdown = radio.labels.showended; jQuery(this).removeClass('upcoming-show-times');}
             else {countdown = radio.labels.showstarted;}
         } else {countdown = radio_countdown_display(diffa, radio.labels.timecommencing);}
-        jQuery(this).parent().find('.rs-countdown').html(countdown);
+        jQuery(this).closest('.upcoming-shows-list').find('.rs-countdown').html(countdown);
     });
 
     /* Current Playlist Countdown */
-    jQuery('.current-playlist-end').each(function() {
+    jQuery('current-playlist.countdown .current-playlist-end').each(function() {
         diff = parseInt(jQuery(this).val()) - radio.time.current;
         if (radio.clock_debug) {console.log('Current Playlist Ends in: '+diff);}
         if (diff < 1) {countdown = radio.labels.playlistended; jQuery(this).removeClass('current-playlist-end');}
         else {countdown = radio_countdown_display(diff, radio.labels.timeremaining);}
-        jQuery(this).parent().find('.rs-countdown').html(countdown);
+        jQuery(this).closest('.current-playlist').find('.rs-countdown').html(countdown);
     });
     
     /* Continue Countdown */
     if ( jQuery('.current-show-list.countdown .current-show-end')
 		|| jQuery('.upcoming-shows-list.countdown .upcoming-show-times')
-		|| jQuery('.current-playlist-end') ) {
+		|| jQuery('.current-playlist.countdown .current-playlist-end') ) {
         setTimeout('radio_countdown();', 1000);
     }
 }
