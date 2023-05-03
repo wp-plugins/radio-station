@@ -442,7 +442,7 @@ We recommend you test these on a Staging site (or a development copy of your liv
 
 #### 2.4.0
 * Radio Station Stream Player Widget!
-* https://netmix.com/radio-station-2-4-0-release-with-stream-player/
+* https://radiostation.pro/radio-station-update-version-2-4-0-with-streaming-audio-player/
 
 #### 2.3.3.9
 * Multiple Dates and Times for Schedule Overrides!

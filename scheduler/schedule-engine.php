@@ -2242,11 +2242,11 @@ class radio_station_schedule_engine {
 		if ( isset( $day_shift ) ) {
 
 			// 2.3.3.6: added check to not last check shift against itself
-			// TODO: check possible re-occurrence of undefined index 'start' warning here ?
-			if ( ( $day_shift['show'] != $record_id )
-				|| ( $day_shift['day'] != $shift['day'] )
-				|| ( $day_shift['start'] != $shift['start'] )
-				|| ( $day_shift['end'] != $shift['end'] ) ) {
+			// 2.5.1: check all indexes exist to avoid undefined index warnings
+			if ( ( isset( $day_shift['show'] ) && ( $day_shift['show'] != $record_id ) )
+				|| ( isset( $day_shift['day'] ) && ( $day_shift['day'] != $shift['day'] ) )
+				|| ( isset( $day_shift['start'] ) && ( $day_shift['start'] != $shift['start'] ) )
+				|| ( isset( $day_shift['end'] ) && ( $day_shift['end'] != $shift['end'] ) ) ) {
 
 				// --- check for new shift overlap using next week ---
 				$shift_start_time = $shift_start_time + ( 7 * 24 * 60 * 60 );

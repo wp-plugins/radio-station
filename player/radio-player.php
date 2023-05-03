@@ -3091,6 +3091,9 @@ if ( !function_exists( 'esc_url' ) ) {
  }
 }
 
+// -------------------
+// Sanitize Text Field
+// -------------------
 if ( !function_exists( 'sanitize_text_field' ) ) {
  function sanitize_text_field( $text ) {
 	return $text;

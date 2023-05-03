@@ -5,7 +5,7 @@ Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
 Tested up to: 6.2
-Stable tag: 2.5.0
+Stable tag: 2.5.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -399,6 +399,10 @@ We recommend you test these on a Staging site (or a development copy of your liv
 8. Show Conflict Display
 
 == Changelog ==
+
+= 2.5.1 =
+* Fixed: Widget Countdown Timer Display Bug
+* Fixed: Pro Player Backwards Compatibility
 
 = 2.5.0 =
 * Added: Radio Station Blocks! (converted Widgets)
@@ -984,7 +988,7 @@ We recommend you test these on a Staging site (or a development copy of your liv
 
 = 2.5.0 =
 * Radio Station Blocks for Gutenberg Block Editor!
-* https://netmix.com/radio-station-2-5-0-release-with-blocks/
+* https://radiostation.pro/radio-station-2-5-0-release-with-blocks/
 * Refactored Schedule Engine Class
 * Improved translations and sanitization
 * Numerous bugfixes and improvements
@@ -992,7 +996,7 @@ We recommend you test these on a Staging site (or a development copy of your liv
 
 = 2.4.0 =
 * Radio Station Stream Player Widget!
-* https://netmix.com/radio-station-2-4-0-release-with-stream-player/
+* https://radiostation.pro/radio-station-update-version-2-4-0-with-streaming-audio-player/
 
 = 2.3.3.9 =
 * Multiple Dates and Times for Schedule Overrides!

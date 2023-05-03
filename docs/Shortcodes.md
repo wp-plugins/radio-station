@@ -27,11 +27,11 @@ Note that Divs and Legacy Views are considered deprecated as they do not honour 
 
 The following attributes are available for the shortcode:
 
-* ** Layout Display Options **
+* **Layout Display Options**
 * *view* : Which View to use for display output. 'table', 'tabs', 'list', 'divs', 'legacy', 'grid', 'calendar'. Default 'table'.
 * *time* : Display time format you with to use. 12 and 24. Default is Plugin Setting.
 * *clock* : Display Radio Clock above schedule. (See clock shortcode.) 0 or 1. Default is Plugin Setting.
-* ** Show Display Attributes **
+* **Show Display Attributes**
 * *show_times* : Whether to display the show shift's start and end times. 0 or 1. Default 1.
 * *show_link* : Display the title of the show as a link to its profile page. 0 or 1.  Default 1.
 * *show_image* : Whether the display the show's avatar. 0 or 1. Default 0 (1 for Tabbed View.)
@@ -41,7 +41,7 @@ The following attributes are available for the shortcode:
 * *show_genres* : Whether to display a list of show genres. 0 or 1. Default 0 (1 for Tabbed View.)
 * *show_encore* : Whether to display 'encore airing' for a show shift. 0 or 1. Default 1.
 * *show_file* : Whether to add a link to the latest audio file. 0 or 1. Default 0.
-* ** Time Display Attributes **
+* **Time Display Attributes**
 * *days* : Display for single day or multiple days (string or 0-6, comma separated.) Default all.
 * *start_day* : day of the week to start schedule (string or 0-6, or 'today') Defaults to WordPress setting.
 * *display_day* : Full or short day heading ('full' or 'short') Default short for Table, full for Tabs/List.
@@ -52,7 +52,7 @@ The following attributes are available for the shortcode:
 * *hide_past_shows* : Tabs View: Hide shows that are finished in the Schedule. 0 or 1. Default 0.
 * *gridwidth* : [Pro] Grid View: Set the width, in pixels of the grid columns. Default 150.
 * *divheight* : [Legacy] Divs View: Set the height, in pixels, of the individual divs. Default 45.
-* 'time_spaced* : [Pro] Grid View: Enabled time spacing with background images. 0 or 1. Default 0.
+* *time_spaced* : [Pro] Grid View: Enabled time spacing with background images. 0 or 1. Default 0.
 * *weeks* : Number of weeks to display in calendar. For Pro 'calendar' view only. Default 4.
 * *previous_weeks* : Number of past weeks to display in calendar. For Pro 'calendar' view only. Default 1.
 
@@ -186,11 +186,11 @@ The following attributes are available for this shortcode:
 
 * *genres* : Genres to display (ID or slug). Separate multiple values with commas. Default empty (all)
 * *link_genres* : Link Genre titles to term pages. 0 or 1. Default 1.
-* *genre_desc' :  Display Genre term description. 0 or 1. Default 1.
+* *genre_desc* :  Display Genre term description. 0 or 1. Default 1.
 * *genre_images' : [Pro] Display Genre images. 0 or 1. Default 1.
 * *view* : Layout display view. 'list' or 'grid'. Default 'grid'.
-* *image_width' : [Pro] Set a width style in pixels for Genre images. Default is 100.
-* *hide_empty' : No output if no records to display for Genre. 0 or 1. Default 1.
+* *image_width* : [Pro] Set a width style in pixels for Genre images. Default is 100.
+* *hide_empty* : No output if no records to display for Genre. 0 or 1. Default 1.
 * *status* : Query for Show status. Default 'publish'.
 * *perpage* : Query for number of Shows. Default -1 (all)
 * *offset* : Query for Show offset. Default '' (no offset)
@@ -212,7 +212,7 @@ The following attributes are available for this shortcode:
 
 * *languages* : Genres to display (ID or slug). Separate multiple values with commas. Default empty (all)
 * *link_languages* : Link Genre titles to term pages. 0 or 1. Default 1.
-* *language_desc' :  Display Genre term description. 0 or 1. Default 1.
+* *language_desc* :  Display Genre term description. 0 or 1. Default 1.
 * *view* : Layout display view. 'list' or 'grid'. Default 'grid'.
 * *hide_empty' : No output if no records to display for Genre. 0 or 1. Default 1.
 * *status* : Query for Show status. Default 'publish'.
