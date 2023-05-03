@@ -75,7 +75,7 @@ The following attribute options are available for this shortcode:
 * *dynamic* : [Pro] Whether to dynamically reload on show changeover time. 0 or 1. Default 1.
 * *title* : The title you would like to appear over the Upcoming Shows.
 * *no_shows* : The text displayed when no upcoming show is scheduled. Default empty.
-* *hide_empty*: Hide the content of the widget/shortcode if there is no current show. 0 or 1. Default 0.
+* *hide_empty* : Hide the content of the widget/shortcode if there is no current show. 0 or 1. Default 0.
 * **Show Display Attributes**
 * *show_link* : Link the Show title to the Show's page. 0 or 1. Default is 0.
 * *title_position* : Relative to Avatar. 'above', 'below', 'left' or 'right'. Default is 'right'.

@@ -2,7 +2,7 @@
 
 /**
  * @package Radio Station
- * @version 2.5.0
+ * @version 2.5.1
  */
 /*
 
@@ -10,7 +10,7 @@ Plugin Name: Radio Station
 Plugin URI: https://radiostation.pro/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.5.0
+Version: 2.5.1
 Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
@@ -193,6 +193,17 @@ foreach ( $features as $feature ) {
 		include $filepath;
 	}
 }
+
+// --- Backwards Compatible Player ---
+// 2.5.1: add player backwards compatible functions
+add_action( 'plugins_loaded', 'radio_station_back_compat_player' );
+function radio_station_back_compat_player() {
+	$back_compat = apply_filters( 'radio_station_back_compat_player', true );
+	if ( $back_compat ) {
+		include RADIO_STATION_DIR . '/player/compat.php';
+	}
+}
+
 
 // ---------------------------
 // Plugin Options and Defaults

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 = 2.5.1 =
 * Fixed: Widget Countdown Timer Display Bug
+* Fixed: Pro Player Backwards Compatibility
 
 = 2.5.0 =
 * Added: Radio Station Blocks! (converted Widgets)
