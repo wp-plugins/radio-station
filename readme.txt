@@ -5,7 +5,7 @@ Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
 Tested up to: 6.2
-Stable tag: 2.5.1
+Stable tag: 2.5.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -399,6 +399,9 @@ We recommend you test these on a Staging site (or a development copy of your liv
 8. Show Conflict Display
 
 == Changelog ==
+
+= 2.5.2 =
+* Fixed: Bug retrieving show data for linked overrides
 
 = 2.5.1 =
 * Fixed: Widget Countdown Timer Display Bug
