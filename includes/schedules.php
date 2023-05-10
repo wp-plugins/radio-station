@@ -159,7 +159,8 @@ function radio_station_get_all_overrides( $start_date = false, $end_date = false
 			$linked_id = get_post_meta( $override_id, 'linked_show_id', true );
 			if ( $linked_id ) {
 				$override_data[$i]['linked_show'] = get_post( $linked_id );
-				$linked_fields = get_post_meta( $override['ID'], 'linked_show_fields', true );
+				// 2.5.2: fix to use override property not array key
+				$linked_fields = get_post_meta( $override_id, 'linked_show_fields', true );
 				if ( !isset( $linked_fields['show_title'] ) || !$linked_fields['show_title'] ) {
 					$data['title'] = $linked_show->post_title;
 				}
