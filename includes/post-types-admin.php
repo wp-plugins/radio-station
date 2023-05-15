@@ -3524,7 +3524,8 @@ function radio_station_schedule_override_metabox() {
 			if ( '' != $table['html'] ) {
 				// 2.5.0: use wp_kses on table output
 				$allowed = radio_station_allowed_html( 'content', 'settings' );
-				echo wp_kses( $table['list'], $allowed );
+				// 2.5.3: fix to incorrect table output key
+				echo wp_kses( $table['html'], $allowed );
 			}
 		echo '</div>' . "\n";
 
