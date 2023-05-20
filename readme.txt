@@ -400,6 +400,9 @@ We recommend you test these on a Staging site (or a development copy of your liv
 
 == Changelog ==
 
+= 2.5.3 =
+* Fixed: Bug in Admin Override Timeslot List
+
 = 2.5.2 =
 * Fixed: Bug retrieving show data for linked overrides
 
