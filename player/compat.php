@@ -90,7 +90,7 @@ if ( !function_exists( 'radio_player_script' ) ) {
 
 if ( !function_exists( 'radio_station_player_get_settings' ) ) {
 	function radio_station_player_get_settings() {
-		return radio_player_get_settings();
+		return radio_player_get_player_settings();
 	}
 }
 
