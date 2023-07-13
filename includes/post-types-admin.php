@@ -3731,13 +3731,13 @@ function radio_station_overrides_table( $post_id ) {
 			}
 		}
 		if ( isset( $_REQUEST['end_meridian'] ) ) {
-			$times['end_meridian'] = $_REQUEST['end_meridian'];
+			$times['end_meridian'] = sanitize_text_field( $_REQUEST['end_meridian'] );
 			if ( !in_array( $times['end_meridian'], array( '', 'am', 'pm' ) ) ) {
 				$times['end_meridian'] = '';
 			}
 		}
 		if ( isset( $_REQUEST['disabled'] ) ) {
-			$times['disabled'] = $_REQUEST['disabled'];
+			$times['disabled'] = sanitize_text_field( $_REQUEST['disabled'] );
 			if ( !in_array( $times['disabled'], array( '', 'yes' ) ) ) {
 				$times['disabled'] = '';
 			}

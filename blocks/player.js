@@ -4,22 +4,22 @@
 (() => {
 
 	/* --- Import Modules/Components --- */
-	const el = window.wp.element.createElement;
+	const rs_el = window.wp.element.createElement;
 	const { serverSideRender: ServerSideRender } = window.wp;
 	const { registerBlockType } = window.wp.blocks;
 	const { getBlockType } = window.wp.blocks;
 	const { InspectorControls } = window.wp.blockEditor;
 	const { Fragment } = window.wp.element;
 	const { BaseControl, TextControl, SelectControl, RadioControl, RangeControl, ToggleControl, ColorPicker, Dropdown, Button, Panel, PanelBody, PanelRow } = window.wp.components;
-	const { __, _e } = window.wp.i18n;
+	const { __ } = window.wp.i18n;
 	
 	/* --- Register Block --- */
 	if ( !getBlockType('radio-station/player' ) ) {
 	 registerBlockType( 'radio-station/player', {
 
 		/* --- Block Settings --- */
-		title: __( '[Radio Station] Stream Player', 'radio-station' ),
-		description: __( 'Audio stream player block.', 'radio-station' ),
+		title: rs__( '[Radio Station] Stream Player', 'radio-station' ),
+		description: rs__( 'Audio stream player block.', 'radio-station' ),
 		icon: 'controls-volumeon',
 		category: 'radio-station',
 		example: {},
@@ -48,17 +48,17 @@
 		edit: (props) => {
 			const atts = props.attributes;
 			return (
-				el( Fragment, {},
-					el( ServerSideRender, { block: 'radio-station/player', className: 'radio-player-block', attributes: atts } ),
-					el( InspectorControls, {},
-						el( Panel, {},
+				rs_el( Fragment, {},
+					rs_el( ServerSideRender, { block: 'radio-station/player', className: 'radio-player-block', attributes: atts } ),
+					rs_el( InspectorControls, {},
+						rs_el( Panel, {},
 							/* === Player Content === */
-							el( PanelBody, { title: __( 'Player Content', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
+							rs_el( PanelBody, { title: rs__( 'Player Content', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
 								/* --- Stream URL --- */
-								el( PanelRow, {},
-									el( TextControl, {
-										label: __( 'Stream URL', 'radio-station' ),
-										help: __( 'Leave blank to use default stream.', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( TextControl, {
+										label: rs__( 'Stream URL', 'radio-station' ),
+										help: rs__( 'Leave blank to use default stream.', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { url: value } );
 										},
@@ -66,10 +66,10 @@
 									})
 								),
 								/* --- Player Title Text --- */
-								el( PanelRow, {},
-									el( TextControl, {
-										label: __( 'Player Title Text', 'radio-station' ),
-										help: __( 'Empty for default, 0 for none.', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( TextControl, {
+										label: rs__( 'Player Title Text', 'radio-station' ),
+										help: rs__( 'Empty for default, 0 for none.', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { title: value } );
 										},
@@ -77,14 +77,14 @@
 									})
 								),
 								/* --- Image --- */
-								el( PanelRow, {},
-									el( SelectControl, {
-										label: __( 'Player Image', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( SelectControl, {
+										label: rs__( 'Player Image', 'radio-station' ),
 										options : [
-											{ label: __( 'Plugin Setting', 'radio-station' ), value: 'default' },
-											{ label: __( 'Display Station Image', 'radio-station' ), value: '1' },
-											{ label: __( 'Do Not Display Station Image', 'radio-station' ), value: '0' },
-											/* { label: __( 'Display Custom Image', 'radio-station' ), value: 'custom' }, */
+											{ label: rs__( 'Plugin Setting', 'radio-station' ), value: 'default' },
+											{ label: rs__( 'Display Station Image', 'radio-station' ), value: '1' },
+											{ label: rs__( 'Do Not Display Station Image', 'radio-station' ), value: '0' },
+											/* { label: rs__( 'Display Custom Image', 'radio-station' ), value: 'custom' }, */
 										],
 										onChange: ( value ) => {
 											props.setAttributes( { image: value } );
@@ -95,16 +95,16 @@
 							),
 
 							/* === Player Options === */
-							el( PanelBody, { title: __( 'Player Options', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
+							rs_el( PanelBody, { title: rs__( 'Player Options', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
 								/* --- Script --- */
-								el( PanelRow, {},
-									el( SelectControl, {
-										label: __( 'Player Script', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( SelectControl, {
+										label: rs__( 'Player Script', 'radio-station' ),
 										options : [
-											{ label: __( 'Plugin Setting', 'radio-station' ), value: 'default' },
-											{ label: __( 'Amplitude', 'radio-station' ), value: 'amplitude' },
-											{ label: __( 'Howler', 'radio-station' ), value: 'howler' },
-											{ label: __( 'jPlayer', 'radio-station' ), value: 'jplayer' },
+											{ label: rs__( 'Plugin Setting', 'radio-station' ), value: 'default' },
+											{ label: rs__( 'Amplitude', 'radio-station' ), value: 'amplitude' },
+											{ label: rs__( 'Howler', 'radio-station' ), value: 'howler' },
+											{ label: rs__( 'jPlayer', 'radio-station' ), value: 'jplayer' },
 										],
 										onChange: ( value ) => {
 											props.setAttributes( { script: value } );
@@ -113,9 +113,9 @@
 									})
 								),
 								/* --- Volume --- */
-								el( PanelRow, {},
-									el( RangeControl, {
-										label: __( 'Initial Volume', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( RangeControl, {
+										label: rs__( 'Initial Volume', 'radio-station' ),
 										min: 0,
 										max: 100,
 										onChange: ( value ) => {
@@ -125,16 +125,16 @@
 									})
 								),
 								/* --- Volume controls --- */
-								el( PanelRow, {},
-									el( SelectControl, {
+								rs_el( PanelRow, {},
+									rs_el( SelectControl, {
 										multiple: true,
-										label: __( 'Volume Controls', 'radio-station' ),
-										help: __( 'Ctrl-Click to select multiple controls.', 'radio-station' ),
+										label: rs__( 'Volume Controls', 'radio-station' ),
+										help: rs__( 'Ctrl-Click to select multiple controls.', 'radio-station' ),
 										options: [
-											{ label: __( 'Volume Slider', 'radio-station' ), value: 'slider' },
-											{ label: __( 'Up and Down Buttons', 'radio-station' ), value: 'updown' },
-											{ label: __( 'Mute Button', 'radio-station' ), value: 'mute' },
-											{ label: __( 'Maximize Button', 'radio-station' ), value: 'max' },
+											{ label: rs__( 'Volume Slider', 'radio-station' ), value: 'slider' },
+											{ label: rs__( 'Up and Down Buttons', 'radio-station' ), value: 'updown' },
+											{ label: rs__( 'Mute Button', 'radio-station' ), value: 'mute' },
+											{ label: rs__( 'Maximize Button', 'radio-station' ), value: 'max' },
 										],
 										onChange: ( value ) => {
 											props.setAttributes( { volumes: value } );
@@ -143,10 +143,10 @@
 									})
 								),
 								/* --- Default Player --- */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Use as Default Player', 'radio-station' ),
-										help: __( 'Make this the default player on this page.', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Use as Default Player', 'radio-station' ),
+										help: rs__( 'Make this the default player on this page.', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { default: value } );
 										},
@@ -154,15 +154,15 @@
 									})
 								),
 								/* --- Popup Player Button --- */
-								el( PanelRow, {},
+								rs_el( PanelRow, {},
 									( ( atts.pro ) && 
-										el( SelectControl, {
-											label: __( 'Popup Player', 'radio-station' ),
-											help: __( 'Enables button to open Player in separate window.', 'radio-station' ),
+										rs_el( SelectControl, {
+											label: rs__( 'Popup Player', 'radio-station' ),
+											help: rs__( 'Enables button to open Player in separate window.', 'radio-station' ),
 											options : [
-												{ label: __( 'Plugin Setting', 'radio-station' ), value: 'default' },
-												{ label: __( 'On', 'radio-station' ), value: 'on' },
-												{ label: __( 'Off', 'radio-station' ), value: 'off' },
+												{ label: rs__( 'Plugin Setting', 'radio-station' ), value: 'default' },
+												{ label: rs__( 'On', 'radio-station' ), value: 'on' },
+												{ label: rs__( 'Off', 'radio-station' ), value: 'off' },
 											],
 											onChange: ( value ) => {
 												props.setAttributes( { popup: value } );
@@ -170,23 +170,23 @@
 											value: atts.popup
 										})
 									), ( ( !atts.pro ) &&
-										el( BaseControl, {
-											label: __( 'Popup Player', 'radio-station' ),
-											help: __( 'Popup Player Button available in Pro.', 'radio-station' ),
+										rs_el( BaseControl, {
+											label: rs__( 'Popup Player', 'radio-station' ),
+											help: rs__( 'Popup Player Button available in Pro.', 'radio-station' ),
 										})
 									)
 								),
 							),
 
 							/* === Player Styles === */
-							el( PanelBody, { title: __( 'Player Design', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
+							rs_el( PanelBody, { title: rs__( 'Player Design', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
 								/* --- Player Layout --- */
-								el( PanelRow, {},
-									el( RadioControl, {
-										label: __( 'Player Layout', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( RadioControl, {
+										label: rs__( 'Player Layout', 'radio-station' ),
 										options : [
-											{ label: __( 'Vertical (Stacked)', 'radio-station' ), value: 'vertical' },
-											{ label: __( 'Horizontal (Inline)', 'radio-station' ), value: 'horizontal' },
+											{ label: rs__( 'Vertical (Stacked)', 'radio-station' ), value: 'vertical' },
+											{ label: rs__( 'Horizontal (Inline)', 'radio-station' ), value: 'horizontal' },
 										],
 										onChange: ( value ) => {
 											props.setAttributes( { layout: value } );
@@ -196,13 +196,13 @@
 								),
 								/* --- Player Theme --- */
 								( ( !atts.pro ) &&
-									el( PanelRow, {},
-										el( SelectControl, {
-											label: __( 'Player Theme', 'radio-station' ),
+									rs_el( PanelRow, {},
+										rs_el( SelectControl, {
+											label: rs__( 'Player Theme', 'radio-station' ),
 											options : [
-												{ label: __( 'Plugin Setting', 'radio-station' ), value: 'default' },
-												{ label: __( 'Light', 'radio-station' ), value: 'light' },
-												{ label: __( 'Dark', 'radio-station' ), value: 'dark' },
+												{ label: rs__( 'Plugin Setting', 'radio-station' ), value: 'default' },
+												{ label: rs__( 'Light', 'radio-station' ), value: 'light' },
+												{ label: rs__( 'Dark', 'radio-station' ), value: 'dark' },
 											],
 											onChange: ( value ) => {
 												props.setAttributes( { theme: value } );
@@ -213,23 +213,23 @@
 								),
 								/* [Pro] Extra Theme Color Options */
 								( ( atts.pro ) &&
-									el( PanelRow, {},
-										el( SelectControl, {
-											label: __( 'Player Theme', 'radio-station' ),
+									rs_el( PanelRow, {},
+										rs_el( SelectControl, {
+											label: rs__( 'Player Theme', 'radio-station' ),
 											options : [
-												{ label: __( 'Plugin Setting', 'radio-station' ), value: 'default' },
-												{ label: __( 'Light', 'radio-station' ), value: 'light' },
-												{ label: __( 'Dark', 'radio-station' ), value: 'dark' },
-												{ label: __( 'Red', 'radio-station' ), value: 'red' },
-												{ label: __( 'Orange', 'radio-station' ), value: 'orange' },
-												{ label: __( 'Yellow', 'radio-station' ), value: 'yellow' },
-												{ label: __( 'Light Green', 'radio-station' ), value: 'light-green' },
-												{ label: __( 'Green', 'radio-station' ), value: 'green' },
-												{ label: __( 'Cyan', 'radio-station' ), value: 'cyan' },
-												{ label: __( 'Light Blue', 'radio-station' ), value: 'light-blue' },
-												{ label: __( 'Blue', 'radio-station' ), value: 'blue' },
-												{ label: __( 'Purple', 'radio-station' ), value: 'purple' },
-												{ label: __( 'Magenta', 'radio-station' ), value: 'magenta' },
+												{ label: rs__( 'Plugin Setting', 'radio-station' ), value: 'default' },
+												{ label: rs__( 'Light', 'radio-station' ), value: 'light' },
+												{ label: rs__( 'Dark', 'radio-station' ), value: 'dark' },
+												{ label: rs__( 'Red', 'radio-station' ), value: 'red' },
+												{ label: rs__( 'Orange', 'radio-station' ), value: 'orange' },
+												{ label: rs__( 'Yellow', 'radio-station' ), value: 'yellow' },
+												{ label: rs__( 'Light Green', 'radio-station' ), value: 'light-green' },
+												{ label: rs__( 'Green', 'radio-station' ), value: 'green' },
+												{ label: rs__( 'Cyan', 'radio-station' ), value: 'cyan' },
+												{ label: rs__( 'Light Blue', 'radio-station' ), value: 'light-blue' },
+												{ label: rs__( 'Blue', 'radio-station' ), value: 'blue' },
+												{ label: rs__( 'Purple', 'radio-station' ), value: 'purple' },
+												{ label: rs__( 'Magenta', 'radio-station' ), value: 'magenta' },
 											],
 											onChange: ( value ) => {
 												props.setAttributes( { theme: value } );
@@ -239,14 +239,14 @@
 									)
 								),
 								/* --- Player Buttons --- */
-								el( PanelRow, {},
-									el( SelectControl, {
-										label: __( 'Player Buttons', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( SelectControl, {
+										label: rs__( 'Player Buttons', 'radio-station' ),
 										options : [
-											{ label: __( 'Plugin Setting', 'radio-station' ), value: 'default' },
-											{ label: __( 'Circular', 'radio-station' ), value: 'circular' },
-											{ label: __( 'Rounded', 'radio-station' ), value: 'rounded' },
-											{ label: __( 'Square', 'radio-station' ), value: 'square' },
+											{ label: rs__( 'Plugin Setting', 'radio-station' ), value: 'default' },
+											{ label: rs__( 'Circular', 'radio-station' ), value: 'circular' },
+											{ label: rs__( 'Rounded', 'radio-station' ), value: 'rounded' },
+											{ label: rs__( 'Square', 'radio-station' ), value: 'square' },
 										],
 										onChange: ( value ) => {
 											props.setAttributes( { buttons: value } );
@@ -258,17 +258,17 @@
 							
 							/* === [Pro] Player Colors === */
 							( ( atts.pro ) &&
-								el( PanelBody, { title: __( 'Player Colors', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
+								rs_el( PanelBody, { title: rs__( 'Player Colors', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
 								
 									/* --- Text Color --- */
-									el( PanelRow, {},
-										el( BaseControl, {
-											label: __( 'Text Color', 'radio-station' ),
+									rs_el( PanelRow, {},
+										rs_el( BaseControl, {
+											label: rs__( 'Text Color', 'radio-station' ),
 											className: 'color-dropdown-control'
 										},
-											el( Dropdown, {
+											rs_el( Dropdown, {
 												renderContent: () => (
-													el( ColorPicker, {
+													rs_el( ColorPicker, {
 														disableAlpha: true,
 														defaultValue: '',
 														onChangeComplete: color => {
@@ -278,30 +278,30 @@
 													})
 												),
 												renderToggle: (args) => (
-													el( 'div', {className: 'color-dropdown-buttons'},
+													rs_el( 'div', {className: 'color-dropdown-buttons'},
 														el ( Button, {
 															className: 'color-dropdown-text_color',
 															onClick: args.onToggle,
 															variant: 'secondary',
 															'aria-expanded': args.isOpen,
 															'aria-haspopup': 'true',
-															'aria-label': __( 'Select Text Color', 'radio-station' )
+															'aria-label': rs__( 'Select Text Color', 'radio-station' )
 														},
-														( ('' != atts.text_color) ? atts.text_color : __( 'Select', 'radio-station' ) )
+														( ('' != atts.text_color) ? atts.text_color : rs__( 'Select', 'radio-station' ) )
 														),
-														el( Button, {
+														rs_el( Button, {
 															onClick: () => {
 																props.setAttributes( {text_color: ''} );
 																args.onClose();
 															},
 															isSmall: true,
 															variant: 'tertiary',
-															'aria-label': __( 'Clear Text Color Selection', 'radio-station' )
+															'aria-label': rs__( 'Clear Text Color Selection', 'radio-station' )
 														},
-														__( 'Clear', 'radio-station' )
+														rs__( 'Clear', 'radio-station' )
 														),
 														( ( '' != atts.text_color ) &&
-															el( 'style', {}, '.components-button.is-secondary.color-dropdown-text_color {background-color:'+atts.text_color+'}' )
+															rs_el( 'style', {}, '.components-button.is-secondary.color-dropdown-text_color {background-color:'+atts.text_color+'}' )
 														)
 													)
 												)
@@ -310,14 +310,14 @@
 									),
 
 									/* --- Background Color --- */
-									el( PanelRow, {},
-										el( BaseControl, {
-											label: __( 'Background Color', 'radio-station' ),
+									rs_el( PanelRow, {},
+										rs_el( BaseControl, {
+											label: rs__( 'Background Color', 'radio-station' ),
 											className: 'color-dropdown-control'
 										},
-											el( Dropdown, {
+											rs_el( Dropdown, {
 												renderContent: () => (
-													el( ColorPicker, {
+													rs_el( ColorPicker, {
 														defaultValue: '',
 														onChangeComplete: color => {
 															props.setAttributes( {background_color: color.hex} );
@@ -326,30 +326,30 @@
 													})
 												),
 												renderToggle: (args) => (
-													el( 'div', {className: 'color-dropdown-buttons'},
+													rs_el( 'div', {className: 'color-dropdown-buttons'},
 														el ( Button, {
 															className: 'color-dropdown-background_color',
 															onClick: args.onToggle,
 															variant: 'secondary',
 															'aria-expanded': args.isOpen,
 															'aria-haspopup': 'true',
-															'aria-label': __( 'Select Background Color', 'radio-station' )
+															'aria-label': rs__( 'Select Background Color', 'radio-station' )
 														},
-														( ('' != atts.background_color) ? atts.background_color : __( 'Select', 'radio-station' ) )
+														( ('' != atts.background_color) ? atts.background_color : rs__( 'Select', 'radio-station' ) )
 														),
-														el( Button, {
+														rs_el( Button, {
 															onClick: () => {
 																props.setAttributes( {background_color: ''} );
 																args.onClose();
 															},
 															isSmall: true,
 															variant: 'tertiary',
-															'aria-label': __( 'Clear Background Color Selection', 'radio-station' )
+															'aria-label': rs__( 'Clear Background Color Selection', 'radio-station' )
 														},
-														__( 'Clear', 'radio-station' )
+														rs__( 'Clear', 'radio-station' )
 														),
 														( ( '' != atts.background_color ) &&
-															el( 'style', {}, '.components-button.is-secondary.color-dropdown-background_color {background-color:'+atts.background_color+'}' )
+															rs_el( 'style', {}, '.components-button.is-secondary.color-dropdown-background_color {background-color:'+atts.background_color+'}' )
 														)
 													)
 												)
@@ -358,14 +358,14 @@
 									),
 									
 									/* --- Playing Color --- */
-									el( PanelRow, {},
-										el( BaseControl, {
-											label: __( 'Playing Highlight', 'radio-station' ),
+									rs_el( PanelRow, {},
+										rs_el( BaseControl, {
+											label: rs__( 'Playing Highlight', 'radio-station' ),
 											className: 'color-dropdown-control'
 										},
-											el( Dropdown, {
+											rs_el( Dropdown, {
 												renderContent: () => (
-													el( ColorPicker, {
+													rs_el( ColorPicker, {
 														defaultValue: '',
 														onChangeComplete: color => {
 															props.setAttributes( {playing_color: color.hex} );
@@ -374,30 +374,30 @@
 													})
 												),
 												renderToggle: (args) => (
-													el( 'div', {className: 'color-dropdown-buttons'},
+													rs_el( 'div', {className: 'color-dropdown-buttons'},
 														el ( Button, {
 															className: 'color-dropdown-playing_color',
 															onClick: args.onToggle,
 															variant: 'secondary',
 															'aria-expanded': args.isOpen,
 															'aria-haspopup': 'true',
-															'aria-label': __( 'Select Playing Highlight Color', 'radio-station' )
+															'aria-label': rs__( 'Select Playing Highlight Color', 'radio-station' )
 														},
-														( ('' != atts.playing_color) ? atts.playing_color : __( 'Select', 'radio-station' ) )
+														( ('' != atts.playing_color) ? atts.playing_color : rs__( 'Select', 'radio-station' ) )
 														),
-														el( Button, {
+														rs_el( Button, {
 															onClick: () => {
 																props.setAttributes( {playing_color: ''} );
 																args.onClose();
 															},
 															isSmall: true,
 															variant: 'tertiary',
-															'aria-label': __( 'Clear Playing Color Selection', 'radio-station' )
+															'aria-label': rs__( 'Clear Playing Color Selection', 'radio-station' )
 														},
-														__( 'Clear', 'radio-station' )
+														rs__( 'Clear', 'radio-station' )
 														),
 														( ( '' != atts.playing_color ) &&
-															el( 'style', {}, '.components-button.is-secondary.color-dropdown-playing_color {background-color:'+atts.playing_color+'}' )
+															rs_el( 'style', {}, '.components-button.is-secondary.color-dropdown-playing_color {background-color:'+atts.playing_color+'}' )
 														)
 													)
 												)
@@ -406,14 +406,14 @@
 									),
 									
 									/* --- Buttons Color --- */
-									el( PanelRow, {},
-										el( BaseControl, {
-											label: __( 'Buttons Highlight', 'radio-station' ),
+									rs_el( PanelRow, {},
+										rs_el( BaseControl, {
+											label: rs__( 'Buttons Highlight', 'radio-station' ),
 											className: 'color-dropdown-control'
 										},
-											el( Dropdown, {
+											rs_el( Dropdown, {
 												renderContent: () => (
-													el( ColorPicker, {
+													rs_el( ColorPicker, {
 														defaultValue: '',
 														onChangeComplete: color => {
 															props.setAttributes( {buttons_color: color.hex} );
@@ -422,30 +422,30 @@
 													})
 												),
 												renderToggle: (args) => (
-													el( 'div', {className: 'color-dropdown-buttons'},
+													rs_el( 'div', {className: 'color-dropdown-buttons'},
 														el ( Button, {
 															className: 'color-dropdown-buttons_color',
 															onClick: args.onToggle,
 															variant: 'secondary',
 															'aria-expanded': args.isOpen,
 															'aria-haspopup': 'true',
-															'aria-label': __( 'Select Button Highlight Color', 'radio-station' )
+															'aria-label': rs__( 'Select Button Highlight Color', 'radio-station' )
 														},
-														( ('' != atts.buttons_color) ? atts.buttons_color : __( 'Select', 'radio-station' ) )
+														( ('' != atts.buttons_color) ? atts.buttons_color : rs__( 'Select', 'radio-station' ) )
 														),
-														el( Button, {
+														rs_el( Button, {
 															onClick: () => {
 																props.setAttributes( {buttons_color: ''} );
 																args.onClose();
 															},
 															isSmall: true,
 															variant: 'tertiary',
-															'aria-label': __( 'Clear Button Highlight Color Selection', 'radio-station' )
+															'aria-label': rs__( 'Clear Button Highlight Color Selection', 'radio-station' )
 														},
-														__( 'Clear', 'radio-station' )
+														rs__( 'Clear', 'radio-station' )
 														),
 														( ( '' != atts.buttons_color ) &&
-															el( 'style', {}, '.components-button.is-secondary.color-dropdown-buttons_color {background-color:'+atts.buttons_color+'}' )
+															rs_el( 'style', {}, '.components-button.is-secondary.color-dropdown-buttons_color {background-color:'+atts.buttons_color+'}' )
 														)
 													)
 												)
@@ -454,14 +454,14 @@
 									),
 									
 									/* --- Track Color --- */
-									el( PanelRow, {},
-										el( BaseControl, {
-											label: __( 'Volume Track', 'radio-station' ),
+									rs_el( PanelRow, {},
+										rs_el( BaseControl, {
+											label: rs__( 'Volume Track', 'radio-station' ),
 											className: 'color-dropdown-control'
 										},
-											el( Dropdown, {
+											rs_el( Dropdown, {
 												renderContent: () => (
-													el( ColorPicker, {
+													rs_el( ColorPicker, {
 														defaultValue: '',
 														onChangeComplete: color => {
 															props.setAttributes( {track_color: color.hex} );
@@ -470,30 +470,30 @@
 													})
 												),
 												renderToggle: (args) => (
-													el( 'div', {className: 'color-dropdown-buttons'},
+													rs_el( 'div', {className: 'color-dropdown-buttons'},
 														el ( Button, {
 															className: 'color-dropdown-track_color',
 															onClick: args.onToggle,
 															variant: 'secondary',
 															'aria-expanded': args.isOpen,
 															'aria-haspopup': 'true',
-															'aria-label': __( 'Select Volume Track Color', 'radio-station' )
+															'aria-label': rs__( 'Select Volume Track Color', 'radio-station' )
 														},
-														( ('' != atts.track_color) ? atts.track_color : __( 'Select', 'radio-station' ) )
+														( ('' != atts.track_color) ? atts.track_color : rs__( 'Select', 'radio-station' ) )
 														),
-														el( Button, {
+														rs_el( Button, {
 															onClick: () => {
 																props.setAttributes( {track_color: ''} );
 																args.onClose();
 															},
 															isSmall: true,
 															variant: 'tertiary',
-															'aria-label': __( 'Clear Volume Track Color Selection', 'radio-station' )
+															'aria-label': rs__( 'Clear Volume Track Color Selection', 'radio-station' )
 														},
-														__( 'Clear', 'radio-station' )
+														rs__( 'Clear', 'radio-station' )
 														),
 														( ( '' != atts.track_color ) &&
-															el( 'style', {}, '.components-button.is-secondary.color-dropdown-track_color {background-color:'+atts.track_color+'}' )
+															rs_el( 'style', {}, '.components-button.is-secondary.color-dropdown-track_color {background-color:'+atts.track_color+'}' )
 														)
 													)
 												)
@@ -502,14 +502,14 @@
 									),
 									
 									/* --- Thumb Color --- */
-									el( PanelRow, {},
-										el( BaseControl, {
-											label: __( 'Volume Thumb', 'radio-station' ),
+									rs_el( PanelRow, {},
+										rs_el( BaseControl, {
+											label: rs__( 'Volume Thumb', 'radio-station' ),
 											className: 'color-dropdown-control'
 										},
-											el( Dropdown, {
+											rs_el( Dropdown, {
 												renderContent: () => (
-													el( ColorPicker, {
+													rs_el( ColorPicker, {
 														defaultValue: '',
 														onChangeComplete: color => {
 															props.setAttributes( {thumb_color: color.hex} );
@@ -518,30 +518,30 @@
 													})
 												),
 												renderToggle: (args) => (
-													el( 'div', {className: 'color-dropdown-buttons'},
+													rs_el( 'div', {className: 'color-dropdown-buttons'},
 														el ( Button, {
 															className: 'color-dropdown-thumb_color',
 															onClick: args.onToggle,
 															variant: 'secondary',
 															'aria-expanded': args.isOpen,
 															'aria-haspopup': 'true',
-															'aria-label': __( 'Select Volume Thumb Color', 'radio-station' )
+															'aria-label': rs__( 'Select Volume Thumb Color', 'radio-station' )
 														},
-														( ('' != atts.thumb_color) ? atts.thumb_color : __( 'Select', 'radio-station' ) )
+														( ('' != atts.thumb_color) ? atts.thumb_color : rs__( 'Select', 'radio-station' ) )
 														),
-														el( Button, {
+														rs_el( Button, {
 															onClick: () => {
 																props.setAttributes( {thumb_color: ''} );
 																args.onClose();
 															},
 															isSmall: true,
 															variant: 'tertiary',
-															'aria-label': __( 'Clear Volume Thumb Color Selection', 'radio-station' )
+															'aria-label': rs__( 'Clear Volume Thumb Color Selection', 'radio-station' )
 														},
-														__( 'Clear', 'radio-station' )
+														rs__( 'Clear', 'radio-station' )
 														),
 														( ( '' != atts.thumb_color ) &&
-															el( 'style', {}, '.components-button.is-secondary.color-dropdown-thumb_color {background-color:'+atts.thumb_color+'}' )
+															rs_el( 'style', {}, '.components-button.is-secondary.color-dropdown-thumb_color {background-color:'+atts.thumb_color+'}' )
 														)
 													)
 												)
@@ -554,15 +554,15 @@
 
 							/* === Advanced Options === */
 							( ( atts.pro ) &&
-								el( PanelBody, { title: __( 'Advanced Options', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
+								rs_el( PanelBody, { title: rs__( 'Advanced Options', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
 									/* --- Current Show Display --- */
-									el( PanelRow, {},
-										el( SelectControl, {
-											label: __( 'Current Show Display', 'radio-station' ),
+									rs_el( PanelRow, {},
+										rs_el( SelectControl, {
+											label: rs__( 'Current Show Display', 'radio-station' ),
 											options : [
-												{ label: __( 'Plugin Setting', 'radio-station' ), value: 'default' },
-												{ label: __( 'On', 'radio-station' ), value: 'on' },
-												{ label: __( 'Off', 'radio-station' ), value: 'off' },
+												{ label: rs__( 'Plugin Setting', 'radio-station' ), value: 'default' },
+												{ label: rs__( 'On', 'radio-station' ), value: 'on' },
+												{ label: rs__( 'Off', 'radio-station' ), value: 'off' },
 											],
 											onChange: ( value ) => {
 												props.setAttributes( { currentshow: value } );
@@ -571,13 +571,13 @@
 										})
 									),
 									/* ---Now Playing Display --- */
-									el( PanelRow, {},
-										el( SelectControl, {
-											label: __( 'Now Playing Track Display', 'radio-station' ),
+									rs_el( PanelRow, {},
+										rs_el( SelectControl, {
+											label: rs__( 'Now Playing Track Display', 'radio-station' ),
 											options : [
-												{ label: __( 'Plugin Setting', 'radio-station' ), value: 'default' },
-												{ label: __( 'On', 'radio-station' ), value: 'on' },
-												{ label: __( 'Off', 'radio-station' ), value: 'off' },
+												{ label: rs__( 'Plugin Setting', 'radio-station' ), value: 'default' },
+												{ label: rs__( 'On', 'radio-station' ), value: 'on' },
+												{ label: rs__( 'Off', 'radio-station' ), value: 'off' },
 											],
 											onChange: ( value ) => {
 												props.setAttributes( { nowplaying: value } );
@@ -586,16 +586,16 @@
 										})
 									),
 									/* --- Track Animation --- */
-									el( PanelRow, {},
-										el( SelectControl, {
-											label: __( 'Track Animation', 'radio-station' ),
+									rs_el( PanelRow, {},
+										rs_el( SelectControl, {
+											label: rs__( 'Track Animation', 'radio-station' ),
 											options : [
-												{ label: __( 'Plugin Setting', 'radio-station' ), value: 'default' },
-												{ label: __( 'No Animation', 'radio-station' ), value: 'none' },
-												{ label: __( 'Left to Right Ticker', 'radio-station' ), value: 'lefttoright' },
-												{ label: __( 'Right to Left Ticker', 'radio-station' ), value: 'righttoleft' },
-												{ label: __( 'Back and Forth', 'radio-station' ), value: 'backandforth' },
-												{ label: __( '', 'radio-station' ), value: 'off' },
+												{ label: rs__( 'Plugin Setting', 'radio-station' ), value: 'default' },
+												{ label: rs__( 'No Animation', 'radio-station' ), value: 'none' },
+												{ label: rs__( 'Left to Right Ticker', 'radio-station' ), value: 'lefttoright' },
+												{ label: rs__( 'Right to Left Ticker', 'radio-station' ), value: 'righttoleft' },
+												{ label: rs__( 'Back and Forth', 'radio-station' ), value: 'backandforth' },
+												{ label: rs__( '', 'radio-station' ), value: 'off' },
 											],
 											onChange: ( value ) => {
 												props.setAttributes( { animation: value } );
@@ -604,10 +604,10 @@
 										})
 									),
 									/* --- Metadata URL --- */
-									el( PanelRow, {},
-										el( TextControl, {
-											label: __( 'Metadata Source URL', 'radio-station' ),
-											help: __( 'Defaults to Stream URL.', 'radio-station' ),
+									rs_el( PanelRow, {},
+										rs_el( TextControl, {
+											label: rs__( 'Metadata Source URL', 'radio-station' ),
+											help: rs__( 'Defaults to Stream URL.', 'radio-station' ),
 											onChange: ( value ) => {
 												props.setAttributes( { metadata: value } );
 											},

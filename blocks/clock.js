@@ -3,19 +3,19 @@
  */
 (() => {
 
-	const el = window.wp.element.createElement;
+	const rs_el = window.wp.element.createElement;
 	const { serverSideRender: ServerSideRender } = window.wp;
 	const { registerBlockType } = window.wp.blocks;
 	const { InspectorControls } = window.wp.blockEditor;
 	const { Fragment } = window.wp.element;
 	const { BaseControl, TextControl, SelectControl, RadioControl, RangeControl, ToggleControl, Panel, PanelBody, PanelRow } = window.wp.components;
-	const { __, _e } = window.wp.i18n;
+	const { rs__ } = window.wp.i18n;
 
 	registerBlockType( 'radio-station/clock', {
 
 		/* --- Block Settings --- */
 		title: '[Radio Station] Radio Clock',
-		description: __( 'Radio Station Clock time display.', 'radio-station' ),
+		description: rs__( 'Radio Station Clock time display.', 'radio-station' ),
 		icon: 'clock',
 		category: 'radio-station',
 		example: {},
@@ -39,19 +39,19 @@
 		edit: (props) => {
 			const atts = props.attributes;
 			return (
-				el( Fragment, {},
-					el( ServerSideRender, { block: 'radio-station/clock', className: 'radio-clock-block', attributes: atts } ),
-					el( InspectorControls, {},
+				rs_el( Fragment, {},
+					rs_el( ServerSideRender, { block: 'radio-station/clock', className: 'radio-clock-block', attributes: atts } ),
+					rs_el( InspectorControls, {},
 						el ( Panel, {},
-							el( PanelBody, { title: __( 'Clock Display Options', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
+							rs_el( PanelBody, { title: rs__( 'Clock Display Options', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
 								/* Time Display Format */
-								el( PanelRow, {},
-									el( SelectControl, {
-										label: __( 'Time Display Format', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( SelectControl, {
+										label: rs__( 'Time Display Format', 'radio-station' ),
 										options: [
-											{ label: __( 'Plugin Setting', 'radio-station' ), value: '' },
-											{ label: __( '12 Hour', 'radio-station' ), value: '12' },
-											{ label: __( '24 Hour', 'radio-station' ), value: '24' },
+											{ label: rs__( 'Plugin Setting', 'radio-station' ), value: '' },
+											{ label: rs__( '12 Hour', 'radio-station' ), value: '12' },
+											{ label: rs__( '24 Hour', 'radio-station' ), value: '24' },
 										],
 										onChange: ( value ) => {
 											props.setAttributes( { time_format: value } );
@@ -60,13 +60,13 @@
 									})
 								),
 								/* Day Display Format */
-								el( PanelRow, {},
-									el( SelectControl, {
-										label: __( 'Day Display Format', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( SelectControl, {
+										label: rs__( 'Day Display Format', 'radio-station' ),
 										options: [
-											{ label: __( 'Full', 'radio-station' ), value: 'full' },
-											{ label: __( 'Short', 'radio-station' ), value: 'short' },
-											{ label: __( 'None', 'radio-station' ), value: 'none' },
+											{ label: rs__( 'Full', 'radio-station' ), value: 'full' },
+											{ label: rs__( 'Short', 'radio-station' ), value: 'short' },
+											{ label: rs__( 'None', 'radio-station' ), value: 'none' },
 										],
 										onChange: ( value ) => {
 											props.setAttributes( { day: value } );
@@ -75,9 +75,9 @@
 									})
 								),
 								/* Date Display */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Display Date?', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Display Date?', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { date: value } );
 										},
@@ -85,13 +85,13 @@
 									})
 								),
 								/* Month Display Format */
-								el( PanelRow, {},
-									el( SelectControl, {
+								rs_el( PanelRow, {},
+									rs_el( SelectControl, {
 										label: 'Month Display Format',
 										options: [
-											{ label: __( 'Full', 'radio-station' ), value: 'full' },
-											{ label: __( 'Short', 'radio-station' ), value: 'short' },
-											{ label: __( 'None', 'radio-station' ), value: 'none' },
+											{ label: rs__( 'Full', 'radio-station' ), value: 'full' },
+											{ label: rs__( 'Short', 'radio-station' ), value: 'short' },
+											{ label: rs__( 'None', 'radio-station' ), value: 'none' },
 										],
 										onChange: ( value ) => {
 											props.setAttributes( { month: value } );
@@ -100,9 +100,9 @@
 									})
 								),
 								/* Timezone Display */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Display Timezone?', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Display Timezone?', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { zone: value } );
 										},
@@ -110,9 +110,9 @@
 									})
 								),
 								/* Seconds Display */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Display Seconds?', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Display Seconds?', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { seconds: value } );
 										},

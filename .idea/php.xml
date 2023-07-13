@@ -3,6 +3,9 @@
   <component name="PhpIncludePathManager">
     <include_path>
       <path value="C:/!WP/InstantWP_4.5/iwpserver/htdocs/wordpress" />
+      <path value="$PROJECT_DIR$/vendor/composer" />
+      <path value="$PROJECT_DIR$/vendor/symfony/yaml" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
     </include_path>
   </component>
 </project>

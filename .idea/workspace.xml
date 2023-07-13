@@ -7,7 +7,8 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ComposerSettings">
+  <component name="ComposerSettings" synchronizationState="SYNCHRONIZE">
+    <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
     <execution>
       <executable />
     </execution>
@@ -15,6 +16,9 @@
   <component name="PhpWorkspaceProjectConfiguration">
     <include_path>
       <path value="C:/!WP/InstantWP_4.5/iwpserver/htdocs/wordpress" />
+      <path value="$PROJECT_DIR$/vendor/composer" />
+      <path value="$PROJECT_DIR$/vendor/symfony/yaml" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
     </include_path>
   </component>
   <component name="ProjectId" id="2BsJZ5XXJG3NAgUBzN6c74lrXIr" />
@@ -27,7 +31,25 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -41,6 +63,7 @@
       <updated>1657688918584</updated>
       <workItem from="1657688961259" duration="3311000" />
       <workItem from="1657932585003" duration="42000" />
+      <workItem from="1688690653745" duration="649000" />
     </task>
     <servers />
   </component>
@@ -48,22 +71,10 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="458" y="0" key="#PHP" timestamp="1657689794884">
-      <screen x="218" y="0" width="1062" height="720" />
+    <state x="809" y="362" key="com.intellij.ide.util.TipDialog" timestamp="1688690669692">
+      <screen x="281" y="0" width="1639" height="1080" />
     </state>
-    <state x="458" y="0" key="#PHP/218.0.1062.720@218.0.1062.720" timestamp="1657689794884" />
-    <state x="588" y="285" key="#WordPress" timestamp="1657689783597">
-      <screen x="218" y="0" width="1062" height="720" />
-    </state>
-    <state x="588" y="285" key="#WordPress/218.0.1062.720@218.0.1062.720" timestamp="1657689783597" />
-    <state x="508" y="230" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1657697287447">
-      <screen x="218" y="0" width="1062" height="720" />
-    </state>
-    <state x="508" y="230" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/218.0.1062.720@218.0.1062.720" timestamp="1657697287447" />
-    <state x="445" y="183" key="com.intellij.ide.util.TipDialog" timestamp="1657932624842">
-      <screen x="218" y="0" width="1062" height="720" />
-    </state>
-    <state x="445" y="183" key="com.intellij.ide.util.TipDialog/218.0.1062.720@218.0.1062.720" timestamp="1657932624842" />
+    <state x="809" y="362" key="com.intellij.ide.util.TipDialog/281.0.1639.1080@281.0.1639.1080" timestamp="1688690669692" />
   </component>
   <component name="WordPressConfiguration" enabled="true">
     <wordpressPath>C:\!WP\InstantWP_4.5\iwpserver\htdocs\wordpress</wordpressPath>

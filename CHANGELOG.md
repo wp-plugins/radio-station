@@ -7,6 +7,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+= 2.5.5 =
+* Fixed: Prefix Block element JS constant to prevent conflict (EventOn)
+
+= 2.5.4 =
+* Updated: Freemius SDK (2.5.9)
+* Fixed: Missing player back-compat arguments
+
 = 2.5.3 =
 * Fixed: Bug in Admin Override Timeslot List
 

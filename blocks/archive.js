@@ -3,32 +3,32 @@
  */
 (() => {
 
-	const el = window.wp.element.createElement;
+	const rs_el = window.wp.element.createElement;
 	const { serverSideRender: ServerSideRender } = window.wp;
 	const { registerBlockType } = window.wp.blocks;
 	const { InspectorControls } = window.wp.blockEditor;
 	const { Fragment } = window.wp.element;
 	const { BaseControl, TextControl, SelectControl, RadioControl, RangeControl, ToggleControl, Panel, PanelBody, PanelRow } = window.wp.components;
-	const { __, _e } = window.wp.i18n;
+	const { rs__ } = window.wp.i18n;
 
 	archive_options = [
-		{ label: __( 'Shows', 'radio-station' ), value: 'shows' },
-		{ label: __( 'Overrides', 'radio-station' ), value: 'overrides' },
-		{ label: __( 'Playlists', 'radio-station' ), value: 'playlists' },
-		{ label: __( 'Shows by Genre', 'radio-station' ), value: 'genres' },
-		{ label: __( 'Shows by Language', 'radio-station' ), value: 'languages' },
+		{ label: rs__( 'Shows', 'radio-station' ), value: 'shows' },
+		{ label: rs__( 'Overrides', 'radio-station' ), value: 'overrides' },
+		{ label: rs__( 'Playlists', 'radio-station' ), value: 'playlists' },
+		{ label: rs__( 'Shows by Genre', 'radio-station' ), value: 'genres' },
+		{ label: rs__( 'Shows by Language', 'radio-station' ), value: 'languages' },
 	];
 	pro_archive_options = archive_options;
-	pro_archive_options[5] = { label: __( 'Episodes', 'radio-station' ), value: 'episodes' };
-	pro_archive_options[6] = { label: __( 'Hosts', 'radio-station' ), value: 'hosts' };
-	pro_archive_options[7] = { label: __( 'Producers', 'radio-station' ), value: 'producers' };
-	/* pro_archive_options[8] = { label: __( 'Team', 'radio-station' ), value: 'team' }; */
+	pro_archive_options[5] = { label: rs__( 'Episodes', 'radio-station' ), value: 'episodes' };
+	pro_archive_options[6] = { label: rs__( 'Hosts', 'radio-station' ), value: 'hosts' };
+	pro_archive_options[7] = { label: rs__( 'Producers', 'radio-station' ), value: 'producers' };
+	/* pro_archive_options[8] = { label: rs__( 'Team', 'radio-station' ), value: 'team' }; */
 			
 	registerBlockType( 'radio-station/archive', {
 
 		/* --- Block Settings --- */
 		title: '[Radio Station] Archive List',
-		description: __( 'Archive list for Radio Station record types.', 'radio-station' ),
+		description: rs__( 'Archive list for Radio Station record types.', 'radio-station' ),
 		icon: 'media-audio',
 		category: 'radio-station',
 		example: {},
@@ -66,23 +66,23 @@
 			const atts = props.attributes;
 			if ( atts.pro ) {
 				archive_type_options = pro_archive_options;
-				archive_type_help = __( 'Which type of records to display.', 'radio-station' );
+				archive_type_help = rs__( 'Which type of records to display.', 'radio-station' );
 			} else {
 				archive_type_options = archive_options;
-				archive_type_help = __( 'Episodes, Hosts and Producer archives available in Pro version.', 'radio-station' );
+				archive_type_help = rs__( 'Episodes, Hosts and Producer archives available in Pro version.', 'radio-station' );
 			}
 
 			return (
-				el( Fragment, {},
-					el( ServerSideRender, { block: 'radio-station/archive', className: 'radio-archive-block', attributes: atts } ),
-					el( InspectorControls, {},
-						el( Panel, {},
+				rs_el( Fragment, {},
+					rs_el( ServerSideRender, { block: 'radio-station/archive', className: 'radio-archive-block', attributes: atts } ),
+					rs_el( InspectorControls, {},
+						rs_el( Panel, {},
 							/* === Archive List Details === */
-							el( PanelBody, { title: __( 'Archive List Details', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
+							rs_el( PanelBody, { title: rs__( 'Archive List Details', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
 								/* --- Archive Type --- */
-								el( PanelRow, {},
-									el( SelectControl, {
-										label: __( 'Archive Type', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( SelectControl, {
+										label: rs__( 'Archive Type', 'radio-station' ),
 										help: archive_type_help,
 										options: archive_type_options,
 										onChange: ( value ) => {
@@ -92,12 +92,12 @@
 									})
 								),
 								/* --- Archive View --- */
-								el( PanelRow, {},
-									el( SelectControl, {
-										label: __( 'Archive View', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( SelectControl, {
+										label: rs__( 'Archive View', 'radio-station' ),
 										options : [
-											{ label: __( 'List View', 'radio-station' ), value: 'list' },
-											{ label: __( 'Grid View', 'radio-station' ), value: 'grid' },
+											{ label: rs__( 'List View', 'radio-station' ), value: 'list' },
+											{ label: rs__( 'Grid View', 'radio-station' ), value: 'grid' },
 										],
 										onChange: ( value ) => {
 											props.setAttributes( { view: value } );
@@ -106,10 +106,10 @@
 									})
 								),
 								/* --- Per Page --- */
-								el( PanelRow, {},
-									el( RangeControl, {
-										label: __( 'Records Per Page', 'radio-station' ),
-										help: __( 'Use 0 for all records.', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( RangeControl, {
+										label: rs__( 'Records Per Page', 'radio-station' ),
+										help: rs__( 'Use 0 for all records.', 'radio-station' ),
 										min: 0,
 										max: 100,
 										onChange: ( value ) => {
@@ -119,9 +119,9 @@
 									})
 								),
 								/* --- Pagination --- */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Display Pagination?', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Display Pagination?', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { pagination: value } );
 										},
@@ -129,9 +129,9 @@
 									})
 								),
 								/* --- Hide if Empty --- */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Hide if Empty?', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Hide if Empty?', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { hide_empty: value } );
 										},
@@ -141,24 +141,24 @@
 							),
 
 							/* === Archive Record Query === */
-							el( PanelBody, { title: __( 'Archive Record Query', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
-								el( SelectControl, {
-									label: __( 'Order By', 'radio-station' ),
+							rs_el( PanelBody, { title: rs__( 'Archive Record Query', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
+								rs_el( SelectControl, {
+									label: rs__( 'Order By', 'radio-station' ),
 									options: [
-										{ label: __( 'Title', 'radio-station' ), value: 'title' },
-										{ label: __( 'Publish Date', 'radio-station' ), value: 'date' },
-										{ label: __( 'Modified Date', 'radio-station' ), value: 'modified' },
+										{ label: rs__( 'Title', 'radio-station' ), value: 'title' },
+										{ label: rs__( 'Publish Date', 'radio-station' ), value: 'date' },
+										{ label: rs__( 'Modified Date', 'radio-station' ), value: 'modified' },
 									],
 									onChange: ( value ) => {
 										props.setAttributes( { orderby: value } );
 									},
 									value: atts.orderby
 								}),
-								el( RadioControl, {
-									label: __( 'Order', 'radio-station' ),
+								rs_el( RadioControl, {
+									label: rs__( 'Order', 'radio-station' ),
 									options: [
-										{ label: __( 'Ascending', 'radio-station' ), value: 'ASC' },
-										{ label: __( 'Descending', 'radio-station' ), value: 'DESC' },
+										{ label: rs__( 'Ascending', 'radio-station' ), value: 'ASC' },
+										{ label: rs__( 'Descending', 'radio-station' ), value: 'DESC' },
 									],
 									onChange: ( value ) => {
 										props.setAttributes( { order: value } );
@@ -171,15 +171,15 @@
 							),
 
 							/* === Archive Record Display === */
-							el( PanelBody, { title: __( 'Archive Record Display', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
+							rs_el( PanelBody, { title: rs__( 'Archive Record Display', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
 								/* --- Time Format --- */
-								el( PanelRow, {},
-									el( SelectControl, {
-										label: __( 'Time Display Format', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( SelectControl, {
+										label: rs__( 'Time Display Format', 'radio-station' ),
 										options: [
-											{ label: __( 'Plugin Setting', 'radio-station' ), value: '' },
-											{ label: __( '12 Hour', 'radio-station' ), value: '12' },
-											{ label: __( '24 Hour', 'radio-station' ), value: '24' },
+											{ label: rs__( 'Plugin Setting', 'radio-station' ), value: '' },
+											{ label: rs__( '12 Hour', 'radio-station' ), value: '12' },
+											{ label: rs__( '24 Hour', 'radio-station' ), value: '24' },
 										],
 										onChange: ( value ) => {
 											props.setAttributes( { time_format: value } );
@@ -188,14 +188,14 @@
 									})
 								),
 								/* --- Description --- */
-								el( PanelRow, {},
-									el( SelectControl, {
-										label: __( 'Description Display Format', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( SelectControl, {
+										label: rs__( 'Description Display Format', 'radio-station' ),
 										options: [
-											{ label: __( 'View Default', 'radio-station' ), value: '' },
-											{ label: __( 'None', 'radio-station' ), value: 'none' },
-											{ label: __( 'Excerpt', 'radio-station' ), value: 'excerpt' },
-											{ label: __( 'Full', 'radio-station' ), value: 'full' },
+											{ label: rs__( 'View Default', 'radio-station' ), value: '' },
+											{ label: rs__( 'None', 'radio-station' ), value: 'none' },
+											{ label: rs__( 'Excerpt', 'radio-station' ), value: 'excerpt' },
+											{ label: rs__( 'Full', 'radio-station' ), value: 'full' },
 										],
 										onChange: ( value ) => {
 											props.setAttributes( { description: value } );
@@ -205,10 +205,10 @@
 								),
 								/* --- Image Display (conditional) --- */
 								( ( atts.archive_type == 'shows' || atts.archive_type == 'overrides' ) &&
-									el( PanelRow, { className: 'shows-only overrides-only' },
-										el( ToggleControl, {
-											label: __( 'Display Image?', 'radio-station' ),
-											help: __( 'This setting is for Shows and Overrides.', 'radio-station' ),
+									rs_el( PanelRow, { className: 'shows-only overrides-only' },
+										rs_el( ToggleControl, {
+											label: rs__( 'Display Image?', 'radio-station' ),
+											help: rs__( 'This setting is for Shows and Overrides.', 'radio-station' ),
 											onChange: ( value ) => {
 												props.setAttributes( { show_avatars: value } );
 											},
@@ -218,10 +218,10 @@
 								),
 								/* --- With Shifts Only (conditional) --- */
 								( ( atts.archive_type == 'shows' ) &&
-									el( PanelRow, { className: 'shows-only' },
-										el( ToggleControl, {
-											label: __( 'Only Shows with Shifts?', 'radio-station' ),
-											help: __( 'This setting is for Shows only.', 'radio-station' ),
+									rs_el( PanelRow, { className: 'shows-only' },
+										rs_el( ToggleControl, {
+											label: rs__( 'Only Shows with Shifts?', 'radio-station' ),
+											help: rs__( 'This setting is for Shows only.', 'radio-station' ),
 											onChange: ( value ) => {
 												props.setAttributes( { with_shifts: value } );
 											},
@@ -231,10 +231,10 @@
 								),
 								/* --- Override Dates (conditional) --- */
 								( ( atts.archive_type == 'overrides' ) &&
-									el( PanelRow, { className: 'overrides-only' },
-										el( ToggleControl, {
-											label: __( 'Display Override Dates?', 'radio-station' ),
-											help: __( 'This setting is for Overrides only.', 'radio-station' ),
+									rs_el( PanelRow, { className: 'overrides-only' },
+										rs_el( ToggleControl, {
+											label: rs__( 'Display Override Dates?', 'radio-station' ),
+											help: rs__( 'This setting is for Overrides only.', 'radio-station' ),
 											onChange: ( value ) => {
 												props.setAttributes( { show_dates: value } );
 											},
