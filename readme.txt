@@ -4,8 +4,8 @@ Contributors: tonyzeoli, majick
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
-Tested up to: 6.2
-Stable tag: 2.5.2
+Tested up to: 6.2.2
+Stable tag: 2.5.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -399,6 +399,17 @@ We recommend you test these on a Staging site (or a development copy of your liv
 8. Show Conflict Display
 
 == Changelog ==
+
+= 2.5.5 =
+* Updated: Freemius SDK (2.5.10)
+* Added: RSS Posts Feed: Related Show node
+* Added: RSS Show Feed: Host/Producer node
+* Fixed: Prefix Block element JS constant to prevent conflict (EventOn)
+* Fixed: RSS Posts Feed: filter by Show conflict
+
+= 2.5.4 =
+* Updated: Freemius SDK (2.5.9)
+* Fixed: Missing player back-compat arguments
 
 = 2.5.3 =
 * Fixed: Bug in Admin Override Timeslot List

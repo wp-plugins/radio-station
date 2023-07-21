@@ -3,13 +3,13 @@
  */
 (() => {
 
-	const el = window.wp.element.createElement;
+	const rs_el = window.wp.element.createElement;
 	const { serverSideRender: ServerSideRender } = window.wp;
 	const { registerBlockType } = window.wp.blocks;
 	const { InspectorControls } = window.wp.blockEditor;
 	const { Fragment } = window.wp.element;
 	const { BaseControl, TextControl, SelectControl, RadioControl, RangeControl, ToggleControl, Panel, PanelBody, PanelRow } = window.wp.components;
-	const { __, _e } = window.wp.i18n;
+	const { rs__ } = window.wp.i18n;
 
 	/* --- create image size options --- */
 	image_size_options = [];
@@ -22,7 +22,7 @@
 
 		/* --- Block Settings --- */
 		title: '[Radio Station] Current Show',
-		description: __( 'Radio Station current show block.', 'radio-station' ),
+		description: rs__( 'Radio Station current show block.', 'radio-station' ),
 		icon: 'controls-play',
 		category: 'radio-station',
 		example: {},
@@ -66,21 +66,21 @@
 		edit: (props) => {
 			const atts = props.attributes;
 			return (
-				el( Fragment, {},
-					el( ServerSideRender, { block: 'radio-station/current-show', className: 'radio-current-block', attributes: atts } ),
-					el( InspectorControls, {},
-						el( Panel, {},
+				rs_el( Fragment, {},
+					rs_el( ServerSideRender, { block: 'radio-station/current-show', className: 'radio-current-block', attributes: atts } ),
+					rs_el( InspectorControls, {},
+						rs_el( Panel, {},
 							
 							// === Loading Options === */
-							el( PanelBody, { title: __( 'Show Display Options', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
-								el( PanelRow, {},
-									el( SelectControl, {
-										label: __( 'AJAX Load Block', 'radio-station' ),
-										help: __( 'To bypass page caching.', 'radio-station' ),
+							rs_el( PanelBody, { title: rs__( 'Show Display Options', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
+								rs_el( PanelRow, {},
+									rs_el( SelectControl, {
+										label: rs__( 'AJAX Load Block', 'radio-station' ),
+										help: rs__( 'To bypass page caching.', 'radio-station' ),
 										options : [
-											{ label: __( 'Plugin Setting', 'radio-station' ), value: '' },
-											{ label: __( 'On', 'radio-station' ), value: 'on' },
-											{ label: __( 'Off', 'radio-station' ), value: 'off' },
+											{ label: rs__( 'Plugin Setting', 'radio-station' ), value: '' },
+											{ label: rs__( 'On', 'radio-station' ), value: 'on' },
+											{ label: rs__( 'Off', 'radio-station' ), value: 'off' },
 										],
 										onChange: ( value ) => {
 											props.setAttributes( { ajax: value } );
@@ -89,15 +89,15 @@
 									})
 								),
 								/* --- [Pro] Dynamic Reloading --- */
-								el( PanelRow, {},
+								rs_el( PanelRow, {},
 									( ( atts.pro ) && 
-										el( SelectControl, {
-											label: __( 'Dynamic Reloading', 'radio-station' ),
-											help: __( 'Reloads at show changeover times.', 'radio-station' ),
+										rs_el( SelectControl, {
+											label: rs__( 'Dynamic Reloading', 'radio-station' ),
+											help: rs__( 'Reloads at show changeover times.', 'radio-station' ),
 											options : [
-												{ label: __( 'Plugin Setting', 'radio-station' ), value: '' },
-												{ label: __( 'On', 'radio-station' ), value: 'on' },
-												{ label: __( 'Off', 'radio-station' ), value: 'off' },
+												{ label: rs__( 'Plugin Setting', 'radio-station' ), value: '' },
+												{ label: rs__( 'On', 'radio-station' ), value: 'on' },
+												{ label: rs__( 'Off', 'radio-station' ), value: 'off' },
 											],
 											onChange: ( value ) => {
 												props.setAttributes( { dynamic: value } );
@@ -105,17 +105,17 @@
 											value: atts.dynamic
 										})
 									), ( ( !atts.pro ) &&
-										el( BaseControl, {
-											label: __( 'Dynamic Reloading', 'radio-station' ),
-											help: __( 'Show changeover reloading available in Pro.', 'radio-station' ),
+										rs_el( BaseControl, {
+											label: rs__( 'Dynamic Reloading', 'radio-station' ),
+											help: rs__( 'Show changeover reloading available in Pro.', 'radio-station' ),
 										})
 									)
 								),
 								/* --- No Shows Text --- */
-								el( PanelRow, {},
-									el( TextControl, {
-										label: __( 'No Current Show Text', 'radio-station' ),
-										help: __( 'Blank for default. 0 for none.', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( TextControl, {
+										label: rs__( 'No Current Show Text', 'radio-station' ),
+										help: rs__( 'Blank for default. 0 for none.', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { no_shows: value } );
 										},
@@ -123,9 +123,9 @@
 									})
 								),
 								/* --- Hide if Empty --- */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Hide if Empty?', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Hide if Empty?', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { hide_empty: value } );
 										},
@@ -135,11 +135,11 @@
 							),
 
 							/* === Show Display Options === */
-							el( PanelBody, { title: __( 'Show Display Options', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
+							rs_el( PanelBody, { title: rs__( 'Show Display Options', 'radio-station' ), className: 'radio-block-controls', initialOpen: true },
 								/* --- Show Link --- */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Link to Show Page', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Link to Show Page', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { show_link: value } );
 										},
@@ -147,14 +147,14 @@
 									})
 								),
 								/* --- Title Position --- */
-								el( PanelRow, {},
-									el( SelectControl, {
-										label: __( 'Title Position', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( SelectControl, {
+										label: rs__( 'Title Position', 'radio-station' ),
 										options : [
-											{ label: __( 'Above Image', 'radio-station' ), value: 'above' },
-											{ label: __( 'Left of Image', 'radio-station' ), value: 'left' },
-											{ label: __( 'Right of Image', 'radio-station' ), value: 'right' },
-											{ label: __( 'Below Image', 'radio-station' ), value: 'below' },
+											{ label: rs__( 'Above Image', 'radio-station' ), value: 'above' },
+											{ label: rs__( 'Left of Image', 'radio-station' ), value: 'left' },
+											{ label: rs__( 'Right of Image', 'radio-station' ), value: 'right' },
+											{ label: rs__( 'Below Image', 'radio-station' ), value: 'below' },
 										],
 										onChange: ( value ) => {
 											props.setAttributes( { title_position: value } );
@@ -163,9 +163,9 @@
 									})
 								),
 								/* --- Show Avatar --- */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Display Show Image', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Display Show Image', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { show_avatar: value } );
 										},
@@ -173,9 +173,9 @@
 									})
 								),
 								/* --- Avatar Size --- */
-								el( PanelRow, {},
-									el( SelectControl, {
-										label: __( 'Image Size', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( SelectControl, {
+										label: rs__( 'Image Size', 'radio-station' ),
 										options: image_size_options,
 										onChange: ( value ) => {
 											props.setAttributes( { avatar_size: value } );
@@ -184,10 +184,10 @@
 									})
 								),
 								/* --- Avatar Width --- */
-								el( PanelRow, {},
-									el( RangeControl, {
-										label: __( 'Image Width Override', 'radio-station' ),
-										help: __( '0 for default.', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( RangeControl, {
+										label: rs__( 'Image Width Override', 'radio-station' ),
+										help: rs__( '0 for default.', 'radio-station' ),
 										min: 0,
 										max: 1000,
 										onChange: ( value ) => {
@@ -199,11 +199,11 @@
 							),
 
 							/* === Show Time Display Options === */
-							el( PanelBody, { title: __( 'Show Time Display Options', 'radio-station' ), className: 'radio-block-controls', initialOpen: false },
+							rs_el( PanelBody, { title: rs__( 'Show Time Display Options', 'radio-station' ), className: 'radio-block-controls', initialOpen: false },
 								/* --- Show Time --- */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Display Show Time', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Display Show Time', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { show_sched: value } );
 										},
@@ -211,9 +211,9 @@
 									})
 								),
 								/* --- Show Schedule --- */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Display All Show Times', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Display All Show Times', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { show_all_sched: value } );
 										},
@@ -221,9 +221,9 @@
 									})
 								),
 								/* --- Countdown --- */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Remaining Time Countdown', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Remaining Time Countdown', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { countdown: value } );
 										},
@@ -231,13 +231,13 @@
 									})
 								),
 								/* --- Time Format --- */
-								el( PanelRow, {},
-									el( SelectControl, {
-										label: __( 'Time Display Format', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( SelectControl, {
+										label: rs__( 'Time Display Format', 'radio-station' ),
 										options: [
-											{ label: __( 'Plugin Setting', 'radio-station' ), value: '' },
-											{ label: __( '12 Hour', 'radio-station' ), value: '12' },
-											{ label: __( '24 Hour', 'radio-station' ), value: '24' },
+											{ label: rs__( 'Plugin Setting', 'radio-station' ), value: '' },
+											{ label: rs__( '12 Hour', 'radio-station' ), value: '12' },
+											{ label: rs__( '24 Hour', 'radio-station' ), value: '24' },
 										],
 										onChange: ( value ) => {
 											props.setAttributes( { time_format: value } );
@@ -248,11 +248,11 @@
 							),				
 							
 							/* === Extra Displays Panel === */
-							el( PanelBody, { title: __( 'Extra Display Options', 'radio-station' ), className: 'radio-block-controls', initialOpen: false },
+							rs_el( PanelBody, { title: rs__( 'Extra Display Options', 'radio-station' ), className: 'radio-block-controls', initialOpen: false },
 								/* --- Display Hosts --- */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Display Show Hosts', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Display Show Hosts', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { display_hosts: value } );
 										},
@@ -260,9 +260,9 @@
 									})
 								),
 								/* --- Link Hosts --- */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Link to Host Profile', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Link to Host Profile', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { link_hosts: value } );
 										},
@@ -270,9 +270,9 @@
 									})
 								),
 								/* --- Display Producers --- */
-								/* el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Display Show Producers', 'radio-station' ),
+								/* rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Display Show Producers', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { display_hosts: value } );
 										},
@@ -280,9 +280,9 @@
 									})
 								), */
 								/* --- Link Producers --- */
-								/* el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Link to Producer Profile', 'radio-station' ),
+								/* rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Link to Producer Profile', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { link_producers: value } );
 										},
@@ -290,9 +290,9 @@
 									})
 								), */
 								/* --- Show Description Excerpt --- */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Show Description Excerpt', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Show Description Excerpt', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { show_desc: value } );
 										},
@@ -300,9 +300,9 @@
 									})
 								),
 								/* --- Show Playlist --- */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Display Show Playlist', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Display Show Playlist', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { show_playlist: value } );
 										},
@@ -310,9 +310,9 @@
 									})
 								),
 								/* --- Show Encore --- */
-								el( PanelRow, {},
-									el( ToggleControl, {
-										label: __( 'Display if Encore Airing', 'radio-station' ),
+								rs_el( PanelRow, {},
+									rs_el( ToggleControl, {
+										label: rs__( 'Display if Encore Airing', 'radio-station' ),
 										onChange: ( value ) => {
 											props.setAttributes( { show_encore: value } );
 										},

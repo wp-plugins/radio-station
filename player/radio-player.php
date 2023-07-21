@@ -1331,7 +1331,7 @@ function radio_player_core_scripts() {
 	// --- add radio player settings (once only) ---
 	// note: intentionally here after player scripts are set
 	if ( !isset( $radio_player['enqeued_player'] ) ) {
-		$js = radio_player_get_settings();
+		$js = radio_player_get_player_settings();
 		if ( '' != $js ) {
 			if ( function_exists( 'wp_add_inline_script' ) ) {
 				// 2.5.0: added check if script already done
@@ -1615,7 +1615,7 @@ function radio_player_script() {
 // -------------------
 // Get Player Settings
 // -------------------
-function radio_player_get_settings() {
+function radio_player_get_player_settings() {
 
 	global $radio_player;
 	

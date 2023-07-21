@@ -12,7 +12,8 @@ if ( !function_exists( 'radio_station_player_enqueue_styles' ) ) {
 
 if ( !function_exists( 'radio_station_player_output' ) ) {
 	function radio_station_player_output( $args = array(), $echo = false ) {
-		return radio_player_output( $player );
+		// 2.5.4: fix to arguments
+		return radio_player_output( $args, $echo );
 	}
 }
 
@@ -23,7 +24,8 @@ if ( !function_exists( 'radio_station_player_instance_args' ) ) {
 }
 
 if ( !function_exists( 'radio_station_player_shortcode' ) ) {
-	function radio_station_player_shortcode() {
+	// 2.5.4: fix for missing argument
+	function radio_station_player_shortcode( $atts ) {
 		return radio_player_shortcode( $atts );
 	}
 }
@@ -53,7 +55,8 @@ if ( !function_exists( 'radio_station_player_core_scripts' ) ) {
 }
 
 if ( !function_exists( 'radio_station_player_enqueue_script' ) ) {
-	function radio_station_player_enqueue_script() {
+	// 2.5.4: fix for missing argument
+	function radio_station_player_enqueue_script( $script ) {
 		radio_player_enqueue_script( $script );
 	}
 }
@@ -90,7 +93,7 @@ if ( !function_exists( 'radio_player_script' ) ) {
 
 if ( !function_exists( 'radio_station_player_get_settings' ) ) {
 	function radio_station_player_get_settings() {
-		return radio_player_get_settings();
+		return radio_player_get_player_settings();
 	}
 }
 
