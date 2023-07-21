@@ -9,7 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 = 2.5.5 =
 * Updated: Freemius SDK (2.5.10)
+* Added: RSS Posts Feed: Related Show node
+* Added: RSS Show Feed: Host/Producer node
 * Fixed: Prefix Block element JS constant to prevent conflict (EventOn)
+* Fixed: RSS Posts Feed: filter by Show conflict
 
 = 2.5.4 =
 * Updated: Freemius SDK (2.5.9)

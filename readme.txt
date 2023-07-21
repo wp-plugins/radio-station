@@ -402,7 +402,10 @@ We recommend you test these on a Staging site (or a development copy of your liv
 
 = 2.5.5 =
 * Updated: Freemius SDK (2.5.10)
+* Added: RSS Posts Feed: Related Show node
+* Added: RSS Show Feed: Host/Producer node
 * Fixed: Prefix Block element JS constant to prevent conflict (EventOn)
+* Fixed: RSS Posts Feed: filter by Show conflict
 
 = 2.5.4 =
 * Updated: Freemius SDK (2.5.9)
