@@ -399,7 +399,20 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array(), $att
 	// --- get posts from post IDs ---
 	$post_id_list = implode( ',', $post_ids );
 	$query = "SELECT " . $columns . " FROM " . $wpdb->prefix . "posts";
-	$query .= " WHERE ID IN(" . $post_id_list . ") AND post_status = 'publish' ORDER BY post_date DESC";
+	$query .= " WHERE ID IN(" . $post_id_list . ") AND post_status = 'publish'";
+	// 2.5.6: allow for alternative ordering attributes
+	if ( !isset( $atts['orderby'] ) || ( 'date' == $atts['orderby'] ) ) {
+		$query .= "ORDER BY post_date";
+	} elseif ( 'title' == $atts['orderby'] ) {
+		$query .= "ORDER BY post_title";
+	}
+	if ( !isset( $atts['order'] ) || ( 'DESC' == $atts['order'] ) ) {
+		$query .= " DESC";
+	} elseif ( 'ASC' == $atts['order'] ) {
+		$query .= " ASC";
+	}
+	// 2.5.6: add filter to allow for modification of query
+	$query = apply_filters( 'radio_station_show_' . $datatype . '_query', $query, $show_id, $args, $atts );
 	if ( $args['limit'] ) {
 		$query .= $wpdb->prepare( " LIMIT %d", $args['limit'] );
 	}
@@ -409,7 +422,7 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array(), $att
 	if ( RADIO_STATION_DEBUG ) {
 		echo '<span style="display:none;">' . esc_html( $datatype ) . ' for Show ' . esc_html( $show_id ) . ': ';
 		echo esc_html( print_r( $results, true ) );
-		echo 'Query: ' . $query . '</span>';
+		echo 'Query: ' . esc_html( $query ) . '</span>';
 	}
 
 	// 2.4.0.6: add processing of post excerpts

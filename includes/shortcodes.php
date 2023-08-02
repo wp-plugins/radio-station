@@ -1925,7 +1925,12 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 		'content'    => 'excerpt',
 		'thumbnails' => 1,
 		'pagination' => 1,
+		// 2.5.6: add ordering defaults
+		'orderby'    => 'date',
+		'order'      => 'DESC',
 	);
+	// 2.5.6: add filter for default attributes
+	$defaults = apply_filters( 'radio_station_show_list_defaults_atts', $defaults, $type );
 	$atts = shortcode_atts( $defaults, $atts, 'show-' . $type . '-list' );
 
 	// --- maybe get stored post data ---
@@ -1965,11 +1970,13 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 			$args['limit'] = $atts['limit'];
 		}
 		if ( 'post' == $type ) {
-			// TODO: add atts attribute filtering
+			// 2.5.5: added filter for show posts
 			$posts = radio_station_get_show_posts( $show_id, $args );
+			$posts = apply_filters( 'radio_station_get_show_posts', $posts, $show_id, $args, $atts );
 		} elseif ( RADIO_STATION_PLAYLIST_SLUG == $type ) {
-			// TODO: add atts attribute filtering
+			// 2.5.5: added filter for show playlists
 			$posts = radio_station_get_show_playlists( $show_id, $args );
+			$posts = apply_filters( 'radio_station_get_show_playlists', $posts, $show_id, $args, $atts );
 			$type = 'playlist';
 		} elseif ( RADIO_STATION_HOST_SLUG == $type ) {
 			// 2.5.0: added shortcode atts as fourth argument
@@ -2110,6 +2117,14 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 					$list .= esc_html( $post['post_title'] ) . "\n";
 				$list .= '</a>' . "\n";
 			$list .= '</div>' . "\n";
+
+			// --- post meta ---
+			// 2.5.6: add filtered post meta
+			$meta = apply_filters( 'radio_station_show_' . $type . '_shortcode_meta', '', $post, $type, $atts );
+			if ( '' != $meta ) {
+				$allowed = radio_station_allowed_html( 'content', 'meta' );
+				$list .= wp_kses( $meta, $allowed ) . "\n";
+			}
 
 			// --- post excerpt ---
 			$post_content = $post['post_content'];
