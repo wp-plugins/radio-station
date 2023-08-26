@@ -3057,27 +3057,41 @@ function radio_station_current_show() {
 	}
 
 	// --- output widget contents ---
+	$output = radio_station_current_show_shortcode( $atts );
 	echo '<div id="widget-contents">' . "\n";
-		echo radio_station_current_show_shortcode( $atts );
+		// phpcs:ignore WordPress.Security.OutputNotEscaped
+		echo $output;
 	echo '</div>' . "\n";
 
 	$js = '';
 	if ( isset( $atts['instance'] ) ) {
 
-		// --- send to parent window ---
-		$js .= "widget = document.getElementById('widget-contents').innerHTML;" . "\n";
-		$js .= "parent.document.getElementById('rs-current-show-" . esc_js( $atts['instance'] ) . "').innerHTML = widget;" . PHP_EOL;
+		// 2.5.6: maybe hide entire parent widget if empty
+		if ( $atts['hide_empty'] && ( '' == trim( $output ) ) ) {
 
-		// --- maybe restart countdowns ---
-		if ( $atts['countdown'] ) {
-			// 2.5.0: replace timeout with interval and function check
-			// $js .= "setTimeout(function() {parent.radio_countdown();}, 2000);" . "\n";
-			$js .= "countdown = setInterval(function() {" . "\n";
-				$js .= "if (typeof parent.radio_countdown == 'function') {" . "\n";
-					$js .= "parent.radio_countdown();" . "\n";
-					$js .= "clearInterval(countdown);" . "\n";
-				$js .= "}" . "\n";
-			$js .= "}, 1000);" . "\n";
+			$js .= "instance = parent.document.getElementById('current-show-widget-" . esc_js( $atts['instance'] ) . "');" . "\n";
+			$js .= "instance.style.display = 'none';" . "\n";
+
+		} else {
+
+			// --- send to parent window ---
+			// 2.5.6: ensure parent widget is displayed
+			$js .= "instance = parent.document.getElementById('current-show-widget-" . esc_js( $atts['instance'] ) . "');" . "\n";
+			$js .= "instance.style.display = '';" . "\n";
+			$js .= "widget = document.getElementById('widget-contents').innerHTML;" . "\n";
+			$js .= "parent.document.getElementById('rs-current-show-" . esc_js( $atts['instance'] ) . "').innerHTML = widget;" . PHP_EOL;
+
+			// --- maybe restart countdowns ---
+			if ( $atts['countdown'] ) {
+				// 2.5.0: replace timeout with interval and function check
+				// $js .= "setTimeout(function() {parent.radio_countdown();}, 2000);" . "\n";
+				$js .= "countdown = setInterval(function() {" . "\n";
+					$js .= "if (typeof parent.radio_countdown == 'function') {" . "\n";
+						$js .= "parent.radio_countdown();" . "\n";
+						$js .= "clearInterval(countdown);" . "\n";
+					$js .= "}" . "\n";
+				$js .= "}, 1000);" . "\n";
+			}
 		}
 
 	}
@@ -3719,29 +3733,42 @@ function radio_station_upcoming_shows() {
 	}
 
 	// --- output widget contents ---
+	$output = radio_station_upcoming_shows_shortcode( $atts );
 	echo '<div id="widget-contents">' . "\n";
-		echo radio_station_upcoming_shows_shortcode( $atts );
+		// phpcs:ignore WordPress.Security.OutputNotEscaped
+		echo $output;
 	echo '</div>' . "\n";
 
 	$js = '';
 	if ( isset( $atts['instance'] ) ) {
 
-		// --- send to parent window ---
-		$js .= "widget = document.getElementById('widget-contents').innerHTML;" . "\n";
-		$js .= "parent.document.getElementById('rs-upcoming-shows-" . esc_js( $atts['instance'] ) . "').innerHTML = widget;" . "\n";
+		// 2.6.5: maybe hide entire parent widget area if empty
+		if ( $atts['hide_empty'] && ( '' == trim( $output ) ) ) {
 
-		// --- restart countdowns ---
-		if ( $atts['countdown'] ) {
-			// 2.5.0: replace timeout with interval and function check
-			// $js .= "setTimeout(function() {parent.radio_countdown();}, 2000);" . "\n";
-			$js .= "countdown = setInterval(function() {" . "\n";
-				$js .= "if (typeof parent.radio_countdown == 'function') {" . "\n";
-					$js .= "parent.radio_countdown();" . "\n";
-					$js .= "clearInterval(countdown);" . "\n";
-				$js .= "}" . "\n";
-			$js .= "}, 1000);" . "\n";
+			$js .= "instance = parent.document.getElementById('upcoming-shows-widget-" . esc_js( $atts['instance'] ) . "');" . "\n";
+			$js .= "instance.style.display = 'none';" . "\n";
+			
+		} else {
+
+			// --- send to parent window ---
+			// 2.5.6: ensure parent widget is displayed
+			$js .= "instance = parent.document.getElementById('upcoming-shows-widget-" . esc_js( $atts['instance'] ) . "');" . "\n";
+			$js .= "instance.style.display = '';" . "\n";
+			$js .= "widget = document.getElementById('widget-contents').innerHTML;" . "\n";
+			$js .= "parent.document.getElementById('rs-upcoming-shows-" . esc_js( $atts['instance'] ) . "').innerHTML = widget;" . "\n";
+
+			// --- restart countdowns ---
+			if ( $atts['countdown'] ) {
+				// 2.5.0: replace timeout with interval and function check
+				// $js .= "setTimeout(function() {parent.radio_countdown();}, 2000);" . "\n";
+				$js .= "countdown = setInterval(function() {" . "\n";
+					$js .= "if (typeof parent.radio_countdown == 'function') {" . "\n";
+						$js .= "parent.radio_countdown();" . "\n";
+						$js .= "clearInterval(countdown);" . "\n";
+					$js .= "}" . "\n";
+				$js .= "}, 1000);" . "\n";
+			}
 		}
-
 	}
 
 	// --- filter load script ---
@@ -4228,27 +4255,41 @@ function radio_station_current_playlist() {
 	}
 
 	// --- output widget contents ---
+	$output = radio_station_current_playlist_shortcode( $atts );
 	echo '<div id="widget-contents">' . "\n";
-		echo radio_station_current_playlist_shortcode( $atts );
+		// phpcs:ignore WordPress.Security.OutputNotEscaped
+		echo $output;
 	echo '</div>' . "\n";
 
 	$js = '';
 	if ( isset( $atts['instance'] ) ) {
 
-		// --- send to parent window ---
-		$js .= "widget = document.getElementById('widget-contents').innerHTML;" . "\n";
-		$js .= "parent.document.getElementById('rs-current-playlist-" . esc_js( $atts['instance'] ) . "').innerHTML = widget;" . "\n";
+		// 2.6.5: maybe hide entire parent widget area if empty
+		if ( $atts['hide_empty'] && ( '' == trim( $output ) ) ) {
 
-		// --- restart countdowns ---
-		if ( $atts['countdown'] ) {
-			// 2.5.0: replace timeout with interval and function check
-			// $js .= "setTimeout(function() {parent.radio_countdown();}, 2000);" . "\n";
-			$js .= "countdown = setInterval(function() {" . "\n";
-				$js .= "if (typeof parent.radio_countdown == 'function') {" . "\n";
-					$js .= "parent.radio_countdown();" . "\n";
-					$js .= "clearInterval(countdown);" . "\n";
-				$js .= "}" . "\n";
-			$js .= "}, 1000);" . "\n";
+			$js .= "instance = parent.document.getElementById('current-playlist-widget-" . esc_js( $atts['instance'] ) . "');" . "\n";
+			$js .= "instance.style.display = 'none';" . "\n";
+
+		} else {
+
+			// --- send to parent window ---
+			// 2.5.6: ensure parent widget is displayed
+			$js .= "instance = parent.document.getElementById('current-playlist-widget-" . esc_js( $atts['instance'] ) . "');" . "\n";
+			$js .= "instance.style.display = '';" . "\n";
+			$js .= "widget = document.getElementById('widget-contents').innerHTML;" . "\n";
+			$js .= "parent.document.getElementById('rs-current-playlist-" . esc_js( $atts['instance'] ) . "').innerHTML = widget;" . "\n";
+
+			// --- restart countdowns ---
+			if ( $atts['countdown'] ) {
+				// 2.5.0: replace timeout with interval and function check
+				// $js .= "setTimeout(function() {parent.radio_countdown();}, 2000);" . "\n";
+				$js .= "countdown = setInterval(function() {" . "\n";
+					$js .= "if (typeof parent.radio_countdown == 'function') {" . "\n";
+						$js .= "parent.radio_countdown();" . "\n";
+						$js .= "clearInterval(countdown);" . "\n";
+					$js .= "}" . "\n";
+				$js .= "}, 1000);" . "\n";
+			}
 		}
 
 	}

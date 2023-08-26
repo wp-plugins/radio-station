@@ -605,7 +605,7 @@ function radio_station_register_moment() {
 	// 2.5.0: add check for registered script in WP core
 	if ( !wp_script_is( 'moment', 'registered' ) ) {
 		$moment_url = plugins_url( 'js/moment' . $suffix . '.js', RADIO_STATION_FILE );
-		wp_register_script( 'moment', $moment_url, array(), '2.29.4', false );
+		wp_register_script( 'moment', $moment_url, array( 'jquery' ), '2.29.4', false );
 	}
 }
 

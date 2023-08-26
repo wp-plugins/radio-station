@@ -251,12 +251,13 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		// 2.3.0: added countdown display option
 		// 2.3.2: added AJAX load option
 		// 2.5.0; added hide_empty, avatar_size, show_title
+		// 2.5.6: fix hide_empty to 1 or 0
 		// --- widget display options ---
 		$instance['title'] = $new_instance['title'];
 		$instance['limit'] = $new_instance['limit'];
 		$instance['ajax'] = isset( $new_instance['ajax'] ) ? $new_instance['ajax'] : 0;
 		$instance['default'] = $new_instance['default'];
-		$instance['hide_empty'] = isset( $new_instance['hide_empty'] ) ? $new_instance['hide_empty'] : 0;
+		$instance['hide_empty'] = isset( $new_instance['hide_empty'] ) ? 1 : 0;
 		// --- show display options ---
 		$instance['link'] = isset( $new_instance['link'] ) ? 1 : 0;
 		$instance['title_position'] = $new_instance['title_position'];
@@ -301,11 +302,12 @@ class DJ_Upcoming_Widget extends WP_Widget {
 		// 2.3.2: added AJAX load option
 		// 2.5.0: renamed default to no_shows
 		// 2.5.0; added avatar_size, show_title
+		// 2.5.6: cast hide_empty to 1 or 0
 		// --- widget display options ---
 		$limit = empty( $instance['limit'] ) ? '1' : $instance['limit'];
 		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : 0;
 		$no_shows = empty( $instance['default'] ) ? '' : $instance['default'];
-		$hide_empty = isset( $instance['hide_empty'] ) ? $instance['hide_empty'] : 1;
+		$hide_empty = ( isset( $instance['hide_empty'] ) && $instance['hide_empty'] ) ? 1 : 0;
 		// --- show display options ---
 		$link = $instance['link'];
 		$position = empty( $instance['title_position'] ) ? 'right' : $instance['title_position'];

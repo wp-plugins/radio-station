@@ -274,11 +274,12 @@ class DJ_Widget extends WP_Widget {
 		// 2.2.7: fix checkbox value saving
 		// 2.3.0: added countdown display option
 		// 2.3.2: added ajax load option
+		// 2.5.6: fix hide_empty to 1 or 0
 		// --- widget display options ---
 		$instance['title'] = $new_instance['title'];
 		$instance['ajax'] = isset( $new_instance['ajax'] ) ? $new_instance['ajax'] : 0;
 		$instance['default'] = $new_instance['default'];
-		$instance['hide_empty'] = isset( $new_instance['hide_empty'] ) ? $new_instance['hide_empty'] : 0;
+		$instance['hide_empty'] = isset( $new_instance['hide_empty'] ) ? 1 : 0;
 		// --- show display options ---
 		$instance['link'] = isset( $new_instance['link'] ) ? 1 : 0;
 		$instance['title_position'] = $new_instance['title_position'];
@@ -321,13 +322,14 @@ class DJ_Widget extends WP_Widget {
 		// 2.3.2: fix old false values to use 0 for shortcodes
 		// 2.3.2: added AJAX load option
 		// 2.5.0: added avatar_size for show image size
+		// 2.5.6: cast hide_empty to 1 or 0
 
 		// --- widget display options ---
 		$title = empty( $instance['title'] ) ? '' : $instance['title'];
 		$title = apply_filters( 'widget_title', $title );
 		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : 0;
 		$no_shows = empty( $instance['default'] ) ? '' : $instance['default'];
-		$hide_empty = isset( $instance['hide_empty'] ) ? $instance['hide_empty'] : 0;
+		$hide_empty = ( isset( $instance['hide_empty'] ) && $instance['hide_empty'] ) ? 1 : 0;
 		// --- show display options ---
 		$show_link = $instance['link'];
 		$title_position = empty( $instance['title_position'] ) ? 'bottom' : $instance['title_position'];

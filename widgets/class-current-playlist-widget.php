@@ -230,11 +230,13 @@ class Playlist_Widget extends WP_Widget {
 		// 2.3.2: added AJAX load option
 		// 2.5.0: added no_playlist text option
 		// 2.5.0: added playlist_title option
+		// 2.5.6: cast hide_empty to 1 or 0
+
 		// --- widget display options ---
 		$title = empty( $instance['title'] ) ? '' : $instance['title'];
 		$title = apply_filters( 'widget_title', $title );
 		$ajax = isset( $instance['ajax'] ) ? $instance['ajax'] : 0;
-		$hide_empty = isset( $instance['hide_empty'] ) ? $instance['hide_empty'] : 0;
+		$hide_empty = ( isset( $instance['hide_empty'] ) && $instance['hide_empty'] ) ? 1 : 0;
 		// --- playlist display options ---
 		$playlist_title = isset( $instance['playlist_title'] ) ? $instance['playlist_title'] : 0;
 		$link = isset( $instance['link'] ) ? $instance['link'] : 1;

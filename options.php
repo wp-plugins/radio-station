@@ -526,7 +526,8 @@ $options = array(
 		'label'   => __( 'Continuous Playback', 'radio-station' ),
 		'default' => 'yes',
 		'value'   => 'yes',
-		'helper'  => __( 'Uninterrupted Sitewide Bar playback while user is navigating between pages! Pages are loaded in background and faded in while Player Bar persists.', 'radio-station' ),
+		'helper'  => __( 'Uninterrupted Sitewide Bar playback while user is navigating between pages! Pages are loaded in background and faded in while Player Bar persists.', 'radio-station' )
+			. ' <a href="' . RADIO_STATION_DOCS_URL . 'player/#pro-continous-player-integration" target="_blank">' . __( 'Click here for setup notes.', 'radio-station' ) . '</a>',
 		'tab'     => 'player',
 		'section' => 'bar',
 		'pro'     => true,
