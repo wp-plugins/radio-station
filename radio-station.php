@@ -1,22 +1,22 @@
 <?php
-/**
- * @package Radio Station
- * @version 2.1.1
- */
+
 /*
+
 Plugin Name: Radio Station
-Plugin URI: http://nlb-creations.com/2013/02/25/wordpress-plugin-radio-station/ 
-Description: Adds playlist and on-air programming functionality to your site.
-Author: Nikki Blight <nblight@nlb-creations.com>
-Version: 2.1.1
+Plugin URI: https://radiostation.pro/radio-station
+Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
+Author: Tony Zeoli, Tony Hayes
+Version: 2.5.5
+Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
-Author URI: http://www.nlb-creations.com
+Author URI: https://netmix.com/
+GitHub Plugin URI: netmix/radio-station
 
-Copyright 2013 Nikki Blight  (email : nblight@nlb-creations.com)
+Copyright 2019 Digital Strategy Works  (email : info@digitalstrategyworks.com)
 
 This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License, version 2, as 
+it under the terms of the GNU General Public License, version 2, as
 published by the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
@@ -29,799 +29,1215 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-//let's include some files
-include('includes/post_types.php');
-include('includes/master_schedule.php');
-include('includes/shortcodes.php');
-include('includes/widget_nowplaying.php');
-include('includes/widget_djonair.php');
-include('includes/widget_djcomingup.php');
-include('includes/support_functions.php');
+// === Plugin Setup ===
+// - Define Plugin Constants
+// - Set Debug Mode Constant
+// - Define Plugin Data Slugs
+// - Include Plugin Files
+// - Plugin Options and Defaults
+// - Plugin Loader Settings
+// - Bundle Plan Settings Filter
+// - Start Plugin Loader Instance
+// - Include Plugin Admin Files
+// - Load Plugin Text Domain
+// === Plugin Functions ===
+// - Check Plan Options
+// - Check Plugin Version
+// - Plugin Activation Action
+// x Activation Welcome Redirect
+// - Plugin Deactivation Action
+// - Filter Plugin Updates Transient
+// - Filter Freemius Plugin Icon Path
+// - Set Allowed Origins for Radio Player
+// === Resource Handling ===
+// - Enqueue Plugin Scripts
+// - Register Moment JS
+// - Enqueue Plugin Script
+// - Add Inline Script
+// - Print Footer Scripts
+// - Print Admin Footer Scripts
+// - Enqueue Plugin Stylesheet
+// - Add Inline Style
+// - Print Footer Styles
+// - Print Admin Footer Styles
+// - Enqueue Datepicker
+// - Enqueue Localized Script Values
+// - Localization Script
+// === Transient Caching ===
+// - Delete Prefixed Transients
+// - Clear Cached Data
+// - Clear Cache on Status Transitions
+// === Debugging ===
+// - maybe Clear Transient Data
+// - Debug Output and Logging
+// - Freemius Object Debug
 
-//add "show" as a post type that supports featured images
-function station_add_featured_image_support() {
-    $supportedTypes = get_theme_support( 'post-thumbnails' );
-    
-    if( $supportedTypes === false ) {
-        add_theme_support( 'post-thumbnails', array( 'show' ) );
-    }               
-    elseif( is_array( $supportedTypes ) ) {
-        $supportedTypes[0][] = 'show';
-        add_theme_support( 'post-thumbnails', $supportedTypes[0] );
-    }
+
+// --------------------
+// === Plugin Setup ===
+// --------------------
+
+// -----------------------
+// Define Plugin Constants
+// -----------------------
+// 2.3.1: added constant for Netmix Directory
+// 2.4.0.3: remove separate constant for API docs link
+// 2.4.0.3: update home URLs to radiostation.pro
+// 2.4.0.8: added RADIO_STATION_SLUG constant
+// 2.5.0: added RADIO_STATION_PATREON constant
+define( 'RADIO_STATION_SLUG', 'radio-station' );
+define( 'RADIO_STATION_FILE', __FILE__ );
+define( 'RADIO_STATION_DIR', dirname( __FILE__ ) );
+define( 'RADIO_STATION_BASENAME', plugin_basename( __FILE__ ) );
+define( 'RADIO_STATION_HOME_URL', 'https://radiostation.pro/radio-station/' );
+define( 'RADIO_STATION_DOCS_URL', 'https://radiostation.pro/docs/' );
+// define( 'RADIO_STATION_API_DOCS_URL', 'https://radiostation.pro/docs/api/' );
+define( 'RADIO_STATION_PRO_URL', 'https://radiostation.pro/' );
+define( 'RADIO_STATION_NETMIX_DIR', 'https://netmix.com/' );
+define( 'RADIO_STATION_PATREON', 'https://patreon.com/radiostation' );
+
+// ------------------------
+// Define Plugin Data Slugs
+// ------------------------
+define( 'RADIO_STATION_LANGUAGES_SLUG', 'rs-languages' );
+define( 'RADIO_STATION_HOST_SLUG', 'rs-host' );
+define( 'RADIO_STATION_PRODUCER_SLUG', 'rs-producer' );
+
+// --- check and define CPT slugs ---
+// TODO: prefix original slugs and update post/taxonomy data
+if ( get_option( 'radio_show_cpts_prefixed' ) ) {
+	define( 'RADIO_STATION_SHOW_SLUG', 'rs-show' );
+	define( 'RADIO_STATION_PLAYLIST_SLUG', 'rs-playlist' );
+	define( 'RADIO_STATION_OVERRIDE_SLUG', 'rs-override' );
+	define( 'RADIO_STATION_GENRES_SLUG', 'rs-genres' );
+} else {
+	define( 'RADIO_STATION_SHOW_SLUG', 'show' );
+	define( 'RADIO_STATION_PLAYLIST_SLUG', 'playlist' );
+	define( 'RADIO_STATION_OVERRIDE_SLUG', 'override' );
+	define( 'RADIO_STATION_GENRES_SLUG', 'genres' );
 }
-add_action( 'init', 'station_add_featured_image_support' );
 
-//load the text domain
-function station_init() {
-	load_plugin_textdomain( 'radio-station', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+// -----------------------
+// Set Debug Mode Constant
+// -----------------------
+// 2.3.0: added debug mode constant
+// 2.3.2: added saving debug mode constant
+if ( !defined( 'RADIO_STATION_DEBUG' ) ) {
+	// 2.5.0: use simplified single line condition
+	$rs_debug = ( isset( $_REQUEST['rs-debug'] ) && ( '1' == $_REQUEST['rs-debug'] ) ) ? true : false;
+	define( 'RADIO_STATION_DEBUG', $rs_debug );
 }
-add_action('plugins_loaded', 'station_init');
+if ( !defined( 'RADIO_STATION_SAVE_DEBUG' ) ) {
+	// 2.5.0: use simplified single line condition
+	$rs_save_debug = ( isset( $_REQUEST['rs-save-debug'] ) && ( '1' == $_REQUEST['rs-save-debug'] ) ) ? true : false;
+	define( 'RADIO_STATION_SAVE_DEBUG', $rs_save_debug );
+}
 
-//add the necessary stylesheets
-function station_load_styles() {
-	if ( !is_admin() ) {
-		$dir = WP_PLUGIN_URL.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__));
-		
-		$program_css = get_stylesheet_directory().'/program-schedule.css';
-		if(!file_exists($program_css)) {
-			wp_enqueue_style( 'program-schedule', $dir.'templates/program-schedule.css' );
-		}
-		else {
-			wp_enqueue_style( 'program-schedule', get_stylesheet_directory_uri().'/program-schedule.css');
-		}
-		
-		$dj_widget_css = get_stylesheet_directory().'/djonair.css';
-		if(!file_exists($dj_widget_css)) {
-			wp_enqueue_style( 'dj-widget', $dir.'templates/djonair.css' );
-		}
-		else {
-			wp_enqueue_style( 'dj-widget', get_stylesheet_directory_uri().'/djonair.css');
-		}
+// --------------------
+// Include Plugin Files
+// --------------------
+// 2.3.0: include new data feeds file
+// 2.3.0: renamed widget files to match new widget names
+// 2.3.0: separate file for legacy support functions
+// 2.5.0: moved templates and user roles to separate include files
+// 2.5.0: moved times and schedules to separate include files
+
+// --- Main Includes ---
+require RADIO_STATION_DIR . '/includes/support-functions.php';
+require RADIO_STATION_DIR . '/includes/post-types.php';
+require RADIO_STATION_DIR . '/includes/templates.php';
+require RADIO_STATION_DIR . '/includes/user-roles.php';
+require RADIO_STATION_DIR . '/includes/data-feeds.php';
+require RADIO_STATION_DIR . '/includes/legacy.php';
+
+// --- Player ---
+// 2.4.0.4: include player as standard
+require RADIO_STATION_DIR . '/player/radio-player.php';
+
+// --- Scheduler ---
+// note: keep this load order as schedules instantiates schedule engine class
+require RADIO_STATION_DIR . '/scheduler/schedule-engine.php';
+require RADIO_STATION_DIR . '/includes/schedules.php';
+require RADIO_STATION_DIR . '/includes/times.php';
+
+// --- Shortcodes ---
+require RADIO_STATION_DIR . '/includes/master-schedule.php';
+require RADIO_STATION_DIR . '/includes/shortcodes.php';
+
+// --- Widgets ---
+// 2.3.1: added radio player widget file
+// 2.4.0.4: move player widget here
+// 2.5.0: move widget classes to widgets directory
+require RADIO_STATION_DIR . '/widgets/class-current-show-widget.php';
+require RADIO_STATION_DIR . '/widgets/class-upcoming-shows-widget.php';
+require RADIO_STATION_DIR . '/widgets/class-current-playlist-widget.php';
+require RADIO_STATION_DIR . '/widgets/class-radio-clock-widget.php';
+require RADIO_STATION_DIR . '/widgets/class-radio-player-widget.php';
+
+// --- Blocks ---
+// 2.5.0: added for registering block types
+if ( function_exists( 'register_block_type' ) ) {
+	require RADIO_STATION_DIR . '/includes/blocks.php';
+}
+
+// --- Feature Development ---
+// 2.3.0: add feature branch development includes
+$features = array( 'import-export' );
+foreach ( $features as $feature ) {
+	$filepath = RADIO_STATION_DIR . '/includes/' . $feature . '.php';
+	if ( file_exists( $filepath ) ) {
+		include $filepath;
 	}
 }
-add_action('wp_enqueue_scripts', 'station_load_styles');
 
-// load the theme file for the playlist and show post types
-function station_load_templates($single_template) {
-	global $post;
-
-	if ($post->post_type == 'playlist') {
-		//first check to see if there's a template in the active theme's directory
-		$user_theme = get_stylesheet_directory().'/single-playlist.php';
-		if(!file_exists($user_theme)) {
-			$single_template = ABSPATH.'wp-content/plugins/radio-station/templates/single-playlist.php';
-		}
-	}
-	 
-	if ($post->post_type == 'show') {
-		//first check to see if there's a template in the active theme's directory
-		$user_theme = get_stylesheet_directory().'/single-show.php';
-		if(!file_exists($user_theme)) {
-			$single_template = ABSPATH.'wp-content/plugins/radio-station/templates/single-show.php';
-		}
-	}
-	 
-	return $single_template;
-}
-add_filter( "single_template", "station_load_templates" ) ;
-
-// load the theme file for the playlist archive pages
-function station_load_custom_post_type_template( $archive_template ) {
-	global $post;
-	
-	if(is_post_type_archive('playlist')) {
-	
-		$playlist_archive_theme = get_stylesheet_directory().'/archive-playlist.php';
-		if(!file_exists($playlist_archive_theme)) {
-			$archive_template = ABSPATH.'wp-content/plugins/radio-station/templates/archive-playlist.php';
-		}
-	}
-	
-	return $archive_template;
-}
-add_filter( 'archive_template', 'station_load_custom_post_type_template' ) ;
-
-//add some style rules to certain parts of the admin area
-function station_load_admin_styles() {
-	global $post;
-	
-	if(isset($post->post_type)) {
-		if ($post->post_type == 'playlist') {
-			echo '<style type="text/css">
-		           .wp-editor-container textarea.wp-editor-area { height: 100px; }
-		         </style>';
-		}
+// --- Backwards Compatible Player ---
+// 2.5.1: add player backwards compatible functions
+add_action( 'plugins_loaded', 'radio_station_back_compat_player' );
+function radio_station_back_compat_player() {
+	$back_compat = apply_filters( 'radio_station_back_compat_player', true );
+	if ( $back_compat ) {
+		include RADIO_STATION_DIR . '/player/compat.php';
 	}
 }
-add_action('admin_head', 'station_load_admin_styles');
 
-//set up the DJ role and user capabilities
-function set_station_roles() {
-	global $wp_roles;
-	
-	//set only the necessary capabilities for DJs
-	$caps = array(
-				'edit_shows' => true,
-				'edit_published_shows' => true,
-				'edit_others_shows' => true,
-				'read_shows' => true,
-				'edit_playlists' => true,
-				'edit_published_playlists' => true,
-				//'edit_others_playlists' => true,  //uncomment to allow DJs to edit all playlists
-				'read_playlists' => true,
-				'publish_playlists' => true,
-				'read' => true,
-				'upload_files' => true,
-				'edit_posts' => true,
-				'edit_published_posts' => true,
-				'publish_posts' => true,
-				'delete_posts' => true
-			);
-	//$wp_roles->remove_role('dj'); //we need this here in case we ever update the capabilities list
-	$wp_roles->add_role( 'dj', 'DJ', $caps );
-	
-	//grant all new capabilities to admin users
-	$wp_roles->add_cap( 'administrator', 'edit_shows', true );
-	$wp_roles->add_cap( 'administrator', 'edit_published_shows', true );
-	$wp_roles->add_cap( 'administrator', 'edit_others_shows', true );
-	$wp_roles->add_cap( 'administrator', 'edit_private_shows', true );
-	$wp_roles->add_cap( 'administrator', 'delete_shows', true );
-	$wp_roles->add_cap( 'administrator', 'delete_published_shows', true );
-	$wp_roles->add_cap( 'administrator', 'delete_others_shows', true );
-	$wp_roles->add_cap( 'administrator', 'delete_private_shows', true );
-	$wp_roles->add_cap( 'administrator', 'read_shows', true );
-	$wp_roles->add_cap( 'administrator', 'publish_shows', true );
-	$wp_roles->add_cap( 'administrator', 'edit_playlists', true );
-	$wp_roles->add_cap( 'administrator', 'edit_published_playlists', true );
-	$wp_roles->add_cap( 'administrator', 'edit_others_playlists', true );
-	$wp_roles->add_cap( 'administrator', 'edit_private_playlists', true );
-	$wp_roles->add_cap( 'administrator', 'delete_playlists', true );
-	$wp_roles->add_cap( 'administrator', 'delete_published_playlists', true );
-	$wp_roles->add_cap( 'administrator', 'delete_others_playlists', true );
-	$wp_roles->add_cap( 'administrator', 'delete_private_playlists', true );
-	$wp_roles->add_cap( 'administrator', 'read_playlists', true );
-	$wp_roles->add_cap( 'administrator', 'publish_playlists', true );
-}
-if(is_multisite()) {
-	add_action('init', 'set_station_roles', 10, 0);
-}
-else {
-	add_action('admin_init', 'set_station_roles', 10, 0);
+
+// ---------------------------
+// Plugin Options and Defaults
+// ---------------------------
+// 2.3.0: added plugin options
+// 2.4.0.8: moved options array to separate file
+// 2.5.0: move plan options check to separate function
+$timezones = radio_station_get_timezone_options( true );
+$languages = radio_station_get_language_options( true );
+$formats = radio_station_get_stream_formats();
+$plan_options = radio_station_check_plan_options();
+require RADIO_STATION_DIR . '/options.php';
+
+// ----------------------
+// Plugin Loader Settings
+// ----------------------
+// 2.3.0: added plugin loader settings
+// 2.4.0.8: use RADIO_STATION_SLUG constant
+
+// --- settings array ---
+$settings = array(
+	// --- Plugin Info ---
+	'slug'         => RADIO_STATION_SLUG,
+	'file'         => RADIO_STATION_FILE,
+	'version'      => '0.0.1',
+
+	// --- Menus and Links ---
+	'title'        => 'Radio Station',
+	'parentmenu'   => RADIO_STATION_SLUG,
+	'home'         => RADIO_STATION_HOME_URL,
+	'docs'         => RADIO_STATION_DOCS_URL,
+	'support'      => 'https://github.com/netmix/radio-station/issues/',
+	'ratetext'     => __( 'Rate on WordPress.org', 'radio-station' ),
+	'share'        => RADIO_STATION_HOME_URL . '#share',
+	'sharetext'    => __( 'Share the Plugin Love', 'radio-station' ),
+	'donate'       => 'https://patreon.com/radiostation',
+	'donatetext'   => __( 'Support this Plugin', 'radio-station' ),
+	'readme'       => false,
+	'settingsmenu' => false,
+
+	// --- Options ---
+	'namespace'    => 'radio_station',
+	'settings'     => 'rs',
+	'option'       => 'radio_station',
+	'options'      => $options,
+
+	// --- WordPress.Org ---
+	'wporgslug'    => RADIO_STATION_SLUG,
+	'wporg'        => true,
+	'textdomain'   => 'radio-station',
+
+	// --- Freemius ---
+	// 2.4.0.1: turn on addons switch for Pro
+	// 2.4.0.3: turn on plans switch for Pro also
+	// 2.4.0.3: set Pro details and Upgrade links
+	// 2.4.0.4: change upgrade_link to -upgrade
+	'freemius_id'  => '4526',
+	'freemius_key' => 'pk_aaf375c4fb42e0b5b3831e0b8476b',
+	'hasplans'     => $plan_options['has_plans'],
+	'upgrade_link' => add_query_arg( 'page', RADIO_STATION_SLUG . '-pricing', admin_url( 'admin.php' ) ),
+	'pro_link'     => RADIO_STATION_PRO_URL . 'pricing/',
+	'hasaddons'    => $plan_options['has_addons'],
+	'addons_link'  => add_query_arg( 'page', RADIO_STATION_SLUG . '-addons', admin_url( 'admin.php' ) ),
+	'plan'         => $plan_options['plan_type'],
+);
+
+// ---------------------------
+// Bundle Plan Settings Filter
+// ---------------------------
+// 2.5.0: added for bundle pricing configuration
+add_filter( 'freemius_init_settings_radio_station', 'radio_station_freemius_bundle_config' );
+function radio_station_freemius_bundle_config( $settings ) {
+	// 2.4.0.6: add bundles configuration
+	$settings['bundle_id'] = '9521';
+	$settings['bundle_public_key'] = 'pk_a2650f223ef877e87fe0fdfc4442b';
+	$settings['bundle_license_auto_activation'] = true;
+	return $settings;
 }
 
-//revoke the ability to edit a show if the user is not listed as a DJ on that show
-function revoke_show_edit_cap($allcaps, $cap = 'edit_shows', $args) {
-	global $post;
-	global $wp_roles;
-	
-	$user = wp_get_current_user();
-	
-	//determine which roles should have full access aside from administrator
-	$add_roles = array('administrator');
-	if(isset($wp_roles->roles) && is_array($wp_roles->roles)) {
-		foreach($wp_roles->roles as $name => $role) {
-			foreach($role['capabilities'] as $capname => $capstatus) {
-				if($capname == "publish_shows" && ($capstatus == 1 || $capstatus == true)) {
-					$add_roles[] = $name;
+// -------------------------
+// Set Plugin Option Globals
+// -------------------------
+global $radio_station_data;
+$radio_station_data['channel'] = '';
+$radio_station_data['options'] = $options;
+$radio_station_data['settings'] = $settings;
+if ( RADIO_STATION_DEBUG ) {
+	echo '<span style="display:none;">Radio Station Settings: ' . esc_html( print_r( $settings, true ) ) . '</span>';
+}
+
+// ----------------------------
+// Start Plugin Loader Instance
+// ----------------------------
+require RADIO_STATION_DIR . '/loader.php';
+$instance = new radio_station_loader( $settings );
+
+
+// --------------------------
+// Include Plugin Admin Files
+// --------------------------
+// 2.2.7: added conditional load of admin includes
+// 2.2.7: moved all admin functions to radio-station-admin.php
+if ( is_admin() ) {
+
+	// --- Admin Includes ---
+	require RADIO_STATION_DIR . '/radio-station-admin.php';
+	require RADIO_STATION_DIR . '/includes/post-types-admin.php';
+
+	// --- Contextual Help ---
+	// 2.3.0: maybe load contextual help config
+	if ( file_exists( RADIO_STATION_DIR . '/help/contextual-help-config.php' ) ) {
+		include RADIO_STATION_DIR . '/help/contextual-help-config.php';
+	}
+}
+
+// -----------------------
+// Load Plugin Text Domain
+// -----------------------
+add_action( 'plugins_loaded', 'radio_station_init' );
+function radio_station_init() {
+	// 2.3.0: use RADIO_STATION_DIR constant
+	load_plugin_textdomain( 'radio-station', false, RADIO_STATION_DIR . '/languages' );
+}
+
+// ----------------------------
+// Add Pricing Page Path Filter
+// ----------------------------
+// 2.5.0: added for Freemius Pricing Page v2
+add_action( 'radio_station_loaded', 'radio_station_add_pricing_path_filter' );
+function radio_station_add_pricing_path_filter() {
+	global $radio_station_freemius;
+	if ( method_exists( $radio_station_freemius, 'add_filter' ) ) {
+		$radio_station_freemius->add_filter( 'freemius_pricing_js_path', 'radio_station_pricing_page_path' );
+	}
+}
+
+// ------------------------
+// Pricing Page Path Filter
+// ------------------------
+// 2.6.0: added for Freemius Pricing Page v2
+function radio_station_pricing_page_path( $default_pricing_js_path ) {
+	return RADIO_STATION_DIR . '/freemius-pricing/freemius-pricing.js';
+}
+
+
+// ------------------------
+// === Plugin Functions ===
+// ------------------------
+
+// ------------------
+// Check Plan Options
+// ------------------
+// 2.5.0: moved to separate function
+function radio_station_check_plan_options() {
+
+	// 2.4.0.3: added check active/installed Pro version
+	// 2.4.0.4: add defaults for has_addons and has_plans
+	$has_addons = false;
+	$has_plans = true;
+	$plan = 'free';
+
+	// --- check for deactivated pro plugin ---
+	// 2.4.0.4: remove unnecessary second argument to wp_cache_get
+	$plugins = wp_cache_get( 'plugins' );
+	if ( !$plugins ) {
+		if ( function_exists( 'get_plugins' ) ) {
+			$plugins = get_plugins();
+		} else {
+			$plugin_path = ABSPATH . 'wp-admin/includes/plugin.php';
+			if ( file_exists( $plugin_path ) ) {
+				include $plugin_path;
+				$plugins = get_plugins();
+			}
+		}
+	}
+	if ( $plugins && is_array( $plugins ) && ( count( $plugins ) > 0 ) ) {
+		foreach ( $plugins as $slug => $plugin ) {
+			if ( strstr( $slug, 'radio-station-pro.php' ) ) {
+				// 2.4.0.4: only set premium for upgrade version
+				if ( isset( $plugin['Name'] ) && strstr( $plugin['Name'], '(Premium)' ) ) {
+					$plan = 'premium';
+					break;
+				} else {
+					// 2.4.0.4: detect and force enable addon version
+					$plan = 'premium';
+					$has_addons = true;
+					$has_plans = false;
+					break;
 				}
 			}
 		}
 	}
-	
-	//exclude administrators and custom roles with appropriate capabilities... they should be able to do whatever they want
-	$found = false;
-	foreach($add_roles as $role) {
-		if(in_array($role, $user->roles)) {
-			$found = true;
-		}
-	}
 
-	if(!$found) {	
-		
-		//limit this to published shows
-		if(isset($post->post_type)) {
-			if(is_admin() && $post->post_type == 'show' && $post->post_status == 'publish') {
-				$djs = get_post_meta($post->ID, "show_user_list", true);
-				
-				if($djs == '') {
-					$djs = array();
-				}
-				
-				//if they're not listed, temporarily revoke editing ability for this post
-				if(!in_array($user->ID, $djs)) {
-					$allcaps['edit_shows'] = false;
-					$allcaps['edit_published_shows'] = false;
-				}
-			}
-		}
-	}
-	return $allcaps;
-}
-add_filter('user_has_cap', 'revoke_show_edit_cap', 10, 3);
-
-//remove the Add Show link for DJs from the admin side menu
-function radio_modify_shows_menu() {
-	global $submenu;
-	
-	$user = wp_get_current_user();
-	if(in_array('dj', $user->roles)) {
-		unset($submenu['edit.php?post_type=show'][10]);
-	}
-}
-add_action('admin_menu','radio_modify_shows_menu');
-
-//remove the Add Show link for DJs from the wp admin bar
-function radio_modify_admin_bar_menu($wp_admin_bar) {
-
-	$user = wp_get_current_user();
-	if(in_array('dj', $user->roles)) {
-		$wp_admin_bar->remove_node('new-show');
-	}
-}
-add_action( 'admin_bar_menu', 'radio_modify_admin_bar_menu', 999 );
-
-//create a menu item for the options page
-function station_admin_menu() {
-	if (function_exists('add_options_page')) {
-
-		//add to Announcements tab
-		add_submenu_page( 'edit.php?post_type=playlist', __('Export Playlists', 'radio-station'), __('Export', 'radio-station'), 'manage_options', 'radio-station', 'station_admin_export' );
-	}
-}
-add_action( 'admin_menu', 'station_admin_menu' );
-
-//output the options page
-function station_admin_export() {
-	global $wpdb;
-	
-	//first, delete any old exports from the tmp directory
-	$dir = ABSPATH.'/wp-content/plugins/radio-station/tmp/';
-	$get_contents = opendir($dir);
-	while($file = readdir($get_contents)) {
-		if($file != "." && $file != "..") {
-			//chmod($dir.$file, 0777);
-			unlink($dir.$file);
-		}
-	}
-	closedir($get_contents);
-	
-	//watch for form submission
-	if (!empty($_POST['export_action'])) {
-		//validate the referrer field
-		check_admin_referer('station_export_valid');
-		
-		$start = $_POST['station_export_start_year'].'-'.$_POST['station_export_start_month'].'-'.$_POST['station_export_start_day'];
-		$end = $_POST['station_export_end_year'].'-'.$_POST['station_export_end_month'].'-'.$_POST['station_export_end_day'];
-
-		//fetch all records that were created between the start and end dates
-		$playlists = $wpdb->get_results("SELECT `posts`.`ID`, `posts`.`post_date` FROM ".$wpdb->prefix."posts AS `posts`
-										WHERE `posts`.`post_type` = 'playlist'  
-										AND `posts`.`post_status` = 'publish'
-										AND TO_DAYS(`posts`.`post_date`) >= TO_DAYS('".$start." 00:00:00') AND TO_DAYS(`posts`.`post_date`) <= TO_DAYS('".$end." 23:59:59')  
-										ORDER BY `posts`.`post_date` ASC;");
-		
-		if(!$playlists) {
-			$list = 'No playlists found for this period.';
-		}
-		
-		//fetch the tracks for each playlist from the wp_postmeta table
-		foreach($playlists as $i => $playlist) {
-			$songs = get_post_meta($playlist->ID, 'playlist', true);
-			
-			//removed any entries that are marked as 'queued'
-			foreach($songs as $j => $entry) {
-				if($entry['playlist_entry_status'] == 'queued') {
-					unset($songs[$j]);
-				}
-			}
-			
-			$playlists[$i]->songs = $songs;
-		}
-		
-		$output = '';
-		
-		$date = '';
-		foreach($playlists as $playlist) {
-			if($date == '' || $date != array_shift(explode(" ", $playlist->post_date))) {
-				$date = array_shift(explode(" ", $playlist->post_date));
-				$output .= $date."\n\n";
-			}
-			
-			foreach($playlist->songs as $song) {
-				$output .= $song['playlist_entry_artist'].' || '.$song['playlist_entry_song'].' || '.$song['playlist_entry_album'].' || '.$song['playlist_entry_label']."\n";
-			}
-		}
-
-		//save as file
-		$dir = ABSPATH.'/wp-content/plugins/radio-station/tmp/';
-		$file = $date."export.txt";
-		if(!file_exists($dir)) {
-			mkdir($dir);
-		}
-		
-		$f = fopen($dir.$file, "w");
-		fwrite($f, $output);
-		fclose($f);
-		
-		//display link to file
-		echo '<div id="message" class="updated"><p><strong><a href="'.get_bloginfo('url').'/wp-content/plugins/radio-station/tmp/'.$file.'">'.__('Right-click and download this file to save your export', 'radio-station').'</a></strong></p></div>';
-	}
-
-	//display the page
-	?>
- 
-<div style="width: 620px; padding: 10px">
-	<h2><?php _e('Export Playlists', 'radio-station'); ?></h2>
-	<form action="" method="post" id="export_form" accept-charset="utf-8" style="position:relative">
-		
-		<?php wp_nonce_field('station_export_valid'); ?>
-		
-		<input type="hidden" name="export_action" value="station_playlist_export" />
-		<table class="form-table">
-			
-			<tr valign="top">
-				<?php $smonth = isset($_POST['station_export_start_month']) ? $_POST['station_export_start_month'] : ''; ?>
-				<th scope="row"><?php _e('Start Date', 'radio-station'); ?></th>
-				<td>
-					<select name="station_export_start_month" id="station_export_start_month">
-						<option value="01" <?php if($smonth == '01') { echo 'selected="selected"'; } ?>>01 (Jan)</option>
-						<option value="02" <?php if($smonth == '02') { echo 'selected="selected"'; } ?>>02 (Feb)</option>
-						<option value="03" <?php if($smonth == '03') { echo 'selected="selected"'; } ?>>03 (Mar)</option>
-						<option value="04" <?php if($smonth == '04') { echo 'selected="selected"'; } ?>>04 (Apr)</option>
-						<option value="05" <?php if($smonth == '05') { echo 'selected="selected"'; } ?>>05 (May)</option>
-						<option value="06" <?php if($smonth == '06') { echo 'selected="selected"'; } ?>>06 (Jun)</option>
-						<option value="07" <?php if($smonth == '07') { echo 'selected="selected"'; } ?>>07 (Jul)</option>
-						<option value="08" <?php if($smonth == '08') { echo 'selected="selected"'; } ?>>08 (Aug)</option>
-						<option value="09" <?php if($smonth == '09') { echo 'selected="selected"'; } ?>>09 (Sep)</option>
-						<option value="10" <?php if($smonth == '10') { echo 'selected="selected"'; } ?>>10 (Oct)</option>
-						<option value="11" <?php if($smonth == '11') { echo 'selected="selected"'; } ?>>11 (Nov)</option>
-						<option value="12" <?php if($smonth == '12') { echo 'selected="selected"'; } ?>>12 (Dec)</option>
-					</select>
-					
-					<?php $sday = isset($_POST['station_export_start_day']) ? $_POST['station_export_start_day'] : ''; ?>
-					<select name="station_export_start_day" id="station_export_start_day">
-						<?php 
-							for($i=1; $i<=31; $i++) {
-								$day = $i;
-								if($i < 10) { $day = '0'.$day; }
-								echo '<option value="'.$day.'"';
-								if($sday == $day) {
-									echo ' selected="selected"';
-								}
-								echo '>'.$i.'</option>';	
-							}
-						?>
-					</select>
-					
-					<?php $syear = isset($_POST['station_export_start_year']) ? $_POST['station_export_start_year'] : ''; ?>
-					<select name="station_export_start_year" id="station_export_start_year">
-						<?php 
-							$year = date('Y');
-							for($i=$year-5; $i<=$year+5; $i++) {
-								$selected = '';
-								if($i == $syear) { 
-									$selected = ' selected="selected"';
-								}
-								else {
-									if($i == $year && $syear == '') {
-										$selected = ' selected="selected"';
-									}
-								}
-								echo '<option value="'.$i.'"'.$selected.'>'.$i.'</option>';	
-							}
-						?>
-					</select>
-				</td>
-			</tr>
-			
-			<tr valign="top">
-				<th scope="row"><?php _e('End Date', 'radio-station'); ?></th>
-				<td>
-					<?php $emonth = isset($_POST['station_export_end_month']) ? $_POST['station_export_end_month'] : ''; ?>
-					<select name="station_export_end_month" id="station_export_end_month">
-						<option value="01" <?php if($emonth == '01') { echo 'selected="selected"'; } ?>>01 (Jan)</option>
-						<option value="02" <?php if($emonth == '02') { echo 'selected="selected"'; } ?>>02 (Feb)</option>
-						<option value="03" <?php if($emonth == '03') { echo 'selected="selected"'; } ?>>03 (Mar)</option>
-						<option value="04" <?php if($emonth == '04') { echo 'selected="selected"'; } ?>>04 (Apr)</option>
-						<option value="05" <?php if($emonth == '05') { echo 'selected="selected"'; } ?>>05 (May)</option>
-						<option value="06" <?php if($emonth == '06') { echo 'selected="selected"'; } ?>>06 (Jun)</option>
-						<option value="07" <?php if($emonth == '07') { echo 'selected="selected"'; } ?>>07 (Jul)</option>
-						<option value="08" <?php if($emonth == '08') { echo 'selected="selected"'; } ?>>08 (Aug)</option>
-						<option value="09" <?php if($emonth == '09') { echo 'selected="selected"'; } ?>>09 (Sep)</option>
-						<option value="10" <?php if($emonth == '10') { echo 'selected="selected"'; } ?>>10 (Oct)</option>
-						<option value="11" <?php if($emonth == '11') { echo 'selected="selected"'; } ?>>11 (Nov)</option>
-						<option value="12" <?php if($emonth == '12') { echo 'selected="selected"'; } ?>>12 (Dec)</option>
-					</select>
-					
-					<?php $eday = isset($_POST['station_export_end_day']) ? $_POST['station_export_end_day'] : ''; ?>
-					<select name="station_export_end_day" id="station_export_end_day">
-						<?php 
-							for($i=1; $i<=31; $i++) {
-								$day = $i;
-								if($i < 10) { $day = '0'.$day; }
-								echo '<option value="'.$day.'"';
-								if($eday == $day) {
-									echo ' selected="selected"';
-								}
-								echo '>'.$i.'</option>';	
-							}
-						?>
-					</select>
-					
-					<?php $eyear = isset($_POST['station_export_end_year']) ? $_POST['station_export_end_year'] : ''; ?>
-					<select name="station_export_end_year" id="station_export_end_year">
-						<?php 
-							$year = date('Y');
-							for($i=$year-5; $i<=$year+5; $i++) {
-								$selected = '';
-								if($i == $eyear) { 
-									$selected = ' selected="selected"';
-								}
-								else {
-									if($i == $year && $eyear == '') {
-										$selected = ' selected="selected"';
-									}
-								}
-								echo '<option value="'.$i.'"'.$selected.'>'.$i.'</option>';	
-							}
-						?>
-					</select>
-				</td>
-			</tr>
-			
-			<tr valign="top">
-				<th scope="row">&nbsp;</th>
-				<td>
-					<input type="submit" name="Submit" class="button-primary" value="<?php _e('Export', 'radio-station'); ?>"/>
-				</td>
-			</tr>
-		</table>
-	</form>
-</div>
- 
-<?php
-}
-
-
-//Add custom meta box for show assigment on blog posts
-function station_add_showblog_box() {
-	add_meta_box(
-			'dynamicShowBlog_sectionid',
-			__( 'Related to Show', 'radio-station' ),
-			'station_inner_showblog_custom_box',
-			'post',
-			'side');
-}
-add_action( 'add_meta_boxes', 'station_add_showblog_box' );
-
-//Prints the box content for the Show field
-function station_inner_showblog_custom_box() {
-	global $post;
-	// Use nonce for verification
-	wp_nonce_field( plugin_basename( __FILE__ ), 'dynamicMetaShowBlog_noncename' );
-
-	$args = array(
-			'numberposts'     => -1,
-			'offset'          => 0,
-			'orderby'         => 'post_title',
-			'order'           => 'ASC',
-			'post_type'       => 'show',
-			'post_status'     => 'publish'
+	// 2.5.0: set as array for returning
+	$plan_options = array(
+		'has_plans'  => $has_plans,
+		'has_addons' => $has_addons,
+		'plan_type'  => $plan,
 	);
-
-	$shows = get_posts($args);
-	$current = get_post_meta($post->ID,'post_showblog_id',true);
-
-	?>
-    <div id="meta_inner">
-    
-    <select name="post_showblog_id">
-    	<option value=""></option>
-    <?php
-    	foreach($shows as $show) {
-    		$selected = '';
-    		if($show->ID == $current) {
-    			$selected = ' selected="selected"';
-    		}
-    		
-    		echo '<option value="'.$show->ID.'"'.$selected.'>'.$show->post_title.'</option>';	
-    	}
-	?>
-	</select>
-	</div>
-   <?php
+	return $plan_options;
 }
 
-//When a playlist is saved, saves our custom data
-function station_save_postdata( $post_id ) {
-    // verify if this is an auto save routine. 
-    // If it is our form has not been submitted, so we dont want to do anything
-    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) 
-        return;
+// --------------------
+// Check Plugin Version
+// --------------------
+// 2.3.0: check plugin version for updates and announcements
+add_action( 'init', 'radio_station_check_version', 9 );
+function radio_station_check_version() {
 
-    if(isset($_POST['post_showblog_id'])) {
-	    // verify this came from the our screen and with proper authorization,
-	    // because save_post can be triggered at other times
-	    
-	    if (isset($_POST['dynamicMetaShowBlog_noncename'])){
-	    	if ( !wp_verify_nonce( $_POST['dynamicMetaShowBlog_noncename'], plugin_basename( __FILE__ ) ) )
-	    	return;
-	    }else{return;}
-	    
-	    // OK, we're authenticated: we need to find and save the data
-	    $show = $_POST['post_showblog_id'];
+	// --- get current and stored versions ---
+	// 2.3.2: use plugin version function
+	$version = radio_station_plugin_version();
+	$stored_version = get_option( 'radio_station_version', false );
 
-	    update_post_meta($post_id,'post_showblog_id',$show);
-    }
-    
-}
-add_action( 'save_post', 'station_save_postdata' );
+	// --- check current against stored version ---
+	if ( !$stored_version ) {
 
+		// --- no stored plugin version, add it now ---
+		update_option( 'radio_station_version', $version );
 
-//add a help page
-function station_plugin_menu() {
-	if (function_exists('add_options_page')) {
-		//add to Shows tab
-		add_submenu_page( 'edit.php?post_type=show', 'Radio Station Help', 'Radio Station Help', 'manage_options', '', 'station_plugin_help' );
+		if ( version_compare( $version, '2.3.0', '>=' ) ) {
+			// --- flush rewrite rules (for new post type and rest route rewrites) ---
+			// (handled separately as 2.3.0 is first version with version checking)
+			add_option( 'radio_station_flush_rewrite_rules', true );
+		}
+
+	} elseif ( version_compare( $version, $stored_version, '>' ) ) {
+
+		// --- updates from before to after x.x.x ---
+		// (code template if/when needed for future release updates)
+		// if ( ( version_compare( $version, 'x.x.x', '>=' ) )
+		//   && ( version_compare( $stored_version, 'x.x.x', '<' ) ) ) {
+		//		// eg. trigger a single thing to do
+		//		add_option( 'radio_station_do_thing_once', true );
+		// }
+
+		// --- bump stored version to current version ---
+		update_option( 'radio_station_previous_version', $stored_version );
+		update_option( 'radio_station_version', $version );
 	}
 }
-add_action( 'admin_menu', 'station_plugin_menu' );
 
+// ------------------------
+// Plugin Activation Action
+// ------------------------
+// (run on plugin activation, and thus also after a plugin update)
+// 2.2.8: fix for mismatched flag function name
+register_activation_hook( RADIO_STATION_FILE, 'radio_station_plugin_activation' );
+function radio_station_plugin_activation() {
 
-function station_plugin_help() {
-	?>
-	<h2>Radio Station Help/FAQs</h2>
+	// --- flag to flush rewrite rules ---
+	// 2.2.3: added this for custom post types rewrite flushing
+	add_option( 'radio_station_flush_rewrite_rules', true );
 
-	<strong>I've scheduled all my shows, but they're not showing up on the programming grid!</strong>
-	<p>Did you remember to check the "Active" checkbox for each show?  If a show is not marked active, the plugin assumes that it's not currently in production and hides it on the grid.</p>
+	// --- clear schedule transients ---
+	// 2.3.3: added clear transients on (re)activation
+	// 2.3.3.9: just use clear cached data function
+	radio_station_clear_cached_data( false );
 
-	<hr />
-	
-	<strong>I'm seeing 404 Not Found errors when I click on the link for a show!</strong>
-	<p>Try re-saving your site's permalink settings.  Wordpress sometimes gets confused with a new custom post type is added.</p>
+	// --- set welcome redirect transient ---
+	// TODO: check if handled by Freemius activation
+	// set_transient( 'radio_station_welcome', 1, 7 );
 
-	<hr />
-	
-	<strong>How do I display a full schedule of my station's shows? </strong>
-	<p>Use the shortcode <code>[master-schedule]</code> on any page.  This will generate a full-page schedule in one of three formats.
-	<br /><br />
-	The following attributes are available for the shortcode:
-		<ul style="list-style: disc inside none; text-indent: 50px;">
-			<li>'list' => If set to a value of 'list', the schedule will display in list format rather than table or div format. Valid values are 'list', 'divs', 'table'.  Default value is 'table'.</li>
-			<li>'time' => The time format you with to use.  Valid values are 12 and 24.  Default is 12.</li>
-			<li>'show_link' => Display the title of the show as a link to its profile page.  Valid values are 0 for hide, 1 for show.  Default is 1.</li>
-			<li>'display_show_time' => Display start and end times of each show after the title in the grid.  Valid values are 0 for hide, 1 for show.  Default is 1.</li>
-			<li>'show_image' => If set to a value of 1, the show's avatar will be displayed.  Default value is 0.</li>
-			<li>'show_djs' => If set to a value of 1, the names of the show's DJs will be displayed.  Default value is 0.</li>
-			<li>'divheight' => Set the height, in pixels, of the individual divs in the 'divs' layout.  Default is 45.</li>
-		</ul>
-	<br /><br />		
-	For example, if you wish to display the schedule in 24-hour time format, use <code>[master-schedule time="24"]</code>.</p>
-
-	<hr />
-	
-	<strong>How do I schedule a show? </strong>
-
-	<p>Simply create a new show.  You will be able to assign it to any timeslot you wish on the edit page.</p>
-
-	<hr />
-	
-	<strong>What if I have a special event? </strong>
-
-	<p>If you have a one-off event that you need to show up in the On-Air or Coming Up Next widgets, you can create a Schedule Override by clicking the Schedule Override tab in the Dashboard menu.  This will allow you to set aside a block of time on a specific date, and will display the title you give it in the widgets.  Please note that this will only override the widgets and their corresponding shortcodes.  If you are using the weekly master schedule shortcode on a page, its output will not be altered.</p>
-
-	<hr />
-	
-	<strong>How do I get the last song played to show up? </strong>
-
-	<p>You'll find a widget for just that purpose under the Widgets tab.  You can also use the shortcode <code>[now-playing]</code> in your page/post, or use <code>do_shortcode('[now-playing]');</code> in your template files.
-	<br /><br />
-	The following attributes are available for the shortcode:
-		<ul style="list-style: disc inside none; text-indent: 50px;">
-			<li>'title' => The title you would like to appear over the now playing block</li>
-			<li>'artist' => Display artist name.  Valid values are 0 for hide, 1 for show.  Default is 1.</li>
-			<li>'song' => Display song name.  Valid values are 0 for hide, 1 for show.  Default is 1.</li>
-			<li>'album' => Display album name.  Valid values are 0 for hide, 1 for show.  Default is 0.</li>
-			<li>'label' => Display label name.  Valid values are 0 for hide, 1 for show.  Default is 0.</li>
-			<li>'comments' => Display DJ comments.  Valid values are 0 for hide, 1 for show.  Default is 0.</li>
-		</ul>
-	<br /><br />
-	Example:<br />
-	<code>[now-playing title="Current Song" artist="1" song="1" album="1" label="1" comments="0"]</code></p>
-
-	<hr />
-	
-	<strong>What about displaying the current DJ on air? </strong>
-
-	<p>You'll find a widget for just that purpose under the Widgets tab.  You can also use the shortcode <code>[dj-widget]</code> in your page/post, or you can use <code>do_shortcode('[dj-widget]');</code> in your template files.
-	<br /><br />
-	The following attributes are available for the shortcode:
-		<ul style="list-style: disc inside none; text-indent: 50px;">
-			<li>'title' </strong>> The title you would like to appear over the on-air block</li> 
-			<li>'display_djs' </strong>> Display the names of the DJs on the show.  Valid values are 0 for hide names, 1 for show names.  Default is 0.</li>
-			<li>'show_avatar' </strong>> Display a show's thumbnail.  Valid values are 0 for hide avatar, 1 for show avatar.  Default is 0.</li>
-			<li>'show_link' </strong>> Display a link to a show's page.  Valid values are 0 for hide link, 1 for show link.  Default is 0.</li>
-			<li>'default_name' </strong>> The text you would like to display when no show is schedule for the current time.</li>
-			<li>'time' </strong>> The time format used for displaying schedules.  Valid values are 12 and 24.  Default is 12.</li>
-			<li>'show_sched' </strong>> Display the show's schedules.  Valid values are 0 for hide schedule, 1 for show schedule.  Default is 1.</li>
-			<li>'show_playlist' </strong>> Display a link to the show's current playlist.  Valid values are 0 for hide link, 1 for show link.  Default is 1.</li>
-			<li>'show_all_sched' </strong>> Displays all schedules for a show if it airs on multiple days.  Valid values are 0 for current schedule, 1 for all schedules.  Default is 0.</li>
-			<li>'show_desc' </strong>> Displays the first 20 words of the show's description. Valid values are 0 for hide descripion, 1 for show description.  Default is 0.</li>
-		</ul>
-	<br /><br />
-	Example:<br />
-	<code>[dj-widget title</strong>"Now On-Air" display_djs</strong>"1" show_avatar</strong>"1" show_link</strong>"1" default_name</strong>"RadioBot" time</strong>"12" show_sched</strong>"1" show_playlist</strong>"1"]</code></p>
-
-	<hr />
-
-	<strong>Can I display upcoming shows, too? </strong>
-
-	<p>You'll find a widget for just that purpose under the Widgets tab.  You can also use the shortcode <code>[dj-coming-up-widget]</code> in your page/post, or you can use <code>do_shortcode('[dj-coming-up-widget]');</code> in your template files.
-	<br /><br />
-	The following attributes are available for the shortcode:
-		<ul style="list-style: disc inside none; text-indent: 50px;">
-			<li>'title' => The title you would like to appear over the on-air block</li> 
-			<li>'display_djs' => Display the names of the DJs on the show.  Valid values are 0 for hide names, 1 for show names.  Default is 0.</li>
-			<li>'show_avatar' => Display a show's thumbnail.  Valid values are 0 for hide avatar, 1 for show avatar.  Default is 0.</li>
-			<li>'show_link' => Display a link to a show's page.  Valid values are 0 for hide link, 1 for show link.  Default is 0.</li>
-			<li>'limit' => The number of upcoming shows to display.  Default is 1.</li>
-			<li>'time' => The time format used for displaying schedules.  Valid values are 12 and 24.  Default is 12.</li>
-			<li>'show_sched' => Display the show's schedules.  Valid values are 0 for hide schedule, 1 for show schedule.  Default is 1.</li>
-		</ul>
-		<br /><br />
-		Example:<br />
-		<code>[dj-coming-up-widget title</strong>"Coming Up On-Air" display_djs</strong>"1" show_avatar</strong>"1" show_link</strong>"1" limit</strong>"3" time</strong>"12" schow_sched</strong>"1"]`</code></p>
-
-	<hr />
-		
-	<strong>Can I change how show pages are laid out/displayed? </strong>
-
-	<p>Yes.  Copy the radio-station/templates/single-show.php file into your theme directory, and alter as you wish.  This template, and all of the other templates in this plugin, are based on the TwentyEleven theme.  If you're using a different theme, you may have to rework them to reflect your theme's layout.</p>
-
-	<hr />
-	
-	<strong>What about playlist pages? </strong>
-
-	<p>Same deal.  Grab the radio-station/templates/single-playlist.php file, copy it to your theme directory, and go to town.</p>
-
-	<hr />
-	
-	<strong>And playlist archive pages?  </strong>
-
-	<p>Same deal.  Grab the radio-station/templates/archive-playlist.php file, copy it to your theme directory, and go to town.</p>
-
-	<hr />
-	
-	<strong>And the program schedule, too? 	</strong>
-
-	<p>Because of the complexity of outputting the data, you can't directly alter the template, but you can copy the radio-station/templates/program-schedule.css file into your theme directory and change the CSS rules for the page.</p>
-	
-	<hr />
-
-	<strong>What if I want to style the DJ on air sidebar widget? </strong>
-
-	<p>Copy the radio-station/templates/djonair.css file to your theme directory.</p>
-
-	<hr />
-	
-	<strong>How do I get an archive page that lists ALL of the playlists instead of just the archives of individual shows? </strong>
-
-	<p>First, grab the radio-station/templates/playlist-archive-template.php file, and copy it to your active theme directory.
-	<br /><br />
-	Then, create a Page in wordpress to hold the playlist archive.
-	<br /><br />
-	Under Page Attributes, set the template to Playlist Archive.  Please note: If you don't copy the template file to your theme first, the option to select it will not appear.</p>
-	
-	<hr />
-
-	<strong>Can show pages link to an archive of related blog posts? </strong>
-
-	<p>Yes, in much the same way as the full playlist archive described above. First, grab the radio-station/templates/show-blog-archive-template.php file, and copy it to your active theme directory.
-	<br /><br />
-	Then, create a Page in wordpress to hold the blog archive.
-	<br /><br />
-	Under Page Attributes, set the template to Show Blog Archive.</p>
-
-	<hr />
-	
-	<strong>How can I list all of my shows? </strong>
-
-	<p>Use the shortcode <code>[list-shows]</code> in your page/posts or use <code>do_shortcode(['list-shows']);</code> in your template files.  This will output an unordered list element containing the titles of and links to all shows marked as "Active". 
-	<br /><br />
-	The following attributes are available for the shortcode:
-		<ul style="list-style: disc inside none; text-indent: 50px;">
-			<li>'genre' => Displays shows only from the specified genre(s).  Separate multiple genres with a comma, e.g. genre="pop,rock".</li>
-		</ul>
-	<br /><br />
-	Example:
-	<code>`[list-shows genre="pop"]`</code>
-	<code>[list-shows genre="pop,rock,metal"]</code></p>
-	
-	<hr />
-
-	<strong>I need users other than just the Administrator and DJ roles to have access to the Shows and Playlists post types.  How do I do that? </strong>
-
-	<p>Since I'm stongly opposed to reinventing the wheel, I recommend Justin Tadlock's excellent "Members" plugin for that purpose.  You can find it on Wordpress.org, here: <a href="http://wordpress.org/extend/plugins/members/" target="_blank">http://wordpress.org/extend/plugins/members/</a>
-	<br /><br />
-	Add the following capabilities to any role you want to give access to Shows and Playlist:
-		<ul style="list-style: disc inside none; text-indent: 50px;">
-			<li>edit_shows</li>
-			<li>edit_published_shows</li>
-			<li>edit_others_shows</li>
-			<li>read_shows</li>
-			<li>edit_playlists</li>
-			<li>edit_published_playlists</li>
-			<li>read_playlists</li>
-			<li>publish_playlists</li>
-			<li>read</li>
-			<li>upload_files</li>
-			<li>edit_posts</li>
-			<li>edit_published_posts</li>
-			<li>publish_posts</li>
-		</ul>
-	<br /><br />
-	If you want the new role to be able to create or approve new shows, you should also give them the following capabilities:
-		<ul style="list-style: disc inside none; text-indent: 50px;">
-			<li>publish_shows</li>
-			<li>edit_others_shows</li>
-		</ul>
-	</p>
-	
-	<hr />
-
-	<strong>How do I change the DJ's avatar in the sidebar widget? </strong>
-
-	<p>The avatar is whatever image is assigned as the DJ/Show's featured image.  All you have to do is set a new featured image.</p>
-
-	<hr />
-	
-	<strong>Why don't any users show up in the DJs list on the Show edit page? </strong>
-
-	<p>You did remember to assign the DJ role to the users you want to be DJs, right?</p>
-	
-	<hr />
-
-	<strong>My DJs can't edit a show page.  What do I do? </strong>
-
-	<p>The only DJs that can edit a show are the ones listed as being ON that show in the DJs select menu.  This is to prevent DJs from editing other DJs shows without permission.</p>
-	
-	<hr />
-
-	<strong>How can I export a list of songs played on a given date? </strong>
-
-	<p>Under the Playlists menu in the dashboard is an Export link.  Simply specify the a date range, and a text file will be generated for you.</p>
-	
-	<hr />
-
-	<strong>Can my DJ's have customized user pages in addition to Show pages? </strong>
-
-	<p>Yes.  These pages are the same as any other author page (edit or create the author.php template file in your theme directory).  A sample can be found in the radio-station/templates/author.php file (please note that this file doesn't actually do anything unless you copy it over to your theme's directory).  Like the other theme templates included with this plugin, this file is based on the TwentyEleven theme and may need to be modified in order to work with your theme.</p>
-	
-	<hr />
-
-	<strong>I don't want to use Gravatar for my DJ's image on their profile page. </strong>
-
-	<p>Then you'll need to install a plugin that lets you add a different image to your DJ's user account and edit your author.php theme file accordingly.  That's a little out of the scope of this plugin.  I recommend Cimy User Extra Fields:  <a href="http://wordpress.org/extend/plugins/cimy-user-extra-fields/" target="_blank">http://wordpress.org/extend/plugins/cimy-user-extra-fields/</a></p>
-	
-	<hr />
-
-	<strong>What languages other than English is the plugin available in, and can you translate the plugin into my language? </strong>
-	
-	<p>Right now:
-		<ul style="list-style: disc inside none; text-indent: 50px;">
-			<li>Albanian (sq_AL)</li>
-			<li>French (fr_FR)</li>
-			<li>German (de_DE)</li>
-			<li>Italian (it_IT)</li>
-			<li>Russion (ru_RU)</li>
-			<li>Serbian (sr_RS)</li>
-			<li>Spanish (es_ES)</li>
-		</ul>
-
-	My foreign language skills are rather lacking.  I managed a Spanish translation, sheerly due to the fact that I still remember at least some of what I learned in high school Spanish class.  But I've included the .pot file in the /languages directory.  If you want to give it a shot, be my guest.  If you <a href="mailto:nblight@nlb-creations.com">send me</a> your finished translation, I'd love to include it.</p>
-	
-	<?php
+	// 2.4.0.8: clear plugin updates transient on activation
+	delete_site_transient( 'update_plugins' );
 }
 
-?>
+// ---------------------------
+// Activation Welcome Redirect
+// ---------------------------
+/* add_action( 'admin_init', 'radio_station_welcome_redirect' );
+function radio_station_welcome_redirect() {
+	if ( !get_transient( 'radio_station_welcome' ) || wp_doing_ajax() || is_network_admin() || !current_user_can( 'install_plugins' ) ) {
+		return;
+	}
+	delete_transient( 'radio_station_welcome' );
+	$location = admin_url( 'admin.php?page=radio-station&welcome=1' );
+	wp_safe_redirect( $location );
+	exit;
+} */
+
+// --------------------------
+// Plugin Deactivation Action
+// --------------------------
+// 2.4.0.8: clear plugin updates transient on deactivation
+// 2.5.0: fix to typo in deactivation hook function and add _plugin
+register_deactivation_hook( RADIO_STATION_FILE, 'radio_station_plugin_deactivation' );
+function radio_station_plugin_deactivation() {
+	flush_rewrite_rules();
+	delete_site_transient( 'update_plugins' );
+}
+
+// -------------------------------
+// Filter Plugin Updates Transient
+// -------------------------------
+// 2.4.0.8: added to ensure Pro never overwrites free on update
+add_filter( 'pre_set_site_transient_update_plugins', 'radio_station_transient_update_plugins', 999 );
+add_filter( 'site_transient_update_plugins', 'radio_station_transient_update_plugins', 999 );
+function radio_station_transient_update_plugins( $transient_data ) {
+	// 2.4.0.9: fix for PHP8 cannot check property_exists of non-object
+	if ( $transient_data && is_object( $transient_data ) && property_exists( $transient_data, 'response' ) ) {
+		$response = $transient_data->response;
+		if ( isset( $response[RADIO_STATION_BASENAME] ) ) {
+			if ( strstr( $response[RADIO_STATION_BASENAME]->url, 'freemius' ) ) {
+				unset( $response[RADIO_STATION_BASENAME] );
+			}
+		}
+		$transient_data->response = $response;
+	}
+	return $transient_data;
+}
+
+// --------------------------------
+// Filter Freemius Plugin Icon Path
+// --------------------------------
+// 2.4.0.8: filter Freemius plugin icon path
+add_filter( 'fs_plugin_icon_radio-station', 'radio_station_freemius_plugin_url_path' );
+function radio_station_freemius_plugin_url_path( $default_path ) {
+	$icon_path = RADIO_STATION_DIR . '/assets/icon-256x256.png';
+	if ( file_exists( $icon_path ) ) {
+		return $icon_path;
+	}
+	$icon_path = RADIO_STATION_DIR . '/images/' . RADIO_STATION_SLUG . '.png';
+	if ( file_exists( $default_path ) ) {
+		return $icon_path;
+	}
+	// 2.5.0: fix to incorrect return of undefined local_path
+	return $default_path;
+}
+
+// ------------------------------------
+// Set Allowed Origins for Radio Player
+// ------------------------------------
+// 2.3.3.9: added for embedded radio player control
+add_filter( 'allowed_http_origins', 'radio_station_allowed_player_origins' );
+function radio_station_allowed_player_origins( $origins ) {
+
+	if ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) {
+		return $origins;
+	}
+	if ( !isset( $_REQUEST['action'] ) || ( 'radio_player' != $_REQUEST['action'] ) ) {
+		return $origins;
+	}
+
+	$netmix = untrailingslashit( RADIO_STATION_NETMIX_DIR );
+	$allowed = array( $netmix );
+	$allowed = apply_filters( 'radio_station_player_allowed_origins', $allowed );
+	foreach ( $allowed as $allow ) {
+		$origins[] = $allow;
+	}
+	return $origins;
+}
+
+
+// -------------------------
+// === Resource Handling ===
+// -------------------------
+
+// ----------------------
+// Enqueue Plugin Scripts
+// ----------------------
+// 2.3.0: added for enqueueing main Radio Station script
+// 2.5.0: change to prevent conflict with radio station theme
+add_action( 'wp_enqueue_scripts', 'radio_station_enqueue_plugin_scripts' );
+function radio_station_enqueue_plugin_scripts() {
+
+	// --- enqueue custom stylesheet if found ---
+	// 2.3.0: added for automatic custom style loading
+	radio_station_enqueue_style( 'custom' );
+
+	// --- enqueue plugin script ---
+	// 2.3.0: added jquery dependency for inline script fragments
+	radio_station_enqueue_script( 'radio-station', array( 'jquery' ), true );
+
+	// --- set script suffix ---
+	$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+	$suffix = ( defined( 'RADIO_STATION_DEBUG' ) && RADIO_STATION_DEBUG ) ? '' : $suffix;
+
+	// -- enqueue javascript timezone detection script ---
+	// 2.3.3.9: activated for improved timezone detection
+	$jstz_url = plugins_url( 'js/jstz' . $suffix . '.js', RADIO_STATION_FILE );
+	wp_enqueue_script( 'jstz', $jstz_url, array(), '1.0.6', false );
+
+	// --- register moment js ---
+	// 2.5.0: move to separate function for reusability
+	radio_station_register_moment();
+	wp_enqueue_script( 'moment' );
+}
+
+// ------------------
+// Register Moment JS
+// ------------------
+// 2.5.0: moved to separate funciton for resusability
+function radio_station_register_moment() {
+	
+	// --- set script suffix ---
+	$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+	$suffix = ( defined( 'RADIO_STATION_DEBUG' ) && RADIO_STATION_DEBUG ) ? '' : $suffix;
+
+	// --- enqueue Moment.js ---
+	// ref: https://momentjs.com
+	// 2.3.3.9: added for improved time format display
+	// 2.5.0: add check for registered script in WP core
+	if ( !wp_script_is( 'moment', 'registered' ) ) {
+		$moment_url = plugins_url( 'js/moment' . $suffix . '.js', RADIO_STATION_FILE );
+		wp_register_script( 'moment', $moment_url, array( 'jquery' ), '2.29.4', false );
+	}
+}
+
+// ---------------------
+// Enqueue Plugin Script
+// ---------------------
+function radio_station_enqueue_script( $scriptkey, $deps = array(), $infooter = false ) {
+
+	// --- set stylesheet filename and child theme path ---
+	$filename = $scriptkey . '.js';
+
+	// 2.3.0: check template hierarchy for file
+	$template = radio_station_get_template( 'both', $filename, 'js' );
+	if ( $template ) {
+
+		// 2.3.2: use plugin version for releases
+		$plugin_version = radio_station_plugin_version();
+		$version_length = strlen( $plugin_version );
+		// 2.5.0: allow for minor version release numbers
+		if ( 4 > $version_length ) {
+			$version = $plugin_version;
+		} else {
+			$version = filemtime( $template['file'] );
+		}
+
+		$url = $template['url'];
+
+		// --- enqueue script ---
+		// 2.5.0: register script before enqueueing
+		wp_register_script( $scriptkey, $url, $deps, $version, $infooter );
+		wp_enqueue_script( $scriptkey );
+	}
+}
+
+// -----------------
+// Add Inline Script
+// -----------------
+// 2.5.0: added for missed inline scripts (via shortcodes)
+function radio_station_add_inline_script( $handle, $js, $position = 'after' ) {
+	
+	// --- add check if script is already done ---
+	if ( !wp_script_is( $handle, 'done' ) ) {
+		// --- handle javascript normally ---
+		wp_add_inline_script( $handle, $js, $position );
+	} else {
+		// --- store extra javascript for later output ---
+		if ( !strstr( $handle, '-admin' ) ) {
+			global $radio_station_scripts;
+			add_action( 'wp_print_footer_scripts', 'radio_station_print_footer_scripts', 20 );
+			if ( !isset( $radio_station_scripts[$handle] ) ) {
+				$radio_station_scripts[$handle] = '';
+			}
+			$radio_station_scripts[$handle] .= $js;
+		} else {
+			global $radio_station_admin_scripts;
+			add_action( 'admin_print_footer_scripts', 'radio_station_admin_print_footer_scripts', 20 );
+			if ( !isset( $radio_station_admin_scripts[$handle] ) ) {
+				$radio_station_admin_scripts[$handle] = '';
+			}
+			$radio_station_admin_scripts[$handle] .= $js;
+		}
+	}
+}
+
+// --------------------
+// Print Footer Scripts
+// --------------------
+// 2.5.0: added for missed inline scripts
+function radio_station_print_footer_scripts() {
+	global $radio_station_scripts;
+	if ( is_array( $radio_station_scripts ) && ( count( $radio_station_scripts ) > 0 ) ) {
+		foreach ( $radio_station_scripts as $handle => $js ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<script id="' . esc_attr( $handle ) . '-js-after">' . $js . '</script>';
+		}
+	}
+}
+
+// --------------------------
+// Print Admin Footer Scripts
+// --------------------------
+function radio_station_admin_print_footer_scripts() {
+	global $radio_station_admin_scripts;
+	if ( is_array( $radio_station_admin_scripts ) && ( count( $radio_station_admin_scripts ) > 0 ) ) {
+		foreach ( $radio_station_admin_scripts as $handle => $js ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<script id="' . esc_attr( $handle ) . '-js-after">' . $js . '</script>';
+		}
+	}
+}
+
+// -------------------------
+// Enqueue Plugin Stylesheet
+// -------------------------
+// ?.?.?: widgets.css style conditional enqueueing moved to within widget classes
+// 2.3.0: added abstracted method for enqueueing plugin stylesheets
+// 2.3.0: moved master schedule style enqueueing to conditional in master-schedule.php
+// 2.5.0: added optional dependencies argument to style enqueues
+function radio_station_enqueue_style( $stylekey, $deps = array() ) {
+
+	// --- check style enqueued switch ---
+	global $radio_station_styles;
+	if ( !isset( $radio_station_styles ) ) {
+		$radio_station_styles = array();
+	}
+	if ( !isset( $radio_station_styles[$stylekey] ) ) {
+
+		// --- set stylesheet filename and child theme path ---
+		$filename = 'rs-' . $stylekey . '.css';
+
+		// 2.3.0: check template hierarchy for file
+		$template = radio_station_get_template( 'both', $filename, 'css' );
+		if ( $template ) {
+
+			// --- use found template values ---
+			// 2.3.2: use plugin version for releases
+			$plugin_version = radio_station_plugin_version();
+			$version_length = strlen( $plugin_version );
+			// 2.5.0: allow for minor version release numbers
+			if ( 4 > $version_length ) {
+				$version = $plugin_version;
+			} else {
+				$version = filemtime( $template['file'] );
+			}
+			$url = $template['url'];
+
+			// --- enqueue styles in footer ---
+			wp_enqueue_style( 'rs-' . $stylekey, $url, $deps, $version, 'all' );
+
+			// --- set style enqueued switch ---
+			$radio_station_styles[$stylekey] = true;
+		}
+	}
+}
+
+// -----------------
+// Add Inline Styles
+// -----------------
+// 2.5.0: added for missed inline styles (via shortcodes)
+function radio_station_add_inline_style( $handle, $css ) {
+
+	// --- add check if style is already done ---
+	if ( !wp_style_is( $handle, 'done' ) ) {
+		// --- handle javascript normally ---
+		wp_add_inline_style( $handle, $css );
+	} else {
+		// --- store extra javascript for later output ---
+		if ( !strstr( $handle, '-admin' ) ) {
+			global $radio_station_styles;
+			add_action( 'wp_print_footer_scripts', 'radio_station_print_footer_styles', 20 );
+			if ( !isset( $radio_station_styles[$handle] ) ) {
+				$radio_station_styles[$handle] = '';
+			}
+			$radio_station_styles[$handle] .= $css;
+		} else {
+			global $radio_station_admin_styles;
+			add_action( 'admin_print_footer_scripts', 'radio_station_admin_print_footer_styles', 20 );
+			if ( !isset( $radio_station_admin_styles[$handle] ) ) {
+				$radio_station_admin_styles[$handle] = '';
+			}
+			$radio_station_admin_styles[$handle] .= $css;
+		}
+	}
+}
+
+// -------------------
+// Print Footer Styles
+// -------------------
+// 2.5.0: added for missed inline styles
+function radio_station_print_footer_styles() {
+	global $radio_station_styles;
+	if ( is_array( $radio_station_styles ) && ( count( $radio_station_styles ) > 0 ) ) {
+		foreach ( $radio_station_styles as $handle => $css ) {
+			echo '<style>' . wp_kses_post( $css ) . '</style>';
+		}
+	}
+}
+
+// -------------------------
+// Print Admin Footer Styles
+// -------------------------
+// 2.5.0: added for missed inline styles
+function radio_station_admin_print_footer_styles() {
+	global $radio_station_admin_styles;
+	if ( is_array( $radio_station_admin_styles ) && ( count( $radio_station_admin_styles ) > 0 ) ) {
+		foreach ( $radio_station_admin_styles as $handle => $css ) {
+			echo '<style>' . wp_kses_post( $css ) . '</style>';
+		}
+	}
+}
+
+// ------------------
+// Enqueue Datepicker
+// ------------------
+// 2.3.0: enqueued separately by override post type only
+// 2.3.3.9: moved here from radio-station-admin.php
+function radio_station_enqueue_datepicker() {
+
+	// --- enqueue jquery datepicker ---
+	wp_enqueue_script( 'jquery-ui-datepicker' );
+
+	// --- enqueue jquery datepicker styles ---
+	// 2.3.0: update theme styles from 1.8.2 to 1.12.1
+	// 2.3.0: use local datepicker styles instead of via Google
+	// $protocol = is_ssl() ? 'https' : 'http';
+	// $url = $protocol . '://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css';
+	// wp_enqueue_style( 'jquery-ui-style', $url, array(), '1.12.1' );
+	$style = radio_station_get_template( 'both', 'jquery-ui.css', 'css' );
+	wp_enqueue_style( 'jquery-ui-smoothness', $style['url'], array(), '1.12.1', 'all' );
+
+}
+
+// ---------------------------
+// Enqueue Widget Color Picker
+// ---------------------------
+// 2.5.0: added for widget color options
+function radio_station_enqueue_color_picker() {
+
+	// --- enqueue color picker ---
+	$suffix = SCRIPT_DEBUG ? '' : '.min';
+	$url = plugins_url( '/js/wp-color-picker-alpha' . $suffix . '.js', RADIO_STATION_FILE );
+	wp_enqueue_script( 'wp-color-picker-a', $url, array( 'wp-color-picker' ), '3.0.0', true );
+
+	// --- init color picker fields ---
+	$js = "jQuery(document).ready(function() {";
+	$js .= "if (jQuery('.color-picker').length) {jQuery('.color-picker').wpColorPicker();}";
+	$js .= "});" . "\n";
+	// 2.5.0: use radio_station_add_inline_script
+	radio_station_add_inline_script( 'wp-color-picker-a', $js );
+}
+
+// -------------------------------
+// Enqueue Localized Script Values
+// -------------------------------
+add_action( 'wp_enqueue_scripts', 'radio_station_localize_script' );
+function radio_station_localize_script() {
+
+	// 2.5.0: check flag to run once only
+	global $radio_station;
+	if ( isset( $radio_station['script-localized'] ) ) {
+		return;
+	}
+
+	$js = radio_station_localization_script();
+	// 2.5.0: use radio_station_add_inline_script
+	radio_station_add_inline_script( 'radio-station', $js );
+	$radio_station['script-localized'] = true;
+}
+
+// -------------------
+// Localization Script
+// -------------------
+// 2.3.3.9: separated script from enqueueing
+function radio_station_localization_script() {
+
+	// --- create settings objects ---
+	$js = "var radio = {}; radio.timezone = {}; radio.time = {}; radio.labels = {}; radio.units = {};";
+
+	// 2.4.0.6: add filterable time display separator
+	$time_separator = apply_filters( 'radio_station_time_separator', ':', 'javascript' );
+	$js .= " radio.sep = '" . esc_js( $time_separator ) . "';";
+
+	// --- set AJAX URL ---
+	// 2.3.2: add admin AJAX URL
+	$js .= "radio.ajax_url = '" . esc_url( admin_url( 'admin-ajax.php' ) ) . "';" . "\n";
+
+	// --- clock time format ---
+	// TODO: maybe set time format ?
+	// ref: https://devhints.io/wip/intl-datetime
+	$clock_format = radio_station_get_setting( 'clock_time_format' );
+	$js .= "radio.clock_format = '" . esc_js( $clock_format ) . "';" . "\n";
+
+	// --- detect touchscreens ---
+	// ref: https://stackoverflow.com/a/52855084/5240159
+	// 2.5.0: use !any-pointer:fine instead of pointer:coarse
+	// ref: https://stackoverflow.com/a/51774045/5240159
+	$js .= "matchmedia = window.matchMedia || window.msMatchMedia;" . "\n";
+	$js .= "radio.touchscreen = !matchmedia('(any-pointer: fine)').matches;" . "\n";
+
+	// --- set debug flag ---
+	if ( RADIO_STATION_DEBUG ) {
+		$js .= "radio.debug = true;" . "\n";
+	} else {
+		$js .= "radio.debug = false;" . "\n";
+	}
+
+	// 2.5.0: set separate clock debug flag
+	if ( isset( $_REQUEST['rs-clock-debug'] ) && ( '1' == sanitize_text_field( $_REQUEST['rs-clock-debug'] ) ) ) {
+		$js .= "radio.clock_debug = true;" . "\n";
+	} else {
+		$js .= "radio.clock_debug = false;" . "\n";
+	}
+
+	// --- radio timezone ---
+	// 2.3.2: added get timezone function
+	$timezone = radio_station_get_timezone();
+
+	if ( stristr( $timezone, 'UTC' ) ) {
+
+		if ( 'UTC' == $timezone ) {
+			$offset = '0';
+		} else {
+			$offset = str_replace( 'UTC', '', $timezone );
+		}
+		$js .= "radio.timezone.offset = " . esc_js( $offset * 60 * 60 ) . "; ";
+		if ( '0' == $offset ) {
+			$offset = '';
+		} elseif ( $offset > 0 ) {
+			$offset = '+' . $offset;
+		}
+		$js .= "radio.timezone.code = 'UTC" . esc_js( $offset ) . "';" . "\n";
+		$js .= "radio.timezone.utc = '" . esc_js( $offset ) . "';" . "\n";
+		$js .= "radio.timezone.utczone = true;" . "\n";
+
+	} else {
+
+		// --- get offset and code from timezone location ---
+		$datetimezone = new DateTimeZone( $timezone );
+		$offset = $datetimezone->getOffset( new DateTime() );
+		$offset_hours = $offset / ( 60 * 60 );
+		if ( 0 == $offset ) {
+			$utc_offset = '';
+		} elseif ( $offset > 0 ) {
+			$utc_offset = '+' . $offset_hours;
+		} else {
+			$utc_offset = $offset_hours;
+		}
+		$utc_offset = 'UTC' . $utc_offset;
+		$code = radio_station_get_timezone_code( $timezone );
+		$js .= "radio.timezone.location = '" . esc_js( $timezone ) . "';" . "\n";
+		$js .= "radio.timezone.offset = " . esc_js( $offset ) . ";" . "\n";
+		$js .= "radio.timezone.code = '" . esc_js( $code ) . "';" . "\n";
+		$js .= "radio.timezone.utc = '" . esc_js( $utc_offset ) . "';" . "\n";
+		$js .= "radio.timezone.utczone = false;" . "\n";
+
+	}
+
+	if ( defined( 'RADIO_STATION_USE_SERVER_TIMES' ) && RADIO_STATION_USE_SERVER_TIMES ) {
+		$js .= "radio.timezone.adjusted = false;" . "\n";
+	} else {
+		$js .= "radio.timezone.adjusted = true;" . "\n";
+	}
+
+	// --- set user timezone offset ---
+	// (and convert offset minutes to seconds)
+	$js .= "radio.timezone.useroffset = (new Date()).getTimezoneOffset() * 60;" . "\n";
+
+	// --- translated months array ---
+	// 2.3.2: also translate short month labels
+	$js .= "radio.labels.months = new Array(";
+	$short = "radio.labels.smonths = new Array(";
+	$months = array( 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' );
+	foreach ( $months as $i => $month ) {
+		$month = radio_station_translate_month( $month );
+		$short_month = radio_station_translate_month( $month, true );
+		$month = str_replace( "'", "", $month );
+		$short_month = str_replace( "'", "", $short_month );
+		$js .= "'" . esc_js( $month ) . "'";
+		$short .= "'" . esc_js( $short_month ) . "'";
+		if ( $i < ( count( $months ) - 1 ) ) {
+			$js .= ", ";
+			$short .= ", ";
+		}
+	}
+	$js .= ");" . "\n";
+	$js .= $short . ");" . "\n";
+
+	// --- translated days array ---
+	// 2.3.2: also translate short day labels
+	$js .= "radio.labels.days = new Array(";
+	$short = "radio.labels.sdays = new Array(";
+	$days = array( 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' );
+	foreach ( $days as $i => $day ) {
+		$day = radio_station_translate_weekday( $day );
+		$short_day = radio_station_translate_weekday( $day, true );
+		$day = str_replace( "'", "", $day );
+		$short_day = str_replace( "'", "", $short_day );
+		$js .= "'" . esc_js( $day ) . "'";
+		$short .= "'" . esc_js( $short_day ) . "'";
+		if ( $i < ( count( $days ) - 1 ) ) {
+			$js .= ", ";
+			$short .= ", ";
+		}
+	}
+	$js .= ");" . "\n";
+	$js .= $short . ");" . "\n";
+
+	// --- set countdown labels ---
+	// 2.5.0: moved here from countdown enqueue function
+	$js .= "radio.labels.showstarted = '" . esc_js( __( 'This Show has started.', 'radio-station' ) ) . "';" . "\n";
+	$js .= "radio.labels.showended = '" . esc_js( __( 'This Show has ended.', 'radio-station' ) ) . "';" . "\n";
+	$js .= "radio.labels.playlistended = '" . esc_js( __( 'This Playlist has ended.', 'radio-station') ) . "';" . "\n";
+	$js .= "radio.labels.timecommencing = '" . esc_js( __( 'Commencing in', 'radio-station' ) ) . "';" . "\n";
+	$js .= "radio.labels.timeremaining = '" . esc_js( __( 'Remaining Time', 'radio-station' ) ) . "';" . "\n";
+
+	// --- translated time unit strings ---
+	$js .= "radio.units.am = '" . esc_js( radio_station_translate_meridiem( 'am' ) ) . "'; ";
+	$js .= "radio.units.pm = '" . esc_js( radio_station_translate_meridiem( 'pm' ) ) . "'; ";
+	$js .= "radio.units.second = '" . esc_js( __( 'Second', 'radio-station' ) ) . "'; ";
+	$js .= "radio.units.seconds = '" . esc_js( __( 'Seconds', 'radio-station' ) ) . "'; ";
+	$js .= "radio.units.minute = '" . esc_js( __( 'Minute', 'radio-station' ) ) . "'; ";
+	$js .= "radio.units.minutes = '" . esc_js( __( 'Minutes', 'radio-station' ) ) . "'; ";
+	$js .= "radio.units.hour = '" . esc_js( __( 'Hour', 'radio-station' ) ) . "'; ";
+	$js .= "radio.units.hours = '" . esc_js( __( 'Hours', 'radio-station' ) ) . "'; ";
+	$js .= "radio.units.day = '" . esc_js( __( 'Day', 'radio-station' ) ) . "'; ";
+	$js .= "radio.units.days = '" . esc_js( __( 'Days', 'radio-station' ) ) . "'; " . "\n";
+
+	// --- time key map ---
+	// 2.3.3.9: added for PHP Date Format to MomentJS conversions
+	// (object of approximate 'PHP date() key':'moment format() key' conversions)
+	$js .= "radio.moment_map = {'d':'D', 'j':'D', 'w':'e', 'D':'e', 'l':'e', 'N':'e', 'S':'Do', ";
+	$js .= "'F':'M', 'm':'M', 'n':'M', 'M':'M', 'Y':'YYYY', 'y':'YY',";
+	$js .= "'a':'a', 'A':'a', 'g':'h', 'G':'H', 'g':'h', 'H':'H', 'i':'m', 's':'s'}" . "\n";
+
+	// --- convert show times ---
+	// 2.3.3.9:
+	// 2.5.0: shorten logic for convert show times
+	$usertimes = radio_station_get_setting( 'convert_show_times' );
+	$convert_show_times = ( 'yes' === (string) $usertimes ) ? 'true' : 'false';
+	$js .= "radio.convert_show_times = " . esc_js( $convert_show_times ) . ";" . "\n";
+
+	// --- add inline script ---
+	$js = apply_filters( 'radio_station_localization_script', $js );
+	return $js;
+}
+
+// -------------------------
+// Filter for Streaming Data
+// -------------------------
+// 2.3.3.7: added streaming data filter for player integration
+add_filter( 'radio_player_data', 'radio_station_streaming_data' );
+function radio_station_streaming_data( $data, $station = false ) {
+	$data = array(
+		'script'	=> radio_station_get_setting( 'player_script' ),
+		'instance'	=> 0,
+		'url'		=> radio_station_get_stream_url(),
+		'format'	=> radio_station_get_setting( 'streaming_format' ),
+		'fallback'	=> radio_station_get_fallback_url(),
+		'fformat'	=> radio_station_get_setting( 'fallback_format' ),
+	);
+	if ( RADIO_STATION_DEBUG ) {
+		echo '<span style="display:none;">Player Stream Data: ' . esc_html( print_r( $data, true ) ) . '</span>' . "\n";
+	}
+	$data = apply_filters( 'radio_station_streaming_data', $data, $station );
+	return $data;
+}
+
+
+// -------------------------
+// === Transient Caching ===
+// -------------------------
+// 2.5.0: moved here from includes/support-functions.php
+
+// --------------------------
+// Delete Prefixed Transients
+// --------------------------
+// 2.3.3.4: added helper for clearing transient data
+function radio_station_delete_transients_with_prefix( $prefix ) {
+	global $wpdb;
+
+	// 2.3.3.9: add trailing underscore to prefix
+	$prefix = $wpdb->esc_like( '_transient_' . $prefix . '_' );
+
+	// 2.3.3.9: fix to LIKE match
+	$query = "SELECT `option_name` FROM " . $wpdb->prefix . "options WHERE `option_name` LIKE '%" . $prefix . "%'";
+	$results = $wpdb->get_results( $query, ARRAY_A );
+	// if ( RADIO_STATION_DEBUG ) {
+	//	echo $query . PHP_EOL . '<br>';
+	//	echo 'Transients: ' . esc_html( print_r( $results, true ) ) . "\n";
+	// }
+	if ( !$results || !is_array( $results ) || ( count( $results ) < 1 ) ) {
+		return;
+	}
+
+	foreach ( $results as $option ) {
+		// 2.3.3.9: fix to replace malgunctioning ltrim
+		// $key = ltrim( $option['option_name'], '_transient_' );
+		$key = substr( $option['option_name'], 11 );
+		delete_transient( $key );
+		// 2.3.3.9: also delete transient cache object by key
+		wp_cache_delete( $key, 'transient' );
+		// if ( RADIO_STATION_DEBUG ) {
+		// 	echo "Deleting transient and cache object for '" . esc_html( $key ) . "'" . "\n";
+		// }
+	}
+}
+
+// -----------------
+// Clear Cached Data
+// -----------------
+// 2.3.3.9: made into separate function
+// 2.4.0.3: added second argument for post type
+function radio_station_clear_cached_data( $post_id = false, $post_type = false ) {
+
+	// --- clear main schedule transients ---
+	// 2.3.3: remove current show transient
+	// 2.3.4: add previous show transient
+	delete_transient( 'radio_station_current_schedule' );
+	delete_transient( 'radio_station_next_show' );
+	delete_transient( 'radio_station_previous_show' );
+
+	// --- clear time-based schedule transients ---
+	// 2.3.4: delete all prefixed transients (for times)
+	radio_station_delete_transients_with_prefix( 'radio_station_current_schedule' );
+	radio_station_delete_transients_with_prefix( 'radio_station_next_show' );
+	radio_station_delete_transients_with_prefix( 'radio_station_previous_show' );
+
+	// --- maybe clear show meta data ---
+	if ( $post_id ) {
+		do_action( 'radio_station_clear_data', $post_type, $post_id );
+		if ( $post_type ) {
+			do_action( 'radio_station_clear_data', $post_type . '_meta', $post_id );
+		}
+	}
+
+	// --- maybe send directory ping ---
+	// 2.3.1: added directory update ping option
+	// 2.3.2: queue directory ping
+	radio_station_queue_directory_ping();
+
+	// --- set last updated schedule time ---
+	// 2.3.2: added for data API use
+	update_option( 'radio_station_schedule_updated', time() );
+
+}
+
+// ---------------------------------
+// Clear Cache on Status Transitions
+// ---------------------------------
+// 2.4.0.4: clear show and override caches on post status changes
+add_action( 'transition_post_status', 'radio_station_clear_cache_on_transitions', 10, 3 );
+function radio_station_clear_cache_on_transitions( $new_status, $old_status, $post ) {
+	if ( $new_status == $old_status ) {
+		return;
+	}
+	$post_types = array( RADIO_STATION_SHOW_SLUG, RADIO_STATION_OVERRIDE_SLUG );
+	if ( in_array( $post->post_type, $post_types ) ) {
+		radio_station_clear_cached_data( $post->ID, $post->post_type );
+	}
+}
+
+
+// -----------------
+// === Debugging ===
+// -----------------
+
+// --------------------------
+// maybe Clear Transient Data
+// --------------------------
+// 2.3.0: clear show transients if debugging
+// 2.3.1: added action to init hook
+// 2.3.1: check clear show transients option
+add_action( 'init', 'radio_station_clear_transients' );
+function radio_station_clear_transients() {
+	$clear_transients = radio_station_get_setting( 'clear_transients' );
+	if ( RADIO_STATION_DEBUG || ( 'yes' === (string) $clear_transients ) ) {
+		// 2.3.2: do not clear on AJAX calls
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+			return;
+		}
+		// 2.3.3.9: just use clear cached data function
+		radio_station_clear_cached_data( false );
+	}
+}
+
+// ------------------------
+// Debug Output and Logging
+// ------------------------
+// 2.3.0: added debugging function
+function radio_station_debug( $data, $echo = true, $file = false ) {
+
+	// --- maybe output debug info ---
+	if ( $echo ) {
+		// 2.3.0: added span wrap for hidden display
+		// 2.3.1.1: added class for page source searches
+		// 2.5.0: wrap in esc_html anyway (though it might mangle debug output)
+		echo '<span class="radio-station-debug" style="display:none;">' . esc_html( $data ) . '</span>' . PHP_EOL;
+	}
+
+	// --- check for logging constant ---
+	if ( defined( 'RADIO_STATION_DEBUG_LOG' ) ) {
+		if ( !$file && RADIO_STATION_DEBUG_LOG ) {
+			$file = 'radio-station.log';
+		} elseif ( false === RADIO_STATION_DEBUG_LOG ) {
+			$file = false;
+		}
+	}
+
+	// --- write to debug file ---
+	if ( $file ) {
+		if ( !is_dir( RADIO_STATION_DIR . '/debug' ) ) {
+			wp_mkdir_p( RADIO_STATION_DIR . '/debug' );
+		}
+		$file = RADIO_STATION_DIR . '/debug/' . $file;
+		error_log( $data, 3, $file );
+	}
+}
+
+// ---------------------
+// Freemius Object Debug
+// ---------------------
+// 2.4.0.4: added to debug freemius instance
+add_action( 'shutdown', 'radio_station_freemius_debug' );
+function radio_station_freemius_debug() {
+	if ( is_admin() && RADIO_STATION_DEBUG && current_user_can( 'manage_options' ) ) {
+		// 2.4.0.6: check if global instance is set directly
+		if ( isset( $GLOBALS['radio_station_freemius'] ) ) {
+			$instance = $GLOBALS['radio_station_freemius'];
+			echo '<span style="display:none;">Freemius Object: ' . esc_html( print_r( $instance, true ) ) . '</span>';
+		}
+	}
+}
+
+// ---------------------------
+// Debug Footer Scripts/Styles
+// ---------------------------
+// add_action( 'wp_footer', 'radio_station_script_debug', 1 );
+function radio_station_script_debug() {
+	if ( !RADIO_STATION_DEBUG ) {
+		return;
+	}
+	if ( isset( $_REQUEST['debug-script'] ) ) {
+		$handle = $_REQUEST['debug-script'];
+		global $wp_scripts;
+		$debug = $wp_scripts->registered[$handle];
+		echo '<span style="display:none;">Script object for ' . $handle . ': ' . print_r( $debug, true ) . '</span>' . "\n";
+	}
+	if ( isset( $_REQUEST['debug-style'] ) ) {
+		$handle = $_REQUEST['debug-style'];
+		global $wp_styles;
+		$debug = $wp_styles->registered[$handle];
+		echo '<span style="display:none;">Style object for ' . $handle . ': ' . print_r( $debug, true ) . '</span>' . "\n";
+	}
+}
+
