@@ -610,19 +610,6 @@ $options = array(
 		'pro'     => true,
 	),
 
-	// --- [Pro/Player] Metadata URL ---
-	// 2.4.0.3: added for alternative stream metadata URL
-	'player_bar_metadata' => array(
-		'type'    => 'text',
-		'options' => 'URL',
-		'label'   => __( 'Metadata URL', 'radio-station' ),
-		'default' => '',
-		'tab'     => 'player',
-		'section' => 'bar',
-		'helper'  => __( 'Now playing metadata is normally retrieved via the Stream URL. Use this setting if you need to provide an alternative metadata location.', 'radio-station' ),
-		'pro'     => true,
-	),
-
 	// --- [Pro/Player] Track Animation ---
 	// 2.5.0: added track animation option
 	'player_bar_track_animation' => array(
@@ -641,6 +628,32 @@ $options = array(
 		'pro'     => true,	
 	),
 
+	// --- [Pro/Player] Metadata URL ---
+	// 2.4.0.3: added for alternative stream metadata URL
+	'player_bar_metadata' => array(
+		'type'    => 'text',
+		'options' => 'URL',
+		'label'   => __( 'Metadata URL', 'radio-station' ),
+		'default' => '',
+		'tab'     => 'player',
+		'section' => 'bar',
+		'helper'  => __( 'Now playing metadata is normally retrieved via the Stream URL. Use this setting if you need to provide an alternative metadata location.', 'radio-station' ),
+		'pro'     => true,
+	),
+
+	// --- [Pro/Player] Store Track Metadata ---
+	// 2.5.6: added option to store stream 
+	'player_store_metadata' => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Store Track Metadata?', 'radio-station' ),
+		'default' => 'yes',
+		'value'   => 'yes',
+		'tab'     => 'player',
+		'section' => 'bar',
+		'helper'  => __( 'Save now playing track metadata in a separate database table for later use.', 'radio-station' ),
+		'pro'     => true,
+	);
+		
 	// === Master Schedule Page ===
 
 	// --- Schedule Page ---

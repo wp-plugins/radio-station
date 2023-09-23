@@ -401,6 +401,7 @@ We recommend you test these on a Staging site (or a development copy of your liv
 == Changelog ==
 
 = 2.5.6 =
+* Updated: Freemius SDK (2.5.11)
 * Added: Filter for query and meta for show post list shortcode
 * Updated: Language translations file (.pot)
 * Updated: Bundled Dutch translation
