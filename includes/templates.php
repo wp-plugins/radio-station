@@ -405,10 +405,13 @@ function radio_station_single_content_template( $content, $post_type ) {
 		$templates[] = RADIO_STATION_DIR . '/templates/single-show-content.php';
 	}
 	$templates = apply_filters( 'radio_station_' . $post_type . '_content_templates', $templates, $post_type );
-	foreach ( $templates as $template ) {
-		if ( file_exists( $template ) ) {
-			$content_template = $template;
-			break;
+	// 2.5.6: added check that templates is still a populated array
+	if ( is_array( $templates ) && ( count( $templates ) > 0 ) ) {
+		foreach ( $templates as $template ) {
+			if ( file_exists( $template ) ) {
+				$content_template = $template;
+				break;
+			}
 		}
 	}
 	if ( !isset( $content_template ) ) {

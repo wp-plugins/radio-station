@@ -15,6 +15,7 @@ Radio Station lets you build and manage a Show Schedule for a radio station or I
 
 [Live Demo](https://demo.radiostation.pro/) | [Documentation](https://radiostation.pro/docs/) | [Support](https://wordpress.org/support/plugin/radio-station/) | [**Upgrade to PRO**!](https://radiostation.pro/pricing/)
 
+This plugin can be downloaded for free without any paid subscription from the [official WordPress repository](https://wordpress.org/plugins/radio-station/).
 
 #### RADIO STATION by netmix®† - THE BEST WORDPRESS PLUGIN FOR BROADCASTERS!
 

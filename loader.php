@@ -227,16 +227,19 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// --- Pro Functions ---
 			if ( !isset( $args['proslug'] ) ) {
 				$proslug = $this->plugin_data( '@fs_premium_only' );
-				// 1.0.1: if more than one file, extract pro slug based on the first filename
-				if ( !strstr( $proslug, ',' ) ) {
-					$profiles = array( $proslug );
-					$proslug = trim( $proslug );
-				} else {
-					$profiles = explode( ',', $proslug );
-					$proslug = trim( $profiles[0] );
+				// 1.3.0: check for pro slug string
+				if ( is_string( $proslug ) ) {
+					// 1.0.1: if more than one file, extract pro slug based on the first filename
+					if ( !strstr( $proslug, ',' ) ) {
+						$profiles = array( $proslug );
+						$proslug = trim( $proslug );
+					} else {
+						$profiles = explode( ',', $proslug );
+						$proslug = trim( $profiles[0] );
+					}
+					$args['proslug'] = substr( $proslug, 0, - 4 ); // strips .php extension
+					$args['profiles'] = $profiles;
 				}
-				$args['proslug'] = substr( $proslug, 0, - 4 ); // strips .php extension
-				$args['profiles'] = $profiles;
 			}
 
 			// --- Update Loader Args ---
@@ -3470,6 +3473,9 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // =========
 // CHANGELOG
 // =========
+
+// == 1.3.0 ==
+// - add check if pro slug data is a string
 
 // == 1.2.9 ==
 // - fix empty number field converting to NaN value
