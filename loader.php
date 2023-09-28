@@ -5,7 +5,7 @@
 // =================================
 //
 // --------------
-// Version: 1.2.9
+// Version: 1.3.0
 // --------------
 // Note: Changelog and structure at end of file.
 //
@@ -634,6 +634,16 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						}
 						$newsettings = $posted;
 
+					} elseif ( 'email' == $type ) {
+
+						// --- email field ---
+						// 1.3.0: added explicitly for email field type
+						$posted = isset( $_POST[$postkey] ) ? sanitize_text_field( $_POST[$postkey] ) : null;
+						if ( !is_string( $valid ) ) {
+							$valid = 'EMAIL';
+						}
+						$newsettings = $posted;
+
 					} elseif ( ( 'number' == $type ) || ( 'numeric' == $type ) ) {
 
 						// --- number field value ---
@@ -785,6 +795,16 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						}
 						$settings[$key] = $posted;
 
+					} else {
+						
+						// --- fallback to text type ---
+						// 1.3.0: added for unspecified option field type
+						$posted = isset( $_POST[$postkey] ) ? sanitize_text_field( $_POST[$postkey] ) : null;
+						if ( !is_string( $valid ) ) {
+							$valid = 'TEXT';
+						}
+						$newsettings = $posted;						
+						
 					}
 
 					if ( $this->debug ) {
@@ -3475,6 +3495,8 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // =========
 
 // == 1.3.0 ==
+// - added explicit email option field type
+// - added fallback to text option firld type
 // - add check if pro slug data is a string
 
 // == 1.2.9 ==

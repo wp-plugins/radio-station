@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 = 2.5.6 =
 * Updated: Freemius SDK (2.5.11)
+* Updated: Plugin Panel (1.3.0)
 * Added: Filter for query and meta for show post list shortcode
 * Updated: Language translations file (.pot)
 * Updated: Bundled Dutch translation
