@@ -323,9 +323,11 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array(), $att
 
 		// 2.3.3.4: handle possible multiple show post values
 		// 2.3.3.9: added 'i:' prefix to LIKE match value
-		// TODO: use wpdb prepare method on LIKE statement
-		$query = "SELECT post_id,meta_value FROM " . $wpdb->prefix . "postmeta WHERE meta_key = %s AND meta_value LIKE '%i:" . $show_id . "%'";
+		// 2.5.6: fix prepare query syntax by separating LIKE statement
+		$query = "SELECT post_id,meta_value FROM " . $wpdb->prefix . "postmeta WHERE meta_key = %s";
 		$query = $wpdb->prepare( $query, $metakey );
+		// TODO: use wpdb prepare method on LIKE statement?
+		$query .= "AND meta_value LIKE '%i:" . $show_id . "%'";
 		$results = $wpdb->get_results( $query, ARRAY_A );
 		if ( RADIO_STATION_DEBUG ) {
 			echo '<span style="display:none;">Related Query: ' . esc_html( $query ) . '</span>';
@@ -871,17 +873,22 @@ function radio_station_get_linked_override_times( $post_id ) {
 
 	$override_ids = radio_station_get_linked_overrides( $post_id );
 	$overrides = array();
-	foreach ( $override_ids as $override_id ) {
-		$schedule = get_post_meta( $override_id, 'show_override_sched', true );
-		if ( $schedule ) {
-			if ( !is_array( $overrides ) ) {
-				$override = array();
-			}
-			if ( !is_array( $schedule ) ) {
-				$schedule = array( $schedule );
-			}
-			foreach ( $schedule as $override ) {
-				$overrides[] = $override;
+	if ( $override_ids && is_array( $override_ids ) && ( count( $override_ids ) > 0 ) ) {
+		foreach ( $override_ids as $override_id ) {
+			$schedule = get_post_meta( $override_id, 'show_override_sched', true );
+			if ( $schedule ) {
+				if ( !is_array( $overrides ) ) {
+					$override = array();
+				}
+				if ( !is_array( $schedule ) ) {
+					$schedule = array( $schedule );
+				}
+				foreach ( $schedule as $override ) {
+					// 2.5.6: add check if override is disabled
+					if ( 'yes' != $override['disabled'] ) {
+						$overrides[] = $override;
+					}
+				}
 			}
 		}
 	}

@@ -662,45 +662,51 @@ $show_past_dates = apply_filters( 'radio_station_override_show_past_dates', fals
 $overrides = radio_station_get_linked_override_times( $post_id );
 $scheduled = '';
 if ( $overrides && is_array( $overrides ) && ( count( $overrides ) > 0 ) ) {
+	if ( RADIO_STATION_DEBUG ) {
+		echo '<span style="display:none;">LINKED OVERRIDES: ' . esc_html( print_r( $overrides, true ) ) . '</span>' . "\n";
+	}
 	$now = radio_station_get_now();
 	foreach ( $overrides as $override ) {
 		if ( 'yes' != $override['disabled'] ) {
+			// 2.5.6: added check that override keys are not empty
+			if ( !empty( $override['date'] ) && !empty( $override['start_hour'] ) && !empty( $override['start_min'] ) && !empty( $override['start_meridian'] ) && !empty( $override['end_hour'] ) && !empty( $override['end_min'] ) && !empty( $override['end_meridian'] ) ) {
 
-			$start = $override['date'] . ' ' . $override['start_hour'] . ':' . $override['start_min'] . ' ' . $override['start_meridian'];
-			$end = $override['date'] . ' ' . $override['end_hour'] . ':' . $override['end_min'] . ' ' . $override['end_meridian'];
-			$override_start_time = radio_station_to_time( $start );
-			$override_end_time = radio_station_to_time( $end );
-			if ( $override_end_time <= $override_start_time ) {
-				$override_end_time = $override_end_time + ( 24 * 60 * 60 );
-			}
+				$start = $override['date'] . ' ' . $override['start_hour'] . ':' . $override['start_min'] . ' ' . $override['start_meridian'];
+				$end = $override['date'] . ' ' . $override['end_hour'] . ':' . $override['end_min'] . ' ' . $override['end_meridian'];
+				$override_start_time = radio_station_to_time( $start );
+				$override_end_time = radio_station_to_time( $end );
+				if ( $override_end_time <= $override_start_time ) {
+					$override_end_time = $override_end_time + ( 24 * 60 * 60 );
+				}
 
-			// --- maybe filter out past scheduled dates ---
-			if ( $show_past_dates || ( $override_end_time > $now ) ) {
+				// --- maybe filter out past scheduled dates ---
+				if ( $show_past_dates || ( $override_end_time > $now ) ) {
 
-				$start_display = radio_station_get_time( $start_data_format, $override_start_time );
-				$end_display = radio_station_get_time( $end_data_format, $override_end_time );
-				$start_display = radio_station_translate_time( $start_display );
-				$end_display = radio_station_translate_time( $end_display );
-				$date_time = radio_station_to_time( $override['date'] . ' 00:00' );
-				$date = radio_station_get_time( $date_format, $date_time );
+					$start_display = radio_station_get_time( $start_data_format, $override_start_time );
+					$end_display = radio_station_get_time( $end_data_format, $override_end_time );
+					$start_display = radio_station_translate_time( $start_display );
+					$end_display = radio_station_translate_time( $end_display );
+					$date_time = radio_station_to_time( $override['date'] . ' 00:00' );
+					$date = radio_station_get_time( $date_format, $date_time );
 
-				// 2.4.0.6: use filtered shift separator
-				$separator = ' - ';
-				$separator = apply_filters( 'radio_station_show_times_separator', $separator, 'override-content' );
+					// 2.4.0.6: use filtered shift separator
+					$separator = ' - ';
+					$separator = apply_filters( 'radio_station_show_times_separator', $separator, 'override-content' );
 
-				$scheduled .= '<div class="override-time">' . "\n";
-					$scheduled .= '<span class="rs-date rs-start-date" data-format="' . esc_attr( $date_format ) . '" data="' . esc_attr( $date_time ) . '">' . esc_html( $date ) . '</span>' . "\n";
-					$scheduled .= '<span class="rs-time rs-start-time" data-format="' . esc_attr( $start_data_format ) . '" data="' . esc_attr( $override_start_time ) . '">' . esc_html( $start_display ) . '</span>' . "\n";
-					$scheduled .= '<span class="rs-sep">' . esc_html( $separator ) . '</span>' . "\n";
-					$scheduled .= '<span class="rs-time rs-end-time" data-format="' . esc_attr( $end_data_format ) . '" data="' . esc_attr( $override_end_time ) . '">' . esc_html( $end_display ) . '</span>' . "\n";
-				$scheduled .= '</div>' . "\n";
+					$scheduled .= '<div class="override-time">' . "\n";
+						$scheduled .= '<span class="rs-date rs-start-date" data-format="' . esc_attr( $date_format ) . '" data="' . esc_attr( $date_time ) . '">' . esc_html( $date ) . '</span>' . "\n";
+						$scheduled .= '<span class="rs-time rs-start-time" data-format="' . esc_attr( $start_data_format ) . '" data="' . esc_attr( $override_start_time ) . '">' . esc_html( $start_display ) . '</span>' . "\n";
+						$scheduled .= '<span class="rs-sep">' . esc_html( $separator ) . '</span>' . "\n";
+						$scheduled .= '<span class="rs-time rs-end-time" data-format="' . esc_attr( $end_data_format ) . '" data="' . esc_attr( $override_end_time ) . '">' . esc_html( $end_display ) . '</span>' . "\n";
+					$scheduled .= '</div>' . "\n";
 
-				$scheduled .= '<div class="show-user-time">' . "\n";
-					$scheduled .= '[<span class="rs-date rs-start-date"></span>' . "\n";
-					$scheduled .= '<span class="rs-time rs-start-time"></span>' . "\n";
-					$scheduled .= '<span class="rs-sep">' . esc_html( $separator ) . '</span>' . "\n";
-					$scheduled .= '<span class="rs-time rs-end-time"></span>]' . "\n";
-				$scheduled .= '</div>' . "\n";
+					$scheduled .= '<div class="show-user-time">' . "\n";
+						$scheduled .= '[<span class="rs-date rs-start-date"></span>' . "\n";
+						$scheduled .= '<span class="rs-time rs-start-time"></span>' . "\n";
+						$scheduled .= '<span class="rs-sep">' . esc_html( $separator ) . '</span>' . "\n";
+						$scheduled .= '<span class="rs-time rs-end-time"></span>]' . "\n";
+					$scheduled .= '</div>' . "\n";
+				}
 			}
 		}
 	}
