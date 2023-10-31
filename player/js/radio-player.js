@@ -651,7 +651,7 @@ function radio_player_set_state(key, value) {
 
 /* --- store player instance data */
 function radio_player_set_data_state(script, instance, data, start) {
-	url = data.url; format = data.format; fallback = data.fallback; fformat = data.fallback;
+	url = data.url; format = data.format; fallback = data.fallback; fformat = data.fformat; /* 2.5.6: fix to fallback format */
 	if (typeof radio_data.data[instance] != 'undefined') {
 		cdata = radio_data.data[instance];
 		if ( (cdata.script != script) || (cdata.url != url) || (cdata.format != format) || (cdata.fallback != fallback) || (cdata.fformat != fformat) || (cdata.start != start) ) {

@@ -436,14 +436,14 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			}
 			// 1.0.5: use sanitize_title on request variables
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			if ( sanitize_title( $_REQUEST['page'] ) != $args['slug'] ) {
+			if ( sanitize_text_field( $_REQUEST['page'] ) != $args['slug'] ) {
 				return;
 			}
 			if ( !isset( $_POST[$args['namespace'] . '_update_settings'] ) ) {
 				return;
 			}
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing
-			if ( 'reset' != sanitize_title( $_POST[$args['namespace'] . '_update_settings'] ) ) {
+			if ( 'reset' != sanitize_text_field( $_POST[$args['namespace'] . '_update_settings'] ) ) {
 				return;
 			}
 
@@ -454,7 +454,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			}
 
 			// --- verify nonce ---
-			// $noncecheck = wp_verify_nonce( $_POST['_wpnonce', $args['slug'].'_update_settings' );
+			// $noncecheck = wp_verify_nonce( sanitize_text_field( $_POST['_wpnonce'] ), $args['slug'] . '_update_settings' );
 			check_admin_referer( $args['slug'] . '_update_settings' );
 
 			// --- reset plugin settings ---
@@ -484,11 +484,11 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// 1.0.2: fix to namespace key typo in isset check
 			// 1.0.3: only use namespace not settings key
 			// 1.0.9: check page is set and matches slug
-			if ( !isset( $_REQUEST['page'] ) || ( $_REQUEST['page'] != $args['slug'] ) ) {
+			if ( !isset( $_REQUEST['page'] ) || ( sanitize_text_field( $_REQUEST['page'] != $args['slug'] ) ) ) {
 				return;
 			}
 			$updatekey = $args['namespace'] . '_update_settings';
-			if ( !isset( $_POST[$updatekey] ) || ( 'yes' != $_POST[$args['namespace'] . '_update_settings'] ) ) {
+			if ( !isset( $_POST[$updatekey] ) || ( 'yes' != sanitize_text_field( $_POST[$args['namespace'] . '_update_settings'] ) ) ) {
 				return;
 			}
 
@@ -499,7 +499,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			}
 
 			// --- verify nonce ---
-			// $noncecheck = wp_verify_nonce( $_POST['_wpnonce', $args['slug'].'_update_settings' );
+			// $noncecheck = wp_verify_nonce( sanitize_text_field( $_POST['_wpnonce'] ), $args['slug'] . '_update_settings' );
 			check_admin_referer( $args['slug'] . '_update_settings' );
 
 			// --- get plugin options and default settings ---
@@ -935,7 +935,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					}
 					if ( count( $tabs ) > 0 ) {
 						// 1.2.5: sanitize current tab value before validating
-						$currenttab = sanitize_title( $_POST['settingstab'] );
+						$currenttab = sanitize_text_field( $_POST['settingstab'] );
 						if ( in_array( $currenttab, $tabs ) ) {
 							$settings['settingstab'] = $currenttab;
 						} elseif ( in_array( 'general', $tabs ) ) {
@@ -1579,10 +1579,6 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 				// --- initialize Freemius now ---
 				$freemius = $GLOBALS[$namespace . '_freemius'] = fs_dynamic_init( $settings );
-				if ( $this->debug ) {
-					// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-					echo '<span style="display:none;">Freemius Object: ' . esc_html( print_r( $freemius, true ) ) . '</span>' . PHP_EOL;
-				}
 
 				// --- set plugin basename ---
 				// 1.0.1: set free / premium plugin basename
@@ -1593,6 +1589,12 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				// --- add Freemius connect message filter ---
 				$this->freemius_connect();
 
+				// --- Freemius Object Debug ---
+				if ( $this->debug && current_user_can( 'manage_options' ) ) {
+					// phpcs:ignore WordPress.PHP.DevelopmentFunctions
+					echo '<span style="display:none;">Freemius Object: ' . esc_html( print_r( $freemius, true ) ) . '</span>' . PHP_EOL;
+				}
+				
 				// --- fire Freemius loaded action ---
 				do_action( $args['namespace'] . '_loaded' );
 			}
@@ -1680,7 +1682,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			if ( !$menu_added ) {
 				// 1.0.8: check settingsmenu switch that disables automatic settings menu adding
 				if ( !isset( $args['settingsmenu'] ) || ( false !== $args['settingsmenu'] ) ) {
-					add_options_page( $args['pagetitle'], $args['menutitle'], $args['capability'], $args['slug'], $args['namespace'] . '_settings_page' );
+					// 1.3.0: use filtered pagetitle and menutitle
+					add_options_page( $pagetitle, $menutitle, $args['capability'], $args['slug'], $args['namespace'] . '_settings_page' );
 				}
 			}
 
@@ -1797,7 +1800,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			}
 			// 1.0.5: use sanitize_title on request variable
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			if ( substr( sanitize_title( $_REQUEST['page'] ), 0, strlen( $args['slug'] ) ) != $args['slug'] ) {
+			if ( substr( sanitize_text_field( $_REQUEST['page'] ), 0, strlen( $args['slug'] ) ) != $args['slug'] ) {
 				return;
 			}
 
@@ -1864,7 +1867,8 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				if ( isset( $_POST ) ) {
 					echo '<br><b>Posted Values:</b><br>';
 					// phpcs:ignore WordPress.Security.NonceVerification.Missing
-					foreach ( $_POST as $key => $value ) {
+					$posted = array_map( 'sanitize_text_field', $_POST );
+					foreach ( $posted as $key => $value ) {
 						// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 						echo esc_attr( $key ) . ': ' . esc_html( print_r( $value, true ) ) . '<br>' . PHP_EOL;
 					}
@@ -2061,7 +2065,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			if ( isset( $_GET['updated'] ) ) {
 				// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$updated = sanitize_title( $_GET['updated'] );
+				$updated = sanitize_text_field( $_GET['updated'] );
 				if ( 'yes' == $updated ) {
 					$message = $settings['title'] . ' ' . __( 'Settings Updated.' );
 				} elseif ( 'no' == $updated ) {
@@ -2079,7 +2083,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				// --- maybe output welcome message ---
 				// 1.0.5: use sanitize_title on request variable
 				// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				if ( isset( $_REQUEST['welcome'] ) && ( 'true' == sanitize_title( $_REQUEST['welcome'] ) ) ) {
+				if ( isset( $_REQUEST['welcome'] ) && ( 'true' == sanitize_text_field( $_REQUEST['welcome'] ) ) ) {
 					// 1.2.3: skip output if welcome message argument is empty
 					if ( isset( $args['welcome'] ) && ( '' != $args['welcome'] ) ) {
 						echo '<tr><td colspan="3" align="center">';
@@ -2101,7 +2105,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			$namespace = $this->namespace;
 
 			// --- open page wrapper ---
-			echo '<div id="pagewrap" class="wrap" style="width:100%;margin-right:0px !important;">' . PHP_EOL;
+			echo '<div id="pagewrap" class="wrap" style="width:100%;margin-right:0 !important;">' . PHP_EOL;
 
 			do_action( $namespace . '_admin_page_top' );
 
@@ -2602,7 +2606,13 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 								$results = $wpdb->get_results( $query, ARRAY_A );
 
 								// 1.2.7: fix by moving page/post options variable here
-								$pageoptions = $postoptions = array( '' => '' );
+								// 1.3.0: check separately to avoid overwriting existing options
+								if ( !isset( $pageoptions ) ) {
+									$pageoptions = array( '' => '' );
+								}
+								if ( !isset( $postoptions ) ) {
+									$postoptions = array( '' => '' );
+								}
 								if ( $results && ( count( $results ) > 0 ) ) {
 									foreach ( $results as $result ) {
 										if ( strlen( $result['post_title'] ) > 35 ) {
@@ -3172,10 +3182,10 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			// --- filter and output styles ---
 			$namespace = $this->namespace;
 			$styles = apply_filters( $namespace . '_admin_page_styles', $styles );
-			echo "<style>";
 			// 1.2.5: added wp_strip_all_tags to styles output
-			echo wp_strip_all_tags( implode( "\n", $styles ) );
-			echo "</style>";
+			// 1.3.0: use wp_kses_post on styles output
+			// echo wp_strip_all_tags( implode( "\n", $styles ) );
+			echo "<style>" . wp_kses_post( implode( "\n", $styles ) ) . "</style>";
 
 		}
 
@@ -3495,6 +3505,7 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // =========
 
 // == 1.3.0 ==
+// - fix for possible page/post options conflict
 // - added explicit email option field type
 // - added fallback to text option firld type
 // - add check if pro slug data is a string

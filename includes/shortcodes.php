@@ -672,6 +672,7 @@ function radio_station_archive_list_shortcode( $post_type, $atts ) {
 	if ( !$archive_posts || !is_array( $archive_posts ) || ( count( $archive_posts ) == 0 ) ) {
 
 		// --- no shows messages ----
+		$message = '';
 		if ( RADIO_STATION_SHOW_SLUG == $post_type ) {
 			// 2.3.3.9: improve messages if genre / language specificed
 			if ( ( !empty( $atts['genre'] ) ) && ( !empty( $atts['genre'] ) ) ) {
@@ -1033,7 +1034,8 @@ function radio_station_genre_archive_list( $atts ) {
 		$genre_slugs = explode( ',', $atts['genres'] );
 		foreach ( $genre_slugs as $genre_slug ) {
 			$genre_slug = trim( $genre_slug );
-			$genre = radio_station_get_genre( $genre );
+			// 2.5.6: fix to get genre by genre_slug
+			$genre = radio_station_get_genre( $genre_slug );
 			if ( $genre ) {
 				$genres[$genre['name']] = $genre;
 				$genre_ids[] = $genre['id'];
@@ -1193,8 +1195,9 @@ function radio_station_genre_archive_list( $atts ) {
 					}
 					$list .= '>' . "\n";
 						// 2.5.0: added wp_kses on image output
+						// 2.5.6: fix to add missing allowed variable
 						$allowed = radio_station_allowed_html( 'media', 'image' );
-						$list .= wp_kses( $genre_image );
+						$list .= wp_kses( $genre_image, $allowed );
 					$list .= '</div>' . "\n";
 				}
 
@@ -1225,8 +1228,9 @@ function radio_station_genre_archive_list( $atts ) {
 				}
 				$heading .= '>' . "\n";
 					// 2.5.0: added wp_kses on image output
+					// 2.5.6: fix to add missing allowed variable
 					$allowed = radio_station_allowed_html( 'media', 'image' );
-					$heading .= wp_kses( $genre_image );
+					$heading .= wp_kses( $genre_image, $allowed );
 				$heading .= '</div>' . "\n";
 			}
 
@@ -1646,7 +1650,7 @@ function radio_station_language_archive_list( $atts ) {
 		
 		$list .= '<div class="language-archive">' . "\n";
 
-		$heading = '';
+		// $heading = '';
 		if ( !isset( $language_posts[$language['id']] ) ) {
 
 			if ( !$atts['hide_empty'] ) {
@@ -1818,7 +1822,8 @@ function radio_station_archive_pagination( $instance, $type, $atts, $post_count 
 	$pagi .= '<div class="archive-pagination-buttons archive-' . esc_attr( $type ) . 's-page-buttons">' . "\n";
 		if ( $prev_page > 0 ) {
 			$pagi .= '<div class="archive-pagination-button">' . "\n";
-				// $url = add_query_arg( 'page', $prev_page, $permalink );
+				// 2.5.6: fix to set permalink as URL for first page
+				$url = $permalink;
 				if ( $prev_page > 1 ) {
 					$url = add_query_arg( 'offset', ( $prev_page * $atts['perpage'] ), $permalink );
 				}
@@ -1829,7 +1834,7 @@ function radio_station_archive_pagination( $instance, $type, $atts, $post_count 
 		for ( $page_num = 1; $page_num < ( $post_pages + 1 ); $page_num++ ) {
 			$active = ( $current_page == $page_num ) ? ' active' : '';
 			$pagi .= '<div class="archive-' . esc_attr( $type ) . 's-page-button archive-pagination-button' . esc_attr( $active ) . '">' . "\n";
-				// $url = add_query_arg( 'page', $page_num, $permalink );
+				$url = $permalink;
 				if ( $page_num > 1 ) {
 					$offset = ( ( $page_num - 1 ) * $atts['perpage'] );
 					$url = add_query_arg( 'offset', $offset, $permalink );
@@ -1842,7 +1847,6 @@ function radio_station_archive_pagination( $instance, $type, $atts, $post_count 
 		}		
 		if ( $next_page < ( $post_pages + 1 ) ) {
 			$pagi .= '<div class="archive-pagination-button">' . "\n";
-				// $url = add_query_arg( 'page', $next_page, $permalink );
 				$offset = ( ( $next_page - 1 ) * $atts['perpage'] );
 				$url = add_query_arg( 'offset', $offset, $permalink );
 				$onclick = "return radio_archive_page(" . esc_attr( $instance ) . ",'" . esc_attr( $type ) . "'," . esc_attr( $next_page ) . "');";
@@ -2061,7 +2065,8 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 			if ( 'none' == $atts['content'] ) {
 				$list .= '';
 			} elseif ( 'full' == $atts['content'] ) {
-				$content = apply_filters( 'radio_station_show_' . $type . '_content', $bio_content, $user_id );
+				// 2.5.6: fix to filter variable assignment content
+				$bio_content = apply_filters( 'radio_station_show_' . $type . '_content', $bio_content, $user_id );
 				$list .= '<div class="show-' . esc_attr( $type ) . '-content">' . "\n";
 					// 2.5.0: use wp_kses on bio content output
 					$allowed = radio_station_allowed_html( 'content', 'bio' );
@@ -2109,8 +2114,8 @@ function radio_station_show_list_shortcode( $type, $atts ) {
 
 			// --- link to post ---
 			$permalink = get_permalink( $post['ID'] );
-			$timestamp = mysql2date( $dateformat . ' ' . $timeformat, $post['post_date'], false );
-			$title = __( 'Published on ', 'radio-station' ) . $timestamp;
+			$publish_time = mysql2date( $dateformat . ' ' . $timeformat, $post['post_date'], false );
+			$title = __( 'Published on ', 'radio-station' ) . $publish_time;
 			$list .= '<div class="show-' . esc_attr( $type ) . '-title">' . "\n";
 				$list .= '<a href="' . esc_url( $permalink ) . '" title="' . esc_attr( $title ) . '">' . "\n";
 					// 2.5.0: use esc_html instead of esc_attr
@@ -2413,8 +2418,8 @@ function radio_station_current_show_shortcode( $atts ) {
 
 	// 2.3.3: add current time override for manual testing
 	if ( isset( $_GET['date'] ) && isset( $_GET['time'] ) ) {
-		$date = trim( $_GET['date'] );
-		$time = trim( $_GET['time'] );
+		$date = trim( sanitize_text_field( $_GET['date'] ) );
+		$time = trim( sanitize_text_field( $_GET['time'] ) );
 		if ( isset( $_GET['month'] ) ) {
 			$month = absint( trim( $_GET['month'] ) );
 		} else {
@@ -2886,7 +2891,7 @@ function radio_station_current_show_shortcode( $atts ) {
 
 			// --- get show excerpt ---
 			if ( !empty( $show_post->post_excerpt ) ) {
-				$excerpt .= $show_post->post_excerpt;
+				$excerpt = $show_post->post_excerpt;
 				// 2.5.0: added esc_html to more anchor text
 				$excerpt .= ' <a href="' . esc_url( $permalink ) . '">' . esc_html( $more ) . '</a>';
 				// $excerpt .= "<!-- Post Excerpt -->";
@@ -3006,10 +3011,10 @@ function radio_station_current_show_shortcode( $atts ) {
 
 			if ( RADIO_STATION_DEBUG ) {
 				$output .= '<span style="display:none;">';
-					$output .= 'Now: ' . date( 'Y-m-d H:i:s', $now ) . ' (' . esc_attr( $now ) . ')' . PHP_EOL;
-					$output .= 'Shift Start Time: ' . date( 'Y-m-d H:i:s', $current_shift_start ) . ' (' . esc_attr( $current_shift_start ) . ')' . PHP_EOL;
-					$output .= 'Shift End Time: ' . date( 'Y-m-d H:i:s', $current_shift_end ) . ' (' . esc_attr( $current_shift_end ) . ')' . PHP_EOL;
-					$output .= 'Remaining: ' . ( $current_shift_end - $now ) . PHP_EOL;
+					$output .= 'Now: ' . radio_station_get_time( 'Y-m-d H:i:s', $now ) . ' (' . esc_attr( $now ) . ')' . "\n";
+					$output .= 'Shift Start Time: ' . radio_station_get_time( 'Y-m-d H:i:s', $current_shift_start ) . ' (' . esc_attr( $current_shift_start ) . ')' . "\n";
+					$output .= 'Shift End Time: ' . radio_station_get_time( 'Y-m-d H:i:s', $current_shift_end ) . ' (' . esc_attr( $current_shift_end ) . ')' . "\n";
+					$output .= 'Remaining: ' . ( $current_shift_end - $now ) . "\n";
 				$output .= '</span>';
 			}
 
@@ -3218,8 +3223,8 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 	// 2.3.3: added current time override for manual testing
 	if ( isset( $_GET['date'] ) && isset( $_GET['time'] ) ) {
-		$date = trim( $_GET['date'] );
-		$time = trim( $_GET['time'] );
+		$date = sanitize_text_field( trim( $_GET['date'] ) );
+		$time = sanitize_text_field( trim( $_GET['time'] ) );
 		if ( isset( $_GET['month'] ) ) {
 			$month = absint( trim( $_GET['month'] ) );
 		} else {
@@ -3684,10 +3689,10 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 			$output .= '<input type="hidden" class="upcoming-show-times" value="' . esc_attr( $next_start_time ) . '-' . esc_attr( $next_end_time ) . '">' . "\n";
 			if ( RADIO_STATION_DEBUG ) {
 				$output .= '<span style="display:none;">';
-					$output .= 'Now: ' . esc_html( date( 'Y-m-d H:i:s', $now ) ) . ' (' . esc_html( $now ) . ')' . PHP_EOL;
-					$output .= 'Next Start Time: ' . esc_html( date('y-m-d H:i:s', $next_start_time ) ) . ' (' . esc_html( $next_start_time ) . ')' . PHP_EOL;
-					$output .= 'Next End Time: ' . esc_html( date( 'y-m-d H:i:s', $next_end_time  ) ) . ' (' . esc_html( $next_end_time ) . ')' . PHP_EOL;
-					$output .= 'Starting in: ' . esc_html( $next_start_time - $now ) . PHP_EOL;
+					$output .= 'Now: ' . esc_html( radio_station_get_time( 'Y-m-d H:i:s', $now ) ) . ' (' . esc_html( $now ) . ')' . "\n";
+					$output .= 'Next Start Time: ' . esc_html( radio_station_get_time('y-m-d H:i:s', $next_start_time ) ) . ' (' . esc_html( $next_start_time ) . ')' . "\n";
+					$output .= 'Next End Time: ' . esc_html( radio_station_get_time( 'y-m-d H:i:s', $next_end_time  ) ) . ' (' . esc_html( $next_end_time ) . ')' . "\n";
+					$output .= 'Starting in: ' . esc_html( $next_start_time - $now ) . "\n";
 				$output .= '</span>';
 			}
 
@@ -3969,11 +3974,7 @@ function radio_station_current_playlist_shortcode( $atts ) {
 
 			// --- convert dates ---
 			// 2.3.0: use weekdates for reliability
-			if ( $atts['for_time'] ) {
-				$now = $atts['for_time'];
-			} else {
-				$now = radio_station_get_now();
-			}
+			$now = $atts['for_time'] ? $atts['for_time'] : radio_station_get_now();
 			$today = radio_station_get_time( 'l', $now );
 			$yesterday = radio_station_get_previous_day( $today );
 			$weekdays = radio_station_get_schedule_weekdays( $yesterday );
@@ -4025,8 +4026,6 @@ function radio_station_current_playlist_shortcode( $atts ) {
 					if ( $atts['for_time'] ) {
 						// $now = $atts['for_time'];
 						$html['countdown'] .= '<input type="hidden" class="current-time-override" value="' . esc_attr( $atts['for_time'] ) . '">' . "\n";
-					} else {
-						// $now = radio_station_get_now();
 					}
 					// echo 'Shift Start: ' . $shift_start_time . '(' . radio_station_get_time( 'datetime', $shift_start_time ) . ')<br>';
 					// echo 'Shift End: ' . $shift_end_time . '(' . radio_station_get_time( 'datetime', $shift_end_time ) . ')<br>';

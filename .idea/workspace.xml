@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="AUTOSCROLL_TO_SOURCE" value="true" />
+    <option name="SPLITTER_PROPORTION" value="0.5903859" />
+    <option name="GROUP_BY_SEVERITY" value="true" />
+    <option name="SCOPE_TYPE" value="3" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="9c57d3f0-e9db-471c-bef9-1f8f51a895ec" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -7,18 +13,44 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ComposerSettings" synchronizationState="SYNCHRONIZE">
+  <component name="ComposerSettings" doNotAsk="true" synchronizationState="SYNCHRONIZE">
     <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
     <execution>
-      <executable />
+      <phar pharPath="$PROJECT_DIR$/composer.phar" interpreterId="d9c2affa-0a47-4eed-b018-a9b8930dc7bc" />
     </execution>
   </component>
-  <component name="PhpWorkspaceProjectConfiguration">
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
+  <component name="JsFlowSettings">
+    <service-enabled>true</service-enabled>
+    <exe-path />
+    <other-services-enabled>true</other-services-enabled>
+    <auto-save>true</auto-save>
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="PHP">
     <include_path>
       <path value="C:/!WP/InstantWP_4.5/iwpserver/htdocs/wordpress" />
       <path value="$PROJECT_DIR$/vendor/composer" />
       <path value="$PROJECT_DIR$/vendor/symfony/yaml" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
+      <path value="$PROJECT_DIR$/vendor/wp-coding-standards/wpcs" />
+      <path value="$PROJECT_DIR$/vendor/semantic/ui" />
+      <path value="$PROJECT_DIR$/vendor/phpcsstandards/phpcsutils" />
+      <path value="$PROJECT_DIR$/vendor/squizlabs/php_codesniffer" />
+      <path value="$PROJECT_DIR$/vendor/dealerdirect/phpcodesniffer-composer-installer" />
+      <path value="$PROJECT_DIR$/vendor/phpcsstandards/phpcsextra" />
     </include_path>
   </component>
   <component name="ProjectId" id="2BsJZ5XXJG3NAgUBzN6c74lrXIr" />
@@ -31,6 +63,8 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="full.screen.before.presentation.mode" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../stream-player-src" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -38,6 +72,7 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="web-ide.project.structure" />
   </component>
   <component name="ServiceViewManager">
     <option name="viewStates">
@@ -64,6 +99,8 @@
       <workItem from="1657688961259" duration="3311000" />
       <workItem from="1657932585003" duration="42000" />
       <workItem from="1688690653745" duration="649000" />
+      <workItem from="1698024376947" duration="36380000" />
+      <workItem from="1698236704567" duration="11485000" />
     </task>
     <servers />
   </component>
@@ -71,10 +108,42 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="809" y="362" key="com.intellij.ide.util.TipDialog" timestamp="1688690669692">
-      <screen x="281" y="0" width="1639" height="1080" />
+    <state x="703" y="193" key="#CLI_Interpreters" timestamp="1698032306213">
+      <screen x="257" y="0" width="1663" height="1080" />
     </state>
-    <state x="809" y="362" key="com.intellij.ide.util.TipDialog/281.0.1639.1080@281.0.1639.1080" timestamp="1688690669692" />
+    <state x="703" y="193" key="#CLI_Interpreters/257.0.1663.1080@257.0.1663.1080" timestamp="1698032306213" />
+    <state x="754" y="227" key="#Inspections" timestamp="1698035807926">
+      <screen x="257" y="0" width="1663" height="1080" />
+    </state>
+    <state x="754" y="227" key="#Inspections/257.0.1663.1080@257.0.1663.1080" timestamp="1698035807926" />
+    <state x="789" y="192" key="#PHP_CodeSniffer" timestamp="1698033398060">
+      <screen x="257" y="0" width="1663" height="1080" />
+    </state>
+    <state x="789" y="192" key="#PHP_CodeSniffer/257.0.1663.1080@257.0.1663.1080" timestamp="1698033398060" />
+    <state x="878" y="397" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1698236948303">
+      <screen x="257" y="0" width="1663" height="1080" />
+    </state>
+    <state x="878" y="397" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/257.0.1663.1080@257.0.1663.1080" timestamp="1698236948303" />
+    <state x="883" y="422" width="480" height="318" key="ComposerInitDialogKey" timestamp="1698026462284">
+      <screen x="257" y="0" width="1663" height="1080" />
+    </state>
+    <state x="883" y="422" width="480" height="318" key="ComposerInitDialogKey/257.0.1663.1080@257.0.1663.1080" timestamp="1698026462284" />
+    <state x="903" y="293" key="FileChooserDialogImpl" timestamp="1698236929600">
+      <screen x="257" y="0" width="1663" height="1080" />
+    </state>
+    <state x="903" y="293" key="FileChooserDialogImpl/257.0.1663.1080@257.0.1663.1080" timestamp="1698236929600" />
+    <state x="624" y="180" key="SettingsEditor" timestamp="1698236936704">
+      <screen x="257" y="0" width="1663" height="1080" />
+    </state>
+    <state x="624" y="180" key="SettingsEditor/257.0.1663.1080@257.0.1663.1080" timestamp="1698236936704" />
+    <state x="804" y="362" key="com.intellij.ide.util.TipDialog" timestamp="1698236706550">
+      <screen x="257" y="0" width="1663" height="1080" />
+    </state>
+    <state x="804" y="362" key="com.intellij.ide.util.TipDialog/257.0.1663.1080@257.0.1663.1080" timestamp="1698236706550" />
+    <state x="751" y="235" width="672" height="678" key="search.everywhere.popup" timestamp="1698037667903">
+      <screen x="257" y="0" width="1663" height="1080" />
+    </state>
+    <state x="751" y="235" width="672" height="678" key="search.everywhere.popup/257.0.1663.1080@257.0.1663.1080" timestamp="1698037667903" />
   </component>
   <component name="WordPressConfiguration" enabled="true">
     <wordpressPath>C:\!WP\InstantWP_4.5\iwpserver\htdocs\wordpress</wordpressPath>

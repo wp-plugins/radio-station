@@ -13,8 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added: Filter for query and meta for show post list shortcode
 * Updated: Language translations file (.pot)
 * Updated: Bundled Dutch translation
-* Fixed: hide empty widgets in AJAX mode
 * Fixed: check linked override shifts before displaying
+* Fixed: hide empty widgets to work in AJAX loading mode
+* Fixed: remove direct usages of date function
+* Fixed: display of show posts on show page (query)
+* Fixed: minor schedule engine issues
+* Improved: more consistent sanitization and escaping
 
 = 2.5.5 =
 * Updated: Freemius SDK (2.5.10)

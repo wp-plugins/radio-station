@@ -320,8 +320,10 @@ function radio_station_show_language_metabox() {
 	}";
 	// 2.3.3.9: added language edit styles filter
 	// 2.5.0: use wp_kses_post on CSS output
+	// 2.5.6: use radio_station_add_inline_style
 	$css = apply_filters( 'radio_station_language_edit_styles', $css );
-	echo '<style>' . wp_kses_post( $css ) . '</style>';
+	// echo '<style>' . wp_kses_post( $css ) . '</style>';
+	radio_station_add_inline_style( 'rs-admin', $css );
 
 	// --- add script inline ---
 	// 2.3.3.9: added language edit script filter
@@ -341,7 +343,7 @@ function radio_station_language_term_filter( $post_id ) {
 	if ( !isset( $_POST[RADIO_STATION_LANGUAGES_SLUG] ) ) {
 		return;
 	}
-	$check = wp_verify_nonce( $_POST['taxonomy_noncename'], 'taxonomy_' . RADIO_STATION_LANGUAGES_SLUG );
+	$check = wp_verify_nonce( sanitize_text_field( $_POST['taxonomy_noncename'] ), 'taxonomy_' . RADIO_STATION_LANGUAGES_SLUG );
 	if ( !$check ) {
 		return;
 	}
@@ -351,7 +353,8 @@ function radio_station_language_term_filter( $post_id ) {
 	}
 
 	// --- loop and set posted terms ---
-	$terms = $_POST[RADIO_STATION_LANGUAGES_SLUG];
+	// 2.5.6: use array_map with sanitize_text_field on array
+	$terms = array_map( 'sanitize_text_field', $_POST[RADIO_STATION_LANGUAGES_SLUG] );
 
 	$term_ids = array();
 	if ( is_array( $terms ) && ( count( $terms ) > 0 ) ) {
@@ -359,7 +362,7 @@ function radio_station_language_term_filter( $post_id ) {
 		foreach ( $terms as $i => $term_slug ) {
 
 			// 2.5.0: use sanitize_text_field on posted value
-			$term_slug = sanitize_text_field( $term_slug );
+			// $term_slug = sanitize_text_field( $term_slug );
 
 			foreach ( $languages as $j => $language ) {
 
@@ -578,7 +581,6 @@ function radio_station_show_info_metabox() {
 				// echo '</button>';
 
 				// 2.3.2: remove class="hndle" to prevent box sorting
-				$widget_title = $metabox['title'];
 				echo '<h2><span>' . esc_html( $metabox['title'] ) . '</span></h2>' . "\n";
 				echo '<div class="inside">' . "\n";
 					call_user_func( $metabox['callback'] );
@@ -607,8 +609,10 @@ function radio_station_show_info_metabox() {
 	// --- filter and output styles ---
 	// 2.3.3.9: added edit styles filter
 	// 2.5.0: added wp_kses_post to CSS output
+	// 2.5.6: use radio_station_add_inline_style
 	$css = apply_filters( 'radio_station_show_edit_styles', $css );
-	echo '<style>' . wp_kses_post( $css ) . '</style>';
+	// echo '<style>' . wp_kses_post( $css ) . '</style>';
+	radio_station_add_inline_style( 'rs-admin', $css );
 }
 
 // ------------------------------
@@ -634,7 +638,7 @@ function radio_station_add_show_hosts_metabox() {
 // ----------------------------
 function radio_station_show_hosts_metabox() {
 
-	global $post, $wp_roles, $wpdb;
+	global $post;
 
 	// --- add nonce field for verification ---
 	wp_nonce_field( 'radio-station', 'show_hosts_nonce' );
@@ -720,7 +724,7 @@ function radio_station_add_show_producers_metabox() {
 // --------------------------------
 function radio_station_show_producers_metabox() {
 
-	global $post, $wp_roles, $wpdb;
+	global $post;
 
 	// --- add nonce field for verification ---
 	wp_nonce_field( 'radio-station', 'show_producers_nonce' );
@@ -822,7 +826,7 @@ function radio_station_show_shifts_metabox() {
 		echo '<div id="shifts-list">' . "\n";
 
 			// 2.3.2: added to bypass shift check on add (for debugging)
-			if ( isset( $_REQUEST['check-bypass'] ) && ( '1' == $_REQUEST['check-bypass'] ) ) {
+			if ( isset( $_REQUEST['check-bypass'] ) && ( '1' === sanitize_text_field( $_REQUEST['check-bypass'] ) ) ) {
 				echo '<input type="hidden" name="check-bypass" value="1">' . "\n";
 			}
 
@@ -903,8 +907,10 @@ function radio_station_show_shifts_metabox() {
 		// 2.3.2: added dashed border to new shift
 		// 2.3.3.9: moved styles to separate function
 		// 2.5.0: use wp_kses_post on styles output
+		// 2.5.6: use radio_station_add_inline_style
 		$css = radio_station_shifts_list_styles();
-		echo '<style>' . wp_kses_post( $css ) . '</style>' . "\n";
+		// echo '<style>' . wp_kses_post( $css ) . '</style>' . "\n";
+		radio_station_add_inline_style( 'rs-admin', $css );
 
 	// --- close meta inner ---
 	echo '</div>' . "\n";
@@ -976,7 +982,7 @@ function radio_station_shift_edit_script() {
 	// --- show shifts scripts ---
 	// 2.3.0: added confirmation to remove shift button
 	// 2.3.2: removed document ready functions wrapper
-	$c = 0;
+	// $c = 0;
 	$confirm_remove = __( 'Are you sure you want to remove this shift?', 'radio-station' );
 	$confirm_clear = __( 'Are you sure you want to clear the shift list?', 'radio-station' );
 	// $js = "var count = " . esc_attr( $c ) . ";";
@@ -1280,8 +1286,6 @@ function radio_station_shifts_conflict_message( $hidden = false ) {
 // 2.3.2: separate shift table function (for AJAX saving)
 function radio_station_show_shifts_table( $post_id ) {
 
-	global $post;
-
 	// --- edit show link ---
 	$edit_link = add_query_arg( 'action', 'edit', admin_url( 'post.php' ) );
 
@@ -1338,7 +1342,8 @@ function radio_station_show_shifts_table( $post_id ) {
 			}
 		}
 		if ( isset( $_REQUEST['start_hour'] ) ) {
-			$start_hour = absint( $_REQUEST['start_hour'] );
+			// 2.5.6: fix to key instead of variable
+			$times['start_hour'] = absint( $_REQUEST['start_hour'] );
 			if ( ( $times['start_hour'] < 1 ) || ( $times['start_hour'] > 12 ) ) {
 				$times['start_hour'] = 12;
 			}
@@ -1389,7 +1394,7 @@ function radio_station_show_shifts_table( $post_id ) {
 			}
 		}
 		if ( isset( $_REQUEST['disabled'] ) ) {
-			$times['disabled'] = $_REQUEST['disabled'];
+			$times['disabled'] = sanitize_text_field( $_REQUEST['disabled'] );
 			if ( !in_array( $times['disabled'], array( '', 'yes' ) ) ) {
 				$times['disabled'] = '';
 			}
@@ -1760,7 +1765,7 @@ function radio_station_show_images_metabox() {
 
 	global $post;
 
-	if ( isset( $_GET['avatar_refix'] ) && ( 'yes' == $_GET['avatar_refix'] ) ) {
+	if ( isset( $_GET['avatar_refix'] ) && ( 'yes' == sanitize_text_field( $_GET['avatar_refix'] ) ) ) {
 		delete_post_meta( $post->ID, '_rs_image_updated', true );
 		$show_avatar = radio_station_get_show_avatar_id( $post->ID );
 		echo "Transferred ID: " . $show_avatar;
@@ -1952,7 +1957,7 @@ function radio_station_show_images_save() {
 			}
 
 			// --- verify nonce value ---
-			if ( !isset( $_GET['nonce'] ) || !wp_verify_nonce( $_GET['nonce'], 'show-images-autosave' ) ) {
+			if ( !isset( $_GET['nonce'] ) || !wp_verify_nonce( sanitize_text_field( $_GET['nonce'] ), 'show-images-autosave' ) ) {
 				exit;
 			}
 
@@ -1970,8 +1975,8 @@ function radio_station_show_images_save() {
 
 			// --- get image type ---
 			if ( isset( $_GET['image_type'] ) ) {
-				if ( in_array( $_GET['image_type'], array( 'header', 'avatar' ) ) ) {
-					$image_type = $_GET['image_type'];
+				if ( in_array( sanitize_text_field( $_GET['image_type'] ), array( 'header', 'avatar' ) ) ) {
+					$image_type = sanitize_text_field( $_GET['image_type'] );
 				}
 			}
 
@@ -2017,14 +2022,14 @@ function radio_station_show_save_data( $post_id ) {
 		}
 		// 2.3.3: added double check for AJAX action match
 		// 2.3.3.9: check for single or multiple shift save action
-		if ( 'radio_station_show_save_shift' == $_REQUEST['action'] ) {
+		if ( 'radio_station_show_save_shift' == sanitize_text_field( $_REQUEST['action'] ) ) {
 			$selection = 'single';
-			if ( preg_match( '/^[a-zA-Z0-9_]+$/', $_REQUEST['shift_id'] ) ) {
-				$shift_id = $_REQUEST['shift_id'];
+			if ( preg_match( '/^[a-zA-Z0-9_]+$/', sanitize_text_field( $_REQUEST['shift_id'] ) ) ) {
+				$shift_id = sanitize_text_field( $_REQUEST['shift_id'] );
 			}
-		} elseif ( 'radio_station_show_save_shifts' == $_REQUEST['action'] ) {
+		} elseif ( 'radio_station_show_save_shifts' == sanitize_text_field( $_REQUEST['action'] ) ) {
 			$selection = 'multiple';
-		} elseif ( 'radio_station_add_show_shift' == $_REQUEST['action'] ) {
+		} elseif ( 'radio_station_add_show_shift' == sanitize_text_field( $_REQUEST['action'] ) ) {
 			$selection = 'add';
 		} else {
 			return;
@@ -2034,9 +2039,9 @@ function radio_station_show_save_data( $post_id ) {
 		$error = false;
 		if ( !current_user_can( 'edit_shows' ) ) {
 			$error = __( 'Failed. Publish or Update instead.', 'radio-station' );
-		} elseif ( !isset( $_POST['show_shifts_nonce'] ) || !wp_verify_nonce( $_POST['show_shifts_nonce'], 'radio-station' ) ) {
+		} elseif ( !isset( $_POST['show_shifts_nonce'] ) || !wp_verify_nonce( sanitize_text_field( $_POST['show_shifts_nonce'] ), 'radio-station' ) ) {
 			$error = __( 'Expired. Publish or Update instead.', 'radio-station' );
-		} elseif ( !isset( $_POST['show_id'] ) || ( '' == $_POST['show_id'] ) ) {
+		} elseif ( !isset( $_POST['show_id'] ) || ( '' === sanitize_text_field( $_POST['show_id'] ) ) ) {
 			$error = __( 'Error! No Show ID provided.', 'radio-station' );
 		}  else {
 			$post_id = absint( $_POST['show_id'] );
@@ -2064,7 +2069,7 @@ function radio_station_show_save_data( $post_id ) {
 
 	// --- get posted DJ / host list ---
 	// 2.2.7: check DJ post value is set
-	if ( isset( $_POST['show_hosts_nonce'] ) && wp_verify_nonce( $_POST['show_hosts_nonce'], 'radio-station' ) ) {
+	if ( isset( $_POST['show_hosts_nonce'] ) && wp_verify_nonce( sanitize_text_field( $_POST['show_hosts_nonce'] ), 'radio-station' ) ) {
 
 		// 2.3.3.9: user check moved to input sanitization function
 		$hosts = radio_station_sanitize_input( 'show', 'user_list' );
@@ -2079,7 +2084,7 @@ function radio_station_show_save_data( $post_id ) {
 
 	// --- get posted show producers ---
 	// 2.3.0: added show producer sanitization
-	if ( isset( $_POST['show_producers_nonce'] ) && wp_verify_nonce( $_POST['show_producers_nonce'], 'radio-station' ) ) {
+	if ( isset( $_POST['show_producers_nonce'] ) && wp_verify_nonce( sanitize_text_field( $_POST['show_producers_nonce'] ), 'radio-station' ) ) {
 
 		// 2.3.3.9: user check moved to input sanitization function
 		$producers = radio_station_sanitize_input( 'show', 'producer_list' );
@@ -2095,7 +2100,7 @@ function radio_station_show_save_data( $post_id ) {
 
 	// --- save show meta data ---
 	// 2.3.0: added separate nonce check for show meta
-	if ( isset( $_POST['show_meta_nonce'] ) && wp_verify_nonce( $_POST['show_meta_nonce'], 'radio-station' ) ) {
+	if ( isset( $_POST['show_meta_nonce'] ) && wp_verify_nonce( sanitize_text_field( $_POST['show_meta_nonce'] ), 'radio-station' ) ) {
 
 		// --- get the meta data to be saved ---
 		// 2.3.2: added download disable switch
@@ -2140,7 +2145,7 @@ function radio_station_show_save_data( $post_id ) {
 
 
 	// --- update the show images ---
-	if ( isset( $_POST['show_images_nonce'] ) && wp_verify_nonce( $_POST['show_images_nonce'], 'radio-station' ) ) {
+	if ( isset( $_POST['show_images_nonce'] ) && wp_verify_nonce( sanitize_text_field( $_POST['show_images_nonce'] ), 'radio-station' ) ) {
 
 		// --- show header image ---
 		if ( isset( $_POST['show_header'] ) ) {
@@ -2154,7 +2159,7 @@ function radio_station_show_save_data( $post_id ) {
 
 		// --- show avatar image ---
 		// 2.5.0: delete post meta if removing avatar
-		if ( '' == $_POST['show_avatar'] ) {
+		if ( '' == sanitize_text_field( $_POST['show_avatar'] ) ) {
 			delete_post_meta( $post_id, 'show_avatar' );
 		} else {
 			$avatar = absint( $_POST['show_avatar'] );
@@ -2174,7 +2179,7 @@ function radio_station_show_save_data( $post_id ) {
 	}
 
 	// --- check show shift nonce ---
-	if ( isset( $_POST['show_shifts_nonce'] ) && wp_verify_nonce( $_POST['show_shifts_nonce'], 'radio-station' ) ) {
+	if ( isset( $_POST['show_shifts_nonce'] ) && wp_verify_nonce( sanitize_text_field( $_POST['show_shifts_nonce'] ), 'radio-station' ) ) {
 
 		// --- loop posted show shift times ---
 		// 2.3.1: added check if any shifts are set (fix undefined index warning)
@@ -2190,6 +2195,8 @@ function radio_station_show_save_data( $post_id ) {
 			$shifts[$new_id] = $new_shift;
 			$_POST['show_sched'] = $shifts;
 		} else {
+			// TODO: test arrap_map and sanitize_text_field ?
+			// $shifts = array_map( 'sanitize_text_field', $_POST['show_sched );
 			$shifts = $_POST['show_sched'];
 		}
 
@@ -2360,6 +2367,8 @@ function radio_station_show_save_data( $post_id ) {
 	if ( $overrides && is_array( $overrides ) && ( count( $overrides ) > 0 ) ) {
 
 		// --- get genre and language terms ---
+		// 2.5.6: set empty arry for genre and language term ids
+		$genre_term_ids = $language_term_ids = array();
 		$genre_terms = wp_get_object_terms( $post_id, RADIO_STATION_GENRES_SLUG );
 		if ( count( $genre_terms ) > 0 ) {
 			foreach ( $genre_terms as $genre_term ) {
@@ -2404,7 +2413,7 @@ function radio_station_show_save_data( $post_id ) {
 		// 2.3.3.9: removed check of AJAX action as done earlier
 
 		// --- debug information ---
-		echo "Posted Shifts: " . esc_html( print_r( $_POST['show_sched'], true ) ) . "\n";
+		echo "Posted Shifts: " . esc_html( print_r( $shifts, true ) ) . "\n";
 		echo "New Shifts: " . esc_html( print_r( $new_shifts, true ) ) . "\n";
 
 		// --- display shifts saved message ---
@@ -2424,7 +2433,7 @@ function radio_station_show_save_data( $post_id ) {
 
 			// --- output new show shifts list ---
 			echo '<div id="shifts-list">' . "\n";
-			if ( isset( $_REQUEST['check-bypass'] ) && ( '1' == $_REQUEST['check-bypass'] ) ) {
+			if ( isset( $_REQUEST['check-bypass'] ) && ( '1' === sanitize_text_field( $_REQUEST['check-bypass'] ) ) ) {
 				echo '<input type="hidden" name="check-bypass" value="1">' . "\n";
 			}
 			$table = radio_station_show_shifts_table( $post_id );
@@ -2496,7 +2505,7 @@ function radio_station_show_save_data( $post_id ) {
 
 		// --- return early when adding single shift ---
 		// 2.3.3.9: added for single shift action
-		if ( 'radio_station_add_show_shift' == $_REQUEST['action'] ) {
+		if ( 'radio_station_add_show_shift' == sanitize_text_field( $_REQUEST['action'] ) ) {
 			return;
 		}
 
@@ -2847,9 +2856,10 @@ function radio_station_show_admin_list_styles() {
 	.show-shift.disabled.conflict {border: 1px dashed red;}";
 	
 	// 2.5.0: added missing style filter
-	// TODO: use wp_add_inline_style here ?
+	// 2.5.6: use radio_station_add_inline_style
 	$css = apply_filters( 'radio_station_show_list_styles', $css );
-	echo '<style>' . wp_kses_post( $css ) . '</style>' . "\n";
+	// echo '<style>' . wp_kses_post( $css ) . '</style>' . "\n";
+	radio_station_add_inline_style( 'rs-admin', $css );
 }
 
 // -------------------------
@@ -3378,7 +3388,6 @@ function radio_station_override_show_metabox() {
 		echo '>' . "\n";
 
 			// --- inside metabox contents ---
-			$widget_title = $metabox['title'];
 			echo '<h2><span>' . esc_html( $metabox['title'] ) . '</span></h2>' . "\n";
 			echo '<div class="inside">' . "\n";
 				call_user_func( $metabox['callback'] );
@@ -3404,9 +3413,10 @@ function radio_station_override_show_metabox() {
 
 	// 2.3.3.9: filter
 	// 2.5.0: use wp_kses_post on style output
-	// TODO: use wp_add_inline_style ?
+	// 2.5.6: use radio_station_add_inline_style
 	$css = apply_filters( 'radio_station_override_edit_styles', $css );
-	echo '<style>' . wp_kses_post( $css ) . '</style>';
+	// echo '<style>' . wp_kses_post( $css ) . '</style>';
+	radio_station_add_inline_style( 'rs-admin', $css );
 
 	// --- get override show script ---
 	$js = radio_station_override_show_script();
@@ -3556,9 +3566,10 @@ function radio_station_schedule_override_metabox() {
 		// 2.3.3.9: apply class styles to override list
 		// 2.3.3.9: moved styles to separate function
 		// 2.5.0: use wp_kses_post on style output
-		// TODO: use wp_add_inline_style
+		// 2.5.6: use radio_station_add_inline_style
 		$css = radio_station_overrides_list_styles();
-		echo '<style>' . wp_kses_post( $css ) . '</style>';
+		// echo '<style>' . wp_kses_post( $css ) . '</style>';
+		radio_station_add_inline_style( 'rs-admin', $css );
 
 		// --- enqueue datepicker script and styles ---
 		// 2.3.0: enqueue for override post type only
@@ -3691,11 +3702,13 @@ function radio_station_overrides_table( $post_id ) {
 		// --- check and sanitize possibly posted times ---
 		// 2.3.3.9: for adding new override time by querystring
 		if ( isset( $_REQUEST['date'] ) ) {
-			$times['date'] = $_REQUEST['date'];
-			$times['date'] = date( 'Y-m-d', strtotime( $times['date'] ) );
+			$times['date'] = sanitize_text_field( $_REQUEST['date'] );
+			// 2.5.6: use radio_station_get_time instead of date
+			$times['date'] = radio_station_get_time( 'Y-m-d', strtotime( $times['date'] ) );
 		}
 		if ( isset( $_REQUEST['start_hour'] ) ) {
-			$start_hour = absint( $_REQUEST['start_hour'] );
+			// 2.5.6: fix to key as variable
+			$times['start_hour'] = absint( $_REQUEST['start_hour'] );
 			if ( ( $times['start_hour'] < 1 ) || ( $times['start_hour'] > 12 ) ) {
 				$times['start_hour'] = 1;
 			}
@@ -3710,7 +3723,7 @@ function radio_station_overrides_table( $post_id ) {
 			}
 		}
 		if ( isset( $_REQUEST['start_meridian'] ) ) {
-			$times['start_meridian'] = $_REQUEST['start_meridian'];
+			$times['start_meridian'] = sanitize_text_field( $_REQUEST['start_meridian'] );
 			if ( !in_array( $times['start_meridian'], array( '', 'am', 'pm' ) ) ) {
 				$times['start_meridian'] = '';
 			}
@@ -3950,7 +3963,7 @@ function radio_station_override_edit_script() {
 	}
 
 	// --- show shifts scripts ---
-	$c = 0;
+	// $c = 0;
 	$confirm_remove = __( 'Are you sure you want to remove this Override?', 'radio-station' );
 	$confirm_clear = __( 'Are you sure you want to clear all overrides?', 'radio-station' );
 
@@ -4069,7 +4082,8 @@ function radio_station_override_edit_script() {
 
 	// --- add new override ---
 	// 2.5.0: shorten value object
-	$todate = date( 'Y-m-d', time() );
+	// 2.5.6: use radio_station_get_time instead of date
+	$todate = radio_station_get_time( 'Y-m-d', time() );
 	$js .= "function radio_override_new() {
 		values = {date:'" . esc_js( $todate ) . "', start_hour:'', start_min:'', start_meridian:'', end_hour:'', end_min:'', end_meridian:'', multiday:'', end_date:'', disabled:''};
 		radio_override_add(values);
@@ -4250,17 +4264,15 @@ function radio_station_override_save_data( $post_id ) {
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 
 		// 2.3.3: added double check for AJAX action match
-		if ( !isset( $_REQUEST['action'] ) ) {
-			return;
-		}
 		// 2.3.3.9: match to whitelisted actions
+		// 2.5.6: combine test conditions
 		$actions = array( 'radio_station_override_save', 'radio_station_add_override_time' );
-		if ( !in_array( $_REQUEST['action'], $actions ) ) {
+		if ( !isset( $_REQUEST['action'] ) || !in_array( sanitize_text_field( $_REQUEST['action'] ), $actions ) ) {
 			return;
 		}
 
 		// --- make sure we have a post ID for AJAX save ---
-		if ( !isset( $_POST['override_id'] ) || ( '' == $_POST['override_id'] ) ) {
+		if ( !isset( $_POST['override_id'] ) || ( '' === sanitize_text_field( $_POST['override_id'] ) ) ) {
 			return;
 		}
 		$post_id = absint( $_POST['override_id'] );
@@ -4268,7 +4280,7 @@ function radio_station_override_save_data( $post_id ) {
 
 		// --- check for errors ---
 		$error = false;
-		if ( !isset( $_POST['show_override_nonce'] ) || !wp_verify_nonce( $_POST['show_override_nonce'], 'radio-station' ) ) {
+		if ( !isset( $_POST['show_override_nonce'] ) || !wp_verify_nonce( sanitize_text_field( $_POST['show_override_nonce'] ), 'radio-station' ) ) {
 			$error = __( 'Expired. Publish or Update instead.', 'radio-station' );
 		} elseif ( !$post ) {
 			$error = __( 'Failed. Invalid Override.', 'radio-station' );
@@ -4292,7 +4304,7 @@ function radio_station_override_save_data( $post_id ) {
 
 	// --- verify nonce for show data ---
 	// 2.3.3.9: added to save show override metabox data
-	if ( isset( $_POST['show_data_nonce'] ) && wp_verify_nonce( $_POST['show_data_nonce'], 'radio-station' ) ) {
+	if ( isset( $_POST['show_data_nonce'] ) && wp_verify_nonce( sanitize_text_field( $_POST['show_data_nonce'] ), 'radio-station' ) ) {
 
 		// --- save linked show ID ---
 		// 2.3.3.9: save linked show ID
@@ -4310,8 +4322,7 @@ function radio_station_override_save_data( $post_id ) {
 		}
 
 		// --- sync genres switch ---
-		$sync_genres = false;
-		if ( isset( $_POST['sync_genres'] ) && ( 'yes' == $_POST['sync_genres'] ) ) {
+		if ( isset( $_POST['sync_genres'] ) && ( 'yes' == sanitize_text_field( $_POST['sync_genres'] ) ) ) {
 
 			update_post_meta( $post_id, 'sync_genres', 'yes' );
 
@@ -4341,8 +4352,7 @@ function radio_station_override_save_data( $post_id ) {
 		}
 
 		// --- sync languages switch ---
-		$sync_languages = false;
-		if ( isset( $_POST['sync_languages'] ) && ( 'yes' == $_POST['sync_languages'] ) ) {
+		if ( isset( $_POST['sync_languages'] ) && ( 'yes' == sanitize_text_field( $_POST['sync_languages'] ) ) ) {
 
 			if ( $linked_show ) {
 
@@ -4398,7 +4408,7 @@ function radio_station_override_save_data( $post_id ) {
 
 	// --- verify this came from the our screen and with proper authorization ---
 	// 2.3.3.9: reverse condition to allow for combined data/schedule processing
-	if ( isset( $_POST['show_override_nonce'] ) && wp_verify_nonce( $_POST['show_override_nonce'], 'radio-station' ) ) {
+	if ( isset( $_POST['show_override_nonce'] ) && wp_verify_nonce( sanitize_text_field( $_POST['show_override_nonce'] ), 'radio-station' ) ) {
 
 		// --- get the show override data ---
 		$current_scheds = get_post_meta( $post_id, 'show_override_sched', true );
@@ -4408,8 +4418,10 @@ function radio_station_override_save_data( $post_id ) {
 			$new_shift['id'] = radio_station_unique_shift_id();
 			$show_sched = $current_scheds;
 			$show_sched[] = $new_shift;
+			// TODo: test array_map with sanitize_text_field here ?
 			$_POST['show_sched'] = $show_sched;
 		} else {
+			// TODo: test array_map with sanitize_text_field here ?
 			$show_sched = $_POST['show_sched'];
 		}
 		$new_scheds = array();
@@ -4580,8 +4592,9 @@ function radio_station_override_save_data( $post_id ) {
 				update_post_meta( $post_id, 'show_override_sched', $new_scheds );
 
 				// 2.3.3.9: clear out old unique shift IDs from prev_scheds
+				// 2.5.6: added isset check for prev_scheds
 				$new_ids = array();
-				if ( is_array( $prev_scheds ) && ( count( $prev_scheds ) > 0 ) ) {
+				if ( isset( $prev_scheds ) && is_array( $prev_scheds ) && ( count( $prev_scheds ) > 0 ) ) {
 					if ( is_array( $new_scheds ) && ( count( $new_scheds ) > 0 ) ) {
 						foreach ( $new_scheds as $i => $new_sched ) {
 							$new_ids[] = $new_sched['id'];
@@ -4619,7 +4632,7 @@ function radio_station_override_save_data( $post_id ) {
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 
 		// 2.3.3.9: remove duplicate action check
-		sanitize_text_field( $_REQUEST['action'] );
+		$action = sanitize_text_field( $_REQUEST['action'] );
 
 		// --- (hidden) debug information ---
 		echo "Previous Overrides: " . esc_html( print_r( $current_scheds, true ) ) . "\n";
@@ -4691,7 +4704,8 @@ function radio_station_override_save_data( $post_id ) {
 
 			// 2.3.3.9: trigger action for save or add override time
 			if ( 'radio_station_override_save' == $action ) {
-				do_action( 'radio_station_override_save_time', $shift_id );
+				// 2.5.6: fix second argument to post_id not shift_id
+				do_action( 'radio_station_override_save_time', $post_id );
 			} elseif ( 'radio_station_add_override_time' == $action ) {
 				do_action( 'radio_station_override_add_time' );
 			}
@@ -4744,7 +4758,7 @@ function radio_station_override_columns( $columns ) {
 	$columns['taxonomy-' . RADIO_STATION_LANGUAGES_SLUG] = $languages;
 	// 2.3.2: added missing translation text domain
 	$columns['override_image'] = esc_attr( __( 'Image', 'radio-station' ) );
-	// 2.3.3.9: do not re-add published date column (to reduce confusion)
+	// 2.3.3.9: do not re-add the published date column (to reduce confusion)
 	// $columns['date'] = $date;
 
 	return $columns;
@@ -4780,12 +4794,13 @@ function radio_station_override_column_data( $column, $post_id ) {
 			}
 
 			// 2.3.2: no need to apply timezone conversions here
+			// 2.5.6: use radio_station_get_time instead of date
 			$datetime = strtotime( $override['date'] );
-			$month = date( 'F', $datetime );
+			$month = radio_station_get_time( 'F', $datetime );
 			$month = radio_station_translate_month( $month, true );
-			$weekday = date( 'l', $datetime );
+			$weekday = radio_station_get_time( 'l', $datetime );
 			$weekday = radio_station_translate_weekday( $weekday );
-			echo esc_html( $weekday ) . ' ' . esc_html( date( 'j', $datetime ) ) . ' ' . esc_html( $month ) . ' ' . esc_html( date( 'Y', $datetime ) ) . "\n";
+			echo esc_html( $weekday ) . ' ' . esc_html( radio_station_get_time( 'j', $datetime ) ) . ' ' . esc_html( $month ) . ' ' . esc_html( radio_station_get_time( 'Y', $datetime ) ) . "\n";
 			echo '<br>' . "\n";
 
 			// 2.3.3.9: merge override times into this columns
@@ -4795,8 +4810,8 @@ function radio_station_override_column_data( $column, $post_id ) {
 				echo esc_html( $override['start_hour'] ) . ':' . esc_html( $override['start_min'] ) . esc_html( $override['start_meridian'] );
 				echo ' - ' . esc_html( $override['end_hour'] ) . ':' . esc_html( $override['end_min'] ) . esc_html( $override['end_meridian'] ) . "\n";
 			} elseif ( 24 == $time_format ) {
-				$start_hour = radio_station_convert_hour( $override['start_hour'] . ' ' . $override['start_meridian'] );
-				$end_hour = radio_station_convert_hour( $override['end_hour'] . ' ' . $override['end_meridian'] );
+				// $start_hour = radio_station_convert_hour( $override['start_hour'] . ' ' . $override['start_meridian'] );
+				// $end_hour = radio_station_convert_hour( $override['end_hour'] . ' ' . $override['end_meridian'] );
 				echo esc_html( $override['start_hour'] ) . ':' . esc_html( $override['start_min'] );
 				echo ' - ' . esc_html( $override['end_hour'] ) . ':' . esc_html( $override['end_min'] ) . "\n";
 			}
@@ -4827,7 +4842,8 @@ function radio_station_override_column_data( $column, $post_id ) {
 
 			// --- get the override weekday ---
 			// 2.3.2: remove date time and get day from date directly
-			$weekday = date( 'l', strtotime( $override['date'] ) );
+			// 2.5.6: use radio_station-get_time instead of date
+			$weekday = radio_station_get_time( 'l', strtotime( $override['date'] ) );
 
 			// --- get start and end override times ---
 			// 2.3.2: fix to convert to 24 hour format first
@@ -4860,7 +4876,8 @@ function radio_station_override_column_data( $column, $post_id ) {
 						// 2.3.0: validate shift time to check if complete
 						// 2.3.2: replace strtotime with to_time for timezones
 						// 2.3.2: fix to convert to 24 hour format first
-						$time = radio_station_validate_shift( $shift );
+						// 2.5.6: fix to return variable for validate shift
+						$shift = radio_station_validate_shift( $shift );
 						$start = $shift['start_hour'] . ':' . $shift['start_min'] . ' ' . $shift['start_meridian'];
 						$end = $shift['end_hour'] . ':' . $shift['end_min'] . ' ' . $shift['end_meridian'];
 						$start = radio_station_convert_shift_time( $start );
@@ -5016,9 +5033,10 @@ function radio_station_override_admin_list_styles() {
 	// 2.3.2: set override image column width to override image width
 	// 2.3.3.9: set override times column width
 	// 2.5.0: use wp_kses_post on style output
-	// TODO: use wp_add_inline_style
+	// 2.5.6: use radio_station_add_inline_style
 	$css = apply_filters( 'radio_station_override_list_styles', $css );
-	echo '<style>' . $css . '</style>';
+	// echo '<style>' . wp_kses_post( $css ) . '</style>';
+	radio_station_add_inline_style( 'rs-admin', $css );
 }
 
 // ----------------------------------
@@ -5055,8 +5073,8 @@ function radio_station_override_date_filter( $post_type, $which ) {
 	}
 
 	// --- maybe get specified month ---
-	// TODO: maybe use get_query_var for month ?
-	$m = isset( $_GET['month'] ) ? (int) $_GET['month'] : 0;
+	$m = isset( $_GET['month'] ) ? absint( $_GET['month'] ) : 0;
+	$m = ( ( $m < 1 ) || ( $m > 12 ) ) ? 0 : $m;
 
 	// --- month override selector ---
 	echo '<label for="filter-by-override-date" class="screen-reader-text">' . esc_html( __( 'Filter by override date', 'radio-station' ) ) . '</label>' . "\n";
@@ -5084,7 +5102,7 @@ function radio_station_override_past_future_filter( $post_type, $which ) {
 	}
 
 	// --- set past future selection / default ---
-	$pastfuture = isset( $_GET['pastfuture'] ) ? $_GET['pastfuture'] : '';
+	$pastfuture = isset( $_GET['pastfuture'] ) ? sanitize_text_field( $_GET['pastfuture'] ) : '';
 	$pastfuture = apply_filters( 'radio_station_overrides_past_future_default', $pastfuture );
 
 	// --- past / future override selector ---
@@ -5146,7 +5164,8 @@ function radio_station_playlist_metabox() {
 	echo '<div class="meta_inner">' . "\n";
 
 		// 2.3.2: separate track list table
-		echo radio_station_playlist_track_table( $post->ID );
+		// 2.5.6: remove unnecessary echo statement
+		radio_station_playlist_track_table( $post->ID );
 
 		// --- track save/add buttons ---
 		// 2.3.2: change track save from button-primary to button-secondary
@@ -5404,9 +5423,10 @@ function radio_station_playlist_metabox() {
 		// --- filter and output ---
 		// 2.3.3.9: added track list style filter
 		// 2.5.0: use wp_kses_post on style output
-		// TODO: use wp_add_inline_style
+		// 2.5.6: use radio_station_add_inline_style
 		$css = apply_filters( 'radio_station_tracks_list_styles', $css );
-		echo '<style>' . wp_kses_post( $css ) . '</style>';
+		// echo '<style>' . wp_kses_post( $css ) . '</style>';
+		radio_station_add_inline_style( 'rs-admin', $css );
 
 	// --- close meta inner ---
 	echo '</div>' . "\n";
@@ -5819,19 +5839,19 @@ function radio_station_playlist_save_data( $post_id ) {
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 
 		// 2.5.0: added check to exclude quick edit action
-		if ( !isset( $_POST['playlist-quick-edit'] ) || ( '1' != $_POST['playlist-quick-edit'] ) ) {
+		if ( !isset( $_POST['playlist-quick-edit'] ) || ( '1' !== sanitize_text_field( $_POST['playlist-quick-edit'] ) ) ) {
 
 			// 2.3.3: added double check for AJAX action match
-			if ( !isset( $_REQUEST['action'] ) || ( 'radio_station_playlist_save_tracks' != $_REQUEST['action'] ) ) {
+			if ( !isset( $_REQUEST['action'] ) || ( 'radio_station_playlist_save_tracks' != sanitize_text_field( $_REQUEST['action'] ) ) ) {
 				return;
 			}
 
 			$error = false;
 			if ( !current_user_can( 'edit_playlists' ) ) {
 				$error = __( 'Failed. Use manual Publish or Update instead.', 'radio-station' );
-			} elseif ( !isset( $_POST['playlist_tracks_nonce'] ) || !wp_verify_nonce( $_POST['playlist_tracks_nonce'], 'radio-station' ) ) {
+			} elseif ( !isset( $_POST['playlist_tracks_nonce'] ) || !wp_verify_nonce( sanitize_text_field( $_POST['playlist_tracks_nonce'] ), 'radio-station' ) ) {
 				$error = __( 'Expired. Publish or Update instead.', 'radio-station' );
-			} elseif ( !isset( $_POST['playlist_id'] ) || ( '' == $_POST['playlist_id'] ) ) {
+			} elseif ( !isset( $_POST['playlist_id'] ) || ( '' == sanitize_text_field( $_POST['playlist_id'] ) ) ) {
 				$error = __( 'Failed. No Playlist ID provided.', 'radio-station' );
 			} else {
 				$post_id = absint( $_POST['playlist_id'] );
@@ -5861,7 +5881,7 @@ function radio_station_playlist_save_data( $post_id ) {
 
 		// --- verify playlist nonce ---
 		// 2.3.2: fix OR condition to AND condition
-		if ( isset( $_POST['playlist_tracks_nonce'] ) && wp_verify_nonce( $_POST['playlist_tracks_nonce'], 'radio-station' ) ) {
+		if ( isset( $_POST['playlist_tracks_nonce'] ) && wp_verify_nonce( sanitize_text_field( $_POST['playlist_tracks_nonce'] ), 'radio-station' ) ) {
 
 			$prev_playlist = get_post_meta( $post_id, 'playlist', true );
 			$playlist = isset( $_POST['playlist'] ) ? $_POST['playlist'] : array();
@@ -5898,7 +5918,7 @@ function radio_station_playlist_save_data( $post_id ) {
 	if ( isset( $_POST['playlist_show_id'] ) ) {
 
 		// --- verify playlist related to show nonce ---
-		if ( isset( $_POST['playlist_show_nonce'] ) && wp_verify_nonce( $_POST['playlist_show_nonce'], 'radio-station' ) ) {
+		if ( isset( $_POST['playlist_show_nonce'] ) && wp_verify_nonce( sanitize_text_field( $_POST['playlist_show_nonce'] ), 'radio-station' ) ) {
 
 			// 2.5.0: also get previous shift (if any)
 			$show_changed = false;
@@ -5949,7 +5969,7 @@ function radio_station_playlist_save_data( $post_id ) {
 
 	// --- AJAX saving ---
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-		if ( isset( $_POST['action'] ) && ( 'radio_station_playlist_save_tracks' == $_POST['action'] ) ) {
+		if ( isset( $_POST['action'] ) && ( 'radio_station_playlist_save_tracks' == sanitize_text_field( $_POST['action'] ) ) ) {
 
 			// --- display tracks saved message ---
 			// 2.3.3.9: fadeout tracks saved message
@@ -5966,11 +5986,12 @@ function radio_station_playlist_save_data( $post_id ) {
 			// --- refresh track list table ---
 			// 2.3.3.9: added check if playlist changed
 			if ( $playlist_changed ) {
-				echo radio_station_playlist_track_table( $post_id );
+				// 2.5.6: remove unnecessary echo statement
+				radio_station_playlist_track_table( $post_id );
 				echo "<script>tracktable = parent.document.getElementById('track-table');" . "\n";
 				echo "tracktable.innerHTML = document.getElementById('track-table').innerHTML;</script>";
 				
-				print_r( $playlist );
+				// echo esc_html( print_r( $playlist, true ) );
 			}
 
 			exit;
@@ -6118,9 +6139,10 @@ function radio_station_playlist_admin_list_styles() {
 
 	// 2.3.3.9: add playlist list styles filter
 	// 2.5.0: use wp_kses_post on style output
-	// TODO: use wp_add_inline_style ?
+	// 2.5.6: use radio_station_add_inline_style
 	$css = apply_filters( 'radio_station_playlist_list_styles', $css );
-	echo '<style>' . wp_kses_post( $css ) . '</style>';
+	// echo '<style>' . wp_kses_post( $css ) . '</style>';
+	radio_station_add_inline_style( 'rs-admin', $css );
 
 }
 
@@ -6209,7 +6231,9 @@ function radio_station_quick_edit_playlist( $column_name, $post_type ) {
 	// --- related shows post box styles ---
 	$css = '.pre-selected {background-color:#BBB;}';
 	$css = apply_filters( 'radio_station_quick_edit_playlist_styles', $css );
-	echo '<style>' . wp_kses_post( $css ) . '</style>' . "\n";
+	// 2.5.6: use radio_station_add_inline_style
+	// echo '<style>' . wp_kses_post( $css ) . '</style>' . "\n";
+	radio_station_add_inline_style( 'rs-admin', $css );
 
 	// 2.3.3.6: restore stored post object
 	$post = $stored_post;
@@ -6397,10 +6421,11 @@ function radio_station_post_show_metabox() {
 	// 2.3.3.6: add style for pre-selected option
 	// 2.5.0: added missing style filter
 	// 2.5.0: use wp_kses_post on style output
-	// TODO: use wp_add_inline_style ?
+	// 2.5.6: use radio_station_add_inline_style
 	$css = ".pre-selected {background-color:#BBB;}";
 	$css = apply_filters( 'radio_station_post_show_box_styles', $css );
-	echo '<style>' . wp_kses_post( $css ) . '</style>' . "\n";
+	// echo '<style>' . wp_kses_post( $css ) . '</style>' . "\n";
+	radio_station_add_inline_style( 'rs-admin', $css );
 
 	// 2.3.3.6: revert current post global
 	$post = $stored_post;
@@ -6431,14 +6456,14 @@ function radio_station_post_save_data( $post_id ) {
 	if ( isset( $_POST[$metakey] ) ) {
 
 		// ---  verify field save nonce ---
-		if ( !isset( $_POST['post_show_nonce'] ) || !wp_verify_nonce( $_POST['post_show_nonce'], 'radio-station' ) ) {
+		if ( !isset( $_POST['post_show_nonce'] ) || !wp_verify_nonce( sanitize_text_field( $_POST['post_show_nonce'] ), 'radio-station' ) ) {
 			return;
 		}
 
 		// --- get the related show ID ---
 		$changed = false;
 		$current_shows = get_post_meta( $post_id, $metakey, true );
-		$show_ids = $_POST[$metakey];
+		$show_ids = sanitize_text_field( $_POST[$metakey] );
 
 		// 2.3.3.6: maybe add existing (uneditable) Show IDs
 		$new_show_ids = array();
@@ -6554,9 +6579,11 @@ function radio_station_quick_edit_post( $column_name, $post_type ) {
 
 	// --- related shows post box styles ---
 	// 2.3.3.6: add style for pre-selected option
+	// 2.5.6: use radio_station_add_inline_style
 	$css = '.pre-selected {background-color:#BBB;}';
 	$css = apply_filters( 'radio_station_quick_edit_post_styles', $css );
-	echo '<style>' . wp_kses_post( $css ) . '</style>' . "\n";
+	// echo '<style>' . wp_kses_post( $css ) . '</style>' . "\n";
+	radio_station_add_inline_style( 'rs-admin', $css );
 
 	// 2.3.3.6: restore stored post object
 	$post = $stored_post;
@@ -6826,10 +6853,12 @@ function radio_station_posts_bulk_edit_notice() {
 
 	$updated = $failed = false;
 	if ( isset( $_REQUEST['radio_station_related_show_updated'] ) ) {
-		$updated_ = intval( $_REQUEST['radio_station_related_show_updated'] );
+		// 2.5.6: fix variable typo updated_
+		// 2.5.6: use absint instead of intval
+		$updated = absint( $_REQUEST['radio_station_related_show_updated'] );
 	}
 	if ( isset( $_REQUEST['radio_station_related_show_failed'] ) ) {
-		$failed = intval( $_REQUEST['radio_station_related_show_failed'] );
+		$failed = absint( $_REQUEST['radio_station_related_show_failed'] );
 	}
 	if ( $updated || $failed ) {
 
@@ -6873,9 +6902,10 @@ function radio_station_posts_list_styles() {
 
 	// 2.3.3.9: added posts list styles filter
 	// 2.5.0: added wp_kses_post to style output
-	// TODO: use wp_add_inline_style ?
+	// 2.5.6: use radio_station_add_inline_style
 	$css = apply_filters( 'radio_station_posts_list_styles', $css );
-	echo '<style>' . wp_kses_post( $css ) . '</style>';
+	// echo '<style>' . wp_kses_post( $css ) . '</style>';
+	radio_station_add_inline_style( 'rs-admin', $css );
 }
 
 
@@ -6898,9 +6928,9 @@ function radio_station_columns_query_filter( $query ) {
 	if ( RADIO_STATION_SHOW_SLUG === $query->get( 'post_type' ) ) {
 
 		// --- check if day filter is set ---
-		if ( isset( $_GET['weekday'] ) && ( '0' != $_GET['weekday'] ) ) {
+		if ( isset( $_GET['weekday'] ) && ( '0' != sanitize_text_field( $_GET['weekday'] ) ) ) {
 
-			$weekday = $_GET['weekday'];
+			$weekday = sanitize_text_field( $_GET['weekday'] );
 
 			// need to loop and sync a separate meta key to enable filtering
 			// (not really efficient but at least it makes it possible!)
@@ -6911,8 +6941,8 @@ function radio_station_columns_query_filter( $query ) {
 				$results = $radio_station_data['all-shows'];
 			} else {
 				global $wpdb;
-				$showquery = "SELECT ID FROM " . $wpdb->posts . " WHERE post_type = '" . RADIO_STATION_SHOW_SLUG . "'";
-				$results = $wpdb->get_results( $showquery, ARRAY_A );
+				$showquery = "SELECT ID FROM " . $wpdb->posts . " WHERE post_type = %s";
+				$results = $wpdb->get_results( $wpdb->prepare( $showquery, RADIO_STATION_SHOW_SLUG ), ARRAY_A );
 				$radio_station_data['all-shows'] = $results;
 			}
 			if ( $results && ( count( $results ) > 0 ) ) {
@@ -6922,7 +6952,7 @@ function radio_station_columns_query_filter( $query ) {
 					$shifts = radio_station_get_show_schedule( $post_id );
 
 					if ( $shifts && is_array( $shifts ) && ( count( $shifts ) > 0 ) ) {
-						$shiftdays = array();
+						// $shiftdays = array();
 						$shiftstart = $prevtime = false;
 						foreach ( $shifts as $shift ) {
 							if ( $shift['day'] == $weekday ) {
@@ -6975,8 +7005,7 @@ function radio_station_columns_query_filter( $query ) {
 			// 2.3.3.5: use wpdb prepare method on query
 			global $wpdb;
 			$overridequery = "SELECT ID FROM " . $wpdb->posts . " WHERE post_type = %s";
-			$overridequery = $wpdb->prepare( $overridequery, RADIO_STATION_OVERRIDE_SLUG );
-			$results = $wpdb->get_results( $overridequery, ARRAY_A );
+			$results = $wpdb->get_results( $wpdb->prepare( $overridequery, RADIO_STATION_OVERRIDE_SLUG ), ARRAY_A );
 			if ( $results && ( count( $results ) > 0 ) ) {
 				foreach ( $results as $result ) {
 					$post_id = $result['ID'];
@@ -7001,10 +7030,10 @@ function radio_station_columns_query_filter( $query ) {
 			$query->set( 'meta_type', 'date' );
 
 			// --- apply override year/month filtering ---
-			if ( isset( $_GET['month'] ) && ( '0' != $_GET['month'] ) ) {
-				$yearmonth = $_GET['month'];
-				$start_date = date( $yearmonth . '-01' );
-				$end_date = date( $yearmonth . '-t' );
+			if ( isset( $_GET['month'] ) && ( '0' != sanitize_text_field( $_GET['month'] ) ) ) {
+				$yearmonth = sanitize_text_field( $_GET['month'] );
+				$start_date = radio_station_get_time( $yearmonth . '-01' );
+				$end_date = radio_station_get_time( $yearmonth . '-t' );
 				// 2.5.0: fix to use double array for meta_query
 				$meta_query = array( array(
 					'key'     => 'show_override_date',
@@ -7019,12 +7048,13 @@ function radio_station_columns_query_filter( $query ) {
 			// 2.3.3: added past future query prototype code
 			// 2.3.3.5: added option for today selection
 			$valid = array( 'past', 'today', 'future' );
-			if ( isset( $_GET['pastfuture'] ) && in_array( $_GET['pastfuture'], $valid ) ) {
+			if ( isset( $_GET['pastfuture'] ) && in_array( sanitize_text_field( $_GET['pastfuture'] ), $valid ) ) {
 
-				$date = date( 'Y-m-d', time() );
-				$yesterday = date( 'Y-m-d', time() - ( 24 * 60 * 60 ) );
-				$tomorrow = date( 'Y-m-d', time() + ( 24 * 60 * 60 ) );
-				$pastfuture = $_GET['pastfuture'];
+				$now = radio_station_get_now();
+				$date = radio_station_get_time( 'Y-m-d', $now );
+				$yesterday = radio_station_get_time( 'Y-m-d', $now - ( 24 * 60 * 60 ) );
+				$tomorrow = radio_station_get_time( 'Y-m-d', $now + ( 24 * 60 * 60 ) );
+				$pastfuture = sanitize_text_field( $_GET['pastfuture'] );
 				if ( 'today' == $pastfuture ) {
 					$compare = 'BETWEEN';
 					$value = array( $yesterday, $tomorrow );
@@ -7037,10 +7067,10 @@ function radio_station_columns_query_filter( $query ) {
 				}
 
 				$pastfuture_query = array(
-					'key'		=> 'show_override_date',
-					'value'		=> $value,
-					'compare'	=> $compare,
-					'type'		=> 'DATE',
+					'key'     => 'show_override_date',
+					'value'   => $value,
+					'compare' => $compare,
+					'type'    => 'DATE',
 				);
 				if ( isset( $meta_query ) ) {
 					$combined_query = array(
@@ -7081,7 +7111,7 @@ function radio_station_relogin_message() {
 	// 2.3.3.9: fix to playlist action name prefix
 	// 2.3.3.9: added support for override times
 	// 2.3.3.9: add check for single shift action
-	$action = $_REQUEST['action'];
+	$action = sanitize_text_field( $_REQUEST['action'] );
 	$save_shift_actions = array( 'radio_station_show_save_shift', 'radio_station_show_save_shifts' );
 	if ( in_array( $action, $save_shift_actions ) ) {
 		$type = 'shift';

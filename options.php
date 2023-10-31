@@ -131,7 +131,7 @@ $options = array(
 
 	// --- Station Phone Number ---
 	// 2.3.3.6: added station phone number option
-	'station_phone'		=> array(
+	'station_phone' => array(
 		'type'    => 'text',
 		'options' => 'PHONE',
 		'label'   => __( 'Station Phone', 'radio-station' ),
@@ -243,7 +243,7 @@ $options = array(
 
 	// --- Defaults Note ---
 	// 2.5.0: added note about defaults being overrideable in widgets
-	'player_bar_note' => array(
+	'player_defaults_note' => array(
 		'type'    => 'note',
 		'label'   => __( 'Player Defaults Note', 'radio-station' ),
 		'helper'  => __( 'Note that you can override these defaults in specific Player Widgets.', 'radio-station' ),
@@ -312,8 +312,8 @@ $options = array(
 		'label'   => __( 'Default Player Theme', 'radio-station' ),
 		'default' => 'light',
 		'options' => array(
-			'light'	=> __( 'Light', 'radio-station' ),
-			'dark'	=> __( 'Dark', 'radio-station' ),
+			'light' => __( 'Light', 'radio-station' ),
+			'dark'  => __( 'Dark', 'radio-station' ),
 		),
 		'helper'  => __( 'Default Player Controls theme style.', 'radio-station' ),
 		'tab'     => 'player',
@@ -481,9 +481,9 @@ $options = array(
 		'label'   => __( 'Sitewide Player Bar', 'radio-station' ),
 		'default' => 'off',
 		'options' => array(
-			'off'		=> __( 'No Player Bar', 'radio-station' ),
-			'top'   	=> __( 'Top Player Bar', 'radio-station' ),
-			'bottom'	=> __( 'Bottom Player Bar', 'radio-station' ),
+			'off'    => __( 'No Player Bar', 'radio-station' ),
+			'top'    => __( 'Top Player Bar', 'radio-station' ),
+			'bottom' => __( 'Bottom Player Bar', 'radio-station' ),
 		),
 		'tab'     => 'player',
 		'section' => 'bar',
@@ -625,7 +625,7 @@ $options = array(
 		'tab'     => 'player',
 		'section' => 'bar',
 		'helper'  => __( 'How to animate the currently playing track display.', 'radio-station' ),
-		'pro'     => true,	
+		'pro'     => true,
 	),
 
 	// --- [Pro/Player] Metadata URL ---
@@ -642,7 +642,7 @@ $options = array(
 	),
 
 	// --- [Pro/Player] Store Track Metadata ---
-	// 2.5.6: added option to store stream 
+	// 2.5.6: added option to store stream
 	'player_store_metadata' => array(
 		'type'    => 'checkbox',
 		'label'   => __( 'Store Track Metadata?', 'radio-station' ),
@@ -652,8 +652,8 @@ $options = array(
 		'section' => 'bar',
 		'helper'  => __( 'Save now playing track metadata in a separate database table for later use.', 'radio-station' ),
 		'pro'     => true,
-	);
-		
+	),
+
 	// === Master Schedule Page ===
 
 	// --- Schedule Page ---
@@ -729,8 +729,8 @@ $options = array(
 		'label'   => __( 'Available Views', 'radio-station' ),
 		// note: unstyled list view not included in defaults
 		'default' => array( 'table', 'calendar' ),
-		'value'		=> 'yes',
-		'options'	=> array(
+		'value'   => 'yes',
+		'options' => array(
 			'table'    => __( 'Table View', 'radio-station' ),
 			'tabs'     => __( 'Tabbed View', 'radio-station' ),
 			'list'     => __( 'List View', 'radio-station' ),
@@ -749,7 +749,7 @@ $options = array(
 		'type'    => 'checkbox',
 		'label'   => __( 'Time Spaced Grid', 'radio-station' ),
 		'default' => '',
-		'value'	  => 'yes',
+		'value'   => 'yes',
 		'helper'  => __( 'Enable Grid View option for equalized time spacing and background imsges.', 'radio-station' ),
 		'tab'     => 'pages',
 		'section' => 'schedule',

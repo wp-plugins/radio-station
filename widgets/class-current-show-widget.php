@@ -60,17 +60,10 @@ class DJ_Widget extends WP_Widget {
 		$pricing_url = radio_station_get_pricing_url();
 		$upgrade_url = radio_station_get_upgrade_url();
 
-		// --- set image size options ---
-		$image_sizes = radio_station_get_image_sizes();
-		$image_size_options = '';
-		foreach ( $image_sizes as $image_size => $label ) {
-			$image_size_options	.= '<option value="' . esc_attr( $image_size ) . '">' . esc_html( $label ) . '</option>' . "\n";
-		}
-
 		// 2.3.0: convert template style code to strings
 		// 2.5.0: use fields array
 		$fields = array();
-		
+
 		// === Widget Display Options ===
 
 		// --- Widget Title ---
@@ -109,7 +102,7 @@ class DJ_Widget extends WP_Widget {
 			</label>
 			<small>' . esc_html( __( 'Empty for default. 0 for none.', 'radio-station' ) ) . '</small>
 		</p>';
-		
+
 		// --- Hide if Empty ---
 		$fields['hide_empty'] = '<p>
 			<label for="' . esc_attr( $this->get_field_id( 'hide_empty' ) ) . '">
@@ -159,9 +152,19 @@ class DJ_Widget extends WP_Widget {
 		$fields['avatar_size'] = '<p>
 			<label for="' . esc_attr( $this->get_field_id( 'avatar_size' ) ) . '">
 				' . esc_html( __( 'Avatar Image Size', 'radio-station' ) ) . ':
-				<select id="' . esc_attr( $this->get_field_id( 'avatar_size' ) ) . '" name="' . esc_attr( $this->get_field_name( 'avatar_size' ) ) . '">
-					' . $image_size_options . '
-				</select>
+				<select id="' . esc_attr( $this->get_field_id( 'avatar_size' ) ) . '" name="' . esc_attr( $this->get_field_name( 'avatar_size' ) ) . '">';
+				// --- set image size options ---
+				// 2.5.6: move loop to directly inside select field
+				$image_sizes = radio_station_get_image_sizes();
+				foreach ( $image_sizes as $image_size => $label ) {
+					$fields['avatar_size'] .= '<option value="' . esc_attr( $image_size ) . '"';
+					// 2.5.6: added missing check for current avatar size selection
+					if ( $image_size == $avatar_size ) {
+						$fields['avatar_size'] .= ' selected="selected"';
+					}
+					$fields['avatar_size'] .= '>' . esc_html( $label ) . '</option>' . "\n";
+				}
+		$fields['avatar_size'] .= '</select>
 			</label>
 		</p>';
 
@@ -424,7 +427,7 @@ class DJ_Widget extends WP_Widget {
 					// --- output widget display ---
 					// TODO: test wp_kses on shortcode output
 					// echo wp_kses( $output, $allowed );
-					// phpcs:ignore WordPress.Security.OutputNotEscaped
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					echo $output;
 
 				// --- close widget contents wrapper ---
@@ -432,7 +435,7 @@ class DJ_Widget extends WP_Widget {
 
 			// --- close widget container ---
 			echo '</div>' . "\n";
-		
+
 			// --- after widget ---
 			// 2.5.0: use wp_kses on output
 			echo wp_kses( $args['after_widget'], $allowed );
@@ -456,4 +459,3 @@ function radio_station_register_current_show_widget() {
 	// note: widget class name to remain unchanged for backwards compatibility
 	register_widget( 'DJ_Widget' );
 }
-
