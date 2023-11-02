@@ -72,11 +72,12 @@
 // Set Scheduler Debug Mode
 // ------------------------
 // note: use anonymous function to prevent possible future conflicts
-add_action( 'plugins_loaded', function() {
+// 2.5.6: remove this as it is  unnecessary
+/* add_action( 'plugins_loaded', function() {
 	if ( !defined( 'SCHEDULE_ENGINE_DEBUG' ) ) {
 		define( 'SCHEDULE_ENGINE_DEBUG', false );
 	}
-});
+}); */
 
 // --------------------------
 // Open Schedule Engine Class
@@ -389,7 +390,8 @@ class radio_station_schedule_engine {
 				// note: shifts must be already set
 				$shifts = $record['shifts'];
 				if ( $this->debug ) {
-					echo '<span style="display:none;">Shifts for Record ' . esc_html( $id ) . ': ' . esc_html( print_r( $shifts, true ) ) . '</span>';
+					$debug = 'Shifts for Record ' . $id . ': ' . print_r( $shifts, true );
+					$this->debug_log( $debug );
 				}
 
 				if ( $shifts && is_array( $shifts) && ( count( $shifts ) > 0 ) ) {
@@ -526,9 +528,9 @@ class radio_station_schedule_engine {
 
 		// --- debug point ---
 		if ( $this->debug ) {
-			$data = "Raw Shifts" . PHP_EOL . print_r( $all_shifts, true ) . PHP_EOL;
-			$data .= "Shift Errors" . PHP_EOL . print_r( $errors, true ) . PHP_EOL;
-			$this->debug_log( $data );
+			$debug = "Raw Shifts: " . print_r( $all_shifts, true ) . PHP_EOL;
+			$debug .= "Shift Errors: " . print_r( $errors, true ) . PHP_EOL;
+			$this->debug_log( $debug );
 		}
 
 		// --- do action to record shift error ---
@@ -575,8 +577,8 @@ class radio_station_schedule_engine {
 
 		// --- debug point ---
 		if ( $this->debug ) {
-			$data = "Sorted Shifts" . PHP_EOL . print_r( $sorted_shifts, true ) . PHP_EOL;
-			$this->debug_log( $data );
+			$debug = "Sorted Shifts: " . print_r( $sorted_shifts, true );
+			$this->debug_log( $debug );
 		}
 		
 		// --- filter and return ---
@@ -652,7 +654,8 @@ class radio_station_schedule_engine {
 				foreach ( $override_shifts as $j => $data ) {
 
 					if ( $this->debug ) {
-						echo '<span style="display:none;">Override Data: ' . print_r( $data, true ) . '</span>' . "\n";
+						$debug = 'Override Data: ' . print_r( $data, true ) . PHP_EOL;
+						$this->debug_log( $debug );
 					}
 
 					// 2.3.3.9: ignore disabled overrides
@@ -823,7 +826,7 @@ class radio_station_schedule_engine {
 
 		// --- debug point ---
 		if ( $this->debug ) {
-			$debug = "Shifts: " . print_r( $show_shifts, true ) . PHP_EOL;
+			$debug = 'Shifts: ' . print_r( $show_shifts, true );
 			$this->debug_log( $debug );
 		}
 
@@ -903,7 +906,8 @@ class radio_station_schedule_engine {
 
 				$date = $weekdates[$day];
 				if ( $this->debug ) {
-					echo "Override Date: " . esc_html( $date ) . PHP_EOL;
+					$debug = "Override Date: " . $date;
+					$this->debug_log( $debug );
 				}
 
 				// 2.3.2: reset overrides for loop
@@ -912,7 +916,8 @@ class radio_station_schedule_engine {
 
 					$overrides = $override_list[$date];
 					if ( $this->debug ) {
-						echo "Overrides for " . esc_html( $day ) . ": " . esc_html( print_r( $overrides, true ) ) . PHP_EOL;
+						$debug = "Overrides for " . $day . ": " . print_r( $overrides, true );
+						$this->debug_log( $debug );
 					}
 
 					// --- maybe reloop to insert any overrides before shows ---
@@ -1113,11 +1118,12 @@ class radio_station_schedule_engine {
 
 					if ( $this->debug ) {
 						if ( isset( $debugshifts ) ) {
-							$this->debug_log( "Day Debug: " . $debugshifts . PHP_EOL );
+							$this->debug_log( "Day Debug: " . $debugshifts );
 						}
-						echo "Shift Keys: " . esc_html( print_r( $keys, true ) ) . PHP_EOL;
-						echo "Sorted Keys: " . esc_html( print_r( $shift_keys, true ) ) . PHP_EOL;
-						echo "Sorted Shifts: " . esc_html( print_r( $new_shifts, true ) ) . PHP_EOL;
+						$debug = "Shift Keys: " . print_r( $keys, true ) . PHP_EOL;
+						$debug .= "Sorted Keys: " . print_r( $shift_keys, true ) . PHP_EOL;
+						$debug .= "Sorted Shifts: " . print_r( $new_shifts, true ) . PHP_EOL;
+						$this->debug_log( $debug );
 					}
 
 				}
@@ -1126,15 +1132,15 @@ class radio_station_schedule_engine {
 				// $shifts = $show_shifts[$day];
 				// ksort( $shifts );
 				if ( $this->debug ) {
-					echo "New Day Shifts: " . esc_html( print_r( $shifts, true ) ) . PHP_EOL;
-					// echo "Done Overrides: " . print_r( $done_overrides, true ) . PHP_EOL;
+					$debug = "New Day Shifts: " . print_r( $shifts, true );
+					$this->debug_log( $debug );
 				}
 			}
 
 		}
 
 		if ( $this->debug ) {
-			$debug = "Combined Schedule: " . esc_html( print_r( $show_shifts, true ) ). PHP_EOL;
+			$debug = "Combined Schedule: " . print_r( $show_shifts, true );
 			$this->debug_log( $debug );
 		}
 		
@@ -1170,9 +1176,9 @@ class radio_station_schedule_engine {
 
 						// ---- add the override data ---
 						// 2.5.6: use apply_filters instead of prefixed functions
-						$override = apply_filters( 'schedule_engine_override_data_meta', $shift['override'], $shift['id'], $context );
+						$override = apply_filters( 'schedule_engine_schedule_override_data_meta', $shift['override'], $shift['id'], $context );
 						if ( ( '' != $context ) && is_string( $context ) ) {
-							$override = apply_filters( $context . '_override_data_meta', $shift['override'], $shift['id'] );
+							$override = apply_filters( $context . '_schedule_override_data_meta', $shift['override'], $shift['id'] );
 						}
 						$shift['show'] = $show_shifts[$day][$start]['show'] = $override;
 
@@ -1249,14 +1255,13 @@ class radio_station_schedule_engine {
 							$debug = 'Now: ' . $now . PHP_EOL;
 							$debug .= 'Date: ' . $this->get_time( 'm-d H:i:s', $now ) . PHP_EOL;
 							$debug .= 'Shift Start: ' . $shift_start . ' (' . $shift_start_time . ')' . PHP_EOL;
-							$debug .= 'Shift End: ' . $shift_end . ' (' . $shift_end_time . ')' . PHP_EOL . PHP_EOL;
+							$debug .= 'Shift End: ' . $shift_end . ' (' . $shift_end_time . ')' . PHP_EOL;
 							if ( isset ( $current_show ) ) {
 								$debug .= '[Current Shift] ' . print_r( $current_show, true ) . PHP_EOL;
 							}
-							$debug .= PHP_EOL;
 							if ( $now >= $shift_start_time ) {$debug .= "!A!";}
 							if ( $now < $shift_end_time ) {$debug .= "!B!";}
-							echo $debug;
+							$this->debug_log( $debug );
 						}
 
 					} elseif ( isset( $current_show['split'] ) && $current_show['split'] ) {
@@ -1332,17 +1337,19 @@ class radio_station_schedule_engine {
 
 		if ( $this->debug ) {
 			if ( !isset( $current_show ) ) {
-				echo '<span style="display:none;">Current Show Not Found.</span>';
+				$debug = 'Current Show Not Found.';
 			} else {
-				echo '<span style="display:none;">Current Show: ' . esc_html( print_r( $current_show, true ) ) . '</span>';
+				$debug = 'Current Show: ' . print_r( $current_show, true );
 			}
+			$this->debug_log( $debug );
 		}
 
 		// --- get next show if we did not find one ---
 		if ( !isset( $next_show ) ) {
 
 			if ( $this->debug ) {
-				echo "No Next Show Found. Rechecking...";
+				$debug = 'No Next Show Found. Rechecking...';
+				$this->debug_log( $debug );
 			}
 
 			// --- fallback to using get next shift function ---
@@ -1404,11 +1411,10 @@ class radio_station_schedule_engine {
 		$weekdates = $this->get_schedule_weekdates( $weekdays, $now, $timezone );
 
 		if ( $this->debug ) {
-			echo '<span style="display:none;">';
-			echo 'Finding Current Show from ' . esc_html( $yesterday ) . "\n";
-			echo 'Weekdays: ' . esc_html( print_r( $weekdays, true ) ) . "\n";
-			echo 'Weekdates: ' . esc_html( print_r( $weekdates, true ) ) . "\n";
-			echo '</span>';
+			$debug = 'Finding Current Show from ' . $yesterday . PHP_EOL;
+			$debug .= 'Weekdays: ' . print_r( $weekdays, true ) . PHP_EOL;
+			$debug .= 'Weekdates: ' . print_r( $weekdates, true ) . PHP_EOL;
+			$this->debug_log( $debug );
 		}
 
 		// --- loop shifts to get current show ---
@@ -1429,11 +1435,10 @@ class radio_station_schedule_engine {
 						$shift_end_time = $shift_end_time + ( 24 * 60 * 60 );
 					}
 
-					// if ( $this->debug ) {
 					if ( $this->debug ) {
-						echo '<span style="display:none;">';
-						echo 'Now: ' . esc_html( $now ) . ' - Shift Start: ' . esc_html( $shift_start_time ) . ' - Shift End: ' . esc_html( $shift_end_time ) . "\n";
-						echo 'Shift: ' . esc_html( print_r( $shift, true ) ) . "\n";
+						$debug = 'Now: ' . $now . ' - Shift Start: ' . $shift_start_time . ' - Shift End: ' . $shift_end_time . PHP_EOL;
+						$debug .= 'Shift: ' . print_r( $shift, true ) . PHP_EOL;
+						$this->debug_log( $debug );
 					}
 
 					// --- set current show ---
@@ -1442,7 +1447,8 @@ class radio_station_schedule_engine {
 					if ( ( $now >= $shift_start_time ) && ( $now < $shift_end_time ) ) {
 
 						if ( $this->debug ) {
-							echo '^^^ Current ^^^' . PHP_EOL;
+							$debug = '^^^ Current ^^^';
+							$this->debug_log( $debug );
 						}
 						// --- recombine possible split shift to set current show ---
 						$current_shift = $shift;
@@ -1461,10 +1467,6 @@ class radio_station_schedule_engine {
 
 						}
 
-					}
-
-					if ( $this->debug ) {
-						echo '</span>' . PHP_EOL;
 					}
 
 					// 2.3.4: store previous shift
@@ -1569,11 +1571,10 @@ class radio_station_schedule_engine {
 		$weekdates = $this->get_schedule_weekdates( $weekdays, $now, $timezone );
 
 		if ( $this->debug ) {
-			echo '<span style="display:none;">';
-			echo 'Next Shows from ' . esc_html( $yesterday ) . "\n";
-			echo 'Weekdays: ' . esc_html( print_r( $weekdays ) ) . "\n";
-			echo 'Weekdates: ' . esc_html( print_r( $weekdates ) ) . "\n";
-			echo '</span>';
+			$debug = 'Next Shows from ' . $yesterday . PHP_EOL;
+			$debug .= 'Weekdays: ' . print_r( $weekdays, true ) . PHP_EOL;
+			$debug .= 'Weekdates: ' . print_r( $weekdates, true ) . PHP_EOL;
+			$this->debug_log( $debug );
 		}
 
 		// --- loop shifts to find next shows ---
@@ -1592,10 +1593,9 @@ class radio_station_schedule_engine {
 					$shift_end_time = $this->to_time( $weekdates[$day] . ' ' . $shift_end, $timezone );
 
 					if ( $this->debug ) {
-						echo '<span style="display:none;">';
-						echo 'Next? ' . esc_html( $now ) . ' - ' . esc_html( $shift_start_time ) . ' - ' . esc_html( $shift_end_time ) . "\n";
-						echo 'Shift: ' . esc_html( print_r( $shift, true ) ) . "\n";
-						echo '</span>' . "\n";
+						$debug = 'Next? ' . $now . ' - ' . $shift_start_time . ' - ' . $shift_end_time . PHP_EOL;
+						$debug .= 'Shift: ' . print_r( $shift, true ) . PHP_EOL;
+						$this->debug_log( $debug );
 					}
 
 					// --- set current show ---
@@ -1637,7 +1637,8 @@ class radio_station_schedule_engine {
 							$shift['date'] = $weekdates[$day];
 							$next_shows[] = $shift;
 							if ( $this->debug ) {
-								echo '<span style="display:none;">Next Shows: ' . esc_html( print_r( $next_shows, true ) ) . '</span>' . "\n";
+								$debug = 'Next Shows: ' . print_r( $next_shows, true );
+								$this->debug_log( $debug );
 							}
 
 							// --- return if we have reached limit ---
@@ -1739,13 +1740,14 @@ class radio_station_schedule_engine {
 
 							// note: previous shift start and end times set in previous loop iteration
 							if ( $this->debug ) {
-								echo "Shift Date: " . esc_html( $thisdate ) . " - Day: " . esc_html( $day ) . " - Time: " . esc_html( $date_time ) . "\n";
+								$debug = "Shift Date: " . $thisdate . " - Day: " . $day . " - Time: " . $date_time . PHP_EOL;
 								$prevdata = $prev_shift['shift'];
 								$prevday = $prev_shift['day'];
 								$prevdate = $prev_shift['date'];
-								echo "Previous Shift Date: " . esc_html( $prevdate ) . " - Shift Day: " . esc_html( $prevday ) . "\n";
-								echo "Shift: " . esc_html( print_r( $shift, true ) );
-								echo "Previous Shift: " . esc_html( print_r( $prev_shift, true ) );
+								$debug .= "Previous Shift Date: " . $prevdate . " - Shift Day: " . $prevday . PHP_EOL;
+								$debug .= "Shift: " . print_r( $shift, true ) . PHP_EOL;
+								$debug .= "Previous Shift: " . print_r( $prev_shift, true ) . PHP_EOL;
+								$this->debug_log( $debug );
 							}
 
 							// --- detect shift conflicts ---
@@ -1825,7 +1827,8 @@ class radio_station_schedule_engine {
 										$checked_shifts[$day][$prev_shift['start']]['trimmed'] = true;
 
 										if ( $this->debug ) {
-											echo "Previous Previous Shift: " . esc_html( print_r( $prev_prev_shift, true ) );
+											$debug = "Previous Previous Shift: " . print_r( $prev_prev_shift, true );
+											$this->debug_log( $debug );
 										}
 
 										// --- fix for real end of first part of previous split shift ---
@@ -1960,8 +1963,9 @@ class radio_station_schedule_engine {
 			}
 
 			if ( $this->debug ) {
-				echo 'Last Shift End: ' . esc_html( $last_shift['day'] ) . ' ' . esc_html( $l_shift_end ) . ' - (' . esc_html( $last_shift_end ) . ')' . "\n";
-				echo 'First Shift Start: ' . esc_html( $first_shift['day'] ) . ' ' . $f_shift_start . ' - (' . $first_shift_start . ')' . "\n";
+				$debug = 'Last Shift End: ' . $last_shift['day'] . ' ' . $l_shift_end . ' - (' . $last_shift_end . ')' . PHP_EOL;
+				$debug .=  'First Shift Start: ' . $first_shift['day'] . ' ' . $f_shift_start . ' - (' . $first_shift_start . ')' . PHP_EOL;
+				$this->debug_log( $debug );
 			}
 
 			// --- end of the week overlap check ---
@@ -1971,9 +1975,10 @@ class radio_station_schedule_engine {
 
 				// --- record a conflict ---
 				if ( $this->debug ) {
-					echo "First/Last Shift Overlap Conflict" . "\n";
-					echo "First Shift: " . esc_html( print_r( $first_shift, true ) ) . "\n";
-					echo "Last Shift: " . esc_html( print_r( $last_shift, true ) ) . "\n";
+					$debug = "First/Last Shift Overlap Conflict" . PHP_EOL;
+					$debug .= "First Shift: " . print_r( $first_shift, true ) . PHP_EOL;
+					$debug .= "Last Shift: " . print_r( $last_shift, true ) . PHP_EOL;
+					$this->debug_log( $debug );
 				}
 
 				/*
@@ -2099,11 +2104,12 @@ class radio_station_schedule_engine {
 		}
 
 		if ( $this->debug ) {
-			echo "Checking Shift for Show " . $record_id . ": ";
-			echo $shift['day'] . " - " . $weekdates[$shift['day']] . " - " . $shift['start_hour'] . ":" . $shift['start_min'] . $shift['start_meridian'];
-			echo "(" . $shift_start_time . ")";
-			echo " to " . $weekdates[$shift['day']] . " - " . $shift['end_hour'] . ":" . $shift['end_min'] . $shift['end_meridian'];
-			echo "(" . $shift_end_time . ")" . PHP_EOL;
+			$debug = "Checking Shift for Show " . $record_id . ": ";
+			$debug .= $shift['day'] . " - " . $weekdates[$shift['day']] . " - " . $shift['start_hour'] . ":" . $shift['start_min'] . $shift['start_meridian'];
+			$debug .= " (" . $shift_start_time . ")" . PHP_EOL;
+			$debug .= " to " . $weekdates[$shift['day']] . " - " . $shift['end_hour'] . ":" . $shift['end_min'] . $shift['end_meridian'];
+			$debug .= " (" . $shift_end_time . ")" . PHP_EOL;
+			$this->debug_log( $debug );
 		}
 
 		// --- check for conflicts with other show shifts ---
@@ -2144,9 +2150,10 @@ class radio_station_schedule_engine {
 					if ( $check_shift ) {
 
 						if ( $this->debug ) {
-							echo "...with Shift for Show " . esc_html( $day_shift['show'] ) . ": ";
-							echo esc_html( $day_shift['day'] ) . " - " . esc_html( $day_shift['date'] ) . " - " . esc_html( $day_shift['start'] ) . " (" . esc_html( $day_shift_start_time ) . ")";
-							echo " to " . esc_html( $day_shift['end'] ) . " (" . esc_html( $day_shift_end_time ) . ")" . "\n";
+							$debug = "...with Shift for Show " . $day_shift['show'] . ": ";
+							$debug .= $day_shift['day'] . " - " . $day_shift['date'] . " - " . $day_shift['start'] . " (" . $day_shift_start_time . ")" . PHP_EOL;
+							$debug .= " to " . $day_shift['end'] . " (" . $day_shift_end_time . ")" . PHP_EOL;
+							$debug->debug_log( $debug );
 						}
 
 						// 2.3.2: improved shift checking logic
@@ -2172,7 +2179,8 @@ class radio_station_schedule_engine {
 							// --- if there is a shift overlap conflict ---
 							$conflicts[] = $day_shift;
 							if ( $this->debug ) {
-								echo '^^^ CONFLICT ( ' . esc_html( $conflict ) . ' ) ^^^' . "\n";
+								$debug = '^^^ CONFLICT ( ' . $conflict . ' ) ^^^';
+								$this->debug_log( $debug );
 							}
 						}
 					}
@@ -2223,12 +2231,13 @@ class radio_station_schedule_engine {
 				$shift_end_time = $shift_end_time + ( 7 * 24 * 60 * 60 );
 
 				if ( $this->debug ) {
-					echo "...with Last Shift (using next week):" . PHP_EOL;
+					$debug = "...with Last Shift (using next week):" . PHP_EOL;
 					// echo $this->get_time( 'date', $shift_start_time ) . " - " . $shift['start'] . " (" . $shift_start_time . ")";
 					// echo " to " . $shift['end'] . " (" . $shift_end_time . ")" . PHP_EOL;
-					echo $day_shift['day'] . " - " . $this->get_time( 'date', $day_shift_start_time );
-					echo " - " . $day_shift['start'] . " (" . $day_shift_start_time . ")";
-					echo " to " . $day_shift['end'] . " (" . $day_shift_end_time . ")" . PHP_EOL;
+					$debug .= $day_shift['day'] . " - " . $this->get_time( 'date', $day_shift_start_time );
+					$debug .= " - " . $day_shift['start'] . " (" . $day_shift_start_time . ")";
+					$debug .= " to " . $day_shift['end'] . " (" . $day_shift_end_time . ")" . PHP_EOL;
+					$this->debug_log( $debug );
 				}
 
 				// 2.3.3.6: separated logic for conflict match code
@@ -2247,7 +2256,8 @@ class radio_station_schedule_engine {
 				if ( $conflict ) {
 					$conflicts[] = $day_shift;
 					if ( $this->debug ) {
-						echo '^^^ CONFLICT ( ' . $conflict . ') ^^^' . PHP_EOL;
+						$debug = '^^^ CONFLICT ( ' . $conflict . ') ^^^';
+						$this->debug_log( $debug );
 					}
 				}
 			}
@@ -2272,7 +2282,8 @@ class radio_station_schedule_engine {
 
 		// --- debug point ---
 		if ( $this->debug ) {
-			$data = "New Shifts: " . print_r( $new_shifts, true ) . PHP_EOL;
+			$debug = "New Shifts: " . print_r( $new_shifts, true ) . PHP_EOL;
+			$this->debug_log( $debug );
 		}
 
 		// --- convert days to dates for checking ---
@@ -2312,15 +2323,17 @@ class radio_station_schedule_engine {
 				if ( $this->debug ) {
 					$a_start = $shift_a['day'] . ' ' . $shift_a['start_hour'] . ':' . $shift_a['start_min'] . $shift_a['start_meridian'] . ' (' . $shift_a_start_time . ')';
 					$a_end = $shift_a['day'] . ' ' . $shift_a['end_hour'] . ':' . $shift_a['end_min'] . $shift_a['end_meridian'] . ' (' . $shift_a_end_time . ')';
-					$data .= "Shift A Start: " . $a_start . ' - Shift A End: ' . $a_end . "\n";
+					$debug = "Shift A Start: " . $a_start . ' - Shift A End: ' . $a_end . "\n";
+					$this->debug_log( $debug );
 				}
 
+				$debug = '';
 				foreach ( $new_shifts as $j => $shift_b ) {
 
 					if ( $i != $j ) {
 
 						if ( $this->debug ) {
-							$data .= $i . ' ::: ' . $j . "\n";
+							$debug .= $i . ' ::: ' . $j . "\n";
 						}
 
 						if ( '' != $shift_b['day'] ) {
@@ -2343,7 +2356,7 @@ class radio_station_schedule_engine {
 							if ( $this->debug ) {
 								$b_start = $shift_b['day'] . ' ' . $shift_b_start . ' (' . $shift_b_start_time . ')';
 								$b_end = $shift_b['day'] . ' ' . $shift_b_end . ' (' . $shift_b_end_time . ')';
-								$data .= "with Shift B Start: " . $b_start . ' - Shift B End: ' . $b_end . "\n";
+								$debug .= "with Shift B Start: " . $b_start . ' - Shift B End: ' . $b_end . PHP_EOL;
 							}
 
 							// --- compare shift A and B times ---
@@ -2361,30 +2374,30 @@ class radio_station_schedule_engine {
 									// --- debug point ---
 									if ( $this->debug ) {
 										// TODO: write more detailed explanations for debug conditions
-										$data .= "* Conflict Found! New Shift (B) Disabled ";
+										$debug .= "* Conflict Found! New Shift (B) Disabled ";
 										if ( ( $shift_a_start_time < $shift_b_start_time ) && ( $shift_a_end_time > $shift_b_start_time ) ) {
-											$data .= "[A]";
+											$debug .= "[A]";
 										}
 										if ( ( $shift_a_start_time < $shift_b_start_time ) && ( $shift_a_end_time > $shift_b_end_time ) ) {
-											$data .= "[B]";
+											$debug .= "[B]";
 										}
 										if ( $shift_a_start_time == $shift_b_start_time ) {
-											$data .= "[C]";
+											$debug .= "[C]";
 										}
 										if ( ( $shift_a_start_time > $shift_b_start_time ) && ( $shift_a_end_time < $shift_b_end_time ) ) {
-											$data .= "[D]";
+											$debug .= "[D]";
 										}
 										if ( ( $shift_a_start_time > $shift_b_start_time ) && ( $shift_a_start_time < $shift_b_end_time ) ) {
-											$data .= "[E]";
+											$debug .= "[E]";
 										}
-										$data .= "*" . PHP_EOL;
+										$debug .= "*" . PHP_EOL;
 									}
 
 									$new_shifts[$j]['disabled'] = 'yes';
 
 								} else {
 									if ( $this->debug ) {
-										$data .= "[Conflict with disabled shift.]" . "\n";
+										$debug .= "[Conflict with disabled shift.]" . PHP_EOL;
 									}
 								}
 							}
@@ -2396,8 +2409,8 @@ class radio_station_schedule_engine {
 
 		// --- debug point ---
 		if ( $this->debug ) {
-			$data .= "Checked New Shifts: " . esc_html( print_r( $new_shifts, true ) ) . "\n";
-			$this->debug_log( $data, false );
+			$debug .= "Checked New Shifts: " . print_r( $new_shifts, true ) . PHP_EOL;
+			$this->debug_log( $debug, false );
 		}
 
 		// --- filter and return ---
@@ -2522,7 +2535,8 @@ class radio_station_schedule_engine {
 		} else {
 			// 2.5.6: debug output instead of exiting
 			if ( $this->debug ) {
-				echo 'Error in Time String Timezone: ' . esc_html( $timestring ) . ' - Timezone: ' . esc_html( $timezone );
+				$debug = 'Error in Time String Timezone: ' . $timestring . ' - Timezone: ' . $timezone;
+				$this->debug_log( $debug );
 			}
 			return false;
 		}
@@ -3433,7 +3447,7 @@ class radio_station_schedule_engine {
 
 		// --- maybe output debug info ---
 		if ( $echo ) {
-			echo '<span class="schedule-engine-debug" style="display:none;">' . esc_html( $data ) . '</span>' . PHP_EOL;
+			echo '<span class="schedule-engine-debug" style="display:none;">' . esc_html( rtrim( $data ) ) . '</span>' . PHP_EOL;
 		}
 
 		// --- check for logging constant ---
@@ -3450,6 +3464,9 @@ class radio_station_schedule_engine {
 			if ( !is_dir( dirname( __FILE__ ) . '/debug' ) ) {
 				wp_mkdir_p( dirname( __FILE__ ) . '/debug' );
 			}
+
+			// --- ensure line break at end of debug line ---
+			$data = rtrim( $data ) . PHP_EOL;
 
 			// --- write to debug file path ---
 			$filepath = dirname( __FILE__ ) . '/debug/' . $filename;

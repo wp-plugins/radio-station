@@ -812,7 +812,7 @@ function radio_station_override_data_meta_filter( $override_id, $shift_id ) {
 	if ( isset( $radio_station_data['override-' . $override_id] ) ) {
 		$override = $radio_station_data['override-' . $override_id];
 	} else {
-		$override = radio_station_get_override_data_meta( $override );
+		$override = radio_station_get_override_data_meta( $override_id );
 		$radio_station_data['override-' . $override_id] = $override;
 	}
 	return $override;

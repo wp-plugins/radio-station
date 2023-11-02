@@ -1537,11 +1537,15 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				if ( !isset( $args['contact'] ) ) {
 					$args['contact'] = $premium;
 				}
+				if ( !isset( $args['affiliation'] ) ) {
+					$args['affiliaation'] = false;
+				}
 
 				// --- set Freemius settings from plugin settings ---
-				// 1.1.1: remove admin_url wrapper on Freemius first-path value
-				// TODO: further possible args for Freemius init (eg. bundle_id)
 				// ref: https://freemius.com/help/documentation/wordpress-sdk/integrating-freemius-sdk/
+				// 1.1.1: remove admin_url wrapper on Freemius first-path value
+				// 1.3.0: added has_affiliation argument key
+				// TODO: further possible args for Freemius init (eg. bundle_id)
 				$first_path = add_query_arg( 'page', $args['slug'], 'admin.php' );
 				$first_path = add_query_arg( 'welcome', 'true', $first_path );
 				$settings = array(
@@ -1553,6 +1557,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					'has_paid_plans'   => $args['hasplans'],
 					'is_org_compliant' => $args['wporg'],
 					'is_premium'       => $premium,
+					'has_affiliation'  => $args['affiliation'];
 					'menu'             => array(
 						'slug'       => $args['slug'],
 						'first-path' => $first_path,
@@ -3509,6 +3514,7 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // - added explicit email option field type
 // - added fallback to text option firld type
 // - add check if pro slug data is a string
+// - added Freemius has_affiliation key
 
 // == 1.2.9 ==
 // - fix empty number field converting to NaN value

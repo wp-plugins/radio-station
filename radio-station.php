@@ -256,6 +256,7 @@ $settings = array(
 	// 2.4.0.3: turn on plans switch for Pro also
 	// 2.4.0.3: set Pro details and Upgrade links
 	// 2.4.0.4: change upgrade_link to -upgrade
+	// 2.5.6: added affiliation selected key
 	'freemius_id'  => '4526',
 	'freemius_key' => 'pk_aaf375c4fb42e0b5b3831e0b8476b',
 	'hasplans'     => $plan_options['has_plans'],
@@ -264,6 +265,8 @@ $settings = array(
 	'hasaddons'    => $plan_options['has_addons'],
 	'addons_link'  => add_query_arg( 'page', RADIO_STATION_SLUG . '-addons', admin_url( 'admin.php' ) ),
 	'plan'         => $plan_options['plan_type'],
+	'affiliation'  => 'selected',
+
 );
 
 // ---------------------------

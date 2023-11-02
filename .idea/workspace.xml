@@ -45,12 +45,6 @@
       <path value="$PROJECT_DIR$/vendor/composer" />
       <path value="$PROJECT_DIR$/vendor/symfony/yaml" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
-      <path value="$PROJECT_DIR$/vendor/wp-coding-standards/wpcs" />
-      <path value="$PROJECT_DIR$/vendor/semantic/ui" />
-      <path value="$PROJECT_DIR$/vendor/phpcsstandards/phpcsutils" />
-      <path value="$PROJECT_DIR$/vendor/squizlabs/php_codesniffer" />
-      <path value="$PROJECT_DIR$/vendor/dealerdirect/phpcodesniffer-composer-installer" />
-      <path value="$PROJECT_DIR$/vendor/phpcsstandards/phpcsextra" />
     </include_path>
   </component>
   <component name="ProjectId" id="2BsJZ5XXJG3NAgUBzN6c74lrXIr" />

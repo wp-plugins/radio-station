@@ -268,8 +268,11 @@ function radio_player_output( $args = array(), $echo = false ) {
 	// 2.5.0: added preconnect/dns-prefetch link tags for URL host
 	if ( 'stream' == $args['media'] ) {
 		$url_host = parse_url( $args['url'], PHP_URL_HOST );
-		$html['player_open'] .= '<link rel="preconnect" href="' . esc_url( $url_host ) . '">' . "\n";
-		$html['player_open'] .= '<link rel="dns-prefetch" href="' . esc_url( $url_host ) . '">' . "\n";
+		// 2.5.6: added to prevent possible deprecated warning in esc_url
+		if ( ( null != $url_host ) && ( '' != $url_host ) ) {
+			$html['player_open'] .= '<link rel="preconnect" href="' . esc_url( $url_host ) . '">' . "\n";
+			$html['player_open'] .= '<link rel="dns-prefetch" href="' . esc_url( $url_host ) . '">' . "\n";
+		}
 	}
 
 	// --- set Player container ---
@@ -2642,7 +2645,7 @@ function radio_player_enqueue_styles( $script = false, $skin = false ) {
 	}
 
 	// --- enqueue base player styles ---
-	// $suffix = ''; // DEV TEMP
+	$suffix = ''; // DEV TEMP
 
 	if ( defined( 'RADIO_STATION_DIR' ) ) {
 		$path = RADIO_STATION_DIR . '/player/css/radio-player' . $suffix . '.css';
@@ -2685,8 +2688,6 @@ function radio_player_enqueue_styles( $script = false, $skin = false ) {
 			$control_styles = radio_player_control_styles( false );
 			if ( '' != $control_styles ) {
 				// 2.5.6: use wp_kses_post on control styles
-				// TODO: use wp_add_inline_style - with fallback ?
-				// wp_add_inline_style( 'radio-player', $control_styles );
 				echo '<style>' . wp_kses_post( $control_styles ) . '</style>';
 			}
 			
