@@ -12,7 +12,7 @@ Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 
 Requires at least: 3.3.1
 
-Tested up to: 6.2.2
+Tested up to: 6.4.1
 
 Stable tag: 2.5.5
 

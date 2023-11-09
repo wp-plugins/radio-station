@@ -2615,6 +2615,7 @@ function radio_player_get_default_script() {
 function radio_player_enqueue_styles( $script = false, $skin = false ) {
 
 	$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+	$suffix = ''; // DEV TEMP
 
 	// --- get default if not passed by shortcode attribute ---
 	if ( !$script ) {
@@ -2702,6 +2703,7 @@ function radio_player_enqueue_styles( $script = false, $skin = false ) {
 	}
 
 	// --- enqueue base jplayer styles ---
+	/*
 	$suffix = ''; // DEV TEMP
 
 	if ( defined( 'RADIO_STATION_DIR' ) ) {
@@ -2732,7 +2734,7 @@ function radio_player_enqueue_styles( $script = false, $skin = false ) {
 			echo '<span style="display:none;">Skin Path: ' . esc_html( $path ) . '</span>' . "\n";
 			echo '<span style="display:none;">Skin URL: ' . esc_html( $url ) . '</span>' . "\n";
 		}
-	}
+	} */
 
 	// --- JPlayer Skins ---
 	// $skins = array( 'pink-flag', 'blue-monday' );

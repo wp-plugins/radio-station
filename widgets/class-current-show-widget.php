@@ -91,7 +91,7 @@ class DJ_Widget extends WP_Widget {
 		$fields['dynamic'] = '<p>
 			<label for="dynamic">' . esc_html( __( 'Show changeover reloading available in Pro.', 'radio-station' ) ) . '</label><br>
 			<a href="' . esc_url( $upgrade_url ) . '">' . esc_html( __( 'Upgrade to Pro', 'radio-station' ) ) . '</a> |
-			<a href="' . esc_url( $pricing_url ) . '" target="_blank">' . esc_html( __( 'More Details', 'radio-station' ) ) . '</a>
+			<a href="' . esc_url( $pricing_url ) . '#dynamic-reload" target="_blank">' . esc_html( __( 'More Details', 'radio-station' ) ) . '</a>
 		</p>';
 
 		// --- No Current Show Text ---

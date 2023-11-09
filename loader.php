@@ -817,7 +817,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 							// 1.1.7 handle if (new) key not set yet
 							if ( isset( $settings[$key] ) ) {
 								// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-								echo '(Validated) ' . esc_html( print_r( $settings[$key], true ) ) . '<br>' . PHP_EOL;
+								echo '(Validated) ' . esc_html( print_r( $settings[$key], true ) ) . '<br>' . "\n";
 							} else {
 								echo 'No setting yet for key ' . esc_html( $key ) . '<br>' . "\n";
 							}
@@ -1375,17 +1375,17 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				$parsed = $readme->parse_readme_contents( $contents );
 
 				// --- output plugin info ---
-				echo '<b>' . esc_html( __( 'Plugin Name' ) ) . '</b>: ' . esc_html( $parsed['name'] ) . '<br>' . PHP_EOL;
-				// echo '<b>' . esc_html( __( 'Tags' ) ) . '</b>: ' . esc_html( implode( ', ', $parsed['tags'] ) ) . '<br>' . PHP_EOL;
-				echo '<b>' . esc_html( __( 'Requires at least' ) ) . '</b>: ' . esc_html( __( 'WordPress' ) ) . ' v' . esc_html( $parsed['requires_at_least'] ) . '<br>' . PHP_EOL;
-				echo '<b>' . esc_html( __( 'Tested up to' ) ) . '</b>: ' . esc_html( __( 'WordPress' ) ) . ' v' . esc_html( $parsed['tested_up_to'] ) . '<br>' . PHP_EOL;
+				echo '<b>' . esc_html( __( 'Plugin Name' ) ) . '</b>: ' . esc_html( $parsed['name'] ) . '<br>' . "\n";
+				// echo '<b>' . esc_html( __( 'Tags' ) ) . '</b>: ' . esc_html( implode( ', ', $parsed['tags'] ) ) . '<br>' . "\n";
+				echo '<b>' . esc_html( __( 'Requires at least' ) ) . '</b>: ' . esc_html( __( 'WordPress' ) ) . ' v' . esc_html( $parsed['requires_at_least'] ) . '<br>' . "\n";
+				echo '<b>' . esc_html( __( 'Tested up to' ) ) . '</b>: ' . esc_html( __( 'WordPress' ) ) . ' v' . esc_html( $parsed['tested_up_to'] ) . '<br>' . "\n";
 				if ( isset( $parsed['stable_tag'] ) ) {
-					echo '<b>' . esc_html( __( 'Stable Tag' ) ) . '</b>: ' . esc_html( $parsed['stable_tag'] ) . '<br>' . PHP_EOL;
+					echo '<b>' . esc_html( __( 'Stable Tag' ) ) . '</b>: ' . esc_html( $parsed['stable_tag'] ) . '<br>' . "\n";
 				}
-				echo '<b>' . esc_html( __( 'Contributors' ) ) . '</b>: ' . esc_html( implode( ', ', $parsed['contributors'] ) ) . '<br>' . PHP_EOL;
+				echo '<b>' . esc_html( __( 'Contributors' ) ) . '</b>: ' . esc_html( implode( ', ', $parsed['contributors'] ) ) . '<br>' . "\n";
 				// echo '<b>Donate Link</b>: <a href="' . esc_url( $parsed['donate_link'] ) . '" target="_blank">' . esc_html( $parsed['donate_link'] ) . '</a><br>';
 				// 1.2.5: use wp_kses_post on plugin short description markup
-				echo '<br>' . wp_kses_post( $parsed['short_description'] ) . '<br><br>' . PHP_EOL;
+				echo '<br>' . wp_kses_post( $parsed['short_description'] ) . '<br><br>' . "\n";
 
 				// --- output sections ---
 				// possible sections: 'description', 'installation', 'frequently_asked_questions',
@@ -1402,13 +1402,13 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 							$parts[$i] = strtoupper( substr( $part, 0, 1 ) ) . substr( $part, 1 );
 						}
 						$title = implode( ' ', $parts );
-						echo '<h3>' . esc_html( $title ) . '</h3>' . PHP_EOL;
+						echo '<h3>' . esc_html( $title ) . '</h3>' . "\n";
 						// 1.2.5: use wp_kses_post on readme section output
 						echo wp_kses_post( $section );
 					}
 				}
 				if ( isset( $parsed['remaining_content'] ) && !empty( $remaining_content ) ) {
-					echo '<h3>' . esc_html( __( 'Extra Notes' ) ) . '</h3>' . PHP_EOL;
+					echo '<h3>' . esc_html( __( 'Extra Notes' ) ) . '</h3>' . "\n";
 					// 1.2.5: use wp_kses_post on readme extra notes output
 					echo wp_kses_post( $parsed['remaining_content'] );
 				}
@@ -1576,7 +1576,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				$settings = apply_filters( 'freemius_init_settings_' . $args['namespace'], $settings );
 				if ( $this->debug ) {
 					// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-					echo '<span style="display:none;">Freemius Settings: ' . esc_html( print_r( $settings, true ) ) . '</span>' . PHP_EOL;
+					echo '<span style="display:none;">Freemius Settings: ' . esc_html( print_r( $settings, true ) ) . '</span>' . "\n";
 				}
 				if ( !$settings || !is_array( $settings ) ) {
 					return;
@@ -1597,7 +1597,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				// --- Freemius Object Debug ---
 				if ( $this->debug && current_user_can( 'manage_options' ) ) {
 					// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-					echo '<span style="display:none;">Freemius Object: ' . esc_html( print_r( $freemius, true ) ) . '</span>' . PHP_EOL;
+					echo '<span style="display:none;">Freemius Object: ' . esc_html( print_r( $freemius, true ) ) . '</span>' . "\n";
 				}
 				
 				// --- fire Freemius loaded action ---
@@ -1758,7 +1758,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 				if ( $this->debug ) {
 					// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-					echo '<span style="display:none;">Plugin Links for ' . esc_html( $file ) . ': ' . esc_html( print_r( $links, true ) ) . '</span>' . PHP_EOL;
+					echo '<span style="display:none;">Plugin Links for ' . esc_html( $file ) . ': ' . esc_html( print_r( $links, true ) ) . '</span>' . "\n";
 				}
 			}
 
@@ -1775,14 +1775,14 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				ob_start();
 			}
 
-			echo '<table style="background-color: lightYellow; border-style:solid; border-width:1px; border-color: #E6DB55; text-align:center;">' . PHP_EOL;
-				echo '<tr><td>' . PHP_EOL;
-					echo '<div class="message" style="margin:0.25em; font-weight:bold;">' . PHP_EOL;
+			echo '<table style="background-color: lightYellow; border-style:solid; border-width:1px; border-color: #E6DB55; text-align:center;">' . "\n";
+				echo '<tr><td>' . "\n";
+					echo '<div class="message" style="margin:0.25em; font-weight:bold;">' . "\n";
 						// 1.2.5: added wp_kses_post to message output
-						echo wp_kses_post( $message ) . PHP_EOL;
-					echo '</div>' . PHP_EOL;
-				echo '</td></tr>' . PHP_EOL;
-			echo '</table>' . PHP_EOL;
+						echo wp_kses_post( $message ) . "\n";
+					echo '</div>' . "\n";
+				echo '</td></tr>' . "\n";
+			echo '</table>' . "\n";
 			if ( !$echo ) {
 				$box = ob_get_contents();
 				ob_end_clean();
@@ -1815,14 +1815,14 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			}
 
 			// --- output notice box ---
-			echo '<div style="width: 98%;" id="admin-notices-box" class="postbox">' . PHP_EOL;
-			echo '<h3 class="admin-notices-title" style="cursor:pointer; margin:7px 14px; font-size:16px;" onclick="settings_toggle_notices();">' . PHP_EOL;
-			echo '<span id="admin-notices-arrow" style="font-size:24px;">&#9656;</span> &nbsp; ' . PHP_EOL;
-			echo '<span id="admin-notices-title" style="vertical-align:top;">' . esc_html( __( 'Notices' ) ) . '</span>  &nbsp; ' . PHP_EOL;
-			echo '<span id="admin-notices-count" style="vertical-align:top;"></span></h3>' . PHP_EOL;
+			echo '<div style="width: 98%;" id="admin-notices-box" class="postbox">' . "\n";
+			echo '<h3 class="admin-notices-title" style="cursor:pointer; margin:7px 14px; font-size:16px;" onclick="settings_toggle_notices();">' . "\n";
+			echo '<span id="admin-notices-arrow" style="font-size:24px;">&#9656;</span> &nbsp; ' . "\n";
+			echo '<span id="admin-notices-title" style="vertical-align:top;">' . esc_html( __( 'Notices' ) ) . '</span>  &nbsp; ' . "\n";
+			echo '<span id="admin-notices-count" style="vertical-align:top;"></span></h3>' . "\n";
 
-			echo '<div id="admin-notices-wrap" style="display:none";><h2 style="display:none;"></h2></div>' . PHP_EOL;
-			echo '</div>' . PHP_EOL;
+			echo '<div id="admin-notices-wrap" style="display:none";><h2 style="display:none;"></h2></div>' . "\n";
+			echo '</div>' . "\n";
 
 			// --- toggle notice box script ---
 			echo "<script>function settings_toggle_notices() {
@@ -1861,12 +1861,12 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				echo '<br><b>Current Settings:</b><br>';
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 				echo esc_html( print_r( $settings, true ) );
-				echo '<br><br>' . PHP_EOL;
+				echo '<br><br>' . "\n";
 
 				echo '<br><b>Plugin Options:</b><br>';
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 				echo esc_html( print_r( $this->options, true ) );
-				echo '<br><br>' . PHP_EOL;
+				echo '<br><br>' . "\n";
 
 				// phpcs:ignore WordPress.Security.NonceVerification.Missing
 				if ( isset( $_POST ) ) {
@@ -1875,7 +1875,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					$posted = array_map( 'sanitize_text_field', $_POST );
 					foreach ( $posted as $key => $value ) {
 						// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-						echo esc_attr( $key ) . ': ' . esc_html( print_r( $value, true ) ) . '<br>' . PHP_EOL;
+						echo esc_attr( $key ) . ': ' . esc_html( print_r( $value, true ) ) . '<br>' . "\n";
 					}
 				}
 			}
@@ -1902,53 +1902,53 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			$author_icon_url = apply_filters( $namespace . '_author_icon_url', $author_icon_url );
 
 			// --- open header table ---
-			echo '<table class="plugin-settings-page-header"><tr>' . PHP_EOL;
+			echo '<table class="plugin-settings-page-header"><tr>' . "\n";
 
 			// --- plugin icon ---
 			// 1.1.9: add filter for plugin icon url
 			$icon_url = apply_filters( $namespace . '_settings_page_icon_url', $icon_url );
 			echo '<td>' . PHP_EOL;
 			if ( $icon_url ) {
-				echo '<img class="plugin-settings-page-icon" src="' . esc_url( $icon_url ) . '" width="128" height="128">' . PHP_EOL;
+				echo '<img class="plugin-settings-page-icon" src="' . esc_url( $icon_url ) . '" width="128" height="128">' . "\n";
 			}
-			echo '</td>' . PHP_EOL;
+			echo '</td>' . "\n";
 
-			echo '<td width="20"></td><td>' . PHP_EOL;
+			echo '<td width="20"></td><td>' . "\n";
 
-			echo '<table><tr>' . PHP_EOL;
+			echo '<table><tr>' . "\n";
 
 			// --- plugin title ---
 			// 1.1.9: add filter for plugin pagetitle
-			$title = apply_filters( $namespace . '_settings_page_title', $args['title'] ) . PHP_EOL;
-			echo '<td><h3 style="font-size:20px;">' . PHP_EOL;
-			echo '<a href="' . esc_url( $args['home'] ) . '" target="_blank" style="text-decoration:none;">' . esc_html( $title ) . '</a>' . PHP_EOL;
-			echo '</h3></td>' . PHP_EOL;
+			$title = apply_filters( $namespace . '_settings_page_title', $args['title'] );
+			echo '<td><h3 style="font-size:20px;">' . "\n";
+			echo '<a href="' . esc_url( $args['home'] ) . '" target="_blank" style="text-decoration:none;">' . esc_html( $title ) . '</a>' . "\n";
+			echo '</h3></td>' . "\n";
 
-			echo '<td width="20"></td>' . PHP_EOL;
+			echo '<td width="20"></td>' . "\n";
 
 			// --- plugin version ---
 			// 1.1.9: add filter for plugin version
 			$version = apply_filters( $namespace . '_settings_page_version', 'v' . $args['version'] );
-			echo '<td><h3 class="plugin-setttings-page-version">' . esc_html( $version ) . '</h3></td></tr>' . PHP_EOL;
+			echo '<td><h3 class="plugin-setttings-page-version">' . esc_html( $version ) . '</h3></td></tr>' . "\n";
 
 			// --- subtitle ---
 			// 1.1.9: added optional subtitle filter display
 			$subtitle = apply_filters( $namespace . '_settings_page_subtitle', '' );
 			if ( '' != $subtitle ) {
-				echo '<tr><td colspan="3" align="center">' . PHP_EOL;
-				echo '<h4 class="plugins-settings-page-subtitle" style="font-size:14px; margin-top:0;">' . esc_html( $subtitle ) . '</h4>' . PHP_EOL;
-				echo '</td></tr>' . PHP_EOL;
+				echo '<tr><td colspan="3" align="center">' . "\n";
+				echo '<h4 class="plugins-settings-page-subtitle" style="font-size:14px; margin-top:0;">' . esc_html( $subtitle ) . '</h4>' . "\n";
+				echo '</td></tr>' . "\n";
 			}
 
-			echo '<tr><td colspan="3" align="center">' . PHP_EOL;
+			echo '<tr><td colspan="3" align="center">' . "\n";
 
-			echo '<table><tr><td align="center">' . PHP_EOL;
+			echo '<table><tr><td align="center">' . "\n";
 
 			// ---- plugin author ---
 			// 1.0.8: check if author URL is set
 			if ( isset( $args['author_url'] ) ) {
 				echo '<font style="font-size:16px;">' . esc_html( __( 'by' ) ) . '</font> ';
-				echo '<a href="' . esc_url( $args['author_url'] ) . '" target="_blank" style="text-decoration:none;font-size:16px;" target="_blank"><b>' . esc_html( $args['author'] ) . '</b></a><br><br>' . PHP_EOL;
+				echo '<a href="' . esc_url( $args['author_url'] ) . '" target="_blank" style="text-decoration:none;font-size:16px;" target="_blank"><b>' . esc_html( $args['author'] ) . '</b></a><br><br>' . "\n";
 			}
 
 			// --- readme / docs / support links ---
@@ -1982,28 +1982,28 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 			// --- author icon ---
 			if ( $author_icon_url ) {
-				echo '</td><td>' . PHP_EOL;
+				echo '</td><td>' . "\n";
 
 				// 1.0.8: check if author URL is set for link
 				if ( isset( $args['author_url'] ) ) {
-					echo '<a href="' . esc_url( $args['author_url'] ) . '" target="_blank">' . PHP_EOL;
+					echo '<a href="' . esc_url( $args['author_url'] ) . '" target="_blank">' . "\n";
 				}
-				echo '<img src="' . esc_url( $author_icon_url ) . '" width="64" height="64" border="0">' . PHP_EOL;
+				echo '<img src="' . esc_url( $author_icon_url ) . '" width="64" height="64" border="0">' . "\n";
 				if ( isset( $args['author_url'] ) ) {
-					echo '</a>' . PHP_EOL;
+					echo '</a>' . "\n";
 				}
 			}
 
-			echo '</td></tr></table>' . PHP_EOL;
+			echo '</td></tr></table>' . "\n";
 
-			echo '</td></tr></table>' . PHP_EOL;
+			echo '</td></tr></table>' . "\n";
 
-			echo '</td><td width="50"></td><td style="vertical-align:top;">' . PHP_EOL;
+			echo '</td><td width="50"></td><td style="vertical-align:top;">' . "\n";
 
 			// --- plugin supporter links ---
 			// 1.0.1: set rate/share/donate links and texts
 			// 1.0.8: added filters for rate/share/donate links
-			echo '<br><div class="plugin-settings-page-links">' . PHP_EOL;
+			echo '<br><div class="plugin-settings-page-links">' . "\n";
 
 			// --- Rate link ---
 			if ( isset( $args['wporgslug'] ) ) {
@@ -2021,7 +2021,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					$rate_text = __( 'Rate on WordPress.Org' );
 				}
 				$rate_link = '<a href="' . esc_url( $rate_url ) . '" class="pluginlink" target="_blank">';
-				$rate_link .= '<span style="font-size:24px; color:#FC5; margin-right:10px;" class="dashicons dashicons-star-filled"></span>' . PHP_EOL;
+				$rate_link .= '<span style="font-size:24px; color:#FC5; margin-right:10px;" class="dashicons dashicons-star-filled"></span>' . "\n";
 				$rate_link .= ' ' . esc_html( $rate_text ) . '</a><br><br>' . PHP_EOL;
 				$rate_link = apply_filters( $args['namespace'] . '_rate_link', $rate_link, $args );
 				if ( $rate_link ) {
@@ -2079,10 +2079,10 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					$message = $settings['title'] . ' ' . __( 'Settings Reset!' );
 				}
 				if ( isset( $message ) ) {
-					echo '<tr><td></td><td></td><td align="center">' . PHP_EOL;
+					echo '<tr><td></td><td></td><td align="center">' . "\n";
 					// 1.2.5: use direct echo option for message box
 					$this->message_box( $message, true );
-					echo '</td></tr>' . PHP_EOL;
+					echo '</td></tr>' . "\n";
 				}
 			} else {
 				// --- maybe output welcome message ---
@@ -2094,7 +2094,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						echo '<tr><td colspan="3" align="center">';
 						// 1.2.5: use direct echo option for message box
 						$this->message_box( $args['welcome'], true );
-						echo '</td></tr>' . PHP_EOL;
+						echo '</td></tr>' . "\n";
 					}
 				}
 			}
@@ -2110,7 +2110,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			$namespace = $this->namespace;
 
 			// --- open page wrapper ---
-			echo '<div id="pagewrap" class="wrap" style="width:100%;margin-right:0 !important;">' . PHP_EOL;
+			echo '<div id="pagewrap" class="wrap" style="width:100%;margin-right:0 !important;">' . "\n";
 
 			do_action( $namespace . '_admin_page_top' );
 
@@ -2125,7 +2125,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			do_action( $namespace . '_admin_page_bottom' );
 
 			// --- close page wrapper ---
-			echo '</div>' . PHP_EOL;
+			echo '</div>' . "\n";
 		}
 
 		// --------------
@@ -2181,10 +2181,10 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 			// --- output saved settings ---
 			if ( $this->debug ) {
-				echo '<br><b>Saved Settings:</b><br>';
+				echo '<br><b>Saved Settings:</b><br>' . "\n";
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 				echo esc_html( print_r( $settings, true ) );
-				echo '<br><br>';
+				echo '<br><br>' . "\n";
 			}
 
 			// --- get option tabs and sections ---
@@ -2248,10 +2248,10 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					}
 					// 1.2.5: remove onclick attribute and use jQuery click function
 					// onclick="plugin_panel_display_tab(\'' . esc_attr( $tab ) . '\');"
-					echo '<li id="' . esc_attr( $tab ) . '-tab-button" class="settings-tab-button ' . esc_attr( $class ) . '">' . esc_html( $tablabel ) . '</li>' . PHP_EOL;
-					$i ++;
+					echo '<li id="' . esc_attr( $tab ) . '-tab-button" class="settings-tab-button ' . esc_attr( $class ) . '">' . esc_html( $tablabel ) . '</li>' . "\n";
+					$i++;
 				}
-				echo '</ul>' . PHP_EOL;
+				echo '</ul>' . "\n";
 			} else {
 				$tabs = array( 'general' => __( 'General' ) );
 			}
@@ -2262,19 +2262,19 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 			// --- start settings form ---
 			// 1.2.0: remove unused prefix on settings tab name attribute
-			echo '<form method="post" id="settings-form">' . PHP_EOL;
-			echo '<input type="hidden" name="' . esc_attr( $namespace ) . '_update_settings" id="settings-action" value="yes">' . PHP_EOL;
-			echo '<input type="hidden" name="settingstab" id="settings-tab" value="' . esc_attr( $currenttab ) . '">' . PHP_EOL;
+			echo '<form method="post" id="settings-form">' . "\n";
+			echo '<input type="hidden" name="' . esc_attr( $namespace ) . '_update_settings" id="settings-action" value="yes">' . "\n";
+			echo '<input type="hidden" name="settingstab" id="settings-tab" value="' . esc_attr( $currenttab ) . '">' . "\n";
 			wp_nonce_field( $args['slug'] . '_update_settings' );
 
 			// --- maybe set hidden debug input ---
 			if ( $this->debug ) {
-				echo '<input type="hidden" name="debug" value="yes">' . PHP_EOL;
+				echo '<input type="hidden" name="debug" value="yes">' . "\n";
 			}
 
 			// ---- open wrapbox ---
-			echo '<div id="wrapbox" class="postbox" style="line-height:2em;">' . PHP_EOL;
-			echo '<div class="inner" style="padding-left:20px;">' . PHP_EOL;
+			echo '<div id="wrapbox" class="postbox" style="line-height:2em;">' . "\n";
+			echo '<div class="inner" style="padding-left:20px;">' . "\n";
 
 			// --- output tabbed sections ---
 			$i = 0;
@@ -2285,11 +2285,11 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				if ( ( $currenttab == $tab ) || ( ( '' == $currenttab ) && ( 0 == $i ) ) ) {
 					$class = 'active';
 				}
-				echo '<div id="' . esc_attr( $tab ) . '-tab" class="settings-tab ' . esc_attr( $class ) . '">' . PHP_EOL;
+				echo '<div id="' . esc_attr( $tab ) . '-tab" class="settings-tab ' . esc_attr( $class ) . '">' . "\n";
 
 				do_action( $namespace . '_admin_page_tab_' . $tab . '_top' );
 
-				echo '<table cellpadding="0" cellspacing="0">' . PHP_EOL;
+				echo '<table cellpadding="0" cellspacing="0">' . "\n";
 
 				if ( count( $sections ) > 0 ) {
 
@@ -2300,16 +2300,16 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 							// --- section top ---
 							// 1.2.5: fix to mismatched class setting-section-bottom
-							echo '<tr class="setting-section-top"><td colspan="5">' . PHP_EOL;
+							echo '<tr class="setting-section-top"><td colspan="5">' . "\n";
 							// 1.2.5: use do_action directly instead of using stored output
 							do_action( $namespace . '_admin_page_section_' . $section . '_top' );
-							echo '</td></tr>' . PHP_EOL;
+							echo '</td></tr>' . "\n";
 
 							// --- section heading ---
 							if ( !isset( $sectionheadings[$section] ) ) {
-								echo '<tr class="setting-section">' . PHP_EOL;
-								echo '<td colspan="5"><h3>' . esc_html( $sectionlabel ) . '</h3></td>' . PHP_EOL;
-								echo '</tr>' . PHP_EOL;
+								echo '<tr class="setting-section">' . "\n";
+								echo '<td colspan="5"><h3>' . esc_html( $sectionlabel ) . '</h3></td>' . "\n";
+								echo '</tr>' . "\n";
 								$sectionheadings[$section] = true;
 							}
 
@@ -2319,13 +2319,13 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 								// 1.2.5: use wp_kses on setting row output with custom allowed HTML
 								echo wp_kses( $this->setting_row( $option ), $this->allowed_html( $option ) );
 							}
-							echo '<tr height="25"><td> </td></tr>' . PHP_EOL;
+							echo '<tr height="25"><td> </td></tr>' . "\n";
 
 							// --- section bottom hook ---
 							echo '<tr class="setting-section-bottom"><td colspan="5">';
 							// 1.2.5: use do_action directly instead of using stored output
 							do_action( $namespace . '_admin_page_section_' . $section . '_bottom' );
-							echo '</td></tr>' . PHP_EOL;
+							echo '</td></tr>' . "\n";
 
 						}
 
@@ -2333,23 +2333,23 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				} else {
 					foreach ( $taboptions[$tab]['general'] as $key => $option ) {
 						$option['key'] = $key;
-						echo '<tr height="25"><td> </td></tr>' . PHP_EOL;
+						echo '<tr height="25"><td> </td></tr>' . "\n";
 						// 1.2.5: use wp_kses_post on setting output with custom allowed HTML
 						echo wp_kses( $this->setting_row( $option ), $this->allowed_html( $option ) );
-						echo '<tr height="25"><td> </td></tr>' . PHP_EOL;
+						echo '<tr height="25"><td> </td></tr>' . "\n";
 					}
 				}
 
 				// --- reset/save settings buttons ---
 				// (filtered so removable from any specific tab)
-				$buttons = '<tr height="25"><td> </td></tr>' . PHP_EOL;
-				$buttons .= '<tr><td align="center">' . PHP_EOL;
+				$buttons = '<tr height="25"><td> </td></tr>' . "\n";
+				$buttons .= '<tr><td align="center">' . "\n";
 				// 1.2.5: remove reset onclick attribute
-				$buttons .= '<input type="button" id="settingsresetbutton" class="button-secondary settings-button" value="' . esc_attr( __( 'Reset Settings' ) ) . '">' . PHP_EOL;
-				$buttons .= '</td><td colspan="3"></td><td align="center">' . PHP_EOL;
-				$buttons .= '<input type="submit" class="button-primary settings-button" value="' . esc_attr( __( 'Save Settings' ) ) . '">' . PHP_EOL;
-				$buttons .= '</td></tr>' . PHP_EOL;
-				$buttons .= '<tr height="25"><td></td></tr>' . PHP_EOL;
+				$buttons .= '<input type="button" id="settingsresetbutton" class="button-secondary settings-button" value="' . esc_attr( __( 'Reset Settings' ) ) . '">' . "\n";
+				$buttons .= '</td><td colspan="3"></td><td align="center">' . "\n";
+				$buttons .= '<input type="submit" class="button-primary settings-button" value="' . esc_attr( __( 'Save Settings' ) ) . '">' . "\n";
+				$buttons .= '</td></tr>' . "\n";
+				$buttons .= '<tr height="25"><td></td></tr>' . "\n";
 				$buttons = apply_filters( $namespace . '_admin_save_buttons', $buttons, $tab );
 				if ( $buttons ) {
 					// 1.2.5: use wp_kses on filtered buttons output
@@ -2357,22 +2357,22 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 				}
 
 				// --- close table ---
-				echo '</table>' . PHP_EOL;
+				echo '</table>' . "\n";
 
 				// --- do below tab action ---
 				do_action( $namespace . '_admin_page_tab_' . $tab . '_bottom' );
 
 				// --- close tab output ---
-				echo '</div>' . PHP_EOL;
+				echo '</div>' . "\n";
 
 				$i++;
 			}
 
 			// --- close wrapbox ---
-			echo '</div></div>' . PHP_EOL;
+			echo '</div></div>' . "\n";
 
 			// --- close settings form ---
-			echo '</form>' . PHP_EOL;
+			echo '</form>' . "\n";
 
 			// --- enqueue settings resources ---
 			$this->settings_resources( $enqueued_media, $enqueued_color_picker );
@@ -2530,22 +2530,22 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 			}
 
 			// --- prepare row output ---
-			$row = '<tr class="settings-row">' . PHP_EOL;
+			$row = '<tr class="settings-row">' . "\n";
 
-			$row .= '<td class="settings-label">' . $option['label'] . PHP_EOL;
+			$row .= '<td class="settings-label">' . $option['label'] . "\n";
 			if ( 'multiselect' == $type ) {
-				$row .= '<br><span>' . esc_html( __( 'Use Ctrl and Click to Select' ) ) . '</span>' . PHP_EOL;
+				$row .= '<br><span>' . esc_html( __( 'Use Ctrl and Click to Select' ) ) . '</span>' . "\n";
 			}
-			$row .= '</td><td width="25"></td>' . PHP_EOL;
+			$row .= '</td><td width="25"></td>' . "\n";
 
 			// 1.0.9: added multiple cell spanning note type
 			if ( ( 'note' == $type ) || ( 'info' == $type ) || ( 'helper' == $type ) ) {
 
-				$row .= '<td class="settings-helper" colspan="3">' . PHP_EOL;
+				$row .= '<td class="settings-helper" colspan="3">' . "\n";
 				if ( isset( $option['helper'] ) ) {
 					$row .= $option['helper'];
 				}
-				$row .= '</td>' . PHP_EOL;
+				$row .= '</td>' . "\n";
 
 			} else {
 
@@ -2582,16 +2582,18 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						}
 						if ( isset( $pro_link ) ) {
 							// 1.2.2: change text from Pro details
-							$row .= '<a href="' . esc_url( $pro_link ) . '"' . $pro_target . '>' . esc_html( __( 'Details' ) ) . '</a>' . PHP_EOL;
+							// 1.3.0: add hash link anchor for Pro feature options
+							$option_anchor = str_replace( '_', '-', $option['key'] );
+							$row .= '<a href="' . esc_url( $pro_link ) . '#' . esc_attr( $option_anchor ) . '"' . $pro_target . '>' . esc_html( __( 'Details' ) ) . '</a>' . "\n";
 						}
 					} else {
 						$row .= esc_html( __( 'Coming soon in Pro version!' ) );
 					}
-					$row .= '</td>' . PHP_EOL;
+					$row .= '</td>' . "\n";
 
 				} else {
 
-					$row .= '<td class="settings-input">' . PHP_EOL;
+					$row .= '<td class="settings-input">' . "\n";
 
 					// --- maybe prepare special options ---
 					if ( isset( $option['options'] ) && is_string( $option['options'] ) ) {
@@ -2726,9 +2728,9 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						}
 						$checked = ( $setting == $option['value'] ) ? ' checked="checked"' : '';
 						$row .= '<label for="' . esc_attr( $name ) . '" class="setting-toggle">';
-						$row .= '<input type="checkbox" name="' . esc_attr( $name ) . '" class="setting-toggle" value="' . esc_attr( $option['value'] ) . '"' . $checked . '>' . PHP_EOL;
-						$row .= '<span class="setting-slider round"></span>' . PHP_EOL;
-						$row .= '</label>' . PHP_EOL;
+						$row .= '<input type="checkbox" name="' . esc_attr( $name ) . '" class="setting-toggle" value="' . esc_attr( $option['value'] ) . '"' . $checked . '>' . "\n";
+						$row .= '<span class="setting-slider round"></span>' . "\n";
+						$row .= '</label>' . "\n";
 						if ( isset( $option['suffix'] ) ) {
 							$row .= ' ' . $option['suffix'];
 						}
@@ -2741,7 +2743,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 							$option['value'] = '1';
 						}
 						$checked = ( $setting == $option['value'] ) ? ' checked="checked"' : '';
-						$row .= '<input type="checkbox" name="' . esc_attr( $name ) . '" class="setting-checkbox" value="' . esc_attr( $option['value'] ) . '"' . $checked . '>' . PHP_EOL;
+						$row .= '<input type="checkbox" name="' . esc_attr( $name ) . '" class="setting-checkbox" value="' . esc_attr( $option['value'] ) . '"' . $checked . '>' . "\n";
 						if ( isset( $option['suffix'] ) ) {
 							$row .= ' ' . $option['suffix'];
 						}
@@ -2755,7 +2757,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 							if ( is_array( $setting ) && in_array( $key, $setting ) ) {
 								$checked = ' checked="checked"';
 							}
-							$checkboxes[] = '<input type="checkbox" name="' . esc_attr( $name ) . "-" . esc_attr( $key ) . '" class="setting-checkbox" value="yes"' . $checked . '> ' . esc_html( $label ) . PHP_EOL;
+							$checkboxes[] = '<input type="checkbox" name="' . esc_attr( $name ) . "-" . esc_attr( $key ) . '" class="setting-checkbox" value="yes"' . $checked . '> ' . esc_html( $label ) . "\n";
 						}
 						$row .= implode( '<br>', $checkboxes );
 
@@ -2765,25 +2767,25 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						$radios = array();
 						foreach ( $option['options'] as $value => $label ) {
 							$checked = ( $setting == $value ) ? ' checked="checked"' : '';
-							$radios[] = '<input type="radio" class="setting-radio" name="' . esc_attr( $name ) . "' value='" . esc_attr( $value ) . '"' . $checked . '> ' . esc_html( $label ) . PHP_EOL;
+							$radios[] = '<input type="radio" class="setting-radio" name="' . esc_attr( $name ) . "' value='" . esc_attr( $value ) . '"' . $checked . '> ' . esc_html( $label ) . "\n";
 						}
 						$row .= implode( '<br>', $radios );
 
 					} elseif ( 'select' == $type ) {
 
 						// --- select dropdown ---
-						$row .= '<select class="setting-select" name="' . esc_attr( $name ) . '">' . PHP_EOL;
+						$row .= '<select class="setting-select" name="' . esc_attr( $name ) . '">' . "\n";
 						foreach ( $option['options'] as $value => $label ) {
 							// 1.0.9: support option grouping (set unique key containing OPTGROUP-)
 							if ( strstr( $value, '*OPTGROUP*' ) ) {
-								$row .= '<optgroup label="' . esc_attr( $label ) . '">' . esc_html( $label ) . '</optgroup>' . PHP_EOL;
+								$row .= '<optgroup label="' . esc_attr( $label ) . '">' . esc_html( $label ) . '</optgroup>' . "\n";
 							} else {
 								// 1.1.3: remove strict value checking
 								$row .= '<option value="' . esc_attr( $value ) . '"';
 								if ( $setting == $value ) {
 									$row .= ' selected="selected"';
 								}
-								$row .= '>' . esc_html( $label ) . '</option>' . PHP_EOL;
+								$row .= '>' . esc_html( $label ) . '</option>' . "\n";
 							}
 						}
 						$row .= '</select>';
@@ -2794,19 +2796,15 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					} elseif ( 'multiselect' == $type ) {
 
 						// --- multiselect dropdown ---
-						$row .= '<select multiple="multiple" class="setting-select" name="' . esc_attr( $name ) . '[]">' . PHP_EOL;
+						$row .= '<select multiple="multiple" class="setting-select" name="' . esc_attr( $name ) . '[]">' . "\n";
 						foreach ( $option['options'] as $value => $label ) {
 							if ( '' != $value ) {
 								// 1.1.3: check for OPTGROUP instead of *OPTGROUP*
 								if ( strstr( $value, 'OPTGROUP' ) ) {
-									$row .= '<optgroup label="' . esc_attr( $label ) . '">' . PHP_EOL;
+									$row .= '<optgroup label="' . esc_attr( $label ) . '">' . "\n";
 								} else {
-									if ( is_array( $setting ) && in_array( $value, $setting ) ) {
-										$selected = ' selected="selected"';
-									} else {
-										$selected = '';
-									}
-									$row .= '<option value="' . esc_attr( $value ) . '"' . $selected . ">" . esc_html( $label ) . '</option>' . PHP_EOL;
+									$selected = ( is_array( $setting ) && in_array( $value, $setting ) ) ? ' selected="selected"' : '';
+									$row .= '<option value="' . esc_attr( $value ) . '"' . $selected . ">" . esc_html( $label ) . '</option>' . "\n";
 								}
 							}
 						}
@@ -2830,7 +2828,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 							$placeholder = '';
 						}
 						// 1.1.7: fix to attribute quoting output
-						$row .= '<input type="text" name="' . esc_attr( $name ) . '" class="' . esc_attr( $class ) . '" value="' . esc_attr( $setting ) . '" placeholder="' . esc_attr( $placeholder ) . '">' . PHP_EOL;
+						$row .= '<input type="text" name="' . esc_attr( $name ) . '" class="' . esc_attr( $class ) . '" value="' . esc_attr( $setting ) . '" placeholder="' . esc_attr( $placeholder ) . '">' . "\n";
 						if ( isset( $option['suffix'] ) ) {
 							$row .= ' ' . $option['suffix'];
 						}
@@ -2849,7 +2847,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 							$placeholder = '';
 						}
 						// 1.2.4: added missing esc_textarea on value
-						$row .= '<textarea class="setting-textarea" name="' . esc_attr( $name ) . '" rows="' . esc_attr( $rows ) . '" placeholder="' . esc_attr( $placeholder ) . '">' . esc_textarea( $setting ) . '</textarea>' . PHP_EOL;
+						$row .= '<textarea class="setting-textarea" name="' . esc_attr( $name ) . '" rows="' . esc_attr( $rows ) . '" placeholder="' . esc_attr( $placeholder ) . '">' . esc_textarea( $setting ) . '</textarea>' . "\n";
 
 					} elseif ( ( 'numeric' == $type ) || ( 'number' == $type ) ) {
 
@@ -2878,19 +2876,19 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 						// 1.1.7: remove esc_js from onclick attributes
 						// $onclickdown = "plugin_panel_number_step('down', '" . esc_attr( $name ) . "', " . esc_attr( $min ) . ", " . esc_attr( $max ) . ", " . esc_attr( $step ) . ");" . PHP_EOL;
-						// $row .= '<input class="setting-button button-secondary" type="button" value="-" onclick="' . $onclickdown . '">' . PHP_EOL;
-						$row .= '<input class="number-button number-down-button setting-button button-secondary" type="button" value="-" data="' . esc_attr( $name ) . '">' . PHP_EOL;
+						// $row .= '<input class="setting-button button-secondary" type="button" value="-" onclick="' . $onclickdown . '">' . "\n";
+						$row .= '<input class="number-button number-down-button setting-button button-secondary" type="button" value="-" data="' . esc_attr( $name ) . '">' . "\n";
 						if ( isset( $option['prefix'] ) ) {
 							$row .= ' ' . $option['prefix'];
 						}
 						$data = esc_attr( $min ) . "," . esc_attr( $max ) . "," . esc_attr( $step );
-						$row .= '<input id="number-input-' . esc_attr( $name ) . '" class="setting-numeric" type="text" name="' . esc_attr( $name ) . '" value="' . esc_attr( $setting ) . '" placeholder="' . esc_attr( $placeholder ) . '" data="' . esc_attr( $data ) . '">' . PHP_EOL;
+						$row .= '<input id="number-input-' . esc_attr( $name ) . '" class="setting-numeric" type="text" name="' . esc_attr( $name ) . '" value="' . esc_attr( $setting ) . '" placeholder="' . esc_attr( $placeholder ) . '" data="' . esc_attr( $data ) . '">' . "\n";
 						if ( isset( $option['suffix'] ) ) {
 							$row .= ' ' . $option['suffix'];
 						}
 						// $onclickup = "plugin_panel_number_step('up', '" . esc_attr( $name ) . "', " . esc_attr( $min ) . ", " . esc_attr( $max ) . ", " . esc_attr( $step ) . ");" . PHP_EOL;
-						// $row .= '<input class="setting-button button-secondary" type="button" value="+" onclick="' . $onclickup . '">' . PHP_EOL;
-						$row .= '<input class="number-button number-up-button setting-button button-secondary" type="button" value="+" data="' . esc_attr( $name ) . '">' . PHP_EOL;
+						// $row .= '<input class="setting-button button-secondary" type="button" value="+" onclick="' . $onclickup . '">' . "\n";
+						$row .= '<input class="number-button number-up-button setting-button button-secondary" type="button" value="+" data="' . esc_attr( $name ) . '">' . "\n";
 
 
 					} elseif ( 'image' == $type ) {
@@ -2904,42 +2902,42 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						// --- image container ---
 						$row .= '<div class="custom-image-container">';
 						if ( $has_image ) {
-							$row .= '<img src="' . esc_url( $image[0] ) . '" alt="" style="max-width:100%;">' . PHP_EOL;
+							$row .= '<img src="' . esc_url( $image[0] ) . '" alt="" style="max-width:100%;">' . "\n";
 						}
-						$row .= '</div>' . PHP_EOL;
+						$row .= '</div>' . "\n";
 
 						// --- add and remove links ---
 						$upload_link = get_upload_iframe_src( 'image' );
-						$row .= '<p class="hide-if-no-js">' . PHP_EOL;
+						$row .= '<p class="hide-if-no-js">' . "\n";
 							$hidden = '';
 							if ( $has_image ) {
 								$hidden = ' hidden';
 							}
-							$row .= '<a class="upload-custom-image' . esc_attr( $hidden ) . '" href="' . esc_url( $upload_link ) . '">' . PHP_EOL;
+							$row .= '<a class="upload-custom-image' . esc_attr( $hidden ) . '" href="' . esc_url( $upload_link ) . '">' . "\n";
 							$row .= esc_html( __( 'Add Image' ) );
-							$row .= '</a>' . PHP_EOL;
+							$row .= '</a>' . "\n";
 
 							$hidden = '';
 							if ( !$has_image ) {
 								$hidden = ' hidden';
 							}
-							$row .= '<a class="delete-custom-image' . esc_attr( $hidden ) . '" href="#">' . PHP_EOL;
+							$row .= '<a class="delete-custom-image' . esc_attr( $hidden ) . '" href="#">' . "\n";
 							$row .= esc_html( __( 'Remove Image' ) );
-							$row .= '</a>' . PHP_EOL;
-						$row .= '</p>' . PHP_EOL;
+							$row .= '</a>' . "\n";
+						$row .= '</p>' . "\n";
 
 						// --- hidden input for image ID ---
-						$row .= '<input class="custom-image-id" name="' . esc_attr( $name ) . '" type="hidden" value="' . esc_attr( $setting ) . '">' . PHP_EOL;
+						$row .= '<input class="custom-image-id" name="' . esc_attr( $name ) . '" type="hidden" value="' . esc_attr( $setting ) . '">' . "\n";
 
 					} elseif ( 'color' == $type ) {
 
 						// 1.1.7: added color picker field
-						$row .= '<input type="text" class="color-picker" data-default-color="' . esc_attr( $option['default'] ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( $setting ) . '">' . PHP_EOL;
+						$row .= '<input type="text" class="color-picker" data-default-color="' . esc_attr( $option['default'] ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( $setting ) . '">' . "\n";
 
 					} elseif ( 'coloralpha' == $type ) {
 
 						// 1.1.7: added color picker alpha field
-						$row .= '<input type="text" class="color-picker" data-alpha-enabled="true" data-default-color="' . esc_attr( $option['default'] ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( $setting ) . '">' . PHP_EOL;
+						$row .= '<input type="text" class="color-picker" data-alpha-enabled="true" data-default-color="' . esc_attr( $option['default'] ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( $setting ) . '">' . "\n";
 
 					}
 
@@ -2948,15 +2946,15 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 				// --- setting helper text ---
 				if ( isset( $option['helper'] ) ) {
-					$row .= '<td width="25"></td>' . PHP_EOL;
-					$row .= '<td class="settings-helper">' . esc_html( $option['helper'] ) . '</td>' . PHP_EOL;
+					$row .= '<td width="25"></td>' . "\n";
+					$row .= '<td class="settings-helper">' . esc_html( $option['helper'] ) . '</td>' . "\n";
 				}
 			}
 
-			$row .= '</tr>' . PHP_EOL;
+			$row .= '</tr>' . "\n";
 
 			// --- settings row spacer ---
-			$row .= '<tr class="settings-spacer"><td> </td></tr>' . PHP_EOL;
+			$row .= '<tr class="settings-spacer"><td> </td></tr>' . "\n";
 
 			// --- filter and return setting row ---
 			$row = apply_filters( $namespace . '_setting_row', $row, $option );
@@ -2981,23 +2979,23 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 
 						// --- output tab switcher function ---
 						// 1.2.5: changed function prefix for consistency
-						/* echo "function plugin_panel_display_tab(tab) {" . PHP_EOL;
+						/* echo "function plugin_panel_display_tab(tab) {" . "\n";
 						foreach ( $tabs as $tab => $label ) {
-							echo "	document.getElementById('" . esc_js( $tab ) . "-tab-button').className = 'settings-tab-button inactive';" . PHP_EOL;
-							echo "	document.getElementById('" . esc_js( $tab ) . "-tab').className = 'settings-tab inactive'; " . PHP_EOL;
+							echo "	document.getElementById('" . esc_js( $tab ) . "-tab-button').className = 'settings-tab-button inactive';" . "\n";
+							echo "	document.getElementById('" . esc_js( $tab ) . "-tab').className = 'settings-tab inactive'; " . "\n";
 						}
-						echo "	document.getElementById(tab+'-tab-button').className = 'settings-tab-button active';" . PHP_EOL;
-						echo "	document.getElementById(tab+'-tab').className = 'settings-tab active';" . PHP_EOL;
-						echo "	document.getElementById('settings-tab').value = tab;" . PHP_EOL;
-						echo "}" . PHP_EOL; */
+						echo "	document.getElementById(tab+'-tab-button').className = 'settings-tab-button active';" . "\n";
+						echo "	document.getElementById(tab+'-tab').className = 'settings-tab active';" . "\n";
+						echo "	document.getElementById('settings-tab').value = tab;" . "\n";
+						echo "}" . "\n"; */
 
 						// 1.2.5: use jQuery click function to remove onclick button attributes
-						echo "jQuery('.settings-tab-button').on('click', function() {" . PHP_EOL;
-						echo "	tab = jQuery(this).attr('id').replace('-tab-button','');" . PHP_EOL;
-						echo "	jQuery('.settings-tab,.settings-tab-button').removeClass('active').addClass('inactive');" . PHP_EOL;
-						echo "	jQuery('#'+tab+'-tab,#'+tab+'-tab-button').removeClass('inactive').addClass('active');" . PHP_EOL;
-						echo "	jQuery('#settings-tab').val(tab);" . PHP_EOL;
-						echo "});" . PHP_EOL;
+						echo "jQuery('.settings-tab-button').on('click', function() {" . "\n";
+						echo "	tab = jQuery(this).attr('id').replace('-tab-button','');" . "\n";
+						echo "	jQuery('.settings-tab,.settings-tab-button').removeClass('active').addClass('inactive');" . "\n";
+						echo "	jQuery('#'+tab+'-tab,#'+tab+'-tab-button').removeClass('inactive').addClass('active');" . "\n";
+						echo "	jQuery('#settings-tab').val(tab);" . "\n";
+						echo "});" . "\n";
 
 					} elseif ( 'settings_reset' == $script ) {
 
@@ -3005,12 +3003,12 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 						// 1.2.5: changed function prefix for consistency
 						// 1.2.5: changed to jQuery click function to remove onclick button attribute
 						$confirmreset = __( 'Are you sure you want to reset to default settings?' );
-						// echo "function plugin_panel_reset_defaults() {" . PHP_EOL;
-						echo "jQuery('#settingsresetbutton').on('click', function() {" . PHP_EOL;
-						echo "	agree = confirm('" . esc_js( $confirmreset ) . "');" . PHP_EOL;
-						echo "	if (!agree) {return false;}" . PHP_EOL;
-						echo "	document.getElementById('settings-action').value = 'reset';" . PHP_EOL;
-						echo "	document.getElementById('settings-form').submit();" . PHP_EOL;
+						// echo "function plugin_panel_reset_defaults() {" . "\n";
+						echo "jQuery('#settingsresetbutton').on('click', function() {" . "\n";
+						echo "	agree = confirm('" . esc_js( $confirmreset ) . "');" . "\n";
+						echo "	if (!agree) {return false;}" . "\n";
+						echo "	document.getElementById('settings-action').value = 'reset';" . "\n";
+						echo "	document.getElementById('settings-form').submit();" . "\n";
 						echo "});" . "\n";
 						// echo "}" . "\n";
 
@@ -3513,8 +3511,9 @@ if ( !function_exists( 'radio_station_load_prefixed_functions' ) ) {
 // - fix for possible page/post options conflict
 // - added explicit email option field type
 // - added fallback to text option firld type
-// - add check if pro slug data is a string
+// - added check if pro slug data is a string
 // - added Freemius has_affiliation key
+// - added hash link anchor for Pro feature options
 
 // == 1.2.9 ==
 // - fix empty number field converting to NaN value
