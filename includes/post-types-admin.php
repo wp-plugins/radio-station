@@ -1404,6 +1404,7 @@ function radio_station_show_shifts_table( $post_id ) {
 		$shifts = array( $unique_id => $times );
 	}
 
+	$check_conflicts = radio_station_get_setting( 'conflict_checker' );
 	$conflict_list = array();
 	$list = '';
 	if ( isset( $shifts ) && is_array( $shifts ) && ( count( $shifts ) > 0 ) ) {
@@ -1427,7 +1428,7 @@ function radio_station_show_shifts_table( $post_id ) {
 				$starttime = radio_station_to_time( '1981-04-28 ' . $shift_start );
 				$day_shifts[7][$starttime . '.' . $j] = $shift;
 			}
-			$j ++;
+			$j++;
 		}
 
 		// --- sort day shifts by day and time ---
@@ -1467,11 +1468,14 @@ function radio_station_show_shifts_table( $post_id ) {
 
 			// --- check conflicts with other show shifts ---
 			// 2.3.0: added shift conflict checking
-			$conflicts = radio_station_check_shift( $post_id, $shift );
-			if ( $conflicts && is_array( $conflicts ) ) {
-				// 2.3.3.9: store conflicts by shift ID in array list
-				$conflict_list[$unique_id] = $conflicts;
-				$classes[] = 'conflicts';
+			// 2.5.6: check shift conflict setting
+			if ( 'yes' == $check_conflicts ) {
+				$conflicts = radio_station_check_shift( $post_id, $shift );
+				if ( $conflicts && is_array( $conflicts ) ) {
+					// 2.3.3.9: store conflicts by shift ID in array list
+					$conflict_list[$unique_id] = $conflicts;
+					$classes[] = 'conflicts';
+				}
 			}
 
 			// --- check if shift disabled ---
@@ -1625,26 +1629,32 @@ function radio_station_show_shifts_table( $post_id ) {
 				$list .= '</ul>' . "\n";
 
 				// --- output any shift conflicts found ---
-				if ( $conflicts && is_array( $conflicts ) && ( count( $conflicts ) > 0 ) ) {
+				// 2.5.6: check shift conflict setting
+				if ( 'yes' == $check_conflicts ) {
+					if ( $conflicts && is_array( $conflicts ) && ( count( $conflicts ) > 0 ) ) {
 
-					$list .= '<div class="shift-conflicts">' . "\n";
-					$list .= '<b>' . esc_html( __( 'Shift Conflicts', 'radio-station' ) ) . '</b>: ' . "\n";
-					foreach ( $conflicts as $j => $conflict ) {
-						if ( $j > 0 ) {
-							$list .= ', ';
+						$list .= '<div class="shift-conflicts">' . "\n";
+						$list .= '<b>' . esc_html( __( 'Shift Conflicts', 'radio-station' ) ) . '</b>: ' . "\n";
+						foreach ( $conflicts as $j => $conflict ) {
+							if ( $j > 0 ) {
+								$list .= ', ';
+							}
+							if ( $conflict['show'] == $post_id ) {
+								$list .= '<i>' . esc_html( __('This Show', 'radio-station' ) ) . '</i>' . "\n";
+							} else {
+								// 2.5.6: fix to show conflict ID key
+								// $show_edit_link = add_query_arg( 'post', $conflict['show'], $edit_link );
+								// $show_title = get_the_title( $conflict['show'] );
+								$show_edit_link = add_query_arg( 'post', $conflict['ID'], $edit_link );
+								$show_title = get_the_title( $conflict['ID'] );
+								$list .= '<a href="' . esc_url( $show_edit_link ) . '">' . esc_html( $show_title ) . '</a>' . "\n";
+							}
+							$conflict_start = esc_html( $conflict['shift']['start_hour'] ) . ':' . esc_html( $conflict['shift']['start_min'] ) . ' ' . esc_html( $conflict['shift']['start_meridian'] );
+							$conflict_end = esc_html( $conflict['shift']['end_hour'] ) . ':' . esc_html( $conflict['shift']['end_min'] ). ' ' . esc_html( $conflict['shift']['end_meridian'] );
+							$list .= ' - ' . esc_html( $conflict['shift']['day'] ) . ' ' . $conflict_start . ' - ' . $conflict_end;
 						}
-						if ( $conflict['show'] == $post_id ) {
-							$list .= '<i>' . esc_html( __('This Show', 'radio-station' ) ) . '</i>' . "\n";
-						} else {
-							$show_edit_link = add_query_arg( 'post', $conflict['show'], $edit_link );
-							$show_title = get_the_title( $conflict['show'] );
-							$list .= '<a href="' . esc_url( $show_edit_link ) . '">' . esc_html( $show_title ) . '</a>' . "\n";
-						}
-						$conflict_start = esc_html( $conflict['shift']['start_hour'] ) . ':' . esc_html( $conflict['shift']['start_min'] ) . ' ' . esc_html( $conflict['shift']['start_meridian'] );
-						$conflict_end = esc_html( $conflict['shift']['end_hour'] ) . ':' . esc_html( $conflict['shift']['end_min'] ). ' ' . esc_html( $conflict['shift']['end_meridian'] );
-						$list .= ' - ' . esc_html( $conflict['shift']['day'] ) . ' ' . $conflict_start . ' - ' . $conflict_end;
+						$list .= '</div><br>' . "\n";
 					}
-					$list .= '</div><br>' . "\n";
 				}
 
 			// --- close shift wrapper ---

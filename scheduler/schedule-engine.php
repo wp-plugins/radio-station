@@ -2150,10 +2150,10 @@ class radio_station_schedule_engine {
 					if ( $check_shift ) {
 
 						if ( $this->debug ) {
-							$debug = "...with Shift for Show " . $day_shift['show'] . ": ";
+							$debug = "...with Shift for Show " . $day_shift['ID'] . ": ";
 							$debug .= $day_shift['day'] . " - " . $day_shift['date'] . " - " . $day_shift['start'] . " (" . $day_shift_start_time . ")" . PHP_EOL;
 							$debug .= " to " . $day_shift['end'] . " (" . $day_shift_end_time . ")" . PHP_EOL;
-							$debug->debug_log( $debug );
+							$this->debug_log( $debug );
 						}
 
 						// 2.3.2: improved shift checking logic
@@ -2221,7 +2221,9 @@ class radio_station_schedule_engine {
 
 			// 2.3.3.6: added check to not last check shift against itself
 			// 2.5.1: check all indexes exist to avoid undefined index warnings
-			if ( ( isset( $day_shift['show'] ) && ( $day_shift['show'] != $record_id ) )
+			// 2.5.6: fix to check ID key instead of show key
+			// if ( ( isset( $day_shift['show'] ) && ( $day_shift['show'] != $record_id ) )
+			if ( ( isset( $day_shift['ID'] ) && ( $day_shift['ID'] != $record_id ) )
 				|| ( isset( $day_shift['day'] ) && ( $day_shift['day'] != $shift['day'] ) )
 				|| ( isset( $day_shift['start'] ) && ( $day_shift['start'] != $shift['start'] ) )
 				|| ( isset( $day_shift['end'] ) && ( $day_shift['end'] != $shift['end'] ) ) ) {

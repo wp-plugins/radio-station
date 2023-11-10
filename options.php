@@ -203,6 +203,18 @@ $options = array(
 	// === Performance ===
 	// 2.4.0.6: separated performance section
 
+	// --- Shift Conflict Checker ---
+	// 2.5.6: added setting for conflict checker
+	'conflict_checker' => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Shift Conflict Checker', 'radio-station' ),
+		'default' => 'yes',
+		'value'   => 'yes',
+		'helper'  => __( 'Check for Shift conflicts when saving Show shift times.', 'radio-station' ),
+		'tab'     => 'general',
+		'section' => 'performance',
+	),
+
 	// --- Disable Transients ---
 	// 2.4.0.6: change label from Clear Transients
 	'clear_transients' => array(

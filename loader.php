@@ -1557,7 +1557,7 @@ if ( !class_exists( 'radio_station_loader' ) ) {
 					'has_paid_plans'   => $args['hasplans'],
 					'is_org_compliant' => $args['wporg'],
 					'is_premium'       => $premium,
-					'has_affiliation'  => $args['affiliation'];
+					'has_affiliation'  => $args['affiliation'],
 					'menu'             => array(
 						'slug'       => $args['slug'],
 						'first-path' => $first_path,
