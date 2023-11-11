@@ -1667,7 +1667,10 @@ function radio_station_show_shifts_table( $post_id ) {
 	// 2.3.3.9: change element from span to div
 	$list .= '<div id="new-shifts"></div>' . "\n";
 
-	if ( RADIO_STATION_DEBUG ) {
+	// 2.5.6: added conflict checker is disabled reminder message
+	if ( 'yes' != $check_conflicts ) {
+		$list .= __( 'Note: Show shift conflict checker is currently disabled in your plugin settings.', 'radio-station' ) . '<br>' . "\n";
+	} elseif ( RADIO_STATION_DEBUG ) {
 		$list .= 'Conflict List: ' . esc_html( print_r( $conflict_list, true ) ) . '<br>' . "\n";
 	}
 

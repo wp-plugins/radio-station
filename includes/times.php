@@ -59,7 +59,9 @@ function radio_station_use_server_times() {
 function radio_station_get_now( $gmt = true ) {
 	global $rs_se;
 	// note: channel not explicitly needed here
-	$now = $rs_se->get_now( $gmt );
+	// 2.5.6: use stored now time to prevent data mismatch
+	$now = $rs_se->now;
+	// $now = $rs_se->get_now( $gmt );
 	return $now;
 }
 

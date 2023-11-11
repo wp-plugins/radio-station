@@ -488,6 +488,9 @@ function radio_station_get_next_show( $time = false ) {
 	$channel = $rs_se->channel = $radio_station_data['channel'];
 
 	$next_show = false;
+	if ( $rs_se->now == $time ) {
+		$time = false;
+	}
 
 	// --- get cached current show value ---
 	if ( !$time ) {
@@ -500,11 +503,12 @@ function radio_station_get_next_show( $time = false ) {
 			}
 		} else {
 			if ( isset( $radio_station_data['next_show'] ) ) {
-				return $radio_station_data['next_show'];
+				$next_show = $radio_station_data['next_show'];
 			} else {
 				$next_show = get_transient( 'radio_station_next_show' );
 			}
 		}
+
 	} else {
 		// 2.5.0: maybe get next show for channel/time combo
 		if ( '' != $channel ) {
@@ -515,11 +519,13 @@ function radio_station_get_next_show( $time = false ) {
 			}
 		}
 		if ( isset( $radio_station_data['next_show_' . $time] ) ) {
-			return $radio_station_data['next_show_' . $time];
+			$next_show = $radio_station_data['next_show_' . $time];
 		} else {
 			$next_show = get_transient( 'radio_station_next_show_' . $time );
 		}
 	}
+
+	// echo '<span style="display:none;">&1&'; var_dump( $time ); var_dump( $next_show ); echo '</span>';
 
 	// --- if not set it has expired so recheck schedule ---
 	if ( !$next_show ) {
@@ -557,6 +563,8 @@ function radio_station_get_next_show( $time = false ) {
 		// 2.3.4: moved filter to where data is set so only applied once
 		// $next_show = apply_filters( 'radio_station_next_show', $next_show, $time );
 	}
+
+	// echo '<span style="display:none;">&2&'; var_dump( $time ); var_dump( $next_show ); echo '</span>';
 
 	return $next_show;
 }
@@ -838,7 +846,9 @@ function radio_station_set_next_show( $next_show, $expires, $time, $channel ) {
 		$transient_key .= '_' . $time;
 	}
 	$radio_station_data[$transient_key] = $next_show;
+
 	// note: sets next_show not next_shift
+	// echo '<span style="display:none;">Next Show Transient: ' . $transient_key . ' (' . $expires . ')' . PHP_EOL; var_dump( $next_show ); echo '</span>';
 	set_transient( 'radio_station_' . $transient_key, $next_show, $expires );
 }
 

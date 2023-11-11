@@ -411,6 +411,7 @@ We recommend you test these on a Staging site (or a development copy of your liv
 * Fixed: hide empty widgets to work in AJAX loading mode
 * Fixed: remove direct usages of date function
 * Fixed: display of show posts on show page (query)
+* Fixed: Data API next_show data field
 * Fixed: minor schedule engine issues
 * Improved: more consistent sanitization and escaping
 

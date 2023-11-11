@@ -217,7 +217,8 @@ function radio_station_get_broadcast_data() {
 	$next_show = radio_station_convert_show_shift( $next_show );
 
 	// 2.3.3.5: just in case transients are the same
-	if ( $current_show == $next_show ) {
+	// 2.5.6: added check for empty next_show array
+	if ( !is_array( $next_show ) || ( $current_show == $next_show ) ) {
 		// 2.5.0: change from radio_station_get_time
 		$now = radio_station_get_now();
 		$next_show = radio_station_get_next_show( $now );

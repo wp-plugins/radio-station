@@ -89,6 +89,8 @@ class radio_station_schedule_engine {
 	public $channel = '';
 	public $context = '';
 	public $locale = '';
+	public $now = '';
+	public $expires = 1800;
 
 	public $debug = false;
 	public $debug_log = false;
@@ -109,6 +111,17 @@ class radio_station_schedule_engine {
 			$this->locale = $args['locale'];
 		} else {
 			$this->locale = get_locale();
+		}
+
+		// 2.5.6: set now time once to prevent data mismatches
+		if ( isset( $args['time'] ) ) {
+			$this->now = $args['time'];
+		} else {
+			$this->now = $this->get_now();
+		}
+		// 2.5.6: allow passing of transient expiry times
+		if ( isset( $args['expires'] ) ) {
+			$this->expires = $args['expires'];
 		}
 
 		// --- check debug constants ---
@@ -803,15 +816,17 @@ class radio_station_schedule_engine {
 		$show_shifts = $this->get_all_shifts( $records, true, true, $time, $timezone );
 
 		// --- get weekdates ---
-		$now = $time ? $time : $this->get_now();
+		// 2.5.6: ensure time valus is separate to now value
+		$now = $this->get_now();
+		$time = $time ? $time : $now;
 		$timezone = $timezone ? $timezone : $this->get_timezone();
 		// $today = $this->get_time( 'l', $now, $timezone );
 		// 2.3.3.5: add passthrough of optional week start argument
-		$weekdays = $this->get_schedule_weekdays( $weekstart, $now, $timezone );
-		$weekdates = $this->get_schedule_weekdates( $weekdays, $now, $timezone );
+		$weekdays = $this->get_schedule_weekdays( $weekstart, $time, $timezone );
+		$weekdates = $this->get_schedule_weekdates( $weekdays, $time, $timezone );
 		// 2.5.0: set an array of times data
 		$times = array(
-			'time'      => $now,
+			'time'      => $time,
 			'timezone'  => $timezone,
 			'weekdays'  => $weekdays,
 			'weekdates' => $weekdates,
@@ -845,7 +860,10 @@ class radio_station_schedule_engine {
 
 		// --- debug point ---
 		if ( $this->debug ) {
-			$debug = "Now: " . $now . " - Date: " . date( 'd-m-Y', $now ) . PHP_EOL;
+			$debug = "Time: " . $time . " - Date: " . date( 'd-m-Y', $time ) . PHP_EOL;
+			if ( $now != $time ) {
+				$debug .= "Now: " . $now . " - Date: " . date( 'd-m-Y', $now ) . PHP_EOL;
+			}
 			$debug .= "Week Start Date: " . $start_date . " - Week End Date: " . $end_date . PHP_EOL;
 			$debug .= "Schedule Overrides: " . print_r( $overrides, true ) . PHP_EOL;
 			$this->debug_log( $debug );
@@ -864,11 +882,10 @@ class radio_station_schedule_engine {
 		// --- cache expiry time ---
 		// 2.3.2: set temporary transient if time is specified
 		// 2.3.3: also set global data for current schedule
-		if ( !isset( $expires ) ) {
-			$expires = 3600;
-		}
+		// 2.5.6: use global expiry time fr\ir class
+		$expires = $this->expires;
 
-		// 2.5.0 do set current schedule action
+		// 2.5.0: do set current schedule action
 		do_action( 'schedule_engine_set_current_schedule', $show_shifts, $expires, $time, $channel, $context );
 		if ( ( '' != $context ) && is_string( $context ) ) {
 			do_action( $context . '_set_current_schedule', $show_shifts, $expires, $time, $channel );
@@ -890,7 +907,7 @@ class radio_station_schedule_engine {
 		$context = $this->context;
 
 		// --- set variables from times ---
-		$time = $now = $times['time'];
+		$time = $times['time'];
 		$timezone = $times['timezone'];
 		$weekdays = $times['weekdays'];
 		$weekdates = $times['weekdates'];
@@ -1157,7 +1174,8 @@ class radio_station_schedule_engine {
 		$context = $this->context;
 
 		// --- set variables from times ---
-		$time = $now = $times['time'];
+		$now = $this->now;
+		$time = $times['time'];
 		$timezone = $times['timezone'];
 		$weekdays = $times['weekdays'];
 		$weekdates = $times['weekdates'];
@@ -1227,9 +1245,10 @@ class radio_station_schedule_engine {
 							// 2.3.3: set current show to global data
 							// 2.3.4: set previous show shift to global and transient
 							// 2.3.3.8: move expires declaration earlier
+							// 2.5.6: fallback to global expiration time
 							$expires = $shift_end_time - $now - 1;
-							if ( $expires > 3600 ) {
-								$expires = 3600;
+							if ( $expires > $this->expires ) {
+								$expires = $this->expires;
 							}
 							
 							// 2.5.0: do set current shift action
@@ -1252,8 +1271,10 @@ class radio_station_schedule_engine {
 
 						// --- debug point ---
 						if ( $this->debug ) {
-							$debug = 'Now: ' . $now . PHP_EOL;
-							$debug .= 'Date: ' . $this->get_time( 'm-d H:i:s', $now ) . PHP_EOL;
+							$debug = 'Time: ' . $time . ' - Date: ' . $this->get_time( 'm-d H:i:s', $time ) . PHP_EOL;
+							if ( $time != $now ) {
+								$debug .= 'Now: ' . $now . ' - Date: ' . $this->get_time( 'm-d H:i:s', $now ) . PHP_EOL;
+							}
 							$debug .= 'Shift Start: ' . $shift_start . ' (' . $shift_start_time . ')' . PHP_EOL;
 							$debug .= 'Shift End: ' . $shift_end . ' (' . $shift_end_time . ')' . PHP_EOL;
 							if ( isset ( $current_show ) ) {
@@ -1315,6 +1336,12 @@ class radio_station_schedule_engine {
 		if ( !isset( $next_show ) && isset( $maybe_next_show ) ) {
 			$next_show = $maybe_next_show;
 		}
+
+		// 2.5.6: fix to reset time flag if same as now
+		if ( $time == $now ) {
+			$time = false;
+		}
+			
 		if ( isset( $next_show ) ) {
 
 			// 2.3.2: recombine split shift end times
@@ -1326,12 +1353,16 @@ class radio_station_schedule_engine {
 
 			// 2.3.2: added check that expires is set
 			$next_expires = $shift_end_time - $now - 1;
-			if ( isset( $expires ) && ( $next_expires > ( $expires + 3600 ) ) ) {
-				$next_expires = $expires + 3600;
+			if ( isset( $expires ) && ( $next_expires > ( $expires + $this->expires ) ) ) {
+				$next_expires = $expires + $this->expires;
 			}
 
 			// 2.5.0: do next shift record action
-			do_action( $context . '_set_next_shift', $next_show, $next_expires, $time, $channel );
+			// echo '<span style="display:none;">&&&'; var_dump( $time ); var_dump( $next_expires ); var_dump( $next_show ); echo '</span>';
+			do_action( 'schedule_engine_set_next_shift', $next_show, $next_expires, $time, $channel, $context );
+			if ( ( '' != $context ) && is_string( $context ) ) {
+				do_action( $context . '_set_next_shift', $next_show, $next_expires, $time, $channel );
+			}
 
 		}
 
@@ -2459,13 +2490,26 @@ class radio_station_schedule_engine {
 	// -------
 	public function get_now( $gmt = true ) {
 
+		$channel = $this->channel;
+		$context = $this->context;
+
 		if ( defined( 'SCHEDULE_ENGINE_USE_SERVER_TIMES' ) && SCHEDULE_ENGINE_USE_SERVER_TIMES ) {
 			$now = strtotime( current_time( 'mysql' ) );
 		} else {
 			$datetime = new DateTime( 'now', new DateTimeZone( 'UTC' ) );
 			$now = $datetime->format( 'U' );
 		}
+		
+		// 2.5.6: allow explicit override of now time
+		if ( isset( $_REQUEST['for_time'] ) ) {
+			$now = absint( $_REQUEST['for_time'] );
+		}
 
+		// 2.5.6: added programmatic filter for now time
+		$now = apply_filters( 'schedule_engine_now_time', $now, $channel, $context );
+		if ( ( '' != $context ) && is_string( $context ) ) {
+			$now = apply_filters( $context . '_now_time', $now, $channel );
+		}
 		return $now;
 	}
 

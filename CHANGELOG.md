@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed: hide empty widgets to work in AJAX loading mode
 * Fixed: remove direct usages of date function
 * Fixed: display of show posts on show page (query)
+* Fixed: Data API next_show data field
 * Fixed: minor schedule engine issues
 * Improved: more consistent sanitization and escaping
 
