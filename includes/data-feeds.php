@@ -16,6 +16,7 @@
 // - Get Broadcast Data
 // - Get Shows Data
 // - Get Genres Data
+// - Get Languages Data
 // === Data Endpoints ===
 // - Station Data Endpoint
 // - Broadcast Data Endpoint
@@ -43,8 +44,6 @@
 // - Genre List Feed
 // - Language List Feed
 // - Not Found Feed Error
-// - Format Data to XML
-// - Convert Array to XML
 // === RSS Feeds ===
 // - Show Posts Feed Conflict Fix
 // - Show Posts Feed filter
@@ -1181,7 +1180,7 @@ function radio_station_feed_station( $comment_feed, $feed_name ) {
 	if ( RADIO_STATION_DEBUG ) {
 		echo "Output: " . esc_html( print_r( $station, true ) ) . PHP_EOL;
 	} else {
-		// 2.5.0: use wp_json_encode and wp_send_json instead of echo json_encode
+		// 2.5.0: use wp_send_json instead of echo json_encode
 		// header( 'Content-Type: application/json' );
 		wp_send_json( $station, $status_code );
 	}

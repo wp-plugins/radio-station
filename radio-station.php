@@ -6,7 +6,7 @@ Plugin Name: Radio Station
 Plugin URI: https://radiostation.pro/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.5.5.3
+Version: 2.5.6
 Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
@@ -1040,7 +1040,8 @@ function radio_station_localization_script() {
 // Filter for Streaming Data
 // -------------------------
 // 2.3.3.7: added streaming data filter for player integration
-add_filter( 'radio_player_data', 'radio_station_streaming_data' );
+// 2.5.6: added missing 4th argument (arg count declaration)
+add_filter( 'radio_player_data', 'radio_station_streaming_data', 10, 2 );
 function radio_station_streaming_data( $data, $station = false ) {
 	$data = array(
 		'script'   => radio_station_get_setting( 'player_script' ),

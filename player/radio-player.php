@@ -180,8 +180,9 @@
 // 'layout'  | 'horizontal', 'vertical'
 // 'theme'   | 'light', 'dark'
 // 'buttons' | 'circular', 'rounded', 'square'
-// 'skin'    | // Media Elements: 'wordpress', 'minimal');
+// 'skin'    | [not implemented] Media Elements: wordpress, minimal
 // 'volume'  | [Integer: 0 to 100]: Initial Player Volume - default: 77
+// 'default' | Default Player flag
 // 2.5.0: added second echo argument with default to false
 function radio_player_output( $args = array(), $echo = false ) {
 
@@ -265,18 +266,8 @@ function radio_player_output( $args = array(), $echo = false ) {
 	$class_list = implode( ' ', $classes );
 	$html['player_open'] = '<div id="' . esc_attr( $player_id ) . '" class="' . esc_attr( $class_list ) . '"></div>' . "\n";
 
-	// 2.5.0: added preconnect/dns-prefetch link tags for URL host
-	if ( 'stream' == $args['media'] ) {
-		$url_host = parse_url( $args['url'], PHP_URL_HOST );
-		// 2.5.6: added to prevent possible deprecated warning in esc_url
-		if ( ( null != $url_host ) && ( '' != $url_host ) ) {
-			$html['player_open'] .= '<link rel="preconnect" href="' . esc_url( $url_host ) . '">' . "\n";
-			$html['player_open'] .= '<link rel="dns-prefetch" href="' . esc_url( $url_host ) . '">' . "\n";
-		}
-	}
-
 	// --- set Player container ---
-	$classes = array( 'radio-container', 'rp-audio', 'rp-audio-stream' );
+	$classes = array( 'radio-container', 'rp-audio' );
 	$classes[] = $args['layout'];
 	$classes[] = $args['theme'];
 	$classes[] = $args['buttons'];
@@ -285,14 +276,30 @@ function radio_player_output( $args = array(), $echo = false ) {
 		$classes[] = 'no-volume-controls';
 	}
 
+	// 2.5.0: added preconnect/dns-prefetch link tags for URL host
+	if ( 'stream' == $args['media'] ) {
+		$url_host = parse_url( $args['url'], PHP_URL_HOST );
+		// 2.5.6: added to prevent possible deprecated warning in esc_url
+		if ( ( null != $url_host ) && ( '' != $url_host ) ) {
+			$html['player_open'] .= '<link rel="preconnect" href="' . esc_url( $url_host ) . '">' . "\n";
+			$html['player_open'] .= '<link rel="dns-prefetch" href="' . esc_url( $url_host ) . '">' . "\n";
+		}
+		$classes[] = 'rp-audio-stream';
+	}
+
 	// 2.5.0: added filter for radio container class
 	if ( function_exists( 'apply_filters' ) ) {
 		$classes = apply_filters( 'radio_station_player_container_classes', $classes, $args, $instance );
 		$classes = apply_filters( 'radio_player_container_classes', $classes, $args, $instance );
 	}
 	$class_list = implode( ' ', $classes );
-	$html['player_open'] .= '<div id="' . esc_attr( $container_id ) . '" class="' . esc_attr( $class_list ) . '" role="application" aria-label="media player" data-href="' . esc_url( $args['url'] ) . '" data-format="' . esc_attr( $args['format'] ) . '" data-fallback="' . esc_url( $args['fallback'] ) . '" data-fformat="' . esc_attr( $args['fformat'] ) . '">' . "\n";
-	$html['player_open'] .= '	<div class="rp-type-single">' . "\n";
+
+	$html['player_open'] .= '<div id="' . esc_attr( $container_id ) . '" class="' . esc_attr( $class_list ) . '" role="application" aria-label="media player" data-href="' . esc_url( $args['url'] ) . '" data-format="' . esc_attr( $args['format'] ) . '" data-fallback="' . esc_url( $args['fallback'] ) . '" data-fformat="' . esc_attr( $args['fformat'] ) . '"';
+	// 2.5.6: added optional argument for metadata URL (or 0 to disable)
+	if ( isset( $args['metadata'] ) && ( '1' != $args['metadata'] ) ) {
+		$html['player_open'] .= ' data-meta="' . esc_url_raw( $args['metadata'] ) . '"';
+	}
+	$html['player_open'] .= '>' . "\n" . '	<div class="rp-type-single">' . "\n";
     $html['player_close'] = '</div></div>' . "\n";
 
 	// --- set interface wrapper ---
@@ -1874,9 +1881,13 @@ function radio_player_get_player_settings() {
 	}
 	$debug = $debug ? 'true' : 'false';
 
+	// 2.5.6: added explicit touchscreen detection setting
+	$js .= "matchmedia = window.matchMedia || window.msMatchMedia;" . "\n";
+	$js .= "touchscreen = !matchmedia('(any-pointer: fine)').matches;" . "\n";
+
 	// --- set radio player settings and radio data objects ---
 	// (with empty arrays for instances, script types, failbacks, audio targets and stream data)
-	$js .= "var radio_player = {settings:player_settings, scripts:scripts, formats:formats, loading:false, debug:" . esc_js( $debug ) . "}" . "\n";
+	$js .= "var radio_player = {settings:player_settings, scripts:scripts, formats:formats, loading:false, touchscreen:touchscreen, debug:" . esc_js( $debug ) . "}" . "\n";
 	$js .= "var radio_data = {state:{}, players:[], scripts:[], failed:[], data:[], types:[], channels:[], faders:[]}" . "\n";
 
 	// --- logged in / user state settings ---

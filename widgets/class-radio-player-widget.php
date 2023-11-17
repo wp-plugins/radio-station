@@ -141,11 +141,11 @@ class Radio_Player_Widget extends WP_Widget {
 		// 2.5.0: added for consistency with main plugin settings
 		$fields['volumes'] = '<p>
 			<label>
-			' . esc_html( __( 'Volume Controls', 'radio-station' ) ) . '
-				<input name="' . esc_attr( $this->get_field_name( 'volume_slider' ) ) . '" type="checkbox" ' . checked( $volume_slider, true, false ) . '>
-				<input name="' . esc_attr( $this->get_field_name( 'volume_updown' ) ) . '" type="checkbox" ' . checked( $volume_updown, true, false ) . '>
-				<input name="' . esc_attr( $this->get_field_name( 'volume_mute' ) ) . '" type="checkbox" ' . checked( $volume_mute, true, false ) . '>
-				<input name="' . esc_attr( $this->get_field_name( 'volume_max' ) ) . '" type="checkbox" ' . checked( $volume_max, true, false ) . '>
+			' . esc_html( __( 'Volume Controls', 'radio-station' ) ) . '<br>
+				<input name="' . esc_attr( $this->get_field_name( 'volume_slider' ) ) . '" type="checkbox" ' . checked( $volume_slider, true, false ) . '> ' . esc_html( __( 'Slider', 'radio-station' ) ) . ' ' . '
+				<input name="' . esc_attr( $this->get_field_name( 'volume_updown' ) ) . '" type="checkbox" ' . checked( $volume_updown, true, false ) . '> ' . esc_html( __( 'Up/Down', 'radio-station' ) ) . ' ' . '
+				<input name="' . esc_attr( $this->get_field_name( 'volume_mute' ) ) . '" type="checkbox" ' . checked( $volume_mute, true, false ) . '> ' . esc_html( __( 'Mute', 'radio-station' ) ) . ' ' . '
+				<input name="' . esc_attr( $this->get_field_name( 'volume_max' ) ) . '" type="checkbox" ' . checked( $volume_max, true, false ) . '> ' . esc_html( __( 'Max', 'radio-station' ) ) . ' ' . '
 			</label>
 		</p>';
 
@@ -225,8 +225,9 @@ class Radio_Player_Widget extends WP_Widget {
 
 		// --- [Pro] Color Options ---
 		// 2.5.0: added Pro color options message
-		$fields['color_options'] .= '<h4>' . esc_html( __( '[Pro] Color Options', 'radio-station' ) ) . '</h4>' . "\n";
-		$fields['color_options'] = '<p>
+		// 2.5.6: fix to color options title / undefined index warning
+		$fields['color_options'] = '<h4>' . esc_html( __( '[Pro] Color Options', 'radio-station' ) ) . '</h4>' . "\n";
+		$fields['color_options'] .= '<p>
 			<label for="dynamic">' . esc_html( __( 'Color options available in Pro.', 'radio-station' ) ) . '</label><br>
 			<a href="' . esc_url( $pricing_url ) . '">' . esc_html( __( 'Upgrade to Pro', 'radio-station' ) ) . '</a> |
 			<a href="' . esc_url( $upgrade_url ) . '" target="_blank">' . esc_html( __( 'More Details', 'radio-station' ) ) . '</a>

@@ -38,6 +38,7 @@
 // - Get Show Avatar
 // === URL Functions ===
 // - Get Streaming URL
+// - Get Fallback URL
 // - Get Stream Formats
 // - Get Master Schedule Page URL
 // - Get Radio Station API URL
@@ -63,6 +64,7 @@
 // - Sanitize Shortcode Values
 // - KSES Allowed HTML
 // - Link Tag Allowed HTML
+// - Settings Inputs Allowed HTML
 
 
 // ----------------------
@@ -1347,9 +1349,9 @@ function radio_station_get_stream_url() {
 	return $streaming_url;
 }
 
-// -----------------
-// Get Streaming URL
-// -----------------
+// ----------------
+// Get Fallback URL
+// ----------------
 // 2.3.3.9: added get fallback URL helper
 function radio_station_get_fallback_url() {
 	$fallback_url = '';
