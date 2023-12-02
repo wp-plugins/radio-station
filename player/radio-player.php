@@ -6,6 +6,8 @@
 // === by Tony Hayes ==
 // ====================
 
+if ( !defined( 'ABSPATH' ) ) exit;
+
 // === Radio Player ===
 // - Player Output
 // - Store Player Instance Args
@@ -191,7 +193,7 @@ function radio_player_output( $args = array(), $echo = false ) {
 	// --- maybe debug output arguments ---
 	if ( isset( $_REQUEST['player-debug'] ) && ( '1' === sanitize_text_field( $_REQUEST['player-debug'] ) ) ) {
 		echo '<span style="display:none;">Passed Radio Player Output Arguments: ';
-		echo print_r( $args, true ) . '</span>';
+		echo esc_html( print_r( $args, true ) ) . '</span>';
 	}
 
 	// --- settings defaults ---
@@ -1250,7 +1252,7 @@ function radio_player_core_scripts() {
 		if ( defined( 'RADIO_PLAYER_URL' ) ) {
 			$url = RADIO_PLAYER_URL . $url;
 		}
-		echo radio_player_script_tag( $url, $version );
+		radio_player_script_tag( $url, $version );
 		$radio_player['printed_sysend'] = true;
 
 	}
@@ -1287,15 +1289,14 @@ function radio_player_core_scripts() {
 		if ( defined( 'RADIO_PLAYER_URL' ) ) {
 			$url = RADIO_PLAYER_URL . $url;
 		}
-		echo radio_player_script_tag( $url, $version );
+		radio_player_script_tag( $url, $version );
 		$radio_player['printed_player'] = true;
 
 	}
 
 	// --- set minified script suffix ---
 	$suffix = '.min';
-	if ( ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG )
-	  || ( defined( 'RADIO_STATION_DEBUG') && RADIO_STATION_DEBUG ) ) {
+	if ( ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) || ( defined( 'RADIO_STATION_DEBUG') && RADIO_STATION_DEBUG ) ) {
 		  $suffix = '';
 	}
 	// $suffix = ''; // DEV TEST
@@ -1330,7 +1331,7 @@ function radio_player_core_scripts() {
 			$url = plugins_url( 'js/jplayer' . $suffix . '.js', __FILE__ );
 		}
 	} else {
-		echo radio_player_script_tag( $url, $version );
+		radio_player_script_tag( $url, $version );
 		$radio_player['printed_jplayer'] = true;
 	}
 	$radio_player['jplayer_script'] = array( 'version' => '2.9.2', 'url' => $url, 'path' => $path );
@@ -1394,11 +1395,13 @@ function radio_player_core_scripts() {
 					wp_add_inline_script( 'radio-player', $js, 'before' );
 				} else {
 					// --- print settings directly ---
-					echo "<script>" . $js . "</script>";
+					// 2.5.7: use direct echo arg for player settings
+					radio_player_get_player_settings( true );
 				}
 			} else {
 				// --- print settings directly ---
-				echo "<script>" . $js . "</script>";
+				// 2.5.7: use direct echo arg for player settings
+				radio_player_get_player_settings( true );
 			}
 		}
 		$radio_player['enqueued_player'] = true;
@@ -1542,7 +1545,7 @@ function radio_player_enqueue_amplitude( $infooter ) {
 		// note: jquery dependency not required
 		wp_enqueue_script( 'amplitude', $radio_player['amplitude_script']['url'], array(), $radio_player['amplitude_script']['version'], $infooter );
 	} elseif ( !isset( $radio_player['printed_amplitude'] ) ) {
-		echo radio_player_script_tag( $radio_player['amplitude_script']['url'], $radio_player['amplitude_script']['version'] );
+		radio_player_script_tag( $radio_player['amplitude_script']['url'], $radio_player['amplitude_script']['version'] );
 		$radio_player['printed_amplitude'] = true;
 	}
 }
@@ -1555,7 +1558,7 @@ function radio_player_enqueue_jplayer( $infooter ) {
 	if ( function_exists( 'wp_enqueue_script' ) ) {
 		wp_enqueue_script( 'jplayer', $radio_player['jplayer_script']['url'], array( 'jquery' ), $radio_player['jplayer_script']['version'], $infooter );
 	} elseif ( !isset( $radio_player['printed_jplayer'] ) ) {
-		echo radio_player_script_tag( $radio_player['jplayer_script']['url'], $radio_player['jplayer_script']['version'] );
+		radio_player_script_tag( $radio_player['jplayer_script']['url'], $radio_player['jplayer_script']['version'] );
 		$radio_player['printed_jplayer'] = true;
 	}
 }
@@ -1569,7 +1572,7 @@ function radio_player_enqueue_howler( $infooter ) {
 	if ( function_exists( 'wp_enqueue_script' ) ) {
 		wp_enqueue_script( 'howler', $radio_player['howler_script']['url'], array( 'jquery' ), $radio_player['howler_script']['version'], $infooter );
 	} elseif ( !isset( $radio_player['printed_howler'] ) ) {
-		echo radio_player_script_tag( $radio_player['howler_script']['url'], $radio_player['howler_script']['version'] );
+		radio_player_script_tag( $radio_player['howler_script']['url'], $radio_player['howler_script']['version'] );
 		$radio_player['printed_howler'] = true;
 	}
 }
@@ -1586,10 +1589,10 @@ function radio_player_enqueue_howler( $infooter ) {
 		wp_enqueue_script( 'rp-mediaelement', $radio_player['elements_script']['url'], array( 'mediaelement' ), $radio_player['elements_script']['version'], $infooter );
 	} elseif ( !isset( $radio_player['printed_mediaelement'] ) ) {
 		// --- output core media element script ---
-		echo radio_player_script_tag( $radio_player['media_script']['url'], $radio_player['media_script']['version'] );
+		radio_player_script_tag( $radio_player['media_script']['url'], $radio_player['media_script']['version'] );
 
 		// --- output media element player script ---
-		echo radio_player_script_tag( $radio_player['elements_script']['url'], $radio_player['elements_script']['version'] );
+		radio_player_script_tag( $radio_player['elements_script']['url'], $radio_player['elements_script']['version'] );
 		$radio_player['printed_mediaelement'] = true;
 	}
 
@@ -1669,7 +1672,8 @@ function radio_player_script() {
 // -------------------
 // Get Player Settings
 // -------------------
-function radio_player_get_player_settings() {
+// 2.5.7: added echo argument for direct output
+function radio_player_get_player_settings( $echo = false ) {
 
 	global $radio_player;
 	
@@ -1778,17 +1782,22 @@ function radio_player_get_player_settings() {
 	// --- convert player behaviour settings to boolean string ---
 	$player_single = $player_single ? 'true' : 'false';
 
+	// 2.5.7: maybe buffer settings output
+	if ( !$echo ) {
+		ob_start();
+	}
+
 	// --- set radio player settings ---
-	$js .= "player_settings = {";
-		$js .= "'ajaxurl': '" . esc_url( $admin_ajax ) . "', ";
-		$js .= "'saveinterval':" . esc_js( $save_interval ) . ", ";
-		$js .= "'swf_path': '" . esc_url( $swf_path ) . "', ";
-		$js .= "'script': '" . esc_js( $player_script ). "', ";
-		$js .= "'title': '" . esc_js( $player_title ) . "', ";
-		$js .= "'image': '" . esc_url( $player_image ) . "', ";
-		$js .= "'singular': " . esc_js( $player_single ) . ", ";
-		// $js .= "'suffix': '" . esc_js( $suffix ) . "', ";
-	$js .= "}" . "\n";
+	echo "player_settings = {";
+		echo "'ajaxurl': '" . esc_url( $admin_ajax ) . "', ";
+		echo "'saveinterval':" . esc_js( $save_interval ) . ", ";
+		echo "'swf_path': '" . esc_url( $swf_path ) . "', ";
+		echo "'script': '" . esc_js( $player_script ). "', ";
+		echo "'title': '" . esc_js( $player_title ) . "', ";
+		echo "'image': '" . esc_url( $player_image ) . "', ";
+		echo "'singular': " . esc_js( $player_single ) . ", ";
+		// echo "'suffix': '" . esc_js( $suffix ) . "', ";
+	echo "}" . "\n";
 
 	// --- maybe limit available scripts for testing purposes ---
 	$valid_scripts = array( 'amplitude', 'howler', 'jplayer' );
@@ -1835,19 +1844,19 @@ function radio_player_get_player_settings() {
 	if ( is_array( $fallbacks ) && ( count( $fallbacks ) > 0 ) ) {
 		$scripts = array_merge( $scripts, $fallbacks );
 	}
-	$js .= "scripts = {";
+	echo "scripts = {";
 		if ( in_array( 'amplitude', $scripts ) ) {
-			$js .= "'amplitude': '" . $radio_player['amplitude_script']['url'] . '?version=' . $radio_player['amplitude_script']['version'] . "', ";
+			echo "'amplitude': '" . $radio_player['amplitude_script']['url'] . '?version=' . $radio_player['amplitude_script']['version'] . "', ";
 		}
 		if ( in_array( 'howler', $scripts ) ) {
-			$js .= "'howler': '" . $radio_player['howler_script']['url'] . '?version=' . $radio_player['howler_script']['version'] . "', ";
+			echo "'howler': '" . $radio_player['howler_script']['url'] . '?version=' . $radio_player['howler_script']['version'] . "', ";
 		}
 		if ( in_array( 'jplayer', $scripts ) ) {
-			$js .= "'jplayer': '" . $radio_player['jplayer_script']['url'] . '?version=' . $radio_player['jplayer_script']['version'] . "', ";
+			echo "'jplayer': '" . $radio_player['jplayer_script']['url'] . '?version=' . $radio_player['jplayer_script']['version'] . "', ";
 		}
-		// $js .= "'media': '" . $radio_player['media_script']['url'] . '?version=' . $radio_player['media_script']['version'] . "', "
-		// $js .= "'elements': '" . $radio_player['elements_script']['url'] . '?version=' . $radio_player['elements_script']['version'] . "', ";
-	$js .= "}" . "\n";
+		// echo "'media': '" . $radio_player['media_script']['url'] . '?version=' . $radio_player['media_script']['version'] . "', "
+		// echo "'elements': '" . $radio_player['elements_script']['url'] . '?version=' . $radio_player['elements_script']['version'] . "', ";
+	echo "}" . "\n";
 
 	// --- set player script supported formats ---
 	// TODO: recheck supported amplitude formats ?
@@ -1858,12 +1867,12 @@ function radio_player_get_player_settings() {
 	// [Amplitude] HTML5 Support - mp3, aac ...?
 	// ref: https://en.wikipedia.org/wiki/HTML5_audio#Supporting_browsers
 	// [Media Elements] Audio: mp3, wma, wav +Video: mp4, ogg, webm, wmv
-	$js .= "formats = {";
-		$js .= "'howler': ['mp3','opus','ogg','oga','wav','aac','m4a','mp4','webm','weba','flac'], ";
-		$js .= "'jplayer': ['mp3','m4a','webm','oga','rtmpa','wav','flac'], ";
-		$js .= "'amplitude': ['mp3','aac'], ";
+	echo "formats = {";
+		echo "'howler': ['mp3','opus','ogg','oga','wav','aac','m4a','mp4','webm','weba','flac'], ";
+		echo "'jplayer': ['mp3','m4a','webm','oga','rtmpa','wav','flac'], ";
+		echo "'amplitude': ['mp3','aac'], ";
 		// $js .= "'mediaelements': ['mp3','wma','wav'], ";
-	$js .= "}" . "\n";
+	echo "}" . "\n";
 
 	// --- set debug mode ---
 	$debug = false; 
@@ -1882,13 +1891,13 @@ function radio_player_get_player_settings() {
 	$debug = $debug ? 'true' : 'false';
 
 	// 2.5.6: added explicit touchscreen detection setting
-	$js .= "matchmedia = window.matchMedia || window.msMatchMedia;" . "\n";
-	$js .= "touchscreen = !matchmedia('(any-pointer: fine)').matches;" . "\n";
+	echo "matchmedia = window.matchMedia || window.msMatchMedia;" . "\n";
+	echo "touchscreen = !matchmedia('(any-pointer: fine)').matches;" . "\n";
 
 	// --- set radio player settings and radio data objects ---
 	// (with empty arrays for instances, script types, failbacks, audio targets and stream data)
-	$js .= "var radio_player = {settings:player_settings, scripts:scripts, formats:formats, loading:false, touchscreen:touchscreen, debug:" . esc_js( $debug ) . "}" . "\n";
-	$js .= "var radio_data = {state:{}, players:[], scripts:[], failed:[], data:[], types:[], channels:[], faders:[]}" . "\n";
+	echo "var radio_player = {settings:player_settings, scripts:scripts, formats:formats, loading:false, touchscreen:touchscreen, debug:" . esc_js( $debug ) . "}" . "\n";
+	echo "var radio_data = {state:{}, players:[], scripts:[], failed:[], data:[], types:[], channels:[], faders:[]}" . "\n";
 
 	// --- logged in / user state settings ---
 	$loggedin = 'false';
@@ -1897,21 +1906,21 @@ function radio_player_get_player_settings() {
 		$user_id = get_current_user_id();
 		$state = get_user_meta( $user_id, 'radio_player_state', true );
 	}
-	$js .= "radio_data.state.loggedin = " . esc_js( $loggedin ) . ";" . "\n";
+	echo "radio_data.state.loggedin = " . esc_js( $loggedin ) . ";" . "\n";
 
 	// ---- maybe set play state ---
 	// 2.5.0: set playing variable in single line
 	$playing = ( isset( $state ) && isset( $state['playing'] ) && $state['playing'] ) ? 'true' : 'false';
-	$js .= "radio_data.state.playing = " . esc_js( $playing ) . "; " . "\n";
+	echo "radio_data.state.playing = " . esc_js( $playing ) . "; " . "\n";
 
 	// --- maybe set station ID ---
 	if ( isset( $state ) && isset( $state['station'] ) ) {
 		$station = abs( intval( $state['station'] ) );
 	}
 	if ( isset( $station ) && $station && ( $station > 0 ) ) {
-		$js .= "radio_data.state.station = " . esc_js( $station ) . ";" . "\n";
+		echo "radio_data.state.station = " . esc_js( $station ) . ";" . "\n";
 	} else {
-		$js .= "radio_data.state.station = 0;" . "\n";
+		echo "radio_data.state.station = 0;" . "\n";
 	}
 
 	// --- maybe set user volume ---
@@ -1919,17 +1928,17 @@ function radio_player_get_player_settings() {
 	if ( isset( $state ) && isset( $state['volume'] ) ) {
 		$player_volume = abs( intval( $state['volume'] ) );
 	}
-	$js .= "radio_data.state.volume = " . esc_js( $player_volume ) . "; " . "\n";
+	echo "radio_data.state.volume = " . esc_js( $player_volume ) . "; " . "\n";
 
 	// --- maybe set user mute ---
 	$player_mute = 'false';
 	if ( isset( $state ) && isset( $state['mute'] ) && ( $state['mute'] ) ) {
 		$player_mute = 'true';
 	}
-	$js .= "radio_data.state.mute = " . esc_js( $player_mute ) . "; " . "\n";
+	echo "radio_data.state.mute = " . esc_js( $player_mute ) . "; " . "\n";
 
 	// --- set main radio stream data ---
-	$js .= "radio_data.state.data = {};" . "\n";
+	echo "radio_data.state.data = {};" . "\n";
 	if ( function_exists( 'apply_filters' ) ) {
 		$station = ( isset( $state['station'] ) ) ? $state['station'] : 0;
 		// note: this is the main stream data filter hooked into by Radio Station plugin
@@ -1940,13 +1949,14 @@ function radio_player_get_player_settings() {
 	// 2.5.6: add isset check for data variable
 	if ( isset( $data ) && $data && is_array( $data ) ) {
 		foreach ( $data as $key => $value ) {
-			$js .= "radio_data.state.data['" . $key . "'] = '" . $value . "';" . "\n";
+			// TODO: remove currently playing script if not in supported scripts
+			echo "radio_data.state.data['" . $key . "'] = '" . $value . "';" . "\n";
 		}
 	}
-	$js .= "radio_player.stream_data = radio_data.state.data;" . "\n";
+	echo "radio_player.stream_data = radio_data.state.data;" . "\n";
 
 	// --- attempt to set player state from cookies ---
-	$js .= "var radio_player_state_loaded = false;
+	echo "var radio_player_state_loaded = false;
 	var radio_player_state_loader = setInterval(function() {
 		if (!radio_player_state_loaded && (typeof radio_player_load_state != 'undefined')) {
 			radio_player_load_state(); radio_player_state_loaded = true;
@@ -1956,7 +1966,7 @@ function radio_player_get_player_settings() {
 	}, 1000);" . "\n";
 
 	/* --- periodic save to user meta --- */
-	$js .= "rp_save_interval = radio_player.settings.saveinterval * 1000;
+	echo "rp_save_interval = radio_player.settings.saveinterval * 1000;
 	var radio_player_state_saver = setInterval(function() {
 		if (typeof radio_data.state != 'undefined') {
 			if (!radio_data.state.loggedin) {clearInterval(radio_player_state_saver); return;}
@@ -1964,7 +1974,12 @@ function radio_player_get_player_settings() {
 		}
 	}, rp_save_interval);" . "\n";
 
-	return $js;
+	// 2.5.7: maybe return output buffer if not echoing
+	if ( !$echo ) {
+		$js = ob_get_contents();
+		ob_get_clean();
+		return $js;
+	}
 }
 
 // -----------------
@@ -3093,17 +3108,17 @@ function radio_player_control_styles( $instance ) {
 // -----------------
 // Output Script Tag
 // -----------------
+// 2.5.7: echo instead of return script tag
 function radio_player_script_tag( $url, $version ) {
-	$tag = '<script type="text/javascript" src="' . $url . '?' . $version . '"></script>';
-	return $tag;
+	echo '<script type="text/javascript" src="' . esc_url_raw( $url . '?' . $version ) . '"></script>';
 }
 
 // ----------------
 // Output Style Tag
 // ----------------
+// 2.5.7: echo instead of return style tag
 function radio_player_style_tag( $id, $url, $version ) {
-	$tag = '<link id="' . $id . '-css" href="' . $url . '?' . $version . '" rel="stylesheet" type="text/css" media="all">';
-	return $tag;
+	echo '<link id="' . esc_attr( $id ) . '-css" href="' . esc_url_raw( $url . '?' . $version ) . '" rel="stylesheet" type="text/css" media="all">';
 }
 
 // ----------------
@@ -3125,40 +3140,3 @@ function radio_player_validate_boolean( $var ) {
 
 	return (bool) $var;
 }
-
-// ---------
-// Escape JS
-// ---------
-if ( !function_exists( 'esc_js' ) ) {
- function esc_js( $js ) {
-	return $js;
- }
-}
-
-// -----------
-// Escape HTML
-// -----------
-if ( !function_exists( 'esc_html' ) ) {
- function esc_html( $html ) {
-	return $html;
- }
-}
-
-// ----------
-// Escape URL
-// ----------
-if ( !function_exists( 'esc_url' ) ) {
- function esc_url( $url ) {
-	return $url;
- }
-}
-
-// -------------------
-// Sanitize Text Field
-// -------------------
-if ( !function_exists( 'sanitize_text_field' ) ) {
- function sanitize_text_field( $text ) {
-	return $text;
- }
-}
-

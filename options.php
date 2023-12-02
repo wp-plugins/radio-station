@@ -4,10 +4,11 @@
 // === Radio Station Options ===
 // =============================
 
+if ( !defined( 'ABSPATH' ) ) exit;
+
 // ------------------
 // Set Plugin Options
 // ------------------
-
 $options = array(
 
 	// === Broadcast ===

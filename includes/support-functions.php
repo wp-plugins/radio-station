@@ -6,6 +6,8 @@
 * Since: 2.3.0
 */
 
+if ( !defined( 'ABSPATH' ) ) exit;
+
 // =======================================
 // === Radio Station Support Functions ===
 // =======================================

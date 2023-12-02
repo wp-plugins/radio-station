@@ -2456,14 +2456,19 @@ function radio_station_current_show_shortcode( $atts ) {
 			$html .= "<script>" . "\n";
 				$html .= "timestamp = Math.floor( (new Date()).getTime() / 1000 );" . "\n";
 				$html .= "url = '" . esc_url( $ajax_url ) . "?action=radio_station_current_show';" . "\n";
-				$html .= "url += '&instance=" . esc_js( $instance ) . "&timestamp='+timestamp;" . "\n";
+				$html .= "url += '&instance=" . esc_js( $instance ) . "';" . "\n";
 				if ( RADIO_STATION_DEBUG ) {
 					$html .= "url += '&rs-debug=1';";
 				}
 				$html .= "url += '";
 				foreach ( $atts as $key => $value ) {
-					$value = radio_station_encode_uri_component( $value );
-					$html .= "&" . esc_js( $key ) . "=" . esc_js( $value );
+					// 2.5.7: fix to ensure for_time is used for timestamp
+					if ( ( 'for_time' == $key ) && ( 0 == $value ) ) {
+						$html .= "&for_time='+timestamp+'";
+					} else {
+						$value = radio_station_encode_uri_component( $value );
+						$html .= "&" . esc_js( $key ) . "=" . esc_js( $value );
+					}
 				}
 				$html .= "';" . "\n";
 				$html .= "document.getElementById('rs-current-show-" . esc_js( $instance ) ."-loader').src = url;" . "\n";
@@ -3261,14 +3266,19 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 			$html .= "<script>" . "\n";
 				$html .= "timestamp = Math.floor( (new Date()).getTime() / 1000 );" . "\n";
 				$html .= "url = '" . esc_url( $ajax_url ) . "?action=radio_station_upcoming_shows';" . "\n";
-				$html .= "url += '&instance=" . esc_js( $instance ) . "&timestamp='+timestamp;" . "\n";
+				$html .= "url += '&instance=" . esc_js( $instance ) . "';" . "\n";
 				if ( RADIO_STATION_DEBUG ) {
 					$html .= "url += '&rs-debug=1';" . "\n";
 				}
 				$html .= "url += '";
 				foreach ( $atts as $key => $value ) {
-					$value = radio_station_encode_uri_component( $value );
-					$html .= "&" . esc_js( $key ) . "=" . esc_js( $value );
+					// 2.5.7: fix to ensure for_time is used for timestamp
+					if ( ( 'for_time' == $key ) && ( 0 == $value ) ) {
+						$html .= "&for_time='+timestamp+'";
+					} else {
+						$value = radio_station_encode_uri_component( $value );
+						$html .= "&" . esc_js( $key ) . "=" . esc_js( $value );
+					}
 				}
 				$html .= "';" . "\n";
 				$html .= "document.getElementById('rs-upcoming-shows-" . esc_js( $instance ) . "-loader').src = url;" . "\n";
@@ -3898,11 +3908,19 @@ function radio_station_current_playlist_shortcode( $atts ) {
 			// --- shortcode script loader ---
 			$html .= "<script>timestamp = Math.floor( (new Date()).getTime() / 1000 );" . "\n";
 				$html .= "url = '" . esc_url( $ajax_url ) . "?action=radio_station_current_playlist';" . "\n";
-				$html .= "url += '&instance=" . esc_attr( $instance ) . "&timestamp='+timestamp;" . "\n";
+				$html .= "url += '&instance=" . esc_attr( $instance ) . "';" . "\n";
+				if ( RADIO_STATION_DEBUG ) {
+					$html .= "url += '&rs-debug=1';" . "\n";
+				}
 				$html .= "url += '";
 				foreach ( $atts as $key => $value ) {
-					$value = radio_station_encode_uri_component( $value );
-					$html .= "&" . esc_js( $key ) . "=" . esc_js( $value );
+					// 2.5.7: fix to ensure for_time is used for timestamp
+					if ( ( 'for_time' == $key ) && ( 0 == $value ) ) {
+						$html .= "&for_time='+timestamp+'";
+					} else {
+						$value = radio_station_encode_uri_component( $value );
+						$html .= "&" . esc_js( $key ) . "=" . esc_js( $value );
+					}
 				}
 				$html .= "';" . "\n";
 				$html .= "document.getElementById('rs-current-playlist-" . esc_attr( $instance ) ."-loader').src = url;" . "\n";
