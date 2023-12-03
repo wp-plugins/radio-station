@@ -3079,15 +3079,17 @@ function radio_station_current_show() {
 		// 2.5.6: maybe hide entire parent widget if empty
 		if ( $atts['hide_empty'] && ( '' == trim( $output ) ) ) {
 
+			// 2.5.7: added check that widget element exists
 			$js .= "instance = parent.document.getElementById('current-show-widget-" . esc_js( $atts['instance'] ) . "');" . "\n";
-			$js .= "instance.style.display = 'none';" . "\n";
+			$js .= "if (instance) {instance.style.display = 'none';}" . "\n";
 
 		} else {
 
 			// --- send to parent window ---
 			// 2.5.6: ensure parent widget is displayed
+			// 2.5.7: added check that widget element exists
 			$js .= "instance = parent.document.getElementById('current-show-widget-" . esc_js( $atts['instance'] ) . "');" . "\n";
-			$js .= "instance.style.display = '';" . "\n";
+			$js .= "if (instance) {instance.style.display = '';}" . "\n";
 			$js .= "widget = document.getElementById('widget-contents').innerHTML;" . "\n";
 			$js .= "parent.document.getElementById('rs-current-show-" . esc_js( $atts['instance'] ) . "').innerHTML = widget;" . PHP_EOL;
 
@@ -3767,8 +3769,9 @@ function radio_station_upcoming_shows() {
 
 			// --- send to parent window ---
 			// 2.5.6: ensure parent widget is displayed
+			// 2.5.7: added check that widget element exists
 			$js .= "instance = parent.document.getElementById('upcoming-shows-widget-" . esc_js( $atts['instance'] ) . "');" . "\n";
-			$js .= "instance.style.display = '';" . "\n";
+			$js .= "if (instance) {instance.style.display = '';}" . "\n";
 			$js .= "widget = document.getElementById('widget-contents').innerHTML;" . "\n";
 			$js .= "parent.document.getElementById('rs-upcoming-shows-" . esc_js( $atts['instance'] ) . "').innerHTML = widget;" . "\n";
 
@@ -4284,15 +4287,17 @@ function radio_station_current_playlist() {
 		// 2.6.5: maybe hide entire parent widget area if empty
 		if ( $atts['hide_empty'] && ( '' == trim( $output ) ) ) {
 
+			// 2.5.7: added check that widget element exists
 			$js .= "instance = parent.document.getElementById('current-playlist-widget-" . esc_js( $atts['instance'] ) . "');" . "\n";
-			$js .= "instance.style.display = 'none';" . "\n";
+			$js .= "if (instance) {instance.style.display = 'none';}" . "\n";
 
 		} else {
 
 			// --- send to parent window ---
 			// 2.5.6: ensure parent widget is displayed
+			// 2.5.7: added check that widget element exists
 			$js .= "instance = parent.document.getElementById('current-playlist-widget-" . esc_js( $atts['instance'] ) . "');" . "\n";
-			$js .= "instance.style.display = '';" . "\n";
+			$js .= "if (instance) {instance.style.display = '';}" . "\n";
 			$js .= "widget = document.getElementById('widget-contents').innerHTML;" . "\n";
 			$js .= "parent.document.getElementById('rs-current-playlist-" . esc_js( $atts['instance'] ) . "').innerHTML = widget;" . "\n";
 
