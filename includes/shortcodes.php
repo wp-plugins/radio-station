@@ -2534,7 +2534,8 @@ function radio_station_current_show_shortcode( $atts ) {
 
 	// --- shortcode title ---
 	// 2.5.0: also display title for non-shortcodes if set
-	if ( ( '' != $atts['title'] ) && ( 0 != $atts['title'] ) ) {
+	// 2.5.7: but do not display for widgets (duplication)
+	if ( ( '' != $atts['title'] ) && ( 0 != $atts['title'] ) && !$atts['widget'] ) {
 		// 2.3.3.9: fix class to not conflict with actual show title
 		$output .= '<h3 class="current-show-shortcode-title">' . "\n";
 			$output .= esc_html( $atts['title'] ) . "\n";
@@ -3333,7 +3334,8 @@ function radio_station_upcoming_shows_shortcode( $atts ) {
 
 	// --- shortcode title ---
 	// 2.5.0: also maybe output for non-shortcodes
-	if ( ( '' != $atts['title'] ) && ( 0 != $atts['title'] ) ) {
+	// 2.5.7: but do not display for widgets (duplication)
+	if ( ( '' != $atts['title'] ) && ( 0 != $atts['title'] ) && !$atts['widget'] ) {
 		$output .= '<h3 class="upcoming-shows-title dj-coming-up-title">' . "\n";
 			$output .= esc_html( $atts['title'] ) . "\n";
 		$output .= '</h3>' . "\n";
@@ -3969,7 +3971,8 @@ function radio_station_current_playlist_shortcode( $atts ) {
 
 	// --- shortcode title ---
 	// 2.5.0: also maybe display for non-shortcodes
-	if ( ( '' ==  $atts['title'] ) && ( 0 != $atts['title'] ) ) {
+	// 2.5.7: but do not display for widgets (duplication)
+	if ( ( '' ==  $atts['title'] ) && ( 0 != $atts['title'] ) && !$atts['widget'] ) {
 		// 2.3.0: added title class for shortcode
 		$output .= '<h3 class="show-playlist-title myplaylist-title">' . "\n";
 			// 2.5.0: fixed to use esc_html instead of esc_attr
