@@ -870,7 +870,6 @@ $options = array(
 	// --- [Pro] Combined Team Tab ---
 	// 2.4.0.7: added combined team grid option
 	// 2.5.7: updated to add option to remove team display
-	// 2.5.7: enabled option for list or grid display
 	'combined_team_tab' => array(
 		'type'    => 'select',
 		'label'   => __( 'Team Tab Display', 'radio-station' ),
@@ -879,7 +878,7 @@ $options = array(
 			'off'  => __( 'No Team Display', 'radio-station' ),
 			''     => __( 'Separate Role Tabs', 'radio-station' ),
 			'yes'  => __( 'Combined Team List', 'radio-station' ),
-			'grid' => __( 'Combined Grid', 'radio-station' ),
+			// 'grid' => __( 'Combined Team Grid', 'radio-station' ),
 		),
 		'helper'  => __( 'How to display Show team members (eg. hosts, producers) on a Show page.', 'radio-station' ),
 		'tab'     => 'pages',

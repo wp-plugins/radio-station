@@ -1,11 +1,10 @@
-=== Radio Station by netmix® - Manage and play your Show Schedule in WordPress!
-===
+=== Radio Station by netmix® - Manage and play your Show Schedule in WordPress! ===
 Contributors: tonyzeoli, majick
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
 Tested up to: 6.4.1
-Stable tag: 2.5.6
+Stable tag: 2.5.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
