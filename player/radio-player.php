@@ -619,7 +619,8 @@ function radio_player_shortcode( $atts ) {
 	}
 
 	// --- set default player script ---
-	$scripts = array( 'amplitude', 'howler', 'jplayer' ); // 'mediaelements'
+	// 2.5.7: disable howler script
+	$scripts = array( 'amplitude', 'jplayer' ); // 'howler', 'mediaelements'
 	if ( defined( 'RADIO_PLAYER_SCRIPT' ) && in_array( RADIO_PLAYER_SCRIPT, $scripts ) ) {
 		$script = RADIO_PLAYER_SCRIPT;
 	} elseif ( function_exists( 'radio_station_get_setting' ) ) {
@@ -627,6 +628,10 @@ function radio_player_shortcode( $atts ) {
 	} elseif ( function_exists( 'apply_filters' ) ) {
 		$script = apply_filters( 'radio_station_player_default_script', $script );
 		$script = apply_filters( 'radio_player_default_script', $script );
+	}
+	// 2.5.7: reset default fallback player script if unsupported
+	if ( !in_array( $script, $scripts ) ) {
+		$script = 'amplitude';
 	}
 
 	// --- set default player layout ---
@@ -967,9 +972,9 @@ function radio_player_ajax() {
 	}
 
 	// --- debug shortcode attributes ---
-	// if ( defined( 'RADIO_PLAYER_DEBUG' ) && RADIO_PLAYER_DEBUG ) {
+	if ( defined( 'RADIO_PLAYER_DEBUG' ) && RADIO_PLAYER_DEBUG ) {
 		echo '<span style="display:none;">Radio Player Shortcode Attributes: ' . esc_html( print_r( $atts, true ) ) . '</span>';
-	// }
+	}
 
 	// --- output widget contents ---
 	// 2.5.0: maybe add popup player class
@@ -1455,9 +1460,10 @@ function radio_player_enqueue_script( $script ) {
 	}
 
 	// 2.4.0.3: load all player scripts regardless
-	$js .= radio_player_script_howler();
-	$js .= radio_player_script_jplayer();
-	$js .= radio_player_script_amplitude();
+	// 2.5.7: disable scripts here (moved into main js file)
+	// $js .= radio_player_script_howler();
+	// $js .= radio_player_script_jplayer();
+	// $js .= radio_player_script_amplitude();
 
 	// --- append any pageload scripts ---
 	if ( function_exists( 'apply_filters') ) {
@@ -1633,6 +1639,7 @@ function radio_player_enqueue_howler( $infooter ) {
 // ----------------------------
 // Dynamic Load Script via AJAX
 // ----------------------------
+/* 2.5.7: deprecate unused dynamic script load function
 if ( function_exists( 'add_action' ) ) {
 	add_action( 'wp_ajax_radio_player_script', 'radio_player_script' );
 	add_action( 'wp_ajax_nopriv_radio_player_script', 'radio_player_script' );
@@ -1643,17 +1650,13 @@ function radio_player_script() {
 	$script = sanitize_text_field( $_REQUEST['script'] );
 	$js = '';
 	if ( 'amplitude' == $script ) {
-		// $js = file_get_contents( dirname( __FILE__ ) . '/js/amplitude' . $suffix . '.js' );
 		$js .= radio_player_script_amplitude();
 	} elseif ( 'jplayer' == $script ) {
-		// $js = file_get_contents( dirname( __FILE__ ) . '/js/jplayer' . $suffix . '.js';
 		$js .= radio_player_script_jplayer();
 	} elseif ( 'howler' == $script ) {
-		// $js = file_get_contents( dirname( __FILE__ ) . '/js/howler' . $suffix . '.js';
 		$js .= radio_player_script_howler();
 	} // elseif ( 'elements' == $script ) {
 		// TODO: combine both media elements scripts
-		// $js = file_get_contents( dirname( __FILE__ ) . '/js/mediaelements' . $suffix . '.js';
 		// $js .= radio_player_script_mediaelements();
 		// TODO: localize script settings ?
 	// }
@@ -1667,7 +1670,7 @@ function radio_player_script() {
 		echo $js;
 	}
 	exit;
-}
+} */
 
 // -------------------
 // Get Player Settings
@@ -1706,7 +1709,8 @@ function radio_player_get_player_settings( $echo = false ) {
 	}
 
 	// --- set jPlayer Flash path ---
-	if ( defined( 'RADIO_PLAYER_URL' ) ) {
+	// 2.5.7: disable swf fallback support
+	/* if ( defined( 'RADIO_PLAYER_URL' ) ) {
 		$swf_path = RADIO_PLAYER_URL . 'js';
 	} elseif ( function_exists( 'plugins_url' ) ) {
 		if ( defined( 'RADIO_STATION_FILE' ) ) {
@@ -1720,7 +1724,7 @@ function radio_player_get_player_settings( $echo = false ) {
 	} else {
 		// TODO: check fallback to SWF (URL) relative path js/ ?
 		$swf_path = '';
-	}
+	} */
 
 	// --- set default stream settings ---
 	$player_script = radio_player_get_default_script();
@@ -1778,6 +1782,9 @@ function radio_player_get_player_settings( $echo = false ) {
 	// if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
 	// 	$suffix = '';
 	// }
+	
+	// 2.5.7: automatically disable Howler script (browser incompatibilities)
+	$player_script = ( 'howler' == $player_script ) ? 'amplitude' : $player_script;
 
 	// --- convert player behaviour settings to boolean string ---
 	$player_single = $player_single ? 'true' : 'false';
@@ -1788,10 +1795,12 @@ function radio_player_get_player_settings( $echo = false ) {
 	}
 
 	// --- set radio player settings ---
+	// 2.5.7: disable swf fallback support
 	echo "player_settings = {";
 		echo "'ajaxurl': '" . esc_url( $admin_ajax ) . "', ";
 		echo "'saveinterval':" . esc_js( $save_interval ) . ", ";
-		echo "'swf_path': '" . esc_url( $swf_path ) . "', ";
+		// echo "'swf_path': '" . esc_url( $swf_path ) . "', ";
+		echo "'swf_path': false, ";
 		echo "'script': '" . esc_js( $player_script ). "', ";
 		echo "'title': '" . esc_js( $player_title ) . "', ";
 		echo "'image': '" . esc_url( $player_image ) . "', ";
@@ -1813,7 +1822,8 @@ function radio_player_get_player_settings( $echo = false ) {
 
 	// --- set script URL ouput ---
 	// 2.4.0.3: check for fallback script settings
-	$fallbacks = array( 'jplayer', 'howler', 'amplitude' );
+	// 2.5.7: remove howler from script fallback list
+	$fallbacks = array( 'jplayer', 'amplitude' ); // 'howler'
 	if ( function_exists( 'radio_station_get_setting' ) ) {
 		$fallbacks = radio_station_get_setting( 'player_fallbacks' );
 	} elseif ( function_exists( 'apply_filters' ) ) {
@@ -1867,8 +1877,9 @@ function radio_player_get_player_settings( $echo = false ) {
 	// [Amplitude] HTML5 Support - mp3, aac ...?
 	// ref: https://en.wikipedia.org/wiki/HTML5_audio#Supporting_browsers
 	// [Media Elements] Audio: mp3, wma, wav +Video: mp4, ogg, webm, wmv
+	// 2.5.7: disable Howler format list
 	echo "formats = {";
-		echo "'howler': ['mp3','opus','ogg','oga','wav','aac','m4a','mp4','webm','weba','flac'], ";
+		// echo "'howler': ['mp3','opus','ogg','oga','wav','aac','m4a','mp4','webm','weba','flac'], ";
 		echo "'jplayer': ['mp3','m4a','webm','oga','rtmpa','wav','flac'], ";
 		echo "'amplitude': ['mp3','aac'], ";
 		// $js .= "'mediaelements': ['mp3','wma','wav'], ";
@@ -1948,12 +1959,21 @@ function radio_player_get_player_settings( $echo = false ) {
 	}
 	// 2.5.6: add isset check for data variable
 	if ( isset( $data ) && $data && is_array( $data ) ) {
+		
+		// 2.5.7: set currently playing data only if script supported
+		$set_data = false;
 		foreach ( $data as $key => $value ) {
-			// TODO: remove currently playing script if not in supported scripts
-			echo "radio_data.state.data['" . $key . "'] = '" . $value . "';" . "\n";
+			if ( ( 'script' == $key ) && in_array( $value, array( 'jplayer', 'amplitude' ) ) ) {
+				$set_data = true;
+			}
 		}
+		if ( $set_data ) {
+			foreach ( $data as $key => $value ) {
+				echo "radio_data.state.data['" . $key . "'] = '" . $value . "';" . "\n";
+			}
+		}
+		echo "radio_player.stream_data = radio_data.state.data;" . "\n";
 	}
-	echo "radio_player.stream_data = radio_data.state.data;" . "\n";
 
 	// --- attempt to set player state from cookies ---
 	echo "var radio_player_state_loaded = false;
@@ -1965,7 +1985,7 @@ function radio_player_get_player_settings( $echo = false ) {
 		}
 	}, 1000);" . "\n";
 
-	/* --- periodic save to user meta --- */
+	// --- periodic save to user meta ---
 	echo "rp_save_interval = radio_player.settings.saveinterval * 1000;
 	var radio_player_state_saver = setInterval(function() {
 		if (typeof radio_data.state != 'undefined') {

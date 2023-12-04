@@ -6,7 +6,7 @@ Plugin Name: Radio Station
 Plugin URI: https://radiostation.pro/radio-station
 Description: Adds Show pages, DJ role, playlist and on-air programming functionality to your site.
 Author: Tony Zeoli, Tony Hayes
-Version: 2.5.6.2
+Version: 2.5.6.3
 Requires at least: 3.3.1
 Text Domain: radio-station
 Domain Path: /languages
@@ -65,6 +65,8 @@ if ( !defined( 'ABSPATH' ) ) exit;
 // - Enqueue Datepicker
 // - Enqueue Localized Script Values
 // - Localization Script
+// - Filter Streaming Data
+// - Filter Player Script
 // === Transient Caching ===
 // - Delete Prefixed Transients
 // - Clear Cached Data
@@ -1048,13 +1050,14 @@ function radio_station_localization_script() {
 	return $js;
 }
 
-// -------------------------
-// Filter for Streaming Data
-// -------------------------
+// ---------------------
+// Filter Streaming Data
+// ---------------------
 // 2.3.3.7: added streaming data filter for player integration
 // 2.5.6: added missing 4th argument (arg count declaration)
 add_filter( 'radio_player_data', 'radio_station_streaming_data', 10, 2 );
 function radio_station_streaming_data( $data, $station = false ) {
+
 	$data = array(
 		'script'   => radio_station_get_setting( 'player_script' ),
 		'instance' => 0,
@@ -1063,11 +1066,24 @@ function radio_station_streaming_data( $data, $station = false ) {
 		'fallback' => radio_station_get_fallback_url(),
 		'fformat'  => radio_station_get_setting( 'fallback_format' ),
 	);
+	
 	if ( RADIO_STATION_DEBUG ) {
 		echo '<span style="display:none;">Player Stream Data: ' . esc_html( print_r( $data, true ) ) . '</span>' . "\n";
 	}
 	$data = apply_filters( 'radio_station_streaming_data', $data, $station );
 	return $data;
+}
+
+// --------------------
+// Filter Player Script
+// --------------------
+// 2.5.7: disable Howler script setting (browser incompatibilities)
+add_filter( 'radio_station_player_script', 'radio_station_filter_player_script', 11 );
+function radio_station_filter_player_script( $script ) {
+	if ( 'howler' == $script ) {
+		$script = 'amplitude';
+	}
+	return $script;
 }
 
 

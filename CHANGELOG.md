@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Updated: Freemius SDK (2.6.0)
 * Disabled: Howler Player Script (browser compatibility issues)
 * Improved: Schedule Engine Weekdate calculations
-* Fixed: AJAX shortcode/widget loading for current Timer
+* Fixed: AJAX shortcode/widget loading for current time
+* Fixed: Widget title display duplication
 
 = 2.5.6 =
 * Updated: Freemius SDK (2.5.11)

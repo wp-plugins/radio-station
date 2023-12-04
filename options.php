@@ -288,13 +288,14 @@ $options = array(
 
 	// --- [Player] Player Script ---
 	// 2.4.0.3: change script default to jplayer
+	// 2.5.7: disable howler script (browser incompatibilities)
 	'player_script' => array(
 		'type'    => 'select',
 		'label'   => __( 'Player Script', 'radio-station' ),
 		'default' => 'jplayer',
 		'options' => array(
 			'jplayer'   => __( 'jPlayer', 'radio-station' ),
-			'howler'    => __( 'Howler', 'radio-station' ),
+			// 'howler'    => __( 'Howler', 'radio-station' ),
 			'amplitude' => __( 'Amplitude', 'radio-station' ),
 		),
 		'helper'  => __( 'Default audio script to use for playback in the Player.', 'radio-station' ),
@@ -305,13 +306,14 @@ $options = array(
 	// --- [Player] Fallback Scripts ---
 	// 2.4.0.3: added fallback enable/disable switching
 	// 2.4.0.3: fixed option label from Player Script
+	// 2.5.7: disable howler script (browser incompatibilities)
 	'player_fallbacks' => array(
 		'type'    => 'multicheck',
 		'label'   => __( 'Fallback Scripts', 'radio-station' ),
 		'default' => array( 'amplitude', 'howler', 'jplayer' ),
 		'options' => array(
 			'jplayer'   => __( 'jPlayer', 'radio-station' ),
-			'howler'    => __( 'Howler', 'radio-station' ),
+			// 'howler'    => __( 'Howler', 'radio-station' ),
 			'amplitude' => __( 'Amplitude', 'radio-station' ),
 		),
 		'helper'  => __( 'Enabled fallback audio scripts to try when the default Player script fails.', 'radio-station' ),
