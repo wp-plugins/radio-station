@@ -6478,7 +6478,8 @@ function radio_station_post_save_data( $post_id ) {
 		// --- get the related show ID ---
 		$changed = false;
 		$current_shows = get_post_meta( $post_id, $metakey, true );
-		$show_ids = sanitize_text_field( $_POST[$metakey] );
+		// 2.5.8: fix to use array_map on multiselect field
+		$show_ids = array_map( 'absint', $_POST[$metakey] );
 
 		// 2.3.3.6: maybe add existing (uneditable) Show IDs
 		$new_show_ids = array();
@@ -6795,12 +6796,13 @@ function radio_station_posts_bulk_edit_handler( $redirect_to, $action, $post_ids
 
 	if ( 'related_show' !== $action ) {
 		return $redirect_to;
-	} elseif ( !isset($_REQUEST['post_showblog_id'] ) || ( '' == $_REQUEST['post_showblog_id'] ) ) {
+	} elseif ( !isset( $_REQUEST['post_showblog_id'] ) || ( '' == $_REQUEST['post_showblog_id'] ) ) {
 		return $redirect_to;
 	}
 
 	// 2.5.0: added sanitize_text_field to request value
-	$show_ids = sanitize_text_field( $_REQUEST['post_showblog_id'] );
+	// 2.5.8: fix to use array_map on multiselect field
+	$show_ids = array_map( 'absint', $_REQUEST['post_showblog_id'] );
 
 	// 2.3.3.6: check that user can edit specified Shows
 	$posted_show_ids = array();

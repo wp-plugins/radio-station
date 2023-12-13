@@ -400,6 +400,9 @@ We recommend you test these on a Staging site (or a development copy of your liv
 
 == Changelog ==
 
+= 2.5.8 =
+* Fixed: Save multiple Show related post values
+
 = 2.5.7 =
 * Updated: Freemius SDK (2.6.0)
 * Disabled: Howler Player Script (browser compatibility issues)
