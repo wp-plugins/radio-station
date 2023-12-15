@@ -671,7 +671,8 @@ if ( $overrides && is_array( $overrides ) && ( count( $overrides ) > 0 ) ) {
 	}
 	$now = radio_station_get_now();
 	foreach ( $overrides as $override ) {
-		if ( 'yes' != $override['disabled'] ) {
+		// 2.5.8: added isset check for override disabled key
+		if ( ( !isset( $override['disabled'] ) || ( 'yes' != $override['disabled'] ) ) {
 			// 2.5.6: added check that override keys are not empty
 			if ( !empty( $override['date'] ) && !empty( $override['start_hour'] ) && !empty( $override['start_min'] ) && !empty( $override['start_meridian'] ) && !empty( $override['end_hour'] ) && !empty( $override['end_min'] ) && !empty( $override['end_meridian'] ) ) {
 

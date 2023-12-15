@@ -1904,13 +1904,14 @@ function radio_station_trim_excerpt( $content, $length = false, $more = false, $
 
 		$content = strip_shortcodes( $content );
 
+		// TODO: check for Gutenberg plugin-only equivalent ?
+		// if ( function_exists( 'gutenberg_remove_blocks' ) {
+		//	$content = gutenberg_remove_blocks( $content );
+		// } elseif ( function_exists( 'excerpt_remove_blocks' ) ) {
 		if ( function_exists( 'excerpt_remove_blocks' ) ) {
 			$content = excerpt_remove_blocks( $content );
 		}
-		// TODO: check for Gutenberg plugin-only equivalent ?
-		// elseif ( function_exists( 'gutenberg_remove_blocks' ) {
-		//	$content = gutenberg_remove_blocks( $content );
-		// }
+
 		$content = apply_filters( 'the_content', $content );
 		$content = str_replace( ']]>', ']]&gt;', $content );
 
