@@ -3,7 +3,7 @@ Contributors: tonyzeoli, majick
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
-Tested up to: 6.4.1
+Tested up to: 6.4.2
 Stable tag: 2.5.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -402,6 +402,9 @@ We recommend you test these on a Staging site (or a development copy of your liv
 
 = 2.5.8 =
 * Fixed: Save multiple Show related post values
+* Fixed: Count bug on Override Archive shortcode
+* Fixed: Date/time display on Override Archive shortcode
+* Changed: Removed player state saving iframe
 
 = 2.5.7 =
 * Updated: Freemius SDK (2.6.0)

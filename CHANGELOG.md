@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+= 2.5.8 =
+* Fixed: Save multiple Show related post values
+* Fixed: Count bug on Override Archive shortcode
+* Fixed: Date/time display on Override Archive shortcode
+* Changed: Removed player state saving iframe
+
 = 2.5.7 =
 * Updated: Freemius SDK (2.6.0)
 * Disabled: Howler Player Script (browser compatibility issues)
