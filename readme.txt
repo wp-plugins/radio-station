@@ -401,6 +401,7 @@ We recommend you test these on a Staging site (or a development copy of your liv
 == Changelog ==
 
 = 2.5.8 =
+* Fixed: Possible next show duplicates current show in Data API
 * Fixed: Save multiple Show related post values
 * Fixed: Count bug on Override Archive shortcode
 * Fixed: Date/time display on Override Archive shortcode
