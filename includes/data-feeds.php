@@ -227,7 +227,7 @@ function radio_station_get_broadcast_data() {
 			$found = false;
 			foreach ( $next_shows as $show ) {
 				if ( !$found && ( $current_show['ID'] != $show['ID'] ) ) {
-					$next_show = radio_station_convert_show_shift( $next_show );
+					$next_show = radio_station_convert_show_shift( $show );
 					$found = true;
 				}
 			}
