@@ -490,10 +490,29 @@ function radio_station_override_linked_show_data( $post, $post_type ) {
 // 2.3.0: standalone filter name to allow for replacement
 add_filter( 'the_content', 'radio_station_show_content_template', 11 );
 function radio_station_show_content_template( $content ) {
+	// 2.5.8: added early bypass for non-show pages
+	if ( !is_singular( RADIO_STATION_SHOW_SLUG ) ) {
+		return $content;
+	}
 	remove_filter( 'the_content', 'radio_station_show_content_template', 11 );
 	$output = radio_station_single_content_template( $content, RADIO_STATION_SHOW_SLUG );
 	// 2.3.1: re-add filter so the_content can be processed multuple times
 	add_filter( 'the_content', 'radio_station_show_content_template', 11 );
+	return $output;
+}
+
+// ----------------------------
+// Show Excerpt Template Filter
+// ----------------------------
+// 2.5.8: added fix for themes showing only the excerpt on single show pages
+add_filter( 'the_excerpt', 'radio_station_show_content_template_excerpt', 11 );
+function radio_station_show_content_template_excerpt( $content ) {
+	if ( !is_singular( RADIO_STATION_SHOW_SLUG ) ) {
+		return $content;
+	}
+	remove_filter( 'the_excerpt', 'radio_station_show_content_template', 11 );
+	$output = radio_station_single_content_template( $content, RADIO_STATION_SHOW_SLUG );
+	add_filter( 'the_excerpt', 'radio_station_show_content_template', 11 );
 	return $output;
 }
 
@@ -503,10 +522,29 @@ function radio_station_show_content_template( $content ) {
 // 2.3.0: standalone filter name to allow for replacement
 add_filter( 'the_content', 'radio_station_playlist_content_template', 11 );
 function radio_station_playlist_content_template( $content ) {
+	// 2.5.8: added early bypass for non-playlist pages
+	if ( !is_singular( RADIO_STATION_PLAYLIST_SLUG ) ) {
+		return $content;
+	}
 	remove_filter( 'the_content', 'radio_station_playlist_content_template', 11 );
 	$output = radio_station_single_content_template( $content, RADIO_STATION_PLAYLIST_SLUG );
 	// 2.3.1: re-add filter so the_content can be processed multuple times
 	add_filter( 'the_content', 'radio_station_playlist_content_template', 11 );
+	return $output;
+}
+
+// --------------------------------
+// Playlist Excerpt Template Filter
+// --------------------------------
+// 2.5.8: added fix for themes showing only the excerpt on single show pages
+add_filter( 'the_excerpt', 'radio_station_playlist_content_template_excerpt', 11 );
+function radio_station_playlist_content_template_excerpt( $content ) {
+	if ( !is_singular( RADIO_STATION_PLAYLIST_SLUG ) ) {
+		return $content;
+	}
+	remove_filter( 'the_excerpt', 'radio_station_playlist_content_template_excerpt', 11 );
+	$output = radio_station_single_content_template( $content, RADIO_STATION_PLAYLIST_SLUG );
+	add_filter( 'the_excerpt', 'radio_station_playlist_content_template_excerpt', 11 );
 	return $output;
 }
 
@@ -516,10 +554,29 @@ function radio_station_playlist_content_template( $content ) {
 // 2.3.0: standalone filter name to allow for replacement
 add_filter( 'the_content', 'radio_station_override_content_template', 11 );
 function radio_station_override_content_template( $content ) {
+	// 2.5.8: added early bypass for non-override pages
+	if ( !is_singular( RADIO_STATION_OVERRIDE_SLUG ) ) {
+		return $content;
+	}
 	remove_filter( 'the_content', 'radio_station_override_content_template', 11 );
 	$output = radio_station_single_content_template( $content, RADIO_STATION_OVERRIDE_SLUG );
 	// 2.3.1: re-add filter so the_content can be processed multiple times
 	add_filter( 'the_content', 'radio_station_override_content_template', 11 );
+	return $output;
+}
+
+// --------------------------------
+// Override Excerpt Template Filter
+// --------------------------------
+// 2.5.8: added fix for themes showing only the excerpt on single pages
+add_filter( 'the_excerpt', 'radio_station_override_content_template_excerpt', 11 );
+function radio_station_override_content_template_excerpt( $content ) {
+	if ( !is_singular( RADIO_STATION_OVERRIDE_SLUG ) ) {
+		return $content;
+	}
+	remove_filter( 'the_excerpt', 'radio_station_override_content_template_excerpt', 11 );
+	$output = radio_station_single_content_template( $content, RADIO_STATION_OVERRIDE_SLUG );
+	add_filter( 'the_excerpt', 'radio_station_override_content_template_excerpt', 11 );
 	return $output;
 }
 
