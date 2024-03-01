@@ -510,9 +510,20 @@ function radio_station_show_content_template_excerpt( $content ) {
 	if ( !is_singular( RADIO_STATION_SHOW_SLUG ) ) {
 		return $content;
 	}
+
+	// 2.5.8: pass unprocesed content as description to content template
+	remove_filter( 'the_content', 'radio_station_show_content_template', 11 );
+	ob_start();
+	the_content();
+	$content = ob_get_contents();
+	ob_end_clean();
+	add_filter( 'the_content', 'radio_station_show_content_template', 11 );
+	
 	remove_filter( 'the_excerpt', 'radio_station_show_content_template', 11 );
 	$output = radio_station_single_content_template( $content, RADIO_STATION_SHOW_SLUG );
 	add_filter( 'the_excerpt', 'radio_station_show_content_template', 11 );
+	// add_filter( 'the_content', 'radio_station_deduplicate_content', 99 );
+
 	return $output;
 }
 
@@ -543,9 +554,18 @@ function radio_station_playlist_content_template_excerpt( $content ) {
 		return $content;
 	}
 	remove_filter( 'the_excerpt', 'radio_station_playlist_content_template_excerpt', 11 );
+	remove_filter( 'the_content', 'radio_station_playlist_content_template', 11 );
 	$output = radio_station_single_content_template( $content, RADIO_STATION_PLAYLIST_SLUG );
 	add_filter( 'the_excerpt', 'radio_station_playlist_content_template_excerpt', 11 );
+	// add_filter( 'the_content', 'radio_station_deduplicate_content', 99 );
 	return $output;
+}
+
+// --------------------------
+// Deduplicate Content Filter
+// --------------------------
+function radio_station_deduplicate_content( $content ) {
+	return '';
 }
 
 // --------------------------------
@@ -574,9 +594,19 @@ function radio_station_override_content_template_excerpt( $content ) {
 	if ( !is_singular( RADIO_STATION_OVERRIDE_SLUG ) ) {
 		return $content;
 	}
+
+	// 2.5.8: pass unprocesed content as description to content template
+	remove_filter( 'the_content', 'radio_station_override_content_template', 11 );
+	ob_start();
+	the_content();
+	$content = ob_get_contents();
+	ob_end_clean();
+	add_filter( 'the_content', 'radio_station_override_content_template', 11 );
+
 	remove_filter( 'the_excerpt', 'radio_station_override_content_template_excerpt', 11 );
 	$output = radio_station_single_content_template( $content, RADIO_STATION_OVERRIDE_SLUG );
 	add_filter( 'the_excerpt', 'radio_station_override_content_template_excerpt', 11 );
+	// add_filter( 'the_content', 'radio_station_deduplicate_content', 99 );
 	return $output;
 }
 

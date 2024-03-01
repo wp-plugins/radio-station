@@ -406,6 +406,8 @@ We recommend you test these on a Staging site (or a development copy of your liv
 * Fixed: Save multiple Show related post values
 * Fixed: Count bug on Override Archive shortcode
 * Fixed: Date/time display on Override Archive shortcode
+* Fixed: Show file Disable Download checkbox saving
+* Added: Use automatic Embeds on external Show file URLs
 * Changed: Removed player state saving iframe
 
 = 2.5.7 =

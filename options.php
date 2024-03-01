@@ -954,6 +954,17 @@ $options = array(
 		'pro'     => true,
 	),
 
+	// --- [Pro] Use Latest Episode ---
+	'episode_use_latest' => array(
+		'type'    => 'checkbox',
+		'label'   => __( 'Use Latest Episode', 'radio-station' ),
+		'value'   => 'yes',
+		'default' => 'yes',
+		'helper'  => __( 'Automatically use the latest Episode URL for the player embed on the Show page.', 'radio-station' ),
+		'tab'     => 'pages',
+		'section' => 'episode',
+		'pro'     => true,
+	),
 
 	// ==== Post Type Archives ===
 	// 2.4.0.6: move archives to separate tab
