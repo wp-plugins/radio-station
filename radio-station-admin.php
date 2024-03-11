@@ -927,8 +927,10 @@ function radio_station_update_notice() {
 		echo '</ul>' . "\n";
 
 		// --- dismiss notice link ---
+		// 2.5.8: add nonce to dismissal link
 		$dismiss_url = add_query_arg( 'action', 'radio_station_notice_dismiss', admin_url( 'admin-ajax.php' ) );
 		$dismiss_url = add_query_arg( 'upgrade', $notice['update_id'], $dismiss_url );
+		$dismiss_url = add_query_arg( 'nonce', wp_create_nonce( 'radio_station_notice' ), $dismiss_url );
 		echo '<div style="position:absolute; top:20px; right: 20px;">' . "\n";
 			echo '<a href="' . esc_url( $dismiss_url ) . '" target="radio-station-notice-iframe" style="text-decoration:none;">' . "\n";
 			echo '<span class="dashicons dashicons-dismiss" title="' . esc_attr( __( 'Dismiss this Notice', 'radio-station' ) ) . '"></span></a>' . "\n";
@@ -1026,8 +1028,10 @@ function radio_station_notice() {
 		echo '</ul>' . "\n";
 
 		// --- notice dismissal button ---
+		// 2.5.8: add nonce to dismissal link
 		$dismiss_url = add_query_arg( 'action', 'radio_station_notice_dismiss', admin_url( 'admin-ajax.php' ) );
 		$dismiss_url = add_query_arg( 'notice', $notice['id'], $dismiss_url );
+		$dismiss_url = add_query_arg( 'nonce', wp_create_nonce( 'radio_station_notice' ), $dismiss_url );
 		echo '<div style="position:absolute; top:20px; right: 20px;">' . "\n";
 			echo '<a href="' . esc_url( $dismiss_url ) . '" target="radio-station-notice-iframe" id+style="text-decoration:none;">' . "\n";
 			echo '<span class="dashicons dashicons-dismiss" title="' . esc_attr( __( 'Dismiss this Notice', 'radio-station' ) ) . '"></span></a>' . "\n";
@@ -1096,6 +1100,12 @@ function radio_station_get_notices() {
 add_action( 'wp_ajax_radio_station_notice_dismiss', 'radio_station_notice_dismiss' );
 function radio_station_notice_dismiss() {
 	if ( current_user_can( 'manage_options' ) || current_user_can( 'update_plugins' ) ) {
+
+		// 2.5.8: added extra nonce check
+		if ( !wp_verify_nonce( sanitize_text_field( $_REQUEST['nonce'] ), 'radio_station_notice' ) ) {
+			exit;
+		}
+		
 		if ( isset( $_GET['notice'] ) ) {
 
 			$notice = absint( $_GET['notice'] );
@@ -1586,7 +1596,9 @@ function radio_station_announcement_content( $dismissable = true ) {
 
 	// --- dismiss notice icon ---
 	if ( $dismissable ) {
+		// 2.5.8: added nonce to dismissal URL
 		$dismiss_url = admin_url( 'admin-ajax.php?action=radio_station_announcement_dismiss' );
+		$dismiss_url .= add_query_arg( 'nonce',  wp_create_nonce( 'radio_station_notice' ), $dismiss_url );
 		echo '<div style="position:absolute; top:20px; right: 20px;">' . "\n";
 			echo '<a href="' . esc_url( $dismiss_url ) . '" target="radio-station-notice-iframe" style="text-decoration:none;">' . "\n";
 				echo '<span class="dashicons dashicons-dismiss" title="' . esc_html( __( 'Dismiss this Notice', 'radio-station' ) ) . '"></span>' . "\n";
@@ -1603,8 +1615,15 @@ function radio_station_announcement_content( $dismissable = true ) {
 add_action( 'wp_ajax_radio_station_announcement_dismiss', 'radio_station_announcement_dismiss' );
 function radio_station_announcement_dismiss() {
 	if ( current_user_can( 'manage_options' ) || current_user_can( 'update_plugins' ) ) {
+		
+		// 2.5.8: added extra nonce check
+		if ( !wp_verify_nonce( sanitize_text_field( $_REQUEST['nonce'] ), 'radio_station_notice' ) ) {
+			exit;
+		}
+
 		// --- set option to dismissed ---
 		update_option( 'radio_station_announcement_dismissed', true );
+
 		// --- hide the announcement in parent frame ---
 		echo "<script>parent.document.getElementById('radio-station-announcement-notice').style.display = 'none';</script>" . "\n";
 	}

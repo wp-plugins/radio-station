@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed: Date/time display on Override Archive shortcode
 * Fixed: Show file Disable Download checkbox saving
 * Added: Use automatic Embeds on external Show file URLs
+* Added: Nonce check to notice dismissal AJAX
 * Changed: Removed player state saving iframe
 
 = 2.5.7 =
