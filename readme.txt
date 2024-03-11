@@ -3,7 +3,7 @@ Contributors: tonyzeoli, majick
 Donate link: https://netmix.co/donate
 Tags: dj, music, playlist, radio, shows, scheduling, broadcasting
 Requires at least: 3.3.1
-Tested up to: 6.4.1
+Tested up to: 6.4.2
 Stable tag: 2.5.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -399,6 +399,17 @@ We recommend you test these on a Staging site (or a development copy of your liv
 8. Show Conflict Display
 
 == Changelog ==
+
+= 2.5.8 =
+* Fixed: Template display for themes showing excerpts on singular pages
+* Fixed: Possible next show duplicates current show in Data API
+* Fixed: Save multiple Show related post values
+* Fixed: Count bug on Override Archive shortcode
+* Fixed: Date/time display on Override Archive shortcode
+* Fixed: Show file Disable Download checkbox saving
+* Added: Use automatic Embeds on external Show file URLs
+* Added: Nonce check to notice dismissal AJAX
+* Changed: Removed player state saving iframe
 
 = 2.5.7 =
 * Updated: Freemius SDK (2.6.0)

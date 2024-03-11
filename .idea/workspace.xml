@@ -95,6 +95,8 @@
       <workItem from="1688690653745" duration="649000" />
       <workItem from="1698024376947" duration="36380000" />
       <workItem from="1698236704567" duration="11485000" />
+      <workItem from="1706222020050" duration="9000" />
+      <workItem from="1710154793560" duration="12000" />
     </task>
     <servers />
   </component>
@@ -102,42 +104,10 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="703" y="193" key="#CLI_Interpreters" timestamp="1698032306213">
+    <state x="804" y="362" key="com.intellij.ide.util.TipDialog" timestamp="1710154800792">
       <screen x="257" y="0" width="1663" height="1080" />
     </state>
-    <state x="703" y="193" key="#CLI_Interpreters/257.0.1663.1080@257.0.1663.1080" timestamp="1698032306213" />
-    <state x="754" y="227" key="#Inspections" timestamp="1698035807926">
-      <screen x="257" y="0" width="1663" height="1080" />
-    </state>
-    <state x="754" y="227" key="#Inspections/257.0.1663.1080@257.0.1663.1080" timestamp="1698035807926" />
-    <state x="789" y="192" key="#PHP_CodeSniffer" timestamp="1698033398060">
-      <screen x="257" y="0" width="1663" height="1080" />
-    </state>
-    <state x="789" y="192" key="#PHP_CodeSniffer/257.0.1663.1080@257.0.1663.1080" timestamp="1698033398060" />
-    <state x="878" y="397" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1698236948303">
-      <screen x="257" y="0" width="1663" height="1080" />
-    </state>
-    <state x="878" y="397" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/257.0.1663.1080@257.0.1663.1080" timestamp="1698236948303" />
-    <state x="883" y="422" width="480" height="318" key="ComposerInitDialogKey" timestamp="1698026462284">
-      <screen x="257" y="0" width="1663" height="1080" />
-    </state>
-    <state x="883" y="422" width="480" height="318" key="ComposerInitDialogKey/257.0.1663.1080@257.0.1663.1080" timestamp="1698026462284" />
-    <state x="903" y="293" key="FileChooserDialogImpl" timestamp="1698236929600">
-      <screen x="257" y="0" width="1663" height="1080" />
-    </state>
-    <state x="903" y="293" key="FileChooserDialogImpl/257.0.1663.1080@257.0.1663.1080" timestamp="1698236929600" />
-    <state x="624" y="180" key="SettingsEditor" timestamp="1698236936704">
-      <screen x="257" y="0" width="1663" height="1080" />
-    </state>
-    <state x="624" y="180" key="SettingsEditor/257.0.1663.1080@257.0.1663.1080" timestamp="1698236936704" />
-    <state x="804" y="362" key="com.intellij.ide.util.TipDialog" timestamp="1698236706550">
-      <screen x="257" y="0" width="1663" height="1080" />
-    </state>
-    <state x="804" y="362" key="com.intellij.ide.util.TipDialog/257.0.1663.1080@257.0.1663.1080" timestamp="1698236706550" />
-    <state x="751" y="235" width="672" height="678" key="search.everywhere.popup" timestamp="1698037667903">
-      <screen x="257" y="0" width="1663" height="1080" />
-    </state>
-    <state x="751" y="235" width="672" height="678" key="search.everywhere.popup/257.0.1663.1080@257.0.1663.1080" timestamp="1698037667903" />
+    <state x="804" y="362" key="com.intellij.ide.util.TipDialog/257.0.1663.1080@257.0.1663.1080" timestamp="1710154800792" />
   </component>
   <component name="WordPressConfiguration" enabled="true">
     <wordpressPath>C:\!WP\InstantWP_4.5\iwpserver\htdocs\wordpress</wordpressPath>

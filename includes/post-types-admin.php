@@ -517,12 +517,13 @@ function radio_station_show_info_metabox() {
 
 			// --- disable download switch ---
 			// 2.3.2: added show download disable field
+			// 2.6.6: added missing checkbox item value
 			echo '<li class="show-item">' . "\n";
 				echo '<div class="input-label"><label>' . "\n";
 					echo esc_html( __( 'Disable Download', 'radio-station' ) ) . '?' . "\n";
 				echo '</label></div>' . "\n";
 				echo '<div class="input-field">' . "\n";
-					echo '<input type="checkbox" name="show_download" ' . checked( $download, 'on', false ) . '>' . "\n";
+					echo '<input type="checkbox" name="show_download" ' . checked( $download, 'on', false ) . ' value="on">' . "\n";
 				echo '</div>';
 			echo '</li>' . "\n";
 
@@ -6107,29 +6108,35 @@ function radio_station_playlist_column_data( $column, $post_id ) {
 
 	} elseif ( 'trackcount' == $column ) {
 
-		echo count( $tracks ) . "\n";
+		// 2.5.8: added check that tracks is an array
+		if ( is_array( $tracks ) ) {
+			echo count( $tracks ) . "\n";
+		}
 
 	} elseif ( 'tracklist' == $column ) {
 
-		echo '<a href="javascript:void(0);" onclick="showhidetracklist(\'' . esc_js( $post_id ) . '\')">';
-		echo esc_html( __( 'Show/Hide Tracklist', 'radio-station' ) ) . '</a><br>' . "\n";
-		echo '<div id="tracklist-' . esc_attr( $post_id ) . '" style="display:none;">' . "\n";
-			echo '<table class="tracklist-table" cellpadding="0" cellspacing="0">' . "\n";
-				echo '<tr><td class="tracklist-heading"><b>#</b></td>' . "\n";
-				echo '<td><b>' . esc_html( __( 'Song', 'radio-station' ) ) . '</b></td>' . "\n";
-				echo '<td><b>' . esc_html( __( 'Artist', 'radio-station' ) ) . '</b></td>' . "\n";
-				echo '<td><b>' . esc_html( __( 'Status', 'radio-station' ) ) . '</b></td></tr>' . "\n";
-				foreach ( $tracks as $i => $track ) {
-					echo '<tr><td class="tracklist-count">' . esc_html( $i ) . '</td>' . "\n";
-					echo '<td class="tracklist-song">' . esc_html( $track['playlist_entry_song'] ) . '</td>' . "\n";
-					echo '<td class="tracklist-artist">' . esc_html( $track['playlist_entry_artist'] ) . '</td>' . "\n";
-					$status = $track['playlist_entry_status'];
-					$status = strtoupper( substr( $status, 0, 1 ) ) . substr( $status, 1, strlen( $status ) );
-					echo '</td>' . "\n";
-					echo '<td class="tracklist-status">' . esc_html( $status ) . '</td></tr>' . "\n";
-				}
-			echo '</table>' . "\n";
-		echo '</div>' . "\n";
+		// 2.5.8: added check that tracks is an array
+		if ( is_array( $tracks ) ) {
+			echo '<a href="javascript:void(0);" onclick="showhidetracklist(\'' . esc_js( $post_id ) . '\')">';
+			echo esc_html( __( 'Show/Hide Tracklist', 'radio-station' ) ) . '</a><br>' . "\n";
+			echo '<div id="tracklist-' . esc_attr( $post_id ) . '" style="display:none;">' . "\n";
+				echo '<table class="tracklist-table" cellpadding="0" cellspacing="0">' . "\n";
+					echo '<tr><td class="tracklist-heading"><b>#</b></td>' . "\n";
+					echo '<td><b>' . esc_html( __( 'Song', 'radio-station' ) ) . '</b></td>' . "\n";
+					echo '<td><b>' . esc_html( __( 'Artist', 'radio-station' ) ) . '</b></td>' . "\n";
+					echo '<td><b>' . esc_html( __( 'Status', 'radio-station' ) ) . '</b></td></tr>' . "\n";
+					foreach ( $tracks as $i => $track ) {
+						echo '<tr><td class="tracklist-count">' . esc_html( $i ) . '</td>' . "\n";
+						echo '<td class="tracklist-song">' . esc_html( $track['playlist_entry_song'] ) . '</td>' . "\n";
+						echo '<td class="tracklist-artist">' . esc_html( $track['playlist_entry_artist'] ) . '</td>' . "\n";
+						$status = $track['playlist_entry_status'];
+						$status = strtoupper( substr( $status, 0, 1 ) ) . substr( $status, 1, strlen( $status ) );
+						echo '</td>' . "\n";
+						echo '<td class="tracklist-status">' . esc_html( $status ) . '</td></tr>' . "\n";
+					}
+				echo '</table>' . "\n";
+			echo '</div>' . "\n";
+		}
 
 	}
 }
@@ -6478,7 +6485,8 @@ function radio_station_post_save_data( $post_id ) {
 		// --- get the related show ID ---
 		$changed = false;
 		$current_shows = get_post_meta( $post_id, $metakey, true );
-		$show_ids = sanitize_text_field( $_POST[$metakey] );
+		// 2.5.8: fix to use array_map on multiselect field
+		$show_ids = array_map( 'absint', $_POST[$metakey] );
 
 		// 2.3.3.6: maybe add existing (uneditable) Show IDs
 		$new_show_ids = array();
@@ -6795,12 +6803,13 @@ function radio_station_posts_bulk_edit_handler( $redirect_to, $action, $post_ids
 
 	if ( 'related_show' !== $action ) {
 		return $redirect_to;
-	} elseif ( !isset($_REQUEST['post_showblog_id'] ) || ( '' == $_REQUEST['post_showblog_id'] ) ) {
+	} elseif ( !isset( $_REQUEST['post_showblog_id'] ) || ( '' == $_REQUEST['post_showblog_id'] ) ) {
 		return $redirect_to;
 	}
 
 	// 2.5.0: added sanitize_text_field to request value
-	$show_ids = sanitize_text_field( $_REQUEST['post_showblog_id'] );
+	// 2.5.8: fix to use array_map on multiselect field
+	$show_ids = array_map( 'absint', $_REQUEST['post_showblog_id'] );
 
 	// 2.3.3.6: check that user can edit specified Shows
 	$posted_show_ids = array();
