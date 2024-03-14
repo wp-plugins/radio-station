@@ -406,9 +406,20 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array(), $att
 	}
 
 	// --- get posts from post IDs ---
-	$post_id_list = implode( ',', $post_ids );
-	$query = "SELECT " . $columns . " FROM " . $wpdb->prefix . "posts";
-	$query .= " WHERE ID IN(" . $post_id_list . ") AND post_status = 'publish'";
+	// 2.5.9: create decimal placeholder list and values array for wpdb prepare
+	$id_list_string = '';
+	$values = array();
+	foreach ( $post_ids as $i => $post_id ) {
+		$id_list_string .= '%d';
+		if ( ( $i + 1 ) != count( $post_ids ) ) {
+			$id_list_string .= ',';
+		}
+		$values[] = $post_id;
+	}
+	// $post_id_list = implode( ',', $post_ids );
+	// $query = "SELECT " . $columns . " FROM " . $wpdb->prefix . "posts WHERE ID IN(" . $post_id_list . ") AND post_status = 'publish'";
+	$query = "SELECT " . $columns . " FROM " . $wpdb->prefix . "posts WHERE ID IN(" . $id_list_string . ") AND post_status = 'publish'";
+	
 	// 2.5.6: allow for alternative ordering attributes
 	if ( !isset( $atts['orderby'] ) || ( 'date' == strtolower( $atts['orderby'] ) ) ) {
 		$query .= " ORDER BY post_date";
@@ -425,9 +436,13 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array(), $att
 	// 2.5.6: add filter to allow for modification of query
 	$query = apply_filters( 'radio_station_show_' . $datatype . '_query', $query, $show_id, $args, $atts );
 	if ( $args['limit'] ) {
-		$query .= $wpdb->prepare( " LIMIT %d", $args['limit'] );
+		$query .= " LIMIT %d";
+		$values[] = $args['limit'];
 	}
-	$results = $wpdb->get_results( $query, ARRAY_A );
+	
+	// 2.5.9: use wpdb prepare with post ID list placeholder string
+	// $results = $wpdb->get_results( $query, ARRAY_A );
+	$results = $wpdb->get_results( $wpdb->prepare( $query, $values ), ARRAY_A );
 	$results = apply_filters( 'radio_station_show_' . $datatype, $results, $show_id, $args, $atts );
 
 	if ( RADIO_STATION_DEBUG ) {

@@ -276,7 +276,7 @@ if ( $show_file ) {
 	remove_filter( 'embed_maybe_make_link', '__return_false' );
 
 	$embedded = false;
-	if ( $player_embed ) {
+	if ( $player_embed && !stristr( $player_embed, '[audio' ) ) {
 		$embedded = true;
 	} else {
 		$shortcode = '[audio src="' . $show_file . '" preload="metadata"]';
