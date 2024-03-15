@@ -622,11 +622,10 @@ function radio_station_playlist_export_page() {
 		$end .= ' 23:59:59';
 
 		// fetch all records that were created between the start and end dates
-		$sql = "SELECT ID,post_date FROM " . $wpdb->posts . " WHERE post_type = '" . RADIO_STATION_PLAYLIST_SLUG;
-		$sql .= " AND post_status = 'publish' AND TO_DAYS(post_date) >= TO_DAYS(%s) AND TO_DAYS(post_date) <= TO_DAYS(%s) ORDER BY post_date ASC";
+		$sql = "SELECT ID,post_date FROM " . $wpdb->posts . " WHERE post_type = %s AND post_status = 'publish' AND TO_DAYS(post_date) >= TO_DAYS(%s) AND TO_DAYS(post_date) <= TO_DAYS(%s) ORDER BY post_date ASC";
 
 		// prepare query before executing
-		$playlists = $wpdb->get_results( $wpdb->prepare( $sql, array( $start, $end ) ) );
+		$playlists = $wpdb->get_results( $wpdb->prepare( $sql, array( RADIO_STATION_PLAYLIST_SLUG, $start, $end ) ) );
 
 		if ( !$playlists ) {
 			// 2.5.6: output translated and escaped message

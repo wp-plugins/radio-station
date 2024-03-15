@@ -335,9 +335,9 @@ function radio_station_get_show_data( $datatype, $show_id, $args = array(), $att
 		// $query = $wpdb->prepare( $query, $metakey );
 		// $query .= "AND meta_value LIKE '%i:" . $show_id . "%'";
 		// 2.5.6: then use wpdb prepare method for LIKE statement
-		$query = "SELECT post_id,meta_value FROM " . $wpdb->prefix . "postmeta WHERE meta_key = %s AND meta_value LIKE %s";
-		$query = $wpdb->prepare( $query, array( $metakey, "%i:" . $show_id . "%" ) );
-		$results = $wpdb->get_results( $query, ARRAY_A );
+		// 2.5.9: improve LIKE statement code with prepare method
+		$query = "SELECT post_id,meta_value FROM " . $wpdb->prefix . "postmeta WHERE meta_key = %s AND meta_value LIKE '%%%s%%'";
+		$results = $wpdb->get_results( $wpdb->prepare( $query, array( $metakey, 'i:' . $wpdb->esc_like( $show_id ) ) ), ARRAY_A );
 		if ( RADIO_STATION_DEBUG ) {
 			echo '<span style="display:none;">Related Query: ' . esc_html( $query ) . '</span>';
 			echo '<span style="display:none;">Related Results: ' . esc_html( print_r( $results, true ) ) . '</span>';
@@ -1557,6 +1557,16 @@ function radio_station_get_host_url( $host_id ) {
 	return $host_url;
 }
 
+// ------------------------------
+// Get DJ / Host Profile Edit URL
+// ------------------------------
+// 2.5.9: added get host edit URL function
+function radio_station_get_host_edit_url( $host_id ) {
+	$host_edit_url = add_query_arg( 'user_id', $host_id, admin_url( 'user-edit.php' ) );
+	$host_edit_url = apply_filters( 'radio_station_host_edit_url', $host_edit_url, $host_id );
+	return $host_edit_url;
+}
+
 // ------------------------
 // Get Producer Profile URL
 // ------------------------
@@ -1566,6 +1576,16 @@ function radio_station_get_producer_url( $producer_id ) {
 	$producer_url = get_author_posts_url( $producer_id );
 	$producer_url = apply_filters( 'radio_station_producer_url', $producer_url, $producer_id );
 	return $producer_url;
+}
+
+// -----------------------------
+// Get Producer Profile Edit URL
+// -----------------------------
+// 2.5.9: added get producer edit URL function
+function radio_station_get_producer_edit_url( $producer_id ) {
+	$producer_edit_url = add_query_arg( 'user_id', $producer_id, admin_url( 'user-edit.php' ) );
+	$producer_edit_url = apply_filters( 'radio_station_producer_edit_url', $producer_edit_url, $producer_id );
+	return $producer_edit_url;
 }
 
 // ---------------

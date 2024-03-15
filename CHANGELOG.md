@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 = 2.5.9 =
 * Fixed: Missing use of prepare method on some database queries
+* Added: Vulnerability disclosure program link to FAQ
+* Added: Edit Host/Producer link to admin Show List column
 
 = 2.5.8 =
 * Fixed: Template display for themes showing excerpts on singular pages

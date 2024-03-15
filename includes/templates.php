@@ -1195,19 +1195,19 @@ function radio_station_get_show_post_link( $output, $format, $link, $adjacent_po
 		// 2.3.3.9: added 'i:' prefix to LIKE value matches
 		// 2.5.9: use wpdb prepare with LIKE statements
 		global $wpdb;
-		$likes = array( $wpdb->esc_like( 'i:' . $related_shows[0] ) );
+		$likes = array( 'i:' . $wpdb->esc_like(  $related_shows[0] ) );
 		$query = "SELECT post_id,meta_value FROM " . $wpdb->prefix . "postmeta WHERE meta_key = 'post_showblog_id' AND meta_value LIKE '%%%s%%'";
 		if ( count( $related_shows ) > 1 ) {
 			// 2.5.0: fix to loop related_shows (plural)
 			foreach ( $related_shows as $i => $show_id ) {
 				if ( $i > 0 ) {
-					$likes[] = $wpdb->esc_like( 'i:' . $show_id );
+					$likes[] = 'i:' . $wpdb->esc_like(  $show_id );
 					$query .= " OR meta_key = 'post_showblog_id' AND meta_value LIKE '%%%s%%'";
 				}
 			}
 		}
 		// 2.5.9: fix to use prepare with multiple LIKE strings
-		$results = $wpdb->get_results( $query, ARRAY_A );
+		// $results = $wpdb->get_results( $query, ARRAY_A );
 		$results = $wpdb->get_results( $wpdb->prepare( $query, $likes ), ARRAY_A );
 		
 		if ( RADIO_STATION_DEBUG ) {
