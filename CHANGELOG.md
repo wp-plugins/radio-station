@@ -7,6 +7,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+= 2.5.9 =
+* Fixed: Missing use of prepare method on some database queries
+* Added: Vulnerability disclosure program link to FAQ
+* Added: Edit Host/Producer link to admin Show List column
+
 = 2.5.8 =
 * Fixed: Template display for themes showing excerpts on singular pages
 * Fixed: Possible next show duplicates current show in Data API

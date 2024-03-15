@@ -4,7 +4,7 @@ Donate link: https://netmix.co/donate
 Tags: radio station, radio shows, radio station schedule, radio broadcasting, streaming radio player
 Requires at least: 3.3.1
 Tested up to: 6.4.3
-Stable tag: 2.5.8
+Stable tag: 2.5.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -403,6 +403,12 @@ We recommend you test these on a Staging site (or a development copy of your liv
 8. Show Conflict Display
 
 == Changelog ==
+
+= 2.5.9 =
+* Fixed: Missing use of prepare method on some database queries
+* Fixed: Show time conversion on Data API (for current_show/next_show)
+* Added: Vulnerability disclosure program link to FAQ
+* Added: Edit Host/Producer link to admin Show List column
 
 = 2.5.8 =
 * Fixed: Template display for themes showing excerpts on singular pages

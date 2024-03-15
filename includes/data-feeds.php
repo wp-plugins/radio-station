@@ -1511,11 +1511,12 @@ function radio_station_feed_item_node_producers() {
 function radio_station_convert_show_shift( $shift ) {
 
 	// 2.5.6: use radio_station_get_time instead of date
+	// 2.5.9: revert back to date to prevent incorrect timezone conversions
 	if ( isset( $shift['start'] ) ) {
-		$shift['start'] = radio_station_get_time( 'H:i', strtotime( $shift['start'] ) );
+		$shift['start'] = date( 'H:i', strtotime( $shift['start'] ) );
 	}
 	if ( isset( $shift['end'] ) ) {
-		$shift['end'] = radio_station_get_time( 'H:i', strtotime( $shift['end'] ) );
+		$shift['end'] = date( 'H:i', strtotime( $shift['end'] ) );
 	}
 	return $shift;
 }

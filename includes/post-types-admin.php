@@ -2816,7 +2816,16 @@ function radio_station_show_column_data( $column, $post_id ) {
 			if ( is_array( $hosts ) && ( count( $hosts ) > 0 ) ) {
 				foreach ( $hosts as $host ) {
 					$user_info = get_userdata( $host );
-					echo esc_html( $user_info->display_name ) . '<br>' . "\n";
+					// 2.5.9: add link to host edit URL
+					$host_edit_url = radio_station_get_host_edit_url( $host );
+					if ( $host_edit_url ) {
+						echo '<a href="' . esc_url( $host_edit_url ) . '">';
+					}				
+					echo esc_html( $user_info->display_name );
+					if ( $host_edit_url ) {
+						echo '</a>';
+					}
+					echo '<br>' . "\n";
 				}
 			}
 		}
@@ -2833,7 +2842,16 @@ function radio_station_show_column_data( $column, $post_id ) {
 			if ( is_array( $producers ) && ( count( $producers ) > 0 ) ) {
 				foreach ( $producers as $producer ) {
 					$user_info = get_userdata( $producer );
-					echo esc_html( $user_info->display_name ) . '<br>' . "\n";
+					// 2.5.9: add link to host edit URL
+					$producer_edit_url = radio_station_get_producer_edit_url( $producer );
+					if ( $producer_edit_url ) {
+						echo '<a href="' . esc_url( $producer_edit_url ) . '">';
+					}	
+					echo esc_html( $user_info->display_name );
+					if ( $producer_edit_url ) {
+						echo '<a>';
+					}
+					echo '<br>' . "\n";
 				}
 			}
 		}
@@ -5069,8 +5087,9 @@ function radio_station_override_date_filter( $post_type, $which ) {
 
 	// --- get all show override months / years ---
 	global $wpdb;
-	$overridequery = "SELECT ID FROM " . $wpdb->posts . " WHERE post_type = '" . RADIO_STATION_OVERRIDE_SLUG . "'";
-	$results = $wpdb->get_results( $overridequery, ARRAY_A );
+	// 2.5.9: use wpdb prepare on query
+	$overridequery = "SELECT ID FROM " . $wpdb->prefix . "posts WHERE post_type = %s";
+	$results = $wpdb->get_results( $wpdb->prepare( $overridequery, RADIO_STATION_OVERRIDE_SLUG ), ARRAY_A );
 	$months = array();
 	if ( $results && is_array( $results ) && ( count( $results ) > 0 ) ) {
 		foreach ( $results as $result ) {
