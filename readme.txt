@@ -404,6 +404,9 @@ We recommend you test these on a Staging site (or a development copy of your liv
 
 == Changelog ==
 
+= 2.5.10 =
+* Fixed: Dynamic reloading without needing countdown display
+
 = 2.5.9 =
 * Fixed: Missing use of prepare method on some database queries
 * Fixed: Show time conversion on Data API (for current_show/next_show)
